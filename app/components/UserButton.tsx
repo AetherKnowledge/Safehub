@@ -53,7 +53,7 @@ const AuthenticatedUserButton = (session: Session) => {
 
         <ul
           tabIndex={0}
-          className="absolute right-0 mt-2 w-52 menu dropdown-content bg-base-200 rounded-md z-10 p-2 shadow"
+          className="absolute right-0 mt-2 w-52 menu dropdown-content bg-base-100 text-base-content rounded-md z-10 p-2 shadow-br"
         >
           <li>
             <a>Item 1</a>

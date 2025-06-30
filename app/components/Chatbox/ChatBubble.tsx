@@ -29,7 +29,7 @@ const ChatBubble = ({ src, type, name, message, createdAt }: Props) => {
         </time>
         {type === "human" && name}
       </div>
-      <div className="chat-bubble prose">
+      <div className="chat-bubble prose max-w-[800px]">
         <ReactMarkdown>{message}</ReactMarkdown>
       </div>
       <div className="chat-footer opacity-50 text-base-content">Delivered</div>

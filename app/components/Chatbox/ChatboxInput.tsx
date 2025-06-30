@@ -16,11 +16,12 @@ const ChatboxInput = ({ onSend }: Props) => {
     if (!message.trim()) return;
 
     setLoading(true);
-    await sendMessage(message);
+    const sendingMessage = sendMessage(message);
+    setMessage("");
+
+    await sendingMessage;
     onSend?.();
     setLoading(false);
-
-    setMessage("");
   };
 
   return (
@@ -29,6 +30,7 @@ const ChatboxInput = ({ onSend }: Props) => {
         <input
           type="text"
           placeholder="Type a message..."
+          value={message}
           onChange={(e) => setMessage(e.target.value)}
           className="input input-bordered flex-1 focus:outline-none focus:ring-0"
         />

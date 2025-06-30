@@ -1,5 +1,4 @@
 "use client";
-import { on } from "events";
 import React from "react";
 import { useState } from "react";
 
@@ -25,7 +24,7 @@ const ChatboxInput = ({ onSend }: Props) => {
   };
 
   return (
-    <div className="border-t border-base-300 p-4 bg-base-200 rounded-b-2xl ">
+    <div className="border-t border-base-300 p-4 rounded-b-2xl text-base-content bg-base-100">
       <form onSubmit={handleSubmit} className="flex items-center gap-2">
         <input
           type="text"

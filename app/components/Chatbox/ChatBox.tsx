@@ -53,7 +53,7 @@ export function ChatBox() {
   };
 
   return (
-    <div className="flex flex-col h-[800px] bg-base-200 rounded-2xl shadow-br">
+    <div className="flex flex-col h-[70vh]">
       {/* Scrollable chat history */}
       <div className="flex-1 overflow-y-auto p-5" ref={chatContainerRef}>
         {renderChatHistory(loading, chatHistory, userImage)}

@@ -22,11 +22,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${manrope.variable} antialiased`}>
-        <AuthProvider>
-          <Navbar />
-        </AuthProvider>
+        <div className="flex flex-col min-h-screen">
+          <AuthProvider>
+            <Navbar />
+          </AuthProvider>
 
-        <main>{children}</main>
+          {/* Let children take up remaining space */}
+          <main className="">{children}</main>
+        </div>
       </body>
     </html>
   );

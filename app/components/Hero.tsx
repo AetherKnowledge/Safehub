@@ -2,7 +2,7 @@ import lcupBg from "@/public/images/lcupBg.png";
 
 const Hero = () => {
   return (
-    <div className="relative hero min-h-screen bg-base-100 overflow-hidden">
+    <div className="hero min-h-screen bg-base-100 overflow-hidden">
       {/* Background image layer */}
       <div
         className="absolute inset-0 bg-cover bg-center z-0"

@@ -4,7 +4,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/prisma/client";
 
 export async function POST(request: NextRequest) {
-  console.log("Received request to /api/user/sendmessage", request);
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.email) {

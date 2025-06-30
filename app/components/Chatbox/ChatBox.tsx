@@ -1,49 +1,97 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getServerSession } from "next-auth";
-import React, { ReactNode } from "react";
+"use client";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import ChatBubble from "./ChatBubble";
-import { prisma } from "@/prisma/client";
-import { chathistory, User } from "@/app/generated/prisma";
+import { chathistory } from "@/app/generated/prisma";
+import ChatboxInput from "./ChatboxInput";
+import { getSession } from "next-auth/react";
 
 interface Message {
   type: "human" | "ai";
   content: string;
 }
 
-const ChatBox = async () => {
-  const session = await getServerSession(authOptions);
-  const chatHistory = await prisma.chathistory.findMany({
-    where: {
-      session_id: session?.user?.email || "",
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
-  });
+export function ChatBox() {
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [chatHistory, setChatHistory] = useState<chathistory[]>([]);
+  const [userImage, setUserImage] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
 
-  const user = await prisma.user.findUnique({
-    where: { email: session?.user?.email || "" },
-  });
-  if (!user) return <div>User not found</div>;
+  useEffect(() => {
+    const loadData = async () => {
+      const session = await getSession();
+      setUserImage(session?.user?.image || undefined);
+
+      await refreshChat();
+    };
+
+    loadData();
+  }, []);
+
+  const refreshChat = async () => {
+    const res = await fetch("/api/user/history");
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("Failed to fetch chat history:", data);
+      setLoading(false);
+      return;
+    }
+
+    setChatHistory(data);
+    setTimeout(scrollToBottom, 50);
+    setLoading(false);
+  };
+
+  const scrollToBottom = () => {
+    const container = chatContainerRef.current;
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  };
 
   return (
-    <div className="p-5 bg-base-200 rounded-2xl shadow-md">
-      {chatHistory.map((chat) => makeChatBubble(chat, user))}
+    <div className="flex flex-col h-[800px] bg-base-200 rounded-2xl shadow-br">
+      {/* Scrollable chat history */}
+      <div className="flex-1 overflow-y-auto p-5" ref={chatContainerRef}>
+        {renderChatHistory(loading, chatHistory, userImage)}
+      </div>
+
+      {/* Fixed input bar */}
+      <ChatboxInput onSend={refreshChat} />
     </div>
   );
-};
+}
 
-function makeChatBubble(chat: chathistory, user: User): ReactNode {
-  if (!isMessage(chat.message)) {
-    return null;
+function renderChatHistory(
+  loading: boolean,
+  chatHistory: chathistory[],
+  userImage?: string
+): ReactNode {
+  if (loading) {
+    return <p>Loading chat...</p>;
   }
+
+  if (!chatHistory || chatHistory.length === 0) {
+    return (
+      <p className="text-center text-gray-500">No chat history available.</p>
+    );
+  }
+
+  return chatHistory.map((chat) => makeChatBubble(chat, userImage));
+}
+
+function makeChatBubble(chat: chathistory, imageUrl?: string): ReactNode {
+  if (!isMessage(chat.message)) return null;
 
   const message: Message = chat.message;
   return (
     <ChatBubble
       key={chat.id}
       type={message.type}
-      src={user.image || undefined}
+      src={imageUrl}
       message={message.content}
       createdAt={chat.createdAt}
     />
@@ -52,11 +100,12 @@ function makeChatBubble(chat: chathistory, user: User): ReactNode {
 
 function isMessage(value: unknown): value is Message {
   return (
-    (typeof value === "object" &&
-      value !== null &&
-      "type" in value &&
-      (value as any).type === "human") ||
-    ((value as any).type === "ai" && typeof (value as any).content === "string")
+    typeof value === "object" &&
+    value !== null &&
+    "type" in value &&
+    (value as any).type &&
+    (value as any).content &&
+    (value as any).type in { human: 1, ai: 1 }
   );
 }
 

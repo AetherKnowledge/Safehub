@@ -15,8 +15,10 @@ const ChatBubble = ({ src, type, name, message, createdAt }: Props) => {
     name = type === "human" ? "You" : "AI";
   }
 
+  const chatPosition = "chat chat-" + (type === "ai" ? "start" : "end");
+
   return (
-    <div className={"chat chat-" + (type === "ai" ? "start" : "end")}>
+    <div className={chatPosition}>
       <div className="chat-image avatar">
         <div className="w-10 rounded-full">{image(type, name, src)}</div>
       </div>
@@ -75,6 +77,7 @@ function image(type: string, name?: string, src?: string): ReactNode {
 
 export function formatDatetime(date: Date): string {
   // const date = new Date(datetimeStr + " UTC");
+  date = new Date(date);
 
   const now = new Date();
   const currentYear = now.getFullYear();

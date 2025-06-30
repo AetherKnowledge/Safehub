@@ -62,6 +62,6 @@ model chathistory {
   id         Int      @id @default(autoincrement())
   session_id String   @db.VarChar(255)
   message    Json
-  user       User     @relation(fields: [session_id], references: [email], onDelete: Cascade)
+  user       User     @relation(fields: [session_id], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
 }

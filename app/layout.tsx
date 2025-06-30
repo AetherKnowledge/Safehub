@@ -28,7 +28,7 @@ export default function RootLayout({
           </AuthProvider>
 
           {/* Let children take up remaining space */}
-          <main className="">{children}</main>
+          <main>{children}</main>
         </div>
       </body>
     </html>

@@ -33,17 +33,19 @@ const ChatboxInput = ({ onSend }: Props) => {
           onChange={(e) => setMessage(e.target.value)}
           className="input input-bordered flex-1 focus:outline-none focus:ring-0"
         />
-        {loading ? (
-          <div className="loading loading-spinner loading-md"></div>
-        ) : (
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={!message.trim()}
-          >
-            Send
-          </button>
-        )}
+        <div className="flex items-center justify-center w-20">
+          {loading ? (
+            <div className="loading loading-spinner loading-md"></div>
+          ) : (
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={!message.trim()}
+            >
+              Send
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );

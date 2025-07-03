@@ -13,6 +13,7 @@
     "@prisma/client": "^6.11.0",
     "@tailwindcss/typography": "^0.5.16",
     "bcrypt": "^6.0.0",
+    "cally": "^0.8.0",
     "motion": "^12.20.1",
     "next": "15.3.4",
     "next-auth": "^4.24.11",

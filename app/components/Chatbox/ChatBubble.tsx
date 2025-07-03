@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 
@@ -15,7 +15,14 @@ const ChatBubble = ({ src, type, name, message, createdAt }: Props) => {
     name = type === "human" ? "You" : "AI";
   }
 
-  const chatPosition = "chat chat-" + (type === "ai" ? "start" : "end");
+  const defaultPosition = "chat chat-" + (type === "ai" ? "start" : "end");
+  const [chatPosition, setChatPosition] = useState(defaultPosition);
+
+  const togglePosition = () => {
+    setChatPosition((prev) =>
+      prev.includes("chat-end") ? "chat chat-start" : "chat chat-end"
+    );
+  };
 
   return (
     <div className={chatPosition}>
@@ -32,7 +39,9 @@ const ChatBubble = ({ src, type, name, message, createdAt }: Props) => {
       <div className="chat-bubble prose max-w-[800px]">
         <ReactMarkdown>{message}</ReactMarkdown>
       </div>
-      <div className="chat-footer opacity-50 text-base-content">Delivered</div>
+      <div className="chat-footer opacity-50 text-base-content flex">
+        <span>Delivered</span>
+      </div>
     </div>
   );
 };

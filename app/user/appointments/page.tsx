@@ -1,5 +1,6 @@
 import React from "react";
 import AppointmentTable from "@/app/components/AppointmentTable/AppointmentTable";
+import Link from "next/link";
 
 const AppointmentsPage = () => {
   return (
@@ -9,15 +10,15 @@ const AppointmentsPage = () => {
       </div>
       <div className="divider mt-[-8] pl-3 pr-3" />
       <div className="pl-4">
-        <button className="btn btn-primary p-4 w-50">
+        <Link
+          href="/user/appointments/new"
+          className="btn btn-primary p-4 w-50"
+        >
           Book an Appointment
-        </button>
+        </Link>
       </div>
       <div className="flex flex-col items-center justify-center h-full space-y-4">
         <AppointmentTable />
-        {/* Uncomment the following lines if you want to show a loading state */}
-        {/* <p className="text-base-content">No appointments scheduled yet.</p>
-        <div className="loading loading-spinner loading-lg text-primary"></div> */}
       </div>
     </div>
   );

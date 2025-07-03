@@ -3,6 +3,7 @@ import { Manrope } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import AuthProvider from "./components/AuthProvider";
+import { CalendarMonth, CalendarDate, CalendarRange } from "cally";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -26,7 +27,6 @@ export default function RootLayout({
           <AuthProvider>
             <Navbar />
           </AuthProvider>
-
           {/* Let children take up remaining space */}
           <main>{children}</main>
         </div>

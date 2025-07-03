@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
@@ -11,20 +11,11 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Get the user ID from the email via Prisma
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
-
-  if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
-
   const appointments: Appointment[] = await prisma.appointment.findMany({
     where:
-      user.type === "student"
-        ? { studentId: user.id }
-        : { counselorId: user.id },
+      session.user.type === "student"
+        ? { studentId: session.user.id }
+        : { counselorId: session.user.id },
     orderBy: {
       createdAt: "asc",
     },

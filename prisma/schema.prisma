@@ -8,18 +8,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserType {
+  student
+  counselor
+  admin
+}
+
+enum AppointmentStatus {
+  approved
+  pending
+  completed
+  rejected
+}
+
 model User {
-  id            String        @id @default(cuid())
-  name          String?
-  email         String        @unique
-  emailVerified DateTime?
-  password      String?
-  image         String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-  chatHistories chathistory[]
+  id                    String        @id @default(cuid())
+  name                  String?
+  type                  UserType      @default(student)
+  email                 String        @unique
+  emailVerified         DateTime?
+  password              String?
+  image                 String?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  accounts              Account[]
+  sessions              Session[]
+  chatHistories         chathistory[]
+  studentAppointments   Appointment[] @relation("StudentAppointments")
+  counselorAppointments Appointment[] @relation("CounselorAppointments")
 }
 
 model Account {
@@ -64,4 +80,15 @@ model chathistory {
   message    Json
   user       User     @relation(fields: [session_id], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
+}
+
+model Appointment {
+  id          Int               @id @default(autoincrement())
+  studentId   String
+  counselorId String
+  status      AppointmentStatus @default(pending)
+  schedule    DateTime
+  createdAt   DateTime          @default(now())
+  student     User              @relation("StudentAppointments", fields: [studentId], references: [id], onDelete: Cascade)
+  counselor   User              @relation("CounselorAppointments", fields: [counselorId], references: [id], onDelete: Cascade)
 }

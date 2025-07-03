@@ -15,7 +15,7 @@ const Navbar = () => {
       </div>
       <div className="navbar-center pl-10">
         <div className="flex items-center space-x-15">
-          <NavbarButton href="/user/dashboard">Dashboard</NavbarButton>
+          <NavbarButton href="/user">Dashboard</NavbarButton>
           <NavbarButton href="/">Home</NavbarButton>
           <NavbarButton href="/about">About</NavbarButton>
           <NavbarButton href="/booking">Booking</NavbarButton>

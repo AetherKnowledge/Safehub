@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/prisma/client";
 import bcrypt from "bcrypt";
+import { User } from "@/app/generated/prisma";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -41,6 +42,16 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
+  },
+  callbacks: {
+    async session({ session }) {
+      const user = await prisma.user.findUnique({
+        where: { email: session.user.email! },
+      });
+      session.user.id = user?.id;
+      session.user.type = user?.type;
+      return session;
+    },
   },
 };
 

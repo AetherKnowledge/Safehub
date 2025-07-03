@@ -53,7 +53,7 @@ export function ChatBox() {
   };
 
   return (
-    <div className="flex flex-col h-[82vh]">
+    <>
       {/* Scrollable chat history */}
       <div className="flex-1 overflow-y-auto p-5" ref={chatContainerRef}>
         {renderChatHistory(loading, chatHistory, userImage)}
@@ -61,7 +61,7 @@ export function ChatBox() {
 
       {/* Fixed input bar */}
       <ChatboxInput onSend={refreshChat} />
-    </div>
+    </>
   );
 }
 
@@ -71,7 +71,12 @@ function renderChatHistory(
   userImage?: string
 ): ReactNode {
   if (loading) {
-    return <p>Loading chat...</p>;
+    return (
+      <div className="flex flex-col items-center justify-center h-full space-y-4">
+        <div className="loading loading-spinner loading-lg text-primary"></div>
+        <p className="text-base-content">Loading chat...</p>
+      </div>
+    );
   }
 
   if (!chatHistory || chatHistory.length === 0) {

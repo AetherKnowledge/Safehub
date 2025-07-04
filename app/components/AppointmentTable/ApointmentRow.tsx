@@ -8,9 +8,10 @@ import Image from "next/image";
 
 interface Props {
   appointment: AppointmentData;
+  onCancel?: (appointmentId: string) => void;
 }
 
-const ApointmentRow = ({ appointment }: Props) => {
+const ApointmentRow = ({ appointment, onCancel }: Props) => {
   const user = useSession();
 
   const DateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -30,12 +31,12 @@ const ApointmentRow = ({ appointment }: Props) => {
 
   const tableName =
     user.data?.user.type === UserType.student
-      ? appointment.counselor.name
-      : appointment.student.name;
+      ? appointment.counselor.user.name
+      : appointment.student.user.name;
   const tableImage =
     user.data?.user.type === UserType.student
-      ? appointment.counselor.image
-      : appointment.student.image;
+      ? appointment.counselor.user.image
+      : appointment.student.user.image;
 
   return (
     <tr>
@@ -90,7 +91,12 @@ const ApointmentRow = ({ appointment }: Props) => {
         </div>
       </td>
       <th>
-        <button className="btn btn-outline btn-sm">Cancel</button>
+        <button
+          className="btn btn-outline btn-sm"
+          onClick={onCancel && (() => onCancel(appointment.id))}
+        >
+          Cancel
+        </button>
       </th>
     </tr>
   );

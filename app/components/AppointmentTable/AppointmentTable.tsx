@@ -10,17 +10,25 @@ export interface AppointmentData {
   id: string;
   studentId: string;
   counselorId: string;
-  schedule: Date;
   status: AppointmentStatus;
+  schedule: string;
+  createdAt: string;
+  concerns: string[];
   student: {
-    id: string;
-    name: string;
-    image: string;
+    studentId: string;
+    user: {
+      name: string;
+      email: string;
+      image: string;
+    };
   };
   counselor: {
-    id: string;
-    name: string;
-    image: string;
+    counselorId: string;
+    user: {
+      name: string;
+      email: string;
+      image: string;
+    };
   };
 }
 
@@ -46,62 +54,74 @@ const AppointmentTable = () => {
       return;
     }
 
+    console.log(data);
     setAppointments(data);
     setLoading(false);
   };
 
+  const handleCancel = async (appointmentId: string) => {
+    setLoading(true);
+    const res = await fetch("/api/user/appointments", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ appointmentId }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error("Failed to cancel appointment:", errorData);
+      return;
+    }
+
+    // setAppointments((prev) =>
+    //   prev.filter((appointment) => appointment.id !== appointmentId)
+    // );
+    refreshTable();
+  };
+
   return (
     <div className="w-full flex-1 overflow-y-auto p-5">
-      {renderAppointmentsTable(loading, appointments)}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center h-full space-y-4">
+          <div className="loading loading-spinner loading-lg text-primary"></div>
+          <p className="text-base-content">Loading appointments...</p>
+        </div>
+      ) : !appointments || appointments.length === 0 ? (
+        <p className="text-center text-gray-500">No appointments available.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="table">
+            {/* head */}
+            <thead className="text-center text-base-content">
+              <tr>
+                <th>Counselor</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th className="text-green-500">Confirmed</th>
+                <th className="text-yellow-500">Pending</th>
+                <th className="text-blue-500">Done</th>
+                <th></th>
+              </tr>
+              <tr></tr>
+            </thead>
+            <tbody className="text-base-content text-center">
+              <AuthProvider>
+                {appointments.map((appointment) => (
+                  <AppointmentRow
+                    key={appointment.id}
+                    appointment={appointment}
+                    onCancel={handleCancel}
+                  />
+                ))}
+              </AuthProvider>
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
-
-function renderAppointmentsTable(
-  loading: boolean,
-  appointments: AppointmentData[]
-): ReactNode {
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full space-y-4">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
-        <p className="text-base-content">Loading appointments...</p>
-      </div>
-    );
-  }
-
-  if (!appointments || appointments.length === 0) {
-    return (
-      <p className="text-center text-gray-500">No appointments available.</p>
-    );
-  }
-
-  return (
-    <div className="overflow-x-auto">
-      <table className="table">
-        {/* head */}
-        <thead className="text-center text-base-content">
-          <tr>
-            <th>Counselor</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th className="text-green-500">Confirmed</th>
-            <th className="text-yellow-500">Pending</th>
-            <th className="text-blue-500">Done</th>
-            <th></th>
-          </tr>
-          <tr></tr>
-        </thead>
-        <tbody className="text-base-content text-center">
-          <AuthProvider>
-            {appointments.map((appointment) => (
-              <AppointmentRow key={appointment.id} appointment={appointment} />
-            ))}
-          </AuthProvider>
-        </tbody>
-      </table>
-    </div>
-  );
-}
 
 export default AppointmentTable;

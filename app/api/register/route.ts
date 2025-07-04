@@ -1,0 +1,55 @@
+import { NextResponse, NextRequest } from "next/server";
+import { prisma } from "@/prisma/client";
+import { z } from "zod";
+import bcrypt from "bcrypt";
+
+const registerSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  password: z.string(),
+});
+
+export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const validation = registerSchema.safeParse(body);
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: validation.error.errors.map((e) => e.message).join(", ") },
+      { status: 400 }
+    );
+  }
+  const { name, email, password } = validation.data;
+  try {
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "User with this email already exists" },
+        { status: 409 }
+      );
+    }
+
+    // Create new user
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+      },
+    });
+
+    return NextResponse.json(
+      { message: "User registered successfully", user: newUser },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Registration error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

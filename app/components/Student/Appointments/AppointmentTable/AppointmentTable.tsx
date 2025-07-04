@@ -4,7 +4,7 @@ import AppointmentRow from "./ApointmentRow";
 import { useEffect, useState } from "react";
 import { Appointment, AppointmentStatus } from "@/app/generated/prisma";
 import { ReactNode } from "react";
-import AuthProvider from "../AuthProvider";
+import AuthProvider from "../../../../components/AuthProvider";
 
 export interface AppointmentData {
   id: string;

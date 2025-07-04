@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/prisma/client";
 import bcrypt from "bcrypt";
+import { UserType } from "@/app/generated/prisma";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -50,6 +51,21 @@ export const authOptions: NextAuthOptions = {
       session.user.id = user?.id;
       session.user.type = user?.type;
       return session;
+    },
+  },
+  events: {
+    async createUser({ user }) {
+      const newUser = await prisma.user.findUnique({
+        where: { email: user.email || "" },
+      });
+
+      if (!newUser) return;
+
+      await prisma.student.create({
+        data: {
+          studentId: newUser.id,
+        },
+      });
     },
   },
 };

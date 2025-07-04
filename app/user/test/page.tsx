@@ -1,5 +1,5 @@
 import React from "react";
-import TimePicker from "../../components/Date/TimePicker";
+import TimePicker from "../../components/Booking/TimePicker";
 
 const Test = () => {
   return <TimePicker />;

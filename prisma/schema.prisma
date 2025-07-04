@@ -21,21 +21,60 @@ enum AppointmentStatus {
   rejected
 }
 
+enum Days {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}
+
 model User {
-  id                    String        @id @default(cuid())
-  name                  String?
-  type                  UserType      @default(student)
-  email                 String        @unique
-  emailVerified         DateTime?
-  password              String?
-  image                 String?
-  createdAt             DateTime      @default(now())
-  updatedAt             DateTime      @updatedAt
-  accounts              Account[]
-  sessions              Session[]
-  chatHistories         chathistory[]
-  studentAppointments   Appointment[] @relation("StudentAppointments")
-  counselorAppointments Appointment[] @relation("CounselorAppointments")
+  id            String        @id @default(cuid())
+  name          String?
+  type          UserType      @default(student)
+  email         String        @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  chatHistory   chathistory[]
+  Student       Student?
+  Counselor     Counselor?
+  Admin         Admin?
+}
+
+model Student {
+  studentId    String        @id
+  user         User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+}
+
+model Counselor {
+  counselorId    String          @id
+  user           User            @relation(fields: [counselorId], references: [id], onDelete: Cascade)
+  appointments   Appointment[]
+  available      Boolean         @default(false)
+  AvailableSlots AvailableSlot[]
+}
+
+model Admin {
+  adminId String @id
+  user    User   @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
+model AvailableSlot {
+  id          String    @id @default(cuid())
+  counselor   Counselor @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)
+  counselorId String
+  day         Days
+  startTime   String // Format: "09:00"
+  endTime     String // Format: "12:00"
 }
 
 model Account {
@@ -89,6 +128,7 @@ model Appointment {
   status      AppointmentStatus @default(pending)
   schedule    DateTime
   createdAt   DateTime          @default(now())
-  student     User              @relation("StudentAppointments", fields: [studentId], references: [id], onDelete: Cascade)
-  counselor   User              @relation("CounselorAppointments", fields: [counselorId], references: [id], onDelete: Cascade)
+  student     Student           @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
+  counselor   Counselor         @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)
+  concerns    String?
 }

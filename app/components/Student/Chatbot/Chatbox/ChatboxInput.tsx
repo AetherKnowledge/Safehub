@@ -52,7 +52,7 @@ const ChatboxInput = ({ onSend }: Props) => {
 };
 
 const sendMessage = async (message: string) => {
-  const res = await fetch("/api/user/sendmessage", {
+  const res = await fetch("/api/user/student/sendmessage", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message: message }),

@@ -2,18 +2,25 @@
 import React, { useEffect, useState } from "react";
 import SidebarButton from "./SidebarButton";
 import { AiFillHome } from "react-icons/ai";
-import { FaCalendar, FaRobot } from "react-icons/fa";
+import { FaCalendar, FaRobot, FaUsers } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
+import { UserType } from "@/app/generated/prisma"; // Adjust the import path as necessary
 
 const Sidebar = () => {
   const [isLarge, setIsLarge] = useState(false);
+  const session = useSession();
 
   useEffect(() => {
-    const handleResize = () => setIsLarge(window.innerWidth >= 1024); // 1024px = Tailwind's 'lg'
-    handleResize(); // run once on mount
+    const handleResize = () => setIsLarge(window.innerWidth >= 1024);
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  if (!session.data?.user) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -21,6 +28,18 @@ const Sidebar = () => {
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="flex flex-col space-y-4 sticky top-10 h-[40vh] min-w-[60px] max-w-[300px] bg-base-100 shadow-br rounded-xl pt-4 pb-4 z-50 overflow-hidden"
     >
+      {session.data.user.type === UserType.Student
+        ? studentSidebar()
+        : session.data.user.type === UserType.Admin
+        ? adminSidebar()
+        : null}
+    </motion.div>
+  );
+};
+
+const studentSidebar = () => {
+  return (
+    <>
       <SidebarButton href="/user/dashboard" icon={AiFillHome}>
         Dashboard
       </SidebarButton>
@@ -30,7 +49,23 @@ const Sidebar = () => {
       <SidebarButton href="/user/chatbot" icon={FaRobot}>
         Chatbot
       </SidebarButton>
-    </motion.div>
+    </>
+  );
+};
+
+const adminSidebar = () => {
+  return (
+    <>
+      <SidebarButton href="/user/dashboard" icon={AiFillHome}>
+        Dashboard
+      </SidebarButton>
+      <SidebarButton href="/user/appointments" icon={FaCalendar}>
+        Appointments
+      </SidebarButton>
+      <SidebarButton href="/user/users" icon={FaUsers}>
+        Users
+      </SidebarButton>
+    </>
   );
 };
 

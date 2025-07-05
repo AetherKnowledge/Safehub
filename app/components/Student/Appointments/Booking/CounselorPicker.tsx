@@ -31,7 +31,7 @@ const CounselorPicker = ({ onChange }: Props) => {
   }, []);
 
   const refreshTable = async () => {
-    const res = await fetch("/api/user/counselors");
+    const res = await fetch("/api/user/student/counselors");
     const data = await res.json();
 
     if (!res.ok) {

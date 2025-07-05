@@ -6,10 +6,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import DatePicker from "./Booking/DatePicker";
 import TimePicker from "./Booking/TimePicker";
-import CounselorPicker, {
-  CounselorData,
-} from "@/app/pages/Student/Appointments/Booking/CounselorPicker";
-import ConcernPicker from "@/app/pages/Student/Appointments/Booking/ConcernPicker";
+import CounselorPicker, { CounselorData } from "./Booking/CounselorPicker";
+import ConcernPicker from "./Booking/ConcernPicker";
 
 const BookAppointment = () => {
   const router = useRouter();
@@ -56,7 +54,7 @@ const BookAppointment = () => {
     };
 
     try {
-      const response = await fetch("/api/user/appointments", {
+      const response = await fetch("/api/user/student/appointments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

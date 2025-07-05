@@ -2,10 +2,7 @@
 import React from "react";
 import AppointmentRow from "./ApointmentRow";
 import { useEffect, useState } from "react";
-import { Appointment, AppointmentStatus } from "@/app/generated/prisma";
-import { ReactNode } from "react";
-import AuthProvider from "../../../../components/AuthProvider";
-
+import { AppointmentStatus } from "@/app/generated/prisma";
 export interface AppointmentData {
   id: string;
   studentId: string;
@@ -45,7 +42,7 @@ const AppointmentTable = () => {
   }, []);
 
   const refreshTable = async () => {
-    const res = await fetch("/api/user/appointments");
+    const res = await fetch("/api/user/student/appointments");
     const data = await res.json();
 
     if (!res.ok) {
@@ -54,14 +51,13 @@ const AppointmentTable = () => {
       return;
     }
 
-    console.log(data);
     setAppointments(data);
     setLoading(false);
   };
 
   const handleCancel = async (appointmentId: string) => {
     setLoading(true);
-    const res = await fetch("/api/user/appointments", {
+    const res = await fetch("/api/user/student/appointments", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -107,15 +103,13 @@ const AppointmentTable = () => {
               <tr></tr>
             </thead>
             <tbody className="text-base-content text-center">
-              <AuthProvider>
-                {appointments.map((appointment) => (
-                  <AppointmentRow
-                    key={appointment.id}
-                    appointment={appointment}
-                    onCancel={handleCancel}
-                  />
-                ))}
-              </AuthProvider>
+              {appointments.map((appointment) => (
+                <AppointmentRow
+                  key={appointment.id}
+                  appointment={appointment}
+                  onCancel={handleCancel}
+                />
+              ))}
             </tbody>
           </table>
         </div>

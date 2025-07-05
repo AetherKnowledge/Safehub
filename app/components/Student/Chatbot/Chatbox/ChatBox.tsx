@@ -3,7 +3,7 @@ import React, { ReactNode, useEffect, useRef, useState } from "react";
 import ChatBubble from "./ChatBubble";
 import { chathistory } from "@/app/generated/prisma";
 import ChatboxInput from "./ChatboxInput";
-import { getSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 interface Message {
   type: "human" | "ai";
@@ -15,11 +15,11 @@ export function ChatBox() {
   const [chatHistory, setChatHistory] = useState<chathistory[]>([]);
   const [userImage, setUserImage] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+  const session = useSession();
 
   useEffect(() => {
     const loadData = async () => {
-      const session = await getSession();
-      setUserImage(session?.user?.image || undefined);
+      setUserImage(session?.data?.user?.image || undefined);
 
       await refreshChat();
     };
@@ -28,7 +28,7 @@ export function ChatBox() {
   }, []);
 
   const refreshChat = async () => {
-    const res = await fetch("/api/user/history");
+    const res = await fetch("/api/user/student/history");
     const data = await res.json();
 
     if (!res.ok) {

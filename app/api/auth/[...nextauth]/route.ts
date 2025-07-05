@@ -43,6 +43,12 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.type = user.type;
+      }
+      return token;
+    },
     async session({ session }) {
       const user = await prisma.user.findUnique({
         where: { email: session.user.email! },

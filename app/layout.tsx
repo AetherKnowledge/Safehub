@@ -3,7 +3,7 @@ import { Manrope } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import AuthProvider from "./components/AuthProvider";
-import { CalendarMonth, CalendarDate, CalendarRange } from "cally";
+import HeartbeatProvider from "./components/HeartbeatProvider";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -25,10 +25,12 @@ export default function RootLayout({
       <body className={`${manrope.variable} antialiased`}>
         <div className="flex flex-col min-h-screen">
           <AuthProvider>
-            <Navbar />
+            <HeartbeatProvider>
+              <Navbar />
+              {/* Let children take up remaining space */}
+              <main>{children}</main>
+            </HeartbeatProvider>
           </AuthProvider>
-          {/* Let children take up remaining space */}
-          <main>{children}</main>
         </div>
       </body>
     </html>

@@ -30,11 +30,11 @@ const ApointmentRow = ({ appointment, onCancel }: Props) => {
   const formattedTime = TimeFormatter.format(new Date(appointment.schedule));
 
   const tableName =
-    user.data?.user.type === UserType.student
+    user.data?.user.type === UserType.Student
       ? appointment.counselor.user.name
       : appointment.student.user.name;
   const tableImage =
-    user.data?.user.type === UserType.student
+    user.data?.user.type === UserType.Student
       ? appointment.counselor.user.image
       : appointment.student.user.image;
 
@@ -71,21 +71,21 @@ const ApointmentRow = ({ appointment, onCancel }: Props) => {
       <td>{formattedTime}</td>
       <td>
         <div className="flex items-center justify-center h-full w-full text-xl">
-          {appointment.status === AppointmentStatus.approved && (
+          {appointment.status === AppointmentStatus.Approved && (
             <GoDotFill className="text-green-500" />
           )}
         </div>
       </td>
       <td>
         <div className="flex items-center justify-center h-full w-full text-xl">
-          {appointment.status === AppointmentStatus.pending && (
+          {appointment.status === AppointmentStatus.Pending && (
             <GoDotFill className="text-yellow-500" />
           )}
         </div>
       </td>
       <td>
         <div className="flex items-center justify-center h-full w-full text-xl">
-          {appointment.status === AppointmentStatus.completed && (
+          {appointment.status === AppointmentStatus.Completed && (
             <GoDotFill className="text-blue-500" />
           )}
         </div>

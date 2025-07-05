@@ -9,16 +9,16 @@ datasource db {
 }
 
 enum UserType {
-  student
-  counselor
-  admin
+  Student
+  Counselor
+  Admin
 }
 
 enum AppointmentStatus {
-  approved
-  pending
-  completed
-  rejected
+  Approved
+  Pending
+  Completed
+  Rejected
 }
 
 enum Days {
@@ -31,16 +31,24 @@ enum Days {
   Sunday
 }
 
+enum UserStatus {
+  Online
+  Offline
+  Busy
+}
+
 model User {
   id            String        @id @default(cuid())
   name          String?
-  type          UserType      @default(student)
+  type          UserType      @default(Student)
   email         String        @unique
   emailVerified DateTime?
   password      String?
   image         String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+  lastActiveAt  DateTime?     @default(now())
+  status        UserStatus    @default(Offline)
   accounts      Account[]
   sessions      Session[]
   chatHistory   chathistory[]
@@ -125,7 +133,7 @@ model Appointment {
   id          Int               @id @default(autoincrement())
   studentId   String
   counselorId String
-  status      AppointmentStatus @default(pending)
+  status      AppointmentStatus @default(Pending)
   schedule    DateTime
   createdAt   DateTime          @default(now())
   student     Student           @relation(fields: [studentId], references: [studentId], onDelete: Cascade)

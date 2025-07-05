@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { IoMdArrowDropdown } from "react-icons/io";
 
 interface SelectBoxProps {
   items: string[];
@@ -12,6 +14,11 @@ interface SelectBoxProps {
   className?: string;
   defaultValue?: string;
   value?: string;
+  padding?: string;
+  borderColor?: string;
+  bgColor?: string;
+  textColor?: string;
+  colorMap?: Record<string, { bg: string; text: string }>;
 }
 
 export default function SelectBox({
@@ -21,10 +28,26 @@ export default function SelectBox({
   className = "",
   defaultValue,
   queryKey,
+  padding = "pr-2 py-1",
+  borderColor = "border-base-300",
+  bgColor = "bg-base-100",
+  textColor = "text-base-content",
+  colorMap,
 }: SelectBoxProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathName = usePathname();
+
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<string | null>(defaultValue ?? null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const [dropdownStyles, setDropdownStyles] =
+    useState<React.CSSProperties | null>(null);
+
+  const selectedStyles =
+    selected && colorMap?.[selected]
+      ? `${colorMap[selected].bg} ${colorMap[selected].text}`
+      : `${bgColor ?? "bg-base-100"} ${textColor ?? "text-base-content"}`;
 
   function handleSearchChange(queryKey: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -36,10 +59,6 @@ export default function SelectBox({
     router.push(`${pathName}?${params.toString()}`, { scroll: false });
   }
 
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
-  const boxRef = useRef<HTMLDivElement>(null); // 👈 create a ref for the box
-
   function handleSelect(item: string) {
     setSelected(item);
     onSelect && onSelect(item);
@@ -47,18 +66,33 @@ export default function SelectBox({
     setOpen(false);
   }
 
-  // 👇 Close on outside click
+  // Calculate dropdown position when opened
+  useLayoutEffect(() => {
+    if (open && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownStyles({
+        position: "absolute",
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+        zIndex: 9999,
+      });
+    }
+  }, [open]);
+
+  // Close on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (boxRef.current && !boxRef.current.contains(event.target as Node)) {
+      if (
+        triggerRef.current &&
+        !triggerRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     }
 
     if (open) {
       document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
@@ -67,35 +101,48 @@ export default function SelectBox({
   }, [open]);
 
   return (
-    <div ref={boxRef} className={`relative w-f ${className}`}>
-      <button
-        onClick={() => setOpen((prev) => !prev)}
-        className="px-4 py-2 w-full bg-base-100 border border-base-300 rounded-xl text-base-content shadow-sm text-left"
+    <>
+      <div
+        ref={triggerRef}
+        className={`relative border rounded-xl shadow-sm ${className} ${selectedStyles} ${borderColor}`}
       >
-        {selected && selected !== defaultValue ? selected : placeholder}
-      </button>
+        <div className={`flex justify-center items-center ${padding}`}>
+          <button onClick={() => setOpen((prev) => !prev)} className="w-full">
+            {selected && selected !== defaultValue ? selected : placeholder}
+          </button>
+          <IoMdArrowDropdown
+            className="text-xl cursor-pointer"
+            onClick={() => setOpen((prev) => !prev)}
+          />
+        </div>
+      </div>
 
-      <AnimatePresence>
-        {open && (
-          <motion.ul
-            initial={{ opacity: 0, y: -5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.2 }}
-            className="absolute left-0 mt-2 w-full bg-base-100 border border-base-300 rounded-xl shadow-br z-50"
-          >
-            {items.map((item) => (
-              <li
-                key={item}
-                onClick={() => handleSelect(item)}
-                className="px-4 py-2 cursor-pointer hover:bg-base-200 text-base-content"
+      {typeof window !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {open && dropdownStyles && (
+              <motion.ul
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.2 }}
+                style={dropdownStyles}
+                className="bg-base-100 border border-base-300 rounded-xl shadow-md"
               >
-                {item}
-              </li>
-            ))}
-          </motion.ul>
+                {items.map((item) => (
+                  <li
+                    key={item}
+                    onClick={() => handleSelect(item)}
+                    className="px-4 py-2 cursor-pointer hover:bg-base-200 text-base-content text-sm"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </motion.ul>
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
-    </div>
+    </>
   );
 }

@@ -29,7 +29,7 @@ const RegisteredUsersTable = () => {
           items={["All", "Admin", "Counselor", "Student"]}
           placeholder="Role"
           queryKey="role"
-          className="w-[12vw]"
+          className="w-[12vw] min-w-30"
           defaultValue="All"
         />
         <SelectBox
@@ -37,7 +37,7 @@ const RegisteredUsersTable = () => {
           placeholder="Status"
           queryKey="status"
           defaultValue="All"
-          className="w-[12vw]"
+          className="w-[12vw] min-w-30"
         />
       </div>
       <UsersTable name={name ?? undefined} />

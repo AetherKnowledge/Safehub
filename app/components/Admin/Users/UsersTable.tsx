@@ -73,7 +73,7 @@ const UsersTable = ({ name }: { name?: string }) => {
     if (!res.ok) {
       console.error("Failed to update user role:", result);
       return;
-    }
+    } else await refreshUsers();
   }
 
   return (

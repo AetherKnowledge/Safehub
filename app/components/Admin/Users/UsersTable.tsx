@@ -1,14 +1,22 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { User } from "@/app/generated/prisma";
+import { User, UserType } from "@/app/generated/prisma";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
+import { IoIosArrowDropdown } from "react-icons/io";
+import SelectBox from "../../SelectBox";
 
 const statusColorMap = {
   Online: { bg: "#d1fae5", text: "#047857" }, // green
   Offline: { bg: "#fee2e2", text: "#b91c1c" }, // red
   Busy: { bg: "#fef9c3", text: "#92400e" }, // yellow
+};
+
+const roleColorMap = {
+  Admin: { bg: "bg-blue-100", text: "text-blue-900" }, // Tailwind equivalent of #dbeafe / #1e40af
+  Counselor: { bg: "bg-sky-100", text: "text-sky-600" }, // Tailwind equivalent of #e0f2fe / #0284c7
+  Student: { bg: "bg-purple-100", text: "text-purple-700" }, // Tailwind equivalent of #f3e8ff / #7c3aed
 };
 
 const UsersTable = ({ name }: { name?: string }) => {
@@ -47,6 +55,25 @@ const UsersTable = ({ name }: { name?: string }) => {
     }
 
     setAllUsers(data);
+  }
+
+  async function changeRole(userId: string, newRole: UserType) {
+    const res = await fetch("/api/user/admin/users", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: userId,
+        type: newRole,
+      }),
+    });
+
+    const result = await res.json();
+    if (!res.ok) {
+      console.error("Failed to update user role:", result);
+      return;
+    }
   }
 
   return (
@@ -88,23 +115,40 @@ const UsersTable = ({ name }: { name?: string }) => {
                     className="origin-top"
                   >
                     <td>{user.name}</td>
-                    <td>{user.type}</td>
+                    <td>
+                      <div className="flex justify-center">
+                        <SelectBox
+                          items={Object.keys(UserType).sort()}
+                          placeholder={user.type}
+                          className="w-30 font-medium"
+                          defaultValue={user.type}
+                          colorMap={roleColorMap}
+                          borderColor="border-transparent"
+                          padding="pl-1 pr-2 py-1 w-full"
+                          onSelect={(item) => {
+                            changeRole(user.id, item as UserType);
+                          }}
+                        />
+                      </div>
+                    </td>
                     <td>{user.email}</td>
                     <td>
-                      <motion.span
-                        key={`${user.id}-${user.status}`}
-                        initial={{ opacity: 0 }}
-                        animate={{
-                          opacity: 1,
-                          backgroundColor: statusColorMap[user.status].bg,
-                          color: statusColorMap[user.status].text,
-                        }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="px-3 py-1 rounded-full text-sm font-medium"
-                      >
-                        {user.status}
-                      </motion.span>
+                      {
+                        <motion.span
+                          key={`${user.id}-${user.status}`}
+                          initial={{ opacity: 0 }}
+                          animate={{
+                            opacity: 1,
+                            backgroundColor: statusColorMap[user.status].bg,
+                            color: statusColorMap[user.status].text,
+                          }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="px-3 py-1 rounded-full text-sm font-medium"
+                        >
+                          {user.status}
+                        </motion.span>
+                      }
                     </td>
                   </motion.tr>
                 ))}

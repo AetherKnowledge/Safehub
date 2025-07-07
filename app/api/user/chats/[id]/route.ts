@@ -73,7 +73,12 @@ export async function SOCKET(
   const { id } = await context.params;
 
   const token = await getToken({ req: request as any, secret });
-  console.log("WebSocket connection attempt for chat:", id, "Token:", token);
+  console.log(
+    "WebSocket connection attempt for chat:",
+    id,
+    " by ",
+    token?.name
+  );
 
   if (!token || !token.sub || !token.email) {
     console.error("Unauthorized access attempt:", request.socket.remoteAddress);
@@ -142,5 +147,10 @@ export async function SOCKET(
       console.error("Error processing message:", error);
       client.send(JSON.stringify({ error: "Failed to process message" }));
     }
+  });
+
+  client.on("close", () => {
+    console.log("Client disconnected from chat:", id, "User ID:", userId);
+    client.close();
   });
 }

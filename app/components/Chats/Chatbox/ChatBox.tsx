@@ -4,12 +4,15 @@ import ChatBubble from "./ChatBubble";
 import ChatboxInput from "./ChatboxInput";
 import { Message } from "@/app/components/Chats/Chatbox/messaging";
 import { useMessaging } from "@/app/components/Chats/Chatbox/messaging";
+import { useMemo } from "react";
 
 export function ChatBox() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const [messages, sendMessage, loading] = useMessaging(
-    () => `ws://${window.location.host}/api/user/chats/chat_direct_1`
-  );
+  const url = useMemo(() => {
+    return () => `ws://${window.location.host}/api/user/chats/chat_direct_1`;
+  }, []);
+
+  const [messages, sendMessage, loading] = useMessaging(url);
 
   useEffect(() => {
     setTimeout(scrollToBottom, 50);

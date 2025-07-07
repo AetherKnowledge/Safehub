@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { ChatMessage } from "@/app/generated/prisma";
-
+import { useWebSocket } from "./useWebsocket";
 export interface Message extends ChatMessage {
   name: string;
   src?: string;
@@ -12,10 +12,14 @@ interface WebSocketEventMap {
   error: string;
 }
 
-export function useMessaging(url: () => string) {
-  const socket = useWebSocket(url);
+export function useMessaging(urlFn: () => string) {
+  const { socket, isConnected, error } = useWebSocket(urlFn, {
+    reconnect: true,
+    reconnectIntervalMs: 1000,
+    maxReconnectAttempts: 5,
+  });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
@@ -29,60 +33,40 @@ export function useMessaging(url: () => string) {
   }, []);
 
   useEffect(() => {
-    const controller = new AbortController();
+    if (!socket) return;
 
-    socket?.addEventListener(
-      "message",
-      async (event) => {
-        const payload =
-          typeof event.data === "string" ? event.data : await event.data.text();
+    const handleMessage = async (event: MessageEvent) => {
+      const payload =
+        typeof event.data === "string" ? event.data : await event.data.text();
 
-        if (!payload) {
-          return console.log("Received empty message from WebSocket");
-        }
+      if (!payload) return;
 
-        const message = JSON.parse(payload) as WebSocketEventMap;
-        console.log("WebSocket message received:", message);
-        if (message.error) {
-          console.log("WebSocket error:", payload.error);
-          return console.error("WebSocket error:", payload.error);
-        }
+      const message = JSON.parse(payload) as WebSocketEventMap;
+      if (message.error) {
+        console.error("WebSocket error message:", message.error);
+        return;
+      }
 
-        setMessages((p) => [...p, message.message]);
-      },
-      controller
-    );
+      setMessages((prev) => [...prev, message.message]);
+    };
 
-    socket?.addEventListener(
-      "error",
-      (event) => {
-        console.log("WebSocket error:", event);
-      },
-      controller
-    );
-
-    socket?.addEventListener(
-      "close",
-      (event) => {
-        if (event.wasClean) return;
-        console.log("WebSocket closed unexpectedly:", event);
-      },
-      controller
-    );
-
-    return () => controller.abort();
+    socket.addEventListener("message", handleMessage);
+    return () => socket.removeEventListener("message", handleMessage);
   }, [socket]);
 
   const sendMessage = useCallback(
     (content: string) => {
-      if (!socket || socket.readyState !== socket.OPEN) return;
-      console.log("Outgoing message:", content);
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        console.warn("Socket not open. Cannot send message.");
+        return;
+      }
+
       socket.send(JSON.stringify({ content }));
     },
     [socket]
   );
 
-  return [messages, sendMessage, loading] as const;
+  return [messages, sendMessage, loading, isConnected, error] as const;
 }
 
 async function fetchMessages(): Promise<Message[]> {
@@ -95,21 +79,4 @@ async function fetchMessages(): Promise<Message[]> {
   }
 
   return data as Message[];
-}
-
-export function useWebSocket(url: () => string) {
-  const ref = useRef<WebSocket>(null);
-  const target = useRef(url);
-  const [, update] = useState(0);
-
-  useEffect(() => {
-    if (ref.current) return;
-    const socket = new WebSocket(target.current());
-    ref.current = socket;
-    update((p) => p + 1);
-
-    return () => socket.close();
-  }, []);
-
-  return ref.current;
 }

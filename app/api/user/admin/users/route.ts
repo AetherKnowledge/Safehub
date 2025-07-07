@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import AuthOptions from "@/app/components/AuthOptions";
 import { UserType, UserStatus } from "@/app/generated/prisma";
-import { z } from "zod";
+import { updateUserSchema } from "@/app/components/Schemas";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(AuthOptions);
 
   if (
     !session ||
@@ -53,13 +53,8 @@ export async function GET() {
   return NextResponse.json(usersWithStatus, { status: 200 });
 }
 
-const updateUserSchema = z.object({
-  id: z.string(),
-  type: z.nativeEnum(UserType),
-});
-
 export async function PUT(request: Request) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(AuthOptions);
 
   if (
     !session ||

@@ -37,6 +37,11 @@ enum UserStatus {
   Busy
 }
 
+enum ChatType {
+  GROUP
+  DIRECT
+}
+
 model User {
   id            String        @id @default(cuid())
   name          String?
@@ -52,9 +57,49 @@ model User {
   accounts      Account[]
   sessions      Session[]
   chatHistory   chathistory[]
-  Student       Student?
-  Counselor     Counselor?
-  Admin         Admin?
+
+  Student   Student?
+  Counselor Counselor?
+  Admin     Admin?
+
+  chatMembers ChatMember[]
+  messages    ChatMessage[]
+}
+
+model Chat {
+  id          String   @id @default(cuid())
+  type        ChatType @default(DIRECT)
+  name        String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members  ChatMember[]
+  messages ChatMessage[]
+}
+
+model ChatMember {
+  id       String   @id @default(cuid())
+  chatId   String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, userId]) // Prevent duplicate members
+}
+
+model ChatMessage {
+  id        Int      @id @default(autoincrement())
+  chatId    String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Student {

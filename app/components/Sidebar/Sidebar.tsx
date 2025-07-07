@@ -6,6 +6,7 @@ import { FaCalendar, FaRobot, FaUsers } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { UserType } from "@/app/generated/prisma"; // Adjust the import path as necessary
+import { IoChatboxEllipses } from "react-icons/io5";
 
 const Sidebar = () => {
   const [isLarge, setIsLarge] = useState(false);
@@ -49,6 +50,9 @@ const studentSidebar = () => {
       <SidebarButton href="/user/chatbot" icon={FaRobot}>
         Chatbot
       </SidebarButton>
+      <SidebarButton href="/user/chats" icon={IoChatboxEllipses}>
+        Chats
+      </SidebarButton>
     </>
   );
 };
@@ -64,6 +68,9 @@ const adminSidebar = () => {
       </SidebarButton>
       <SidebarButton href="/user/users" icon={FaUsers}>
         Users
+      </SidebarButton>
+      <SidebarButton href="/user/chats" icon={IoChatboxEllipses}>
+        Chats
       </SidebarButton>
     </>
   );

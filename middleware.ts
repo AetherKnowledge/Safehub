@@ -4,7 +4,6 @@ import { UserType } from "@/app/generated/prisma"; // Adjust if path is differen
 export default withAuth(
   function middleware(req: NextRequestWithAuth) {
     // This runs only if the user is authorized
-    console.log("User Type:", req.nextauth.token?.type);
   },
   {
     callbacks: {

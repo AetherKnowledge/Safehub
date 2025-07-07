@@ -2,11 +2,13 @@
   "name": "capstone",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "next-ws patch"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
@@ -17,11 +19,13 @@
     "bcrypt": "^6.0.0",
     "cally": "^0.8.0",
     "clsx": "^2.1.1",
+    "cross-env": "^7.0.3",
     "date-fns": "^4.1.0",
     "dotenv": "^17.0.1",
     "motion": "^12.20.1",
     "next": "15.3.4",
     "next-auth": "^4.24.11",
+    "next-ws": "^2.0.10",
     "prisma": "^6.11.1",
     "radix-ui": "^1.4.2",
     "react": "^19.0.0",
@@ -31,6 +35,7 @@
     "recharts": "^3.0.2",
     "tailwind-merge": "^3.3.1",
     "tailwind-variants": "^1.0.0",
+    "ws": "^8.18.3",
     "zod": "^3.25.67"
   },
   "devDependencies": {
@@ -42,12 +47,15 @@
     "@types/pg": "^8.15.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/ws": "^8.18.1",
     "daisyui": "^5.0.43",
     "eslint": "^9",
-    "eslint-config-next": "15.3.4",
+    "eslint-config-next": "^15.3.5",
+    "nodemon": "^3.1.10",
     "pg": "^8.16.3",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3"
   },
   "prisma": {

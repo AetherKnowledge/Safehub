@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../../auth/[...nextauth]/route";
+import AuthOptions from "@/app/components/AuthOptions";
 import { Appointment } from "@/app/generated/prisma";
 import { UserType } from "@/app/generated/prisma";
-import { z } from "zod";
+import {
+  newAppointmentSchema,
+  deleteAppointmentSchema,
+} from "@/app/components/Schemas";
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(AuthOptions);
 
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -52,14 +55,8 @@ export async function GET() {
   return NextResponse.json(appointments, { status: 200 });
 }
 
-const newAppointmentSchema = z.object({
-  counselorId: z.string(),
-  schedule: z.string(),
-  concerns: z.array(z.string()),
-});
-
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(AuthOptions);
 
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -118,12 +115,8 @@ export async function POST(request: Request) {
   );
 }
 
-const deleteAppointmentSchema = z.object({
-  appointmentId: z.number(),
-});
-
 export async function DELETE(request: Request) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(AuthOptions);
 
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { User, UserType } from "@/app/generated/prisma";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import { IoIosArrowDropdown } from "react-icons/io";
 import SelectBox from "../../SelectBox";
 
 const statusColorMap = {

@@ -3,7 +3,6 @@ import React from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { Session } from "next-auth";
 import Image from "next/image";
-import { motion } from "framer-motion";
 
 const UserButton = () => {
   const { status, data: session } = useSession();

@@ -1,13 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/prisma/client";
-import { z } from "zod";
 import bcrypt from "bcrypt";
-
-const registerSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  password: z.string(),
-});
+import { registerSchema } from "@/app/components/Schemas";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();

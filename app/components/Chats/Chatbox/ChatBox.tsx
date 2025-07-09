@@ -1,18 +1,15 @@
 "use client";
-import React, { ReactNode, use, useEffect, useRef, useState } from "react";
+import {
+  Message,
+  useMessaging,
+} from "@/app/components/Chats/Chatbox/messaging";
+import { ReactNode, useEffect, useRef } from "react";
 import ChatBubble from "./ChatBubble";
 import ChatboxInput from "./ChatboxInput";
-import { Message } from "@/app/components/Chats/Chatbox/messaging";
-import { useMessaging } from "@/app/components/Chats/Chatbox/messaging";
-import { useMemo } from "react";
 
-export function ChatBox() {
+export function ChatBox({ chatId }: { chatId: string }) {
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const url = useMemo(() => {
-    return () => `ws://${window.location.host}/api/user/chats/chat_direct_1`;
-  }, []);
-
-  const [messages, sendMessage, loading] = useMessaging(url);
+  const [messages, sendMessage, loading] = useMessaging(chatId);
 
   useEffect(() => {
     setTimeout(scrollToBottom, 50);

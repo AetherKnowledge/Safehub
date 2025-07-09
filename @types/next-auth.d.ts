@@ -1,5 +1,5 @@
-import { AppointmentStatus, UserType } from "@/app/generated/prisma";
-import { DefaultSession, DefaultUser, JWT } from "next-auth";
+import { UserType } from "@/app/generated/prisma";
+import { DefaultSession, DefaultUser } from "next-auth";
 
 declare module "next-auth" {
   interface Session {

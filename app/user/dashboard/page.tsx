@@ -1,9 +1,8 @@
-import React from "react";
-import StudentDashboard from "@/app/components/Student/Dashboard/Dashboard";
 import AdminDashboard from "@/app/components/Admin/Dashboard/Dashboard";
-import { getServerSession } from "next-auth";
 import AuthOptions from "@/app/components/AuthOptions";
+import StudentDashboard from "@/app/components/Student/Dashboard/Dashboard";
 import { UserType } from "@/app/generated/prisma";
+import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 const UserDashboard = async () => {
@@ -14,7 +13,7 @@ const UserDashboard = async () => {
   else if (session.user.type === UserType.Counselor)
     return <div>Not built</div>;
   else if (session.user.type === UserType.Admin) return <AdminDashboard />;
-  else redirect("/user/dashboard");
+  else redirect("/login");
 };
 
 export default UserDashboard;

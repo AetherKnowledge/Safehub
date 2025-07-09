@@ -1,12 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import SidebarButton from "./SidebarButton";
-import { AiFillHome } from "react-icons/ai";
-import { FaCalendar, FaRobot, FaUsers } from "react-icons/fa";
+import { UserType } from "@/app/generated/prisma"; // Adjust the import path as necessary
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
-import { UserType } from "@/app/generated/prisma"; // Adjust the import path as necessary
+import { useEffect, useState } from "react";
+import { AiFillHome } from "react-icons/ai";
+import { FaCalendar, FaRobot, FaUsers } from "react-icons/fa";
 import { IoChatboxEllipses } from "react-icons/io5";
+import SidebarButton from "./SidebarButton";
 
 const Sidebar = () => {
   const [isLarge, setIsLarge] = useState(false);
@@ -33,6 +33,8 @@ const Sidebar = () => {
         ? studentSidebar()
         : session.data.user.type === UserType.Admin
         ? adminSidebar()
+        : session.data.user.type === UserType.Counselor
+        ? counselorSidebar()
         : null}
     </motion.div>
   );
@@ -43,6 +45,9 @@ const studentSidebar = () => {
     <>
       <SidebarButton href="/user/dashboard" icon={AiFillHome}>
         Dashboard
+      </SidebarButton>
+      <SidebarButton href="/user/counselors" icon={FaUsers}>
+        Counselors
       </SidebarButton>
       <SidebarButton href="/user/appointments" icon={FaCalendar}>
         Appointments
@@ -57,6 +62,21 @@ const studentSidebar = () => {
   );
 };
 
+const counselorSidebar = () => {
+  return (
+    <>
+      <SidebarButton href="/user/dashboard" icon={AiFillHome}>
+        Dashboard
+      </SidebarButton>
+      <SidebarButton href="/user/appointments" icon={FaCalendar}>
+        Appointments
+      </SidebarButton>
+      <SidebarButton href="/user/chats" icon={IoChatboxEllipses}>
+        Chats
+      </SidebarButton>
+    </>
+  );
+};
 const adminSidebar = () => {
   return (
     <>

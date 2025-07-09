@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import SelectBox from "../../SelectBox";
 
 const statusColorMap = {
   Online: { bg: "#d1fae5", text: "#047857" }, // green
@@ -13,27 +12,21 @@ const statusColorMap = {
   Busy: { bg: "#fef9c3", text: "#92400e" }, // yellow
 };
 
-const roleColorMap = {
-  Admin: { bg: "bg-blue-100", text: "text-blue-900" }, // Tailwind equivalent of #dbeafe / #1e40af
-  Counselor: { bg: "bg-sky-100", text: "text-sky-600" }, // Tailwind equivalent of #e0f2fe / #0284c7
-  Student: { bg: "bg-purple-100", text: "text-purple-700" }, // Tailwind equivalent of #f3e8ff / #7c3aed
-};
-
-const UsersTable = ({ name }: { name?: string }) => {
+const CounselorList = ({ name }: { name?: string }) => {
   const searchParams = useSearchParams();
   const roleFilter = searchParams.get("role") ?? undefined;
   const statusFilter = searchParams.get("status") ?? undefined;
 
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [allCounselors, setAllCounselors] = useState<User[]>([]);
+  const [counselors, setCounselors] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    refreshUsers().then(() => setLoading(false));
+    refreshCounselors().then(() => setLoading(false));
 
     const interval = setInterval(() => {
       if (navigator.onLine && document.visibilityState === "visible") {
-        refreshUsers();
+        refreshCounselors();
       }
     }, 30000);
 
@@ -41,24 +34,24 @@ const UsersTable = ({ name }: { name?: string }) => {
   }, []);
 
   useEffect(() => {
-    const filtered = filterUsers(allUsers, roleFilter, statusFilter, name);
-    setUsers(filtered);
-  }, [roleFilter, statusFilter, allUsers, name]);
+    const filtered = filterUsers(allCounselors, roleFilter, statusFilter, name);
+    setCounselors(filtered);
+  }, [roleFilter, statusFilter, allCounselors, name]);
 
-  async function refreshUsers() {
-    const res = await fetch("/api/user/admin/users");
+  async function refreshCounselors() {
+    const res = await fetch("/api/user/student/counselors");
     const data = await res.json();
 
     if (!res.ok) {
-      console.error("Failed to fetch users:", data);
+      console.error("Failed to fetch counselors:", data);
       return;
     }
 
-    setAllUsers(data);
+    setAllCounselors(data);
   }
 
   async function changeRole(userId: string, newRole: UserType) {
-    const res = await fetch("/api/user/admin/users", {
+    const res = await fetch("/api/user/admin/counselors", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +66,7 @@ const UsersTable = ({ name }: { name?: string }) => {
     if (!res.ok) {
       console.error("Failed to update user role:", result);
       return;
-    } else await refreshUsers();
+    } else await refreshCounselors();
   }
 
   return (
@@ -81,11 +74,11 @@ const UsersTable = ({ name }: { name?: string }) => {
       {loading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
           <div className="loading loading-spinner loading-lg text-primary"></div>
-          <p className="text-base-content">Loading registered users...</p>
+          <p className="text-base-content">Loading registered counselors...</p>
         </div>
-      ) : users.length === 0 ? (
+      ) : counselors.length === 0 ? (
         <p className="text-center text-gray-500">
-          No registered users available.
+          No registered counselors available.
         </p>
       ) : (
         <div className="overflow-x-auto">
@@ -93,16 +86,15 @@ const UsersTable = ({ name }: { name?: string }) => {
             <thead className="text-center text-base-content">
               <tr>
                 <th>Name</th>
-                <th>Role</th>
                 <th>Email</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody className="text-base-content text-center">
               <AnimatePresence mode="sync">
-                {users.map((user) => (
+                {counselors.map((counselor) => (
                   <motion.tr
-                    key={user.id}
+                    key={counselor.id}
                     layout
                     initial={{ opacity: 0, scaleY: 0 }}
                     animate={{ opacity: 1, scaleY: 1 }}
@@ -115,17 +107,17 @@ const UsersTable = ({ name }: { name?: string }) => {
                     className="origin-top"
                   >
                     <td>
-                      {user.image ? (
+                      {counselor.image ? (
                         <div className="flex items-center justify-between gap-4">
                           <Image
-                            src={user.image}
-                            alt={user.name ?? "User Avatar"}
+                            src={counselor.image}
+                            alt={counselor.name ?? "counselor Avatar"}
                             className="w-10 h-10 rounded-full"
                             width={20}
                             height={20}
                           />
                           <div className="text-left font-medium w-full">
-                            {user.name}
+                            {counselor.name}
                           </div>
                         </div>
                       ) : (
@@ -136,49 +128,34 @@ const UsersTable = ({ name }: { name?: string }) => {
                               tabIndex={0}
                               className="w-10 h-10 rounded-full bg-gray-500 text-white flex items-center justify-center font-bold hover:brightness-90 active:brightness-75 transition duration-150 select-none cursor-pointer"
                             >
-                              {user.name?.charAt(0).toUpperCase() ||
-                                user.email.charAt(0).toUpperCase() ||
+                              {counselor.name?.charAt(0).toUpperCase() ||
+                                counselor.email.charAt(0).toUpperCase() ||
                                 "?"}
                             </div>
                           </div>
                           <div className="text-left font-medium w-full">
-                            {user.name}
+                            {counselor.name}
                           </div>
                         </div>
                       )}
                     </td>
-                    <td>
-                      <div className="flex justify-center">
-                        <SelectBox
-                          items={Object.keys(UserType).sort()}
-                          placeholder={user.type}
-                          className="w-30 font-medium"
-                          defaultValue={user.type}
-                          colorMap={roleColorMap}
-                          borderColor="border-transparent"
-                          padding="pl-1 pr-2 py-1 w-full"
-                          onSelect={(item) => {
-                            changeRole(user.id, item as UserType);
-                          }}
-                        />
-                      </div>
-                    </td>
-                    <td>{user.email}</td>
+                    <td>{counselor.email}</td>
                     <td>
                       {
                         <motion.span
-                          key={`${user.id}-${user.status}`}
+                          key={`${counselor.id}-${counselor.status}`}
                           initial={{ opacity: 0 }}
                           animate={{
                             opacity: 1,
-                            backgroundColor: statusColorMap[user.status].bg,
-                            color: statusColorMap[user.status].text,
+                            backgroundColor:
+                              statusColorMap[counselor.status].bg,
+                            color: statusColorMap[counselor.status].text,
                           }}
                           exit={{ opacity: 0 }}
                           transition={{ duration: 0.3 }}
                           className="px-3 py-1 rounded-full text-sm font-medium"
                         >
-                          {user.status}
+                          {counselor.status}
                         </motion.span>
                       }
                     </td>
@@ -194,14 +171,14 @@ const UsersTable = ({ name }: { name?: string }) => {
 };
 
 function filterUsers(
-  users: User[],
+  counselor: User[],
   role?: string,
   status?: string,
   name?: string
 ) {
-  if (!role && !status) return users;
+  if (!role && !status) return counselor;
 
-  return users.filter((user) => {
+  return counselor.filter((user) => {
     const matchesRole =
       !role ||
       role === "All" ||
@@ -219,4 +196,4 @@ function filterUsers(
   });
 }
 
-export default UsersTable;
+export default CounselorList;

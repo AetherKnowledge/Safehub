@@ -1,9 +1,10 @@
-import { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { createManyChatsWithOthers } from "@/app/components/Utils";
 import { prisma } from "@/prisma/client";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcrypt";
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 
 export const AuthOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -49,12 +50,14 @@ export const AuthOptions: NextAuthOptions = {
       }
       return token;
     },
-    async session({ session }) {
+    async session({ session, token }) {
       const user = await prisma.user.findUnique({
         where: { email: session.user.email! },
       });
       session.user.id = user?.id;
       session.user.type = user?.type;
+      token.id = user?.id;
+      token.type = user?.type;
       return session;
     },
   },
@@ -71,6 +74,7 @@ export const AuthOptions: NextAuthOptions = {
           studentId: newUser.id,
         },
       });
+      createManyChatsWithOthers(newUser.type, newUser.id);
     },
   },
 };

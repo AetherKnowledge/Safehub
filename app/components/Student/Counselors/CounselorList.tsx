@@ -1,10 +1,10 @@
 "use client";
+
 import { useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 import SelectBox from "../../SelectBox";
-import UsersTable from "./UsersTable";
-
-const RegisteredUsersTable = () => {
+import CounselorsTable from "./CounselorsTable";
+const CounselorList = () => {
   const [name, setName] = useState<string | null>(null);
 
   return (
@@ -26,13 +26,6 @@ const RegisteredUsersTable = () => {
           />
         </label>
         <SelectBox
-          items={["All", "Admin", "Counselor", "Student"]}
-          placeholder="Role"
-          queryKey="role"
-          className="w-[12vw] min-w-30"
-          defaultValue="All"
-        />
-        <SelectBox
           items={["All", "Online", "Offline"]}
           placeholder="Status"
           queryKey="status"
@@ -40,9 +33,9 @@ const RegisteredUsersTable = () => {
           className="w-[12vw] min-w-30"
         />
       </div>
-      <UsersTable name={name ?? undefined} />
+      <CounselorsTable name={name ?? undefined} />
     </div>
   );
 };
 
-export default RegisteredUsersTable;
+export default CounselorList;

@@ -1,6 +1,6 @@
+import { hash } from "bcrypt";
 import { config } from "dotenv";
 import { Client } from "pg";
-import { hash } from "bcrypt";
 
 config();
 
@@ -21,6 +21,14 @@ async function main() {
     ON CONFLICT (email) DO NOTHING
     `,
     ["1", "admin@admin.com", "Admin", hashedPassword, "Admin", now, now]
+  );
+
+  await client.query(
+    `
+    INSERT INTO "Admin" (adminId)
+    VALUES ($1)
+    `,
+    ["1"]
   );
 
   console.log("✅ Admin user created (if not already exists)");

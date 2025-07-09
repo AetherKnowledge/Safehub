@@ -1,5 +1,5 @@
-import { NextRequestWithAuth, withAuth } from "next-auth/middleware";
 import { UserType } from "@/app/generated/prisma"; // Adjust if path is different
+import { NextRequestWithAuth, withAuth } from "next-auth/middleware";
 
 export default withAuth(
   function middleware(req: NextRequestWithAuth) {
@@ -7,7 +7,7 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token, req }) => {
+      authorized: async ({ token, req }) => {
         if (!token) return false;
 
         const url = req.nextUrl.pathname;

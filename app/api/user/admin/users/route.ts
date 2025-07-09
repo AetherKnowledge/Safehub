@@ -1,18 +1,18 @@
-import { NextResponse } from "next/server";
+import AuthOptions from "@/app/components/AuthOptions";
+import { updateUserSchema } from "@/app/components/Schemas";
+import {
+  authenticateUser,
+  createManyChatsWithOthers,
+} from "@/app/components/Utils";
+import { UserStatus, UserType } from "@/app/generated/prisma";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
-import AuthOptions from "@/app/components/AuthOptions";
-import { UserType, UserStatus } from "@/app/generated/prisma";
-import { updateUserSchema } from "@/app/components/Schemas";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   const session = await getServerSession(AuthOptions);
 
-  if (
-    !session ||
-    !session.user?.email ||
-    session.user.type !== UserType.Admin
-  ) {
+  if (!session || !(await authenticateUser(session, UserType.Admin))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -56,11 +56,7 @@ export async function GET() {
 export async function PUT(request: Request) {
   const session = await getServerSession(AuthOptions);
 
-  if (
-    !session ||
-    !session.user?.email ||
-    session.user.type !== UserType.Admin
-  ) {
+  if (!session || !(await authenticateUser(session, UserType.Admin))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -117,24 +113,38 @@ export async function PUT(request: Request) {
     );
   }
 
+  const deleted = await prisma.chat.deleteMany({
+    where: { members: { some: { userId: id } } },
+  });
+  console.log(`Deleted ${deleted.count} chats for user ${updatedUser.name}`);
   if (updatedUser.type === UserType.Admin) {
     await prisma.admin.create({
       data: {
         adminId: updatedUser.id,
       },
     });
+
+    await createManyChatsWithOthers(UserType.Admin, updatedUser.id);
+    await createManyChatsWithOthers(UserType.Counselor, updatedUser.id);
   } else if (updatedUser.type === UserType.Counselor) {
     await prisma.counselor.create({
       data: {
         counselorId: updatedUser.id,
       },
     });
+
+    await createManyChatsWithOthers(UserType.Admin, updatedUser.id);
+    await createManyChatsWithOthers(UserType.Counselor, updatedUser.id);
+
+    await createManyChatsWithOthers(UserType.Student, updatedUser.id);
   } else if (updatedUser.type === UserType.Student) {
     await prisma.student.create({
       data: {
         studentId: updatedUser.id,
       },
     });
+
+    await createManyChatsWithOthers(UserType.Counselor, updatedUser.id);
   }
 
   return NextResponse.json(

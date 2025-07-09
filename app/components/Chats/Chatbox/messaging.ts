@@ -1,6 +1,6 @@
 "use client";
-import { useCallback, useEffect, useState, useRef } from "react";
 import { ChatMessage } from "@/app/generated/prisma";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useWebSocket } from "./useWebsocket";
 export interface Message extends ChatMessage {
   name: string;
@@ -12,8 +12,11 @@ interface WebSocketEventMap {
   error: string;
 }
 
-export function useMessaging(urlFn: () => string) {
-  const { socket, isConnected, error } = useWebSocket(urlFn, {
+export function useMessaging(chatId: string) {
+  const url = useMemo(() => {
+    return () => `ws://${window.location.host}/api/user/chats/${chatId}`;
+  }, []);
+  const { socket, isConnected, error } = useWebSocket(url, {
     reconnect: true,
     reconnectIntervalMs: 1000,
     maxReconnectAttempts: 5,
@@ -24,7 +27,7 @@ export function useMessaging(urlFn: () => string) {
 
   useEffect(() => {
     const loadData = async () => {
-      const serverMessages = await fetchMessages();
+      const serverMessages = await fetchMessages(chatId);
       setMessages(serverMessages);
       setLoading(false);
     };
@@ -69,8 +72,8 @@ export function useMessaging(urlFn: () => string) {
   return [messages, sendMessage, loading, isConnected, error] as const;
 }
 
-async function fetchMessages(): Promise<Message[]> {
-  const res = await fetch("/api/user/chats/chat_direct_1");
+async function fetchMessages(chatId: string): Promise<Message[]> {
+  const res = await fetch("/api/user/chats/" + chatId);
   const data = await res.json();
 
   if (!res.ok) {

@@ -1,7 +1,8 @@
-import { z } from "zod";
 import { UserType } from "@/app/generated/prisma";
+import { z } from "zod";
 
 export const messageSchema = z.object({
+  chatId: z.string().min(1, "Chat ID is required"),
   content: z.string().trim().min(1).max(255),
 });
 
@@ -24,4 +25,8 @@ export const newAppointmentSchema = z.object({
 
 export const deleteAppointmentSchema = z.object({
   appointmentId: z.number(),
+});
+
+export const joinChatSchema = z.object({
+  chatId: z.string().min(1, "Chat ID is required"),
 });

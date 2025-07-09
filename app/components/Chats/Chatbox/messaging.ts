@@ -1,27 +1,18 @@
 "use client";
 import { ChatMessage } from "@/app/generated/prisma";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useWebSocket } from "./useWebsocket";
+import { useCallback, useEffect, useState } from "react";
+import {
+  SocketEvent,
+  SocketEventType,
+  SocketMessage,
+} from "../../Socket/SocketEvents";
+
 export interface Message extends ChatMessage {
   name: string;
   src?: string;
 }
 
-interface WebSocketEventMap {
-  message: Message;
-  error: string;
-}
-
-export function useMessaging(chatId: string) {
-  const url = useMemo(() => {
-    return () => `ws://${window.location.host}/api/user/chats/${chatId}`;
-  }, []);
-  const { socket, isConnected, error } = useWebSocket(url, {
-    reconnect: true,
-    reconnectIntervalMs: 1000,
-    maxReconnectAttempts: 5,
-  });
-
+export function useMessaging(socket: WebSocket | null, chatId: string) {
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -35,41 +26,72 @@ export function useMessaging(chatId: string) {
     loadData();
   }, []);
 
-  useEffect(() => {
-    if (!socket) return;
+  const handleMessage = async (event: MessageEvent) => {
+    const payload =
+      typeof event.data === "string" ? event.data : await event.data.text();
+    console.log("Received message:", payload);
 
-    const handleMessage = async (event: MessageEvent) => {
-      const payload =
-        typeof event.data === "string" ? event.data : await event.data.text();
+    if (!payload) return;
 
-      if (!payload) return;
+    const message = JSON.parse(payload) as SocketEvent<Message>;
+    if (message.type === "error") {
+      console.error("WebSocket error message:", message.payload);
+      return;
+    }
+    if (!message.payload) {
+      return;
+    }
 
-      const message = JSON.parse(payload) as WebSocketEventMap;
-      if (message.error) {
-        console.error("WebSocket error message:", message.error);
-        return;
-      }
-
-      setMessages((prev) => [...prev, message.message]);
-    };
-
-    socket.addEventListener("message", handleMessage);
-    return () => socket.removeEventListener("message", handleMessage);
-  }, [socket]);
+    setMessages((prev) => [...prev, message.payload]);
+  };
 
   const sendMessage = useCallback(
-    (content: string) => {
+    (content: SocketMessage) => {
       if (!socket || socket.readyState !== WebSocket.OPEN) {
         console.warn("Socket not open. Cannot send message.");
         return;
       }
 
-      socket.send(JSON.stringify({ content }));
+      socket.send(
+        JSON.stringify({ type: SocketEventType.MESSAGE, payload: content })
+      );
     },
     [socket]
   );
 
-  return [messages, sendMessage, loading, isConnected, error] as const;
+  const joinChat = useCallback(() => {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      console.warn("Socket not open. Cannot join chat.");
+      return;
+    }
+
+    socket.send(
+      JSON.stringify({ type: SocketEventType.JOINCHAT, payload: { chatId } })
+    );
+  }, [socket, chatId]);
+
+  const leaveChat = useCallback(() => {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      console.warn("Socket not open. Cannot leave chat.");
+      return;
+    }
+
+    socket.send(JSON.stringify({ type: SocketEventType.LEAVECHAT }));
+  }, [socket, chatId]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    joinChat();
+    socket?.addEventListener("message", handleMessage);
+
+    return () => {
+      leaveChat();
+      socket?.removeEventListener("message", handleMessage);
+    };
+  }, [socket, chatId]);
+
+  return [messages, sendMessage, loading] as const;
 }
 
 async function fetchMessages(chatId: string): Promise<Message[]> {

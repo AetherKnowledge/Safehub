@@ -1,3 +1,5 @@
+"use client";
+import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -25,6 +27,7 @@ export function useWebSocket(
     maxReconnectAttempts = 5,
   } = options;
 
+  const session = useSession();
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectAttempts = useRef(0);
   const [isConnected, setIsConnected] = useState(false);
@@ -97,7 +100,7 @@ export function useWebSocket(
     return () => {
       disconnect();
     };
-  }, [pathname]);
+  }, []);
 
   return {
     socket: socketRef.current,

@@ -1,7 +1,25 @@
-import React from "react";
+"use client";
 import OrdersByDayChart from "@/app/components/Charts/OrdersByDayChart";
+import { useEffect } from "react";
+import { useSocket } from "../../SocketProvider";
 
 const Dashboard = () => {
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.send(JSON.stringify({ message: "Dashboard connected" }));
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("Received from server:", data);
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, [socket]);
+
   return (
     <div>
       <div className="flex flex-col h-[82vh] ">

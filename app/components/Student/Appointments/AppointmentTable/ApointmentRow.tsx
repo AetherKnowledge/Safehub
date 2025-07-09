@@ -55,7 +55,7 @@ const ApointmentRow = ({ appointment, onCancel }: Props) => {
                 <div
                   role="button"
                   tabIndex={0}
-                  className="w-10 h-10 rounded-full bg-gray-500 text-white flex items-center justify-center font-bold hover:brightness-90 active:brightness-75 transition duration-150 select-none cursor-pointer"
+                  className="w-12 h-12 rounded-full bg-gray-500 text-xl text-white flex items-center justify-center font-bold hover:brightness-90 active:brightness-75 transition duration-150 select-none cursor-pointer"
                 >
                   {tableName.charAt(0).toUpperCase()}
                 </div>

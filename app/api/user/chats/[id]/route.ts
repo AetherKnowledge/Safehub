@@ -1,12 +1,12 @@
-import { NextResponse, NextRequest } from "next/server";
+import AuthOptions from "@/app/components/AuthOptions";
+import { Message } from "@/app/components/Chats/Chatbox/messaging";
+import { messageSchema } from "@/app/components/Schemas";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
-import { Message } from "@/app/components/Chats/Chatbox/messaging";
-import AuthOptions from "@/app/components/AuthOptions";
-import { messageSchema } from "@/app/components/Schemas";
+import { getToken } from "next-auth/jwt";
+import { NextRequest, NextResponse } from "next/server";
 import { IncomingMessage } from "node:http";
 import { WebSocket, WebSocketServer } from "ws";
-import { getToken } from "next-auth/jwt";
 
 export async function GET(
   request: NextRequest,
@@ -70,6 +70,7 @@ export async function SOCKET(
   server: WebSocketServer,
   context: { params: Promise<{ id: string }> }
 ) {
+  console.log("Socket count:", server.clients.size);
   const { id } = await context.params;
 
   const token = await getToken({ req: request as any, secret });

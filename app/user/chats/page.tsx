@@ -1,8 +1,7 @@
-import React from "react";
-import ChatsPage from "@/app/components/Chats/ChatsPage";
+import { redirect } from "next/navigation";
 
 const page = () => {
-  return <ChatsPage />; // Render the ChatsPage component
+  redirect("/user/chats/-1");
 };
 
 export default page;

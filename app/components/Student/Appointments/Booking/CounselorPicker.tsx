@@ -87,19 +87,33 @@ const CounselorBubble = ({ CounselorData, onChange }: CounselorBubbleProps) => {
     <div className="flex items-center justify-between border border-base-300 rounded-lg px-4 py-3 shadow-sm w-full">
       {/* Profile and Name */}
       <div className="flex items-center gap-4">
-        <Image
-          src={CounselorData.image}
-          alt={CounselorData.name}
-          className="w-12 h-12 rounded-full"
-          width={48}
-          height={48}
-        />
-        <div className="flex flex-col">
-          <span className="text-xs text-base-content font-semibold">Name:</span>
-          <span className="text-base text-base-content">
-            {CounselorData.name}
-          </span>
-        </div>
+        {CounselorData.image ? (
+          <Image
+            src={CounselorData.image}
+            alt={CounselorData.name}
+            className="w-12 h-12 rounded-full"
+            width={48}
+            height={48}
+          />
+        ) : (
+          <div className="w-12">
+            <div
+              role="button"
+              tabIndex={0}
+              className="w-12 h-12 text-xl rounded-full bg-gray-500 text-white flex items-center justify-center font-bold hover:brightness-90 active:brightness-75 transition duration-150 select-none cursor-pointer"
+            >
+              {CounselorData.name?.charAt(0).toUpperCase() ||
+                CounselorData.email.charAt(0).toUpperCase() ||
+                "?"}
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col">
+        <span className="text-xs text-base-content font-semibold">Name:</span>
+        <span className="text-base text-base-content">
+          {CounselorData.name}
+        </span>
       </div>
 
       {/* Day */}

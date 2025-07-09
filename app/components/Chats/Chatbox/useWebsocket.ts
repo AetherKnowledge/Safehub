@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseWebSocketOptions {
   reconnect?: boolean;
@@ -49,6 +49,11 @@ export function useWebSocket(
       setIsConnected(false);
       socketRef.current = null;
 
+      if (event.code !== 1000) {
+        setError("WebSocket connection closed unexpectedly.");
+        return;
+      }
+
       if (reconnect && reconnectAttempts.current < maxReconnectAttempts) {
         const delay = reconnectIntervalMs * 2 ** reconnectAttempts.current;
         reconnectAttempts.current += 1;
@@ -85,7 +90,9 @@ export function useWebSocket(
   }, []);
 
   useEffect(() => {
-    connect();
+    setTimeout(() => {
+      connect();
+    }, 50); // Allow time for the component to mount before connecting
 
     return () => {
       disconnect();

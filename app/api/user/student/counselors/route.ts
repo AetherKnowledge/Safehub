@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import AuthOptions from "@/app/components/AuthOptions";
+import { UserStatus, UserType } from "@/app/generated/prisma";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
-import AuthOptions from "@/app/components/AuthOptions";
-import { UserType } from "@/app/generated/prisma";
+import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const session = await getServerSession(AuthOptions);
@@ -22,6 +22,8 @@ export async function GET(request: Request) {
       id: true,
       name: true,
       image: true,
+      lastActiveAt: true,
+      status: true,
       email: true,
       Counselor: {
         select: {
@@ -31,5 +33,24 @@ export async function GET(request: Request) {
     },
   });
 
-  return NextResponse.json(counselors, { status: 200 });
+  const counselorWithStatus = counselors.map((counselor) => {
+    const now = new Date();
+    const lastActive = counselor.lastActiveAt
+      ? new Date(counselor.lastActiveAt)
+      : null;
+
+    if (lastActive) {
+      const diffInMinutes = Math.floor(
+        (now.getTime() - lastActive.getTime()) / 60000
+      );
+
+      if (diffInMinutes < 1) {
+        counselor.status = UserStatus.Online;
+      }
+    }
+
+    return { ...counselor };
+  });
+
+  return NextResponse.json(counselorWithStatus, { status: 200 });
 }

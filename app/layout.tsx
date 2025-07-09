@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
-import "./globals.css";
-import Navbar from "./components/Navbar";
 import AuthProvider from "./components/AuthProvider";
 import HeartbeatProvider from "./components/HeartbeatProvider";
+import Navbar from "./components/Navbar";
+import SocketProvider from "./components/SocketProvider";
+import "./globals.css";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -26,9 +27,11 @@ export default function RootLayout({
         <div className="flex flex-col min-h-screen">
           <AuthProvider>
             <HeartbeatProvider>
-              <Navbar />
-              {/* Let children take up remaining space */}
-              <main>{children}</main>
+              <SocketProvider>
+                <Navbar />
+                {/* Let children take up remaining space */}
+                <main>{children}</main>
+              </SocketProvider>
             </HeartbeatProvider>
           </AuthProvider>
         </div>

@@ -21,3 +21,14 @@ declare module "next-auth/jwt" {
     type?: UserType;
   }
 }
+
+declare module "ws" {
+  interface WebSocket {
+    userId?: string;
+    userType?: UserType;
+    chatId?: string;
+  }
+  interface WebSocketServer {
+    clients: Set<WebSocket>;
+  }
+}

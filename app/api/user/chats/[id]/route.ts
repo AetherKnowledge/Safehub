@@ -62,8 +62,6 @@ export async function GET(
   return NextResponse.json(messages, { status: 200 });
 }
 
-const secret = process.env.NEXTAUTH_SECRET;
-
 export async function SOCKET(
   client: WebSocket,
   request: IncomingMessage,
@@ -72,6 +70,7 @@ export async function SOCKET(
 ) {
   console.log("Socket count:", server.clients.size);
   const { id } = await context.params;
+  const secret = process.env.NEXTAUTH_SECRET;
 
   const token = await getToken({ req: request as any, secret });
   console.log(

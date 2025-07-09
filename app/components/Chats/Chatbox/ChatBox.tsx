@@ -4,12 +4,14 @@ import {
   useMessaging,
 } from "@/app/components/Chats/Chatbox/messaging";
 import { ReactNode, useEffect, useRef } from "react";
+import { useSocket } from "../../SocketProvider";
 import ChatBubble from "./ChatBubble";
 import ChatboxInput from "./ChatboxInput";
 
 export function ChatBox({ chatId }: { chatId: string }) {
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const [messages, sendMessage, loading] = useMessaging(chatId);
+  const socket = useSocket().socket;
+  const [messages, sendMessage, loading] = useMessaging(socket, chatId);
 
   useEffect(() => {
     setTimeout(scrollToBottom, 50);
@@ -35,7 +37,7 @@ export function ChatBox({ chatId }: { chatId: string }) {
       {/* Fixed input bar */}
       <ChatboxInput
         onSend={(message) => {
-          sendMessage(message);
+          sendMessage({ content: message, chatId: chatId });
         }}
       />
     </>

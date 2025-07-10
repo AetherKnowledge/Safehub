@@ -3,7 +3,7 @@ import { Manrope } from "next/font/google";
 import AuthProvider from "./components/AuthProvider";
 import HeartbeatProvider from "./components/HeartbeatProvider";
 import Navbar from "./components/Navbar";
-import SocketProvider from "./components/SocketProvider";
+import SocketProvider from "./components/Socket/SocketProvider";
 import "./globals.css";
 
 const manrope = Manrope({

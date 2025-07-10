@@ -1,8 +1,8 @@
-import React, { ReactNode, useState } from "react";
-import Image from "next/image";
-import ReactMarkdown from "react-markdown";
+import { Message } from "@/app/components/Socket/useMessaging";
 import { useSession } from "next-auth/react";
-import { Message } from "@/app/components/Chats/Chatbox/messaging";
+import Image from "next/image";
+import { ReactNode } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface Props {
   message: Message;

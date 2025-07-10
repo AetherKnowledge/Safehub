@@ -42,6 +42,13 @@ enum ChatType {
   DIRECT
 }
 
+enum CallStatus {
+  Pending
+  Accepted
+  Rejected
+  Ended
+}
+
 model User {
   id            String        @id @default(cuid())
   name          String?
@@ -64,6 +71,8 @@ model User {
 
   chatMembers ChatMember[]
   messages    ChatMessage[]
+  call        Call[]
+  callMember  CallMember[]
 }
 
 model Chat {
@@ -73,9 +82,34 @@ model Chat {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  call        Call?
 
   members  ChatMember[]
   messages ChatMessage[]
+}
+
+model Call {
+  id        String     @id @default(cuid())
+  chatId    String     @unique
+  status    CallStatus @default(Pending)
+  createdAt DateTime   @default(now())
+  callerId  String
+  chat      Chat       @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  caller     User         @relation(fields: [callerId], references: [id], onDelete: Cascade)
+  callMember CallMember[]
+}
+
+model CallMember {
+  id       String   @id @default(cuid())
+  callId   String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([callId, userId]) // Prevent duplicate members in a call
 }
 
 model ChatMember {

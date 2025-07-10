@@ -1,17 +1,12 @@
 "use client";
-import {
-  Message,
-  useMessaging,
-} from "@/app/components/Chats/Chatbox/messaging";
+import { Message, useMessaging } from "@/app/components/Socket/useMessaging";
 import { ReactNode, useEffect, useRef } from "react";
-import { useSocket } from "../../SocketProvider";
 import ChatBubble from "./ChatBubble";
 import ChatboxInput from "./ChatboxInput";
 
 export function ChatBox({ chatId }: { chatId: string }) {
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const socket = useSocket().socket;
-  const [messages, sendMessage, loading] = useMessaging(socket, chatId);
+  const [messages, sendMessage, loading] = useMessaging(chatId);
 
   useEffect(() => {
     setTimeout(scrollToBottom, 50);

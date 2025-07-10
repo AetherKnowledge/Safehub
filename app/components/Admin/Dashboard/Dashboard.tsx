@@ -1,7 +1,7 @@
 "use client";
 import OrdersByDayChart from "@/app/components/Charts/OrdersByDayChart";
+import { useSocket } from "@/app/components/Socket/SocketProvider";
 import { useEffect } from "react";
-import { useSocket } from "../../SocketProvider";
 
 const Dashboard = () => {
   const { socket } = useSocket();

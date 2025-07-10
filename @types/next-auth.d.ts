@@ -27,6 +27,7 @@ declare module "ws" {
     userId?: string;
     userType?: UserType;
     chatId?: string;
+    callId?: string; // Added callId to WebSocket interface
   }
   interface WebSocketServer {
     clients: Set<WebSocket>;

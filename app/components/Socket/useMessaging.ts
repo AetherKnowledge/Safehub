@@ -1,20 +1,19 @@
 "use client";
 import { ChatMessage } from "@/app/generated/prisma";
 import { useCallback, useEffect, useState } from "react";
-import {
-  SocketEvent,
-  SocketEventType,
-  SocketMessage,
-} from "../../Socket/SocketEvents";
+import { SocketEventType, SocketMessage } from "./SocketEvents";
+import { useSocket } from "./SocketProvider";
 
 export interface Message extends ChatMessage {
   name: string;
   src?: string;
 }
 
-export function useMessaging(socket: WebSocket | null, chatId: string) {
+export function useMessaging(chatId: string) {
+  const socket = useSocket().socket;
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
+  const onMessage = useSocket().onMessage;
 
   useEffect(() => {
     const loadData = async () => {
@@ -26,24 +25,15 @@ export function useMessaging(socket: WebSocket | null, chatId: string) {
     loadData();
   }, []);
 
-  const handleMessage = async (event: MessageEvent) => {
-    const payload =
-      typeof event.data === "string" ? event.data : await event.data.text();
-    console.log("Received message:", payload);
-
-    if (!payload) return;
-
-    const message = JSON.parse(payload) as SocketEvent<Message>;
-    if (message.type === "error") {
-      console.error("WebSocket error message:", message.payload);
-      return;
-    }
-    if (!message.payload) {
-      return;
-    }
-
-    setMessages((prev) => [...prev, message.payload]);
-  };
+  useEffect(() => {
+    const receiveMessage = onMessage((data: Message) => {
+      console.log("Received socket message:", data);
+      setMessages((prev) => [...prev, data]);
+    });
+    return () => {
+      receiveMessage();
+    };
+  }, [onMessage]);
 
   const sendMessage = useCallback(
     (content: SocketMessage) => {
@@ -81,13 +71,10 @@ export function useMessaging(socket: WebSocket | null, chatId: string) {
 
   useEffect(() => {
     if (!socket) return;
-
     joinChat();
-    socket?.addEventListener("message", handleMessage);
 
     return () => {
       leaveChat();
-      socket?.removeEventListener("message", handleMessage);
     };
   }, [socket, chatId]);
 

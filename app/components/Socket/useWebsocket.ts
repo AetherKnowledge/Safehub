@@ -1,6 +1,4 @@
 "use client";
-import { useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseWebSocketOptions {
@@ -27,12 +25,10 @@ export function useWebSocket(
     maxReconnectAttempts = 5,
   } = options;
 
-  const session = useSession();
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectAttempts = useRef(0);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const pathname = usePathname();
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const connect = useCallback(() => {

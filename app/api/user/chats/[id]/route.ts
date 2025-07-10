@@ -1,6 +1,6 @@
 import AuthOptions from "@/app/components/AuthOptions";
-import { Message } from "@/app/components/Chats/Chatbox/messaging";
 import { messageSchema } from "@/app/components/Schemas";
+import { Message } from "@/app/components/Socket/useMessaging";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
 import { getToken } from "next-auth/jwt";

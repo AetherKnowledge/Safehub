@@ -109,6 +109,7 @@ class ClientSocketServer {
         this.leaveChat();
         break;
       case SocketEventType.SDP:
+        console.log("SDP event received:", event.payload);
         this.receiveSdpData(event.payload as SocketSdp);
         break;
       case SocketEventType.TYPING:
@@ -123,27 +124,16 @@ class ClientSocketServer {
   private async receiveInitiateCall(payload: SocketInitiateCall) {
     const validation = initiateCallSchema.safeParse(payload);
     if (!validation.success || !validation.data) {
-      console.error(
-        "Invalid initiate call payload:",
-        payload,
-        validation.error
-      );
       this.sendErrorResponseToSelf("Invalid initiate call payload", 400);
       return;
     }
-
     const { chatId, callerId } = validation.data;
 
     const chat = await prisma.chat.findUnique({
       where: { id: chatId },
       include: {
         call: {
-          select: {
-            id: true,
-            callMember: {
-              select: { socketId: true },
-            },
-          },
+          select: { id: true, callMember: { select: { socketId: true } } },
         },
         members: {
           select: {
@@ -154,9 +144,7 @@ class ClientSocketServer {
       },
     });
 
-    if (!this.client.socketId) {
-      this.client.socketId = crypto.randomUUID(); // Ensure socketId is set
-    }
+    if (!this.client.socketId) this.client.socketId = crypto.randomUUID();
 
     if (!chat) {
       console.error("Chat not found for ID:", chatId);
@@ -170,39 +158,29 @@ class ClientSocketServer {
       return;
     }
 
-    // Check if call already exists for this chat
+    // Improved: Only one call per chat, delete old call if orphaned
     if (chat.call) {
-      for (const ws of this.server.clients) {
-        if (
+      const activeSockets = Array.from(this.server.clients).filter(
+        (ws) =>
           ws.readyState === WebSocket.OPEN &&
           ws.chatId === chatId &&
-          ws.callId === chat.call.id &&
-          chat.call.callMember.filter(
-            (member) => member.socketId === ws.socketId
-          ).length > 1
-        ) {
-          console.error("Call already exists for chat:", chatId);
-          this.sendErrorResponseToSelf(
-            "Call already exists for this chat",
-            409
-          );
-          return;
-        } else {
-          this.deleteCall(chat.call.id);
-        }
+          ws.callId === chat.call!.id
+      );
+      if (activeSockets.length > 1) {
+        console.error("Call already exists for chat:", chatId);
+        this.sendErrorResponseToSelf("Call already exists for this chat", 409);
+        return;
+      } else {
+        console.log("Deleting orphaned call for chat:", chatId);
+        await this.deleteCall(chat.call.id);
       }
     }
 
-    const callerName = chat.members.find((member) => member.userId === callerId)
-      ?.user.name;
-    const callerImage = chat.members.find(
-      (member) => member.userId === callerId
-    )?.user.image;
-
+    const member = chat.members.find((m) => m.userId === callerId);
     const initiateCallData: SocketInitiateCall = {
       ...validation.data,
-      callerName: callerName || this.clientToken.name || "Unknown",
-      callerImage: callerImage || this.clientToken.picture || undefined,
+      callerName: member?.user.name || this.clientToken.name || "Unknown",
+      callerImage: member?.user.image || this.clientToken.picture || undefined,
     };
 
     await prisma.call.create({
@@ -214,19 +192,15 @@ class ClientSocketServer {
       },
     });
 
-    this.createCallMember(initiateCallData.callId, callerId);
+    await this.createCallMember(initiateCallData.callId, callerId);
 
+    // Notify all chat members except caller
     for (const ws of this.server.clients) {
       if (
         ws.readyState === WebSocket.OPEN &&
-        chat.members.some((member) => member.userId === ws.userId) &&
-        ws.userId !== callerId // Don't send to the caller
+        chat.members.some((m) => m.userId === ws.userId) &&
+        ws.userId !== callerId
       ) {
-        console.log(
-          "Sending initiate call to client:",
-          ws.userId,
-          initiateCallData
-        );
         ws.send(
           JSON.stringify({
             type: SocketEventType.INITIATECALL,
@@ -238,17 +212,19 @@ class ClientSocketServer {
 
     this.setupCallTimeout(initiateCallData.callId, chatId);
     this.client.callId = initiateCallData.callId;
+    console.log(
+      "Initiate call setup complete for callId:",
+      initiateCallData.callId
+    );
   }
 
   private async receiveAnswerCall(payload: SocketAnswerCall) {
     const validation = answerCallSchema.safeParse(payload);
     if (!validation.success || !validation.data) {
-      console.error("Invalid answer call payload:", payload, validation.error);
       this.sendErrorResponseToSelf("Invalid answer call payload", 400);
       return;
     }
     const { callId, chatId, answer } = validation.data;
-    console.log("Answering call with ID:", callId, "in chat:", chatId);
 
     const call = await prisma.call.findUnique({
       where: { id: callId },
@@ -272,24 +248,21 @@ class ClientSocketServer {
       this.sendErrorResponseToSelf("Call not found", 404);
       return;
     }
-
     if (!(await this.isMemberOfChat(chatId))) {
       console.error("User is not a member of the chat:", chatId);
       this.sendErrorResponseToSelf("You are not a member of this chat", 403);
       return;
     }
-
     if (call.chatId !== chatId) {
       console.error("Call does not belong to the specified chat:", chatId);
       this.sendErrorResponseToSelf("Call does not belong to this chat", 403);
       return;
     }
-
     if (call.callerId === this.clientToken.sub) {
+      console.error("User cannot answer their own call:", this.clientToken.sub);
       this.sendErrorResponseToSelf("You cannot answer your own call", 403);
       return;
     }
-
     if (call.status !== CallStatus.Pending) {
       console.error("Call is not in pending status:", call.status);
       this.sendErrorResponseToSelf("Call is not in pending status", 400);
@@ -304,28 +277,23 @@ class ClientSocketServer {
       console.log("Call rejected by user:", this.clientToken.name);
       this.sendMessageToClient(
         SocketEventType.ANSWERCALL,
-        {
-          callId,
-          chatId,
-          answer: CallAnswerType.REJECT,
-        } as SocketAnswerCall,
+        { callId, chatId, answer: CallAnswerType.REJECT } as SocketAnswerCall,
         call.callerId
       );
-
-      // delete the call if no members are left
       if (call.callMember.length < 2) {
-        this.deleteCall(call.id);
+        console.log(
+          "Deleting call due to rejection and no members left:",
+          call.id
+        );
+        await this.deleteCall(call.id);
       }
-
       return;
     }
 
     console.log("Call accepted by user:", this.clientToken.name);
     await prisma.call.update({
       where: { id: callId },
-      data: {
-        status: answer ? CallStatus.Accepted : CallStatus.Rejected,
-      },
+      data: { status: CallStatus.Accepted },
     });
 
     this.sendMessageToClient(
@@ -340,18 +308,17 @@ class ClientSocketServer {
       call.callerId
     );
 
-    this.createCallMember(callId, this.clientToken.sub!);
+    await this.createCallMember(callId, this.clientToken.sub!);
     this.client.callId = callId;
+    console.log("Answer call setup complete for callId:", callId);
   }
 
   private async receiveLeaveCall(payload: SocketLeaveCall) {
     const validation = leaveCallSchema.safeParse(payload);
     if (!validation.success || !validation.data) {
-      console.error("Invalid leave call payload:", payload, validation.error);
       this.sendErrorResponseToSelf("Invalid leave call payload", 400);
       return;
     }
-
     const { callId, chatId } = validation.data;
     await this.leaveCall(callId, chatId);
   }
@@ -359,23 +326,15 @@ class ClientSocketServer {
   private async receiveSdpData(payload: SocketSdp) {
     const validation = sdpSchema.safeParse(payload);
     if (!validation.success || !validation.data) {
-      console.error("Invalid SDP offer payload:", payload, validation.error);
       this.sendErrorResponseToSelf("Invalid SDP offer payload", 400);
       return;
     }
-
     const { to, callId, chatId, sdpData } = validation.data;
-    console.log(
-      `Received SDP data from client: ${this.clientToken.name}, sending to peer: ${payload.to}`
-    );
 
-    // Handle the SDP offer (e.g., forward it to the appropriate peer)
     const call = await prisma.call.findUnique({
       where: { id: callId },
       include: {
-        callMember: {
-          select: { userId: true },
-        },
+        callMember: { select: { userId: true } },
         chat: {
           include: {
             members: {
@@ -390,29 +349,25 @@ class ClientSocketServer {
     });
 
     if (!call) {
-      console.error("Call not found for ID:", callId);
       this.sendErrorResponseToSelf("Call not found", 404);
       return;
     }
-
     if (!(await this.isMemberOfChat(chatId))) {
-      console.error("User is not a member of the chat:", chatId);
       this.sendErrorResponseToSelf("You are not a member of this chat", 403);
       return;
     }
-
     if (!(await this.isMemberOfChat(chatId, to))) {
-      console.error("User is not a member of the chat:", chatId);
       this.sendErrorResponseToSelf("User is not a member of this chat", 403);
       return;
     }
-
     if (call.chatId !== chatId) {
-      console.error("Call does not belong to the specified chat:", chatId);
       this.sendErrorResponseToSelf("Call does not belong to this chat", 403);
       return;
     }
 
+    console.log(
+      `Received SDP data from client: ${this.clientToken.name}, sending to peer: ${to}`
+    );
     for (const ws of this.server.clients) {
       if (
         ws.readyState === WebSocket.OPEN &&
@@ -436,8 +391,6 @@ class ClientSocketServer {
   }
 
   private async leaveCall(callId: string, chatId: string) {
-    console.log("Leaving call with ID:", callId, "in chat:", chatId);
-
     const call = await prisma.call.findUnique({
       where: { id: callId },
       include: {
@@ -455,37 +408,33 @@ class ClientSocketServer {
       },
     });
 
+    console.log("Leaving call with ID:", callId, "in chat:", chatId);
+
     if (!call) {
       console.error("Call not found for ID:", callId);
       this.sendErrorResponseToSelf("Call not found", 404);
       return;
     }
-
     if (call.chatId !== chatId) {
       console.error("Call does not belong to the specified chat:", chatId);
       this.sendErrorResponseToSelf("Call does not belong to this chat", 403);
       return;
     }
-
     if (callId !== this.client.callId) {
       console.error("User is not a member of the call:", callId);
       this.sendErrorResponseToSelf("You are not a member of this call", 403);
       return;
     }
 
-    // Remove the user from the call
     await prisma.callMember.delete({
       where: {
-        callId_userId: {
-          callId,
-          userId: this.clientToken.sub!,
-        },
+        callId_userId: { callId, userId: this.clientToken.sub! },
       },
     });
 
-    // If no members are left, delete the call -1 because it doesnt get updated member count
-    console.log("Call member left:", call.callMember.length);
+    // If no members are left, delete the call
     if (call.callMember.length - 1 < 2) {
+      console.log("Deleting call as no members left:", call.id);
       await this.deleteCall(call.id);
     }
 
@@ -510,47 +459,42 @@ class ClientSocketServer {
       }
     }
 
-    this.client.callId = undefined; // Clear the callId
+    console.log("User left call, callId cleared:", callId);
+    this.client.callId = undefined;
   }
 
   private async createCallMember(callId: string, userId: string) {
-    if (!this.client.socketId) {
-      this.client.socketId = crypto.randomUUID(); // Ensure socketId is set
-    }
-
+    if (!this.client.socketId) this.client.socketId = crypto.randomUUID();
+    console.log("Creating call member:", {
+      callId,
+      userId,
+      socketId: this.client.socketId,
+    });
     return await prisma.callMember.create({
-      data: {
-        socketId: this.client.socketId,
-        callId,
-        userId,
-      },
+      data: { socketId: this.client.socketId, callId, userId },
     });
   }
 
   public async joinChat(payload: SocketJoinChat) {
     const validation = joinChatSchema.safeParse(payload);
     if (!validation.success || !validation.data) {
-      console.error("Invalid join chat payload:", payload, validation.error);
       this.sendErrorResponseToSelf("Invalid join chat payload", 400);
       return;
     }
-
     const { chatId } = validation.data;
     console.log("Joining chat with ID:", chatId);
-
-    const isMember = await this.isMemberOfChat(chatId);
-    if (!isMember) {
+    if (!(await this.isMemberOfChat(chatId))) {
       console.error("User is not a member of the chat:", chatId);
       this.sendErrorResponseToSelf("You are not a member of this chat", 403);
       return;
     }
-
     this.client.chatId = chatId;
+    console.log("User joined chat:", chatId);
   }
 
   public leaveChat() {
     console.log("Leaving chat with ID:", this.client.chatId);
-    this.client.chatId = undefined; // Clear the chatId
+    this.client.chatId = undefined;
   }
 
   public async isMemberOfChat(
@@ -563,16 +507,17 @@ class ClientSocketServer {
         where: { id: chatId },
         select: {
           members: {
-            where: { userId: this.clientToken.sub },
+            where: { userId },
             select: { userId: true },
           },
         },
       });
-
-      console.log(chat);
-
-      if (!chat) return false;
-      return chat.members.length > 0;
+      const isMember = !!chat && chat.members.length > 0;
+      console.log(
+        `isMemberOfChat result for user ${userId} in chat ${chatId}:`,
+        isMember
+      );
+      return isMember;
     } catch (error) {
       console.error("Error checking chat membership:", error);
       return false;
@@ -588,20 +533,12 @@ class ClientSocketServer {
       | SocketCallEnded
       | SocketError
   ) {
-    if (this.client.readyState !== WebSocket.OPEN) {
-      console.warn("WebSocket is not open. Cannot send message.");
-      return;
-    }
+    if (this.client.readyState !== WebSocket.OPEN) return;
     console.log(`Sending message to self: ${this.clientToken.name}`, {
       eventType,
       payload,
     });
-
-    const event: SocketEvent = {
-      type: eventType,
-      payload,
-    };
-    this.client.send(JSON.stringify(event));
+    this.client.send(JSON.stringify({ type: eventType, payload }));
   }
 
   private sendMessageToClient(
@@ -618,52 +555,34 @@ class ClientSocketServer {
       this.sendMessageToSelf(eventType, payload);
       return;
     }
-
-    if (this.client.readyState !== WebSocket.OPEN) {
-      console.warn("WebSocket is not open. Cannot send message.");
-      return;
-    }
-    console.log(`Sending message to client: ${this.clientToken.name}`, {
-      eventType,
-      payload,
-    });
-
     for (const ws of this.server.clients) {
       if (ws.readyState === WebSocket.OPEN && ws.userId === id) {
         console.log(`Sending message to client: ${ws.userId}`, {
           eventType,
           payload,
         });
-        ws.send(
-          JSON.stringify({
-            type: eventType,
-            payload,
-          } as SocketEvent)
-        );
+        ws.send(JSON.stringify({ type: eventType, payload }));
       }
     }
   }
 
   private async receiveMessage(payload: SocketMessage) {
     if (this.isRateLimited()) {
+      console.warn(`Rate limit exceeded for user: ${this.clientToken.name}`);
       this.sendErrorResponseToSelf(
         "Rate limit exceeded. Please slow down.",
         429
       );
       return;
     }
-
     console.log("Handling message:", payload);
     const validation = messageSchema.safeParse(payload);
-
     if (!validation.success || !validation.data) {
       console.error("Invalid message format:", payload, validation.error);
       this.client.send(JSON.stringify({ error: "Invalid message format" }));
       return;
     }
-
     console.log("Message content validated:", validation.data);
-
     const chat = await prisma.chat.findUnique({
       where: { id: payload.chatId },
       include: {
@@ -673,21 +592,16 @@ class ClientSocketServer {
         },
       },
     });
-
     if (!chat) {
       console.error("Chat not found for ID:", payload.chatId);
       this.client.close(1008, "Chat not found");
       return;
     }
-
-    if (
-      !chat.members.some((member) => member.userId === this.clientToken.sub)
-    ) {
+    if (!chat.members.some((m) => m.userId === this.clientToken.sub)) {
       console.log("User is not a member of the chat");
       this.client.close(1008, "You are not a member of this chat");
       return;
     }
-
     const newMessage = await prisma.chatMessage.create({
       data: {
         chatId: payload.chatId,
@@ -695,7 +609,6 @@ class ClientSocketServer {
         content: validation.data.content,
       },
     });
-
     for (const ws of this.server.clients) {
       if (ws.readyState === WebSocket.OPEN && ws.chatId === payload.chatId) {
         console.log(
@@ -719,59 +632,38 @@ class ClientSocketServer {
 
   private isRateLimited(): boolean {
     const now = Date.now();
-
-    // Reset counter if window has passed
     if (now - this.lastMessageTime > this.MESSAGE_RATE_WINDOW) {
       this.messageCount = 0;
       this.lastMessageTime = now;
     }
-
     this.messageCount++;
-
     if (this.messageCount > this.MESSAGE_RATE_LIMIT) {
       console.warn(`Rate limit exceeded for user: ${this.clientToken.name}`);
       return true;
     }
-
     return false;
   }
 
   public sendErrorResponseToSelf(message: string, code?: number) {
+    console.error("Sending error response to self:", message, code);
     this.sendMessageToSelf(SocketEventType.ERROR, {
       message,
-      code: code, // Custom error code for unauthorized access
+      code,
     } as SocketError);
-    return;
   }
 
   private async cleanup() {
-    // Clear chat association
+    console.log(`Cleaning up resources for user: ${this.clientToken.name}`);
     this.client.chatId = undefined;
     this.client.userId = undefined;
-
-    // Clear call timeout
     this.clearCallTimeout();
-
-    // Clear heartbeat interval
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = undefined;
     }
-
-    // If the user is in a call, leave it
-    if (this.client.callId) {
-      const call = await prisma.call.findUnique({
-        where: { id: this.client.callId },
-        include: { callMember: true },
-      });
-
-      // If the call has no members left, delete it
-      if (call && call?.callMember.length < 2)
-        this.deleteCall(this.client.callId);
-
-      await this.leaveCall(this.client.callId, this.client.chatId!);
+    if (this.client.callId && this.client.chatId) {
+      await this.leaveCall(this.client.callId, this.client.chatId);
     }
-
     console.log(`Cleaned up resources for user: ${this.clientToken.name}`);
   }
 
@@ -786,64 +678,54 @@ class ClientSocketServer {
   private async deleteCall(callId: string) {
     await prisma.call.delete({ where: { id: callId } });
     console.log(`Call with ID ${callId} deleted`);
-
     for (const ws of this.server.clients) {
       if (
         ws.readyState === WebSocket.OPEN &&
-        ws.callId === this.client.callId &&
+        ws.callId === callId &&
         ws.userId !== this.clientToken.sub
       ) {
         console.log(`Notifying client ${ws.userId} about call end`);
         this.sendMessageToClient(
           SocketEventType.CALLENDED,
-          {
-            callId,
-            chatId: this.client.chatId,
-          } as SocketCallEnded,
+          { callId, chatId: ws.chatId } as SocketCallEnded,
           ws.userId!
         );
       }
     }
-
-    this.client.callId = undefined; // Clear the callId
+    this.client.callId = undefined;
   }
 
   private async setupCallTimeout(callId: string, chatId: string) {
     this.callTimeout = setTimeout(async () => {
       console.log(`Call timeout reached for call ID: ${callId}`);
       const call = await prisma.call.findUnique({ where: { id: callId } });
-      if (call?.status !== CallStatus.Pending) {
-        return;
-      }
-
+      if (call?.status !== CallStatus.Pending) return;
       const answerData: SocketAnswerCall = {
         userId: this.clientToken.sub!,
         userName: this.clientToken.name!,
         callId,
         chatId,
-        answer: CallAnswerType.DID_NOT_ANSWER, // Automatically reject after timeout
+        answer: CallAnswerType.DID_NOT_ANSWER,
       };
       await this.deleteCall(callId);
-
       this.sendMessageToSelf(SocketEventType.ANSWERCALL, answerData);
-    }, 60000); // 60 seconds timeout
+    }, 60000);
   }
 
   private setupHeartbeat() {
-    // Send ping every 30 seconds to keep connection alive
     this.heartbeatInterval = setInterval(() => {
       if (this.client.readyState === WebSocket.OPEN) {
         this.client.ping();
+        console.log(`Sent heartbeat ping to user: ${this.clientToken.name}`);
       }
     }, 30000);
-
-    // Handle pong responses
     this.client.on("pong", () => {
       console.log(`Heartbeat received from user: ${this.clientToken.name}`);
     });
   }
 
   public close() {
+    console.log(`Closing WebSocket for user: ${this.clientToken.name}`);
     this.client.close();
   }
 }

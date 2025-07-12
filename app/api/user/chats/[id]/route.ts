@@ -1,6 +1,6 @@
-import AuthOptions from "@/app/components/AuthOptions";
-import { messageSchema } from "@/app/components/Schemas";
-import { Message } from "@/app/components/Socket/useMessaging";
+import authOptions from "@/lib/auth/authOptions";
+import { messageSchema } from "@/lib/schemas";
+import { Message } from "@/lib/socket/useMessaging";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
 import { getToken } from "next-auth/jwt";
@@ -12,7 +12,7 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(AuthOptions);
+  const session = await getServerSession(authOptions);
   if (!session || !session.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

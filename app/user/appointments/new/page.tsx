@@ -1,12 +1,11 @@
-import React from "react";
 import StudentNewAppointmentPage from "@/app/components/Student/Appointments/NewAppointmentPage";
-import { getServerSession } from "next-auth";
-import AuthOptions from "@/app/components/AuthOptions";
 import { UserType } from "@/app/generated/prisma";
+import authOptions from "@/lib/auth/authOptions";
+import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 const AppointmentPage = async () => {
-  const session = await getServerSession(AuthOptions);
+  const session = await getServerSession(authOptions);
   if (!session || session.user.type !== UserType.Student)
     return redirect("/user/dashboard");
 

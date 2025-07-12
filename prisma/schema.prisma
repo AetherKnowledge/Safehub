@@ -31,12 +31,6 @@ enum Days {
   Sunday
 }
 
-enum UserStatus {
-  Online
-  Offline
-  Busy
-}
-
 enum ChatType {
   GROUP
   DIRECT
@@ -49,6 +43,11 @@ enum CallStatus {
   Ended
 }
 
+enum UserStatus {
+  Online
+  Offline
+}
+
 model User {
   id            String        @id @default(cuid())
   name          String?
@@ -59,7 +58,6 @@ model User {
   image         String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
-  lastActiveAt  DateTime?     @default(now())
   status        UserStatus    @default(Offline)
   accounts      Account[]
   sessions      Session[]
@@ -76,13 +74,14 @@ model User {
 }
 
 model Chat {
-  id          String   @id @default(cuid())
-  type        ChatType @default(DIRECT)
-  name        String?
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  call        Call?
+  id            String   @id @default(cuid())
+  type          ChatType @default(DIRECT)
+  name          String?
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastMessageAt DateTime @default(now())
+  call          Call?
 
   members  ChatMember[]
   messages ChatMessage[]

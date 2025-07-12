@@ -1,4 +1,4 @@
-import ClientSocketServer from "@/app/components/Socket/ClientSocketServer";
+import ClientSocketServer from "@/lib/socket/ClientSocketServer";
 import { getToken } from "next-auth/jwt";
 import { IncomingMessage } from "node:http";
 import { WebSocket, WebSocketServer } from "ws";

@@ -1,5 +1,5 @@
-import React, { ReactNode, useState } from "react";
 import Image from "next/image";
+import { ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 
 interface Props {

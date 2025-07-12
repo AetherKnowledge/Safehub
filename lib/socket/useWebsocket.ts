@@ -16,12 +16,15 @@ interface UseWebSocketReturn {
 }
 
 export function useWebSocket(
-  urlFn: () => string,
+  urlFn: () => string = () =>
+    process.env.NODE_ENV === "production"
+      ? `wss://${window.location.host}/api/user/socket`
+      : `ws://${window.location.host}/api/user/socket`,
   options: UseWebSocketOptions = {}
 ): UseWebSocketReturn {
   const {
     reconnect = true,
-    reconnectIntervalMs = 1000,
+    reconnectIntervalMs = 10000,
     maxReconnectAttempts = 0, // 0 means unlimited attempts
   } = options;
 
@@ -45,6 +48,7 @@ export function useWebSocket(
 
     socket.onclose = (event) => {
       console.log("[WebSocket] Closed", event);
+      console.log(event.code, event.reason);
       setIsConnected(false);
       socketRef.current = null;
 
@@ -58,7 +62,10 @@ export function useWebSocket(
         (maxReconnectAttempts === 0 ||
           reconnectAttempts.current < maxReconnectAttempts)
       ) {
-        const delay = reconnectIntervalMs * 2 ** reconnectAttempts.current;
+        const delay =
+          reconnectIntervalMs * 2 ** reconnectAttempts.current > 10000
+            ? 10000
+            : reconnectIntervalMs * 2 ** reconnectAttempts.current;
         reconnectAttempts.current += 1;
 
         console.log(
@@ -93,9 +100,12 @@ export function useWebSocket(
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      connect();
-    }, 50); // Allow time for the component to mount before connecting
+    // Only connect if not already connected
+    if (!socketRef.current) {
+      setTimeout(() => {
+        connect();
+      }, 50);
+    }
 
     return () => {
       disconnect();

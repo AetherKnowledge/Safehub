@@ -1,6 +1,6 @@
 import { CallStatus, UserType } from "@/app/generated/prisma";
+import { CallAnswerType } from "@/lib/socket/SocketEvents";
 import { z } from "zod";
-import { CallAnswerType } from "./Socket/SocketEvents";
 
 export const messageSchema = z.object({
   chatId: z.string().min(1, "Chat ID is required"),

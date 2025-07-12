@@ -6,24 +6,17 @@ import {
   FaVideo,
   FaVideoSlash,
 } from "react-icons/fa";
-import { PeerData } from "../Socket/useCalling";
+import { PeerData } from "../../../lib/socket/useCalling";
 
 interface Props {
   stream: MediaStream | null;
   isLocalStream: boolean;
-  isOnCall: boolean;
   onEndCall?: () => void;
   peers?: PeerData[];
   visible?: boolean;
 }
 
-const VideoContainer = ({
-  stream,
-  isLocalStream,
-  isOnCall,
-  onEndCall,
-  peers,
-}: Props) => {
+const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const [isMicOn, setIsMicOn] = React.useState(true);
   const [isCameraOn, setIsCameraOn] = React.useState(true);

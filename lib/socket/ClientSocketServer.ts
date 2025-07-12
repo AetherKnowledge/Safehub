@@ -1,7 +1,5 @@
 import { CallStatus } from "@/app/generated/prisma";
-import { prisma } from "@/prisma/client";
-import { JWT } from "next-auth/jwt/types";
-import { WebSocket, WebSocketServer } from "ws";
+import { isUserOnline, setUserOnline } from "@/lib/redis";
 import {
   answerCallSchema,
   initiateCallSchema,
@@ -9,7 +7,10 @@ import {
   leaveCallSchema,
   messageSchema,
   sdpSchema,
-} from "../Schemas";
+} from "@/lib/schemas";
+import { prisma } from "@/prisma/client";
+import { JWT } from "next-auth/jwt/types";
+import { WebSocket, WebSocketServer } from "ws";
 import {
   CallAnswerType,
   SocketAnswerCall,
@@ -25,13 +26,15 @@ import {
 } from "./SocketEvents";
 import { Message } from "./useMessaging";
 
+//TODO: when user connects, check if they have an active call
+
 class ClientSocketServer {
   private client: WebSocket;
   private clientToken: JWT;
   private server: WebSocketServer;
   private lastMessageTime: number = 0;
   private messageCount: number = 0;
-  private readonly MESSAGE_RATE_LIMIT = 10; // messages per minute
+  private readonly MESSAGE_RATE_LIMIT = 100; // messages per minute
   private readonly MESSAGE_RATE_WINDOW = 60000; // 1 minute in ms
   private heartbeatInterval?: NodeJS.Timeout;
   private callTimeout?: NodeJS.Timeout;
@@ -42,6 +45,9 @@ class ClientSocketServer {
     this.clientToken = token;
     this.client.userId = token.sub;
     this.client.socketId = crypto.randomUUID(); // Assign a unique socket ID
+    setUserOnline(this.client.userId);
+
+    console.log(this.clientToken.sub);
 
     this.client.on("open", () => {
       console.log(
@@ -66,11 +72,12 @@ class ClientSocketServer {
 
     this.client.on("error", (error: Error) => {
       console.error("WebSocket error:", error);
+      this.sendErrorResponseToSelf(`WebSocket error: ${error.message}`, 500);
     });
 
-    this.client.on("close", () => {
+    this.client.on("close", (code, reason) => {
       console.log(
-        `WebSocket connection closed for user: ${this.clientToken.name}`
+        `WebSocket connection closed for user: ${this.clientToken.name}, code: ${code}, reason: ${reason}`
       );
       this.cleanup();
     });
@@ -130,7 +137,7 @@ class ClientSocketServer {
         // Handle typing event logic here
         break;
       default:
-        console.warn("Unknown event type:", event.type);
+        console.warn("Unknown event type:", event.type, "payload:", event);
     }
   }
 
@@ -619,7 +626,6 @@ class ClientSocketServer {
       where: { id: payload.chatId },
       include: {
         members: {
-          where: { userId: this.clientToken.sub },
           select: { userId: true },
         },
       },
@@ -641,8 +647,17 @@ class ClientSocketServer {
         content: validation.data.content,
       },
     });
+
+    await prisma.chat.update({
+      where: { id: payload.chatId },
+      data: { lastMessageAt: new Date() },
+    });
+
     for (const ws of this.server.clients) {
-      if (ws.readyState === WebSocket.OPEN && ws.chatId === payload.chatId) {
+      if (
+        ws.readyState === WebSocket.OPEN &&
+        chat.members.some((m) => m.userId === ws.userId)
+      ) {
         console.log(
           "Sending message to client:",
           ws.userId,
@@ -688,6 +703,7 @@ class ClientSocketServer {
 
   private async cleanup() {
     console.log(`Cleaning up resources for user: ${this.clientToken.name}`);
+
     this.client.chatId = undefined;
     this.client.userId = undefined;
     this.clearCallTimeout();
@@ -698,6 +714,7 @@ class ClientSocketServer {
     if (this.client.callId && this.client.chatId) {
       await this.leaveCall(this.client.callId, this.client.chatId);
     }
+
     console.log(`Cleaned up resources for user: ${this.clientToken.name}`);
   }
 
@@ -758,9 +775,14 @@ class ClientSocketServer {
         console.log(`Sent heartbeat ping to user: ${this.clientToken.name}`);
       }
     }, 30000);
-    this.client.on("pong", () => {
+    this.client.on("pong", async () => {
       console.log(`Heartbeat received from user: ${this.clientToken.name}`);
+      await setUserOnline(this.client.userId);
     });
+  }
+
+  public static async isUserOnline(userId: string): Promise<boolean> {
+    return await isUserOnline(userId);
   }
 
   public close() {

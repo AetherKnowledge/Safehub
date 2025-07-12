@@ -1,6 +1,6 @@
 "use client";
 
-import { User, UserType } from "@/app/generated/prisma";
+import { User } from "@/app/generated/prisma";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -48,25 +48,6 @@ const CounselorList = ({ name }: { name?: string }) => {
     }
 
     setAllCounselors(data);
-  }
-
-  async function changeRole(userId: string, newRole: UserType) {
-    const res = await fetch("/api/user/admin/counselors", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: userId,
-        type: newRole,
-      }),
-    });
-
-    const result = await res.json();
-    if (!res.ok) {
-      console.error("Failed to update user role:", result);
-      return;
-    } else await refreshCounselors();
   }
 
   return (

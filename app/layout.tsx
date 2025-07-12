@@ -1,10 +1,10 @@
+import NotificationProvider from "@/lib/NotificationProvider";
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
-import AuthProvider from "./components/AuthProvider";
+import AuthProvider from "../lib/auth/AuthProvider";
+import SocketProvider from "../lib/socket/SocketProvider";
 import CallPopupProvider from "./components/Chats/Chatbox/CallPopupProvider";
-import HeartbeatProvider from "./components/HeartbeatProvider";
 import Navbar from "./components/Navbar";
-import SocketProvider from "./components/Socket/SocketProvider";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -27,15 +27,16 @@ export default function RootLayout({
       <body className={`${manrope.variable} antialiased`}>
         <div className="flex flex-col min-h-screen">
           <AuthProvider>
-            <HeartbeatProvider>
-              <SocketProvider>
-                <CallPopupProvider>
-                  <Navbar />
-                  {/* Let children take up remaining space */}
-                  <main>{children}</main>
-                </CallPopupProvider>
-              </SocketProvider>
-            </HeartbeatProvider>
+            <SocketProvider>
+              <CallPopupProvider>
+                <NotificationProvider>
+                  <main>
+                    <Navbar />
+                    {children}
+                  </main>
+                </NotificationProvider>
+              </CallPopupProvider>
+            </SocketProvider>
           </AuthProvider>
         </div>
       </body>

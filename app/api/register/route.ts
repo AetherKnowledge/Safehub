@@ -1,4 +1,4 @@
-import { registerSchema } from "@/app/components/Schemas";
+import { registerSchema } from "@/lib/schemas";
 import { prisma } from "@/prisma/client";
 import bcrypt from "bcrypt";
 import { NextRequest, NextResponse } from "next/server";

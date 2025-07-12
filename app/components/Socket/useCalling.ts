@@ -20,7 +20,7 @@ export interface PeerData {
   userId: string;
 }
 
-export function useCalling(chatId: string) {
+export function useCalling() {
   const session = useSession();
   const socket = useSocket().socket;
   const [calling, setCalling] = useState<SocketInitiateCall | null>(null);
@@ -71,7 +71,7 @@ export function useCalling(chatId: string) {
       const peer = new Peer({
         stream,
         initiator,
-        trickle: true,
+        trickle: false,
         config: { iceServers },
       });
 
@@ -83,7 +83,7 @@ export function useCalling(chatId: string) {
             from: session.data?.user.id,
             to: member,
             callId: calling.callId,
-            chatId,
+            chatId: calling.chatId,
             sdpData: JSON.stringify(signalData),
           } as SocketSdp,
         } as SocketEvent;
@@ -178,10 +178,10 @@ export function useCalling(chatId: string) {
   useEffect(() => {
     const recieveCall = onRecieveCall((data: SocketInitiateCall) => {
       console.log("Received call data:", data);
-      if (data.chatId === chatId) {
-        // Handle the call data, e.g., show a notification or update state
-        console.log(`Incoming call from ${data.callerName} in chat ${chatId}`);
-      }
+      console.log(
+        `Incoming call from ${data.callerName} in chat ${data.chatId}`
+      );
+
       // Set the calling state to the received call data
       setCalling(data);
     });
@@ -189,14 +189,16 @@ export function useCalling(chatId: string) {
     return () => {
       recieveCall(); // Properly remove the listener
     };
-  }, [onRecieveCall, chatId]);
+  }, [onRecieveCall, calling]);
 
   useEffect(() => {
     const answerCall = onAnswerCall((data: SocketAnswerCall) => {
       console.log("Call answered:", data);
-      if (data.chatId === chatId) {
+      if (data.chatId === calling?.chatId) {
         // Handle the call answered event, e.g., show a notification or update state
-        console.log(`Call answered in chat ${chatId} by ${data.userName}`);
+        console.log(
+          `Call answered in chat ${calling?.chatId} by ${data.userName}`
+        );
       }
 
       if (!calling) {
@@ -217,28 +219,33 @@ export function useCalling(chatId: string) {
     return () => {
       answerCall(); // Properly remove the listener
     };
-  }, [onAnswerCall, chatId, calling]);
+  }, [onAnswerCall, calling]);
 
   useEffect(() => {
     const recieveCallLeft = onRecieveCallLeft((data: SocketLeaveCall) => {
       console.log("Call left:", data);
-      if (data.chatId === chatId) {
+      if (data.chatId === calling?.chatId) {
         // Handle the call left event, e.g., show a notification or update state
-        console.log(`Call left in chat ${chatId} by ${data.userName}`);
+        console.log(`Call left in chat ${calling?.chatId} by ${data.userName}`);
       }
     });
 
     return () => {
       recieveCallLeft(); // Properly remove the listener
     };
-  }, [onRecieveCallLeft, chatId]);
+  }, [onRecieveCallLeft, calling, peers]);
 
   useEffect(() => {
     const recieveCallEnded = onRecieveCallEnded((data: SocketCallEnded) => {
+      if (!calling) {
+        console.warn("No active call to handle call ended event.");
+        return;
+      }
+
       console.log("Call ended:", data);
-      if (data.chatId === chatId) {
+      if (data.chatId === calling?.chatId) {
         // Handle the call ended event, e.g., show a notification or update state
-        console.log(`Call ended in chat ${chatId}`);
+        console.log(`Call ended in chat ${calling?.chatId}`);
       }
 
       setCalling(null); // Clear the calling state
@@ -248,7 +255,7 @@ export function useCalling(chatId: string) {
     return () => {
       recieveCallEnded(); // Properly remove the listener
     };
-  }, [onRecieveCallEnded, chatId]);
+  }, [onRecieveCallEnded, calling]);
 
   useEffect(() => {
     console.log("Current peers:", peers);
@@ -371,7 +378,7 @@ export function useCalling(chatId: string) {
       setCalling(callData);
       setCallMembers([session.data?.user.id]);
     },
-    [socket, session.data?.user.id, getMediaStream]
+    [socket, session, calling]
   );
 
   const answerCall = useCallback(async () => {
@@ -402,7 +409,7 @@ export function useCalling(chatId: string) {
 
     const answerData = {
       callId: calling?.callId,
-      chatId,
+      chatId: calling?.chatId,
       answer: CallAnswerType.ACCEPT,
     } as SocketAnswerCall;
 
@@ -430,7 +437,7 @@ export function useCalling(chatId: string) {
     }
 
     socket.send(JSON.stringify(message));
-  }, [socket, calling, peers, chatId, getMediaStream, createPeer, callMembers]);
+  }, [socket, calling, peers, callMembers]);
 
   const rejectCall = useCallback(() => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -445,7 +452,7 @@ export function useCalling(chatId: string) {
 
     const answerData = {
       callId: calling?.callId,
-      chatId,
+      chatId: calling?.chatId,
       answer: CallAnswerType.REJECT,
     } as SocketAnswerCall;
 
@@ -470,7 +477,7 @@ export function useCalling(chatId: string) {
 
     const leaveData = {
       callId: calling?.callId,
-      chatId,
+      chatId: calling?.chatId,
     };
 
     const message = {
@@ -493,7 +500,7 @@ export function useCalling(chatId: string) {
     socket.send(JSON.stringify(message));
     setCalling(null); // Clear the calling state
     setLocalStream(null); // Clear the local stream
-  }, [socket, calling, localStream, peers, chatId]);
+  }, [socket, calling, localStream, peers]);
 
   return [
     calling,

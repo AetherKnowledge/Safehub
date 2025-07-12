@@ -22,7 +22,7 @@ export function useWebSocket(
   const {
     reconnect = true,
     reconnectIntervalMs = 1000,
-    maxReconnectAttempts = 5,
+    maxReconnectAttempts = 0, // 0 means unlimited attempts
   } = options;
 
   const socketRef = useRef<WebSocket | null>(null);
@@ -49,11 +49,15 @@ export function useWebSocket(
       socketRef.current = null;
 
       if (event.code !== 1000) {
-        setError("WebSocket connection closed unexpectedly.");
-        return;
+        // Only set error if the closure was not intentional (code 1000 means normal closure)
+        console.log("WebSocket connection closed unexpectedly.");
       }
 
-      if (reconnect && reconnectAttempts.current < maxReconnectAttempts) {
+      if (
+        reconnect &&
+        (maxReconnectAttempts === 0 ||
+          reconnectAttempts.current < maxReconnectAttempts)
+      ) {
         const delay = reconnectIntervalMs * 2 ** reconnectAttempts.current;
         reconnectAttempts.current += 1;
 

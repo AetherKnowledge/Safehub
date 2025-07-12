@@ -1,11 +1,12 @@
-import AuthOptions from "@/app/components/AuthOptions";
 import { UserStatus, UserType } from "@/app/generated/prisma";
+import authOptions from "@/lib/auth/authOptions";
+import { isUserOnline } from "@/lib/redis";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const session = await getServerSession(AuthOptions);
+  const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -22,8 +23,6 @@ export async function GET(request: Request) {
       id: true,
       name: true,
       image: true,
-      lastActiveAt: true,
-      status: true,
       email: true,
       Counselor: {
         select: {
@@ -33,24 +32,13 @@ export async function GET(request: Request) {
     },
   });
 
-  const counselorWithStatus = counselors.map((counselor) => {
-    const now = new Date();
-    const lastActive = counselor.lastActiveAt
-      ? new Date(counselor.lastActiveAt)
-      : null;
+  const counselorsWithStatus = await Promise.all(
+    counselors.map(async (counselor) =>
+      (await isUserOnline(counselor.id))
+        ? { ...counselor, status: UserStatus.Online }
+        : { ...counselor, status: UserStatus.Offline }
+    )
+  );
 
-    if (lastActive) {
-      const diffInMinutes = Math.floor(
-        (now.getTime() - lastActive.getTime()) / 60000
-      );
-
-      if (diffInMinutes < 1) {
-        counselor.status = UserStatus.Online;
-      }
-    }
-
-    return { ...counselor };
-  });
-
-  return NextResponse.json(counselorWithStatus, { status: 200 });
+  return NextResponse.json(counselorsWithStatus, { status: 200 });
 }

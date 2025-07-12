@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useCalling } from "../../Socket/useCalling";
+import { useCalling } from "../../../../lib/socket/useCalling";
 import VideoContainer from "../../Video/VideoContainer";
 
 interface CallPopupContextType {
@@ -118,7 +118,6 @@ const CallPopup = ({ children }: Props) => {
         <VideoContainer
           stream={localStream}
           isLocalStream={true}
-          isOnCall={true}
           onEndCall={handleLeaveCall}
           peers={peers}
         />

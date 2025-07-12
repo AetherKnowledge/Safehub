@@ -1,8 +1,8 @@
+import { UserType } from "@/app/generated/prisma";
 import { prisma } from "@/prisma/client";
 import { Session } from "next-auth";
 import Image from "next/image";
 import { ReactNode } from "react";
-import { UserType } from "../generated/prisma";
 
 export const createManyChatsWithOthers = async (
   userType: UserType,
@@ -88,13 +88,15 @@ export function imageGenerator(
   return (
     <>
       {src ? (
-        <Image
-          src={src}
-          alt={name ?? "counselor Avatar"}
-          className={`w-${width} h-${width} rounded-full`}
-          width={width * 2}
-          height={width * 2}
-        />
+        <div className={`w-${width}`}>
+          <Image
+            src={src}
+            alt={name ?? "counselor Avatar"}
+            className={`w-${width} h-${width} rounded-full`}
+            width={width * 2}
+            height={width * 2}
+          />
+        </div>
       ) : (
         <div className={`w-${width}`}>
           <div

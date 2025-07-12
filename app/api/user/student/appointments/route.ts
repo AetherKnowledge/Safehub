@@ -1,16 +1,12 @@
-import { NextResponse } from "next/server";
+import { Appointment, UserType } from "@/app/generated/prisma";
+import authOptions from "@/lib/auth/authOptions";
+import { deleteAppointmentSchema, newAppointmentSchema } from "@/lib/schemas";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
-import AuthOptions from "@/app/components/AuthOptions";
-import { Appointment } from "@/app/generated/prisma";
-import { UserType } from "@/app/generated/prisma";
-import {
-  newAppointmentSchema,
-  deleteAppointmentSchema,
-} from "@/app/components/Schemas";
+import { NextResponse } from "next/server";
 
 export async function GET() {
-  const session = await getServerSession(AuthOptions);
+  const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -56,7 +52,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(AuthOptions);
+  const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -116,7 +112,7 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const session = await getServerSession(AuthOptions);
+  const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

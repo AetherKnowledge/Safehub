@@ -1,9 +1,9 @@
 "use client";
-import React, { ReactNode, useEffect, useRef, useState } from "react";
-import AIChatBubble from "./AiChatBubble";
 import { chathistory } from "@/app/generated/prisma";
-import AIChatboxInput from "./AiChatboxInput";
 import { useSession } from "next-auth/react";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import AIChatboxInput from "./AiChatboxInput";
+import AIChatBubble from "./AiChatBubble";
 
 interface Message {
   type: "human" | "ai";
@@ -89,9 +89,9 @@ function renderChatHistory(
 }
 
 function makeChatBubble(chat: chathistory, imageUrl?: string): ReactNode {
-  if (!isMessage(chat.message)) return null;
-
-  const message: Message = chat.message;
+  const message: Message = JSON.parse(
+    chat.message?.toString() || ""
+  ) as Message;
   return (
     <AIChatBubble
       key={chat.id}
@@ -100,17 +100,6 @@ function makeChatBubble(chat: chathistory, imageUrl?: string): ReactNode {
       message={message.content}
       createdAt={chat.createdAt}
     />
-  );
-}
-
-function isMessage(value: unknown): value is Message {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "type" in value &&
-    (value as any).type &&
-    (value as any).content &&
-    (value as any).type in { human: 1, ai: 1 }
   );
 }
 

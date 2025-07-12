@@ -16,9 +16,9 @@ import {
   SocketInitiateCall,
   SocketLeaveCall,
   SocketSdp,
-} from "./SocketEvents";
-import { Message } from "./useMessaging";
-import { useWebSocket } from "./useWebsocket";
+} from "../socket/SocketEvents";
+import { Message } from "../socket/useMessaging";
+import { useWebSocket } from "../socket/useWebsocket";
 
 interface Prop {
   children: ReactNode;
@@ -33,7 +33,7 @@ interface SocketContextType {
   onRecieveCallEnded: (handler: (data: SocketCallEnded) => void) => () => void;
   onRecieveError: (handler: (error: SocketError) => void) => () => void;
   onSdp: (handler: (data: SocketSdp) => void) => () => void;
-  send: (event: SocketEventType, payload: any) => void;
+  send: (event: SocketEventType, payload: SocketEvent["payload"]) => void;
 }
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -91,6 +91,10 @@ const SocketProvider = ({ children }: Prop) => {
               recieveMessageHandlersRef.current.forEach((handler) => {
                 handler(socketEvent.payload as Message);
               });
+              console.log(
+                "Message received:",
+                (socketEvent.payload as Message).content
+              );
               break;
             case SocketEventType.INITIATECALL:
               recieveCallHandlersRef.current.forEach((handler) => {
@@ -203,7 +207,7 @@ const SocketProvider = ({ children }: Prop) => {
     };
   };
 
-  const send = (event: SocketEventType, payload: any) => {
+  const send = (event: SocketEventType, payload: SocketEvent["payload"]) => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       console.warn("Socket not open. Cannot send message.");
       return;

@@ -1,8 +1,9 @@
+"use client";
 import ChatBox from "./Chatbox/ChatBox";
 import ChatHeader from "./Chatbox/ChatHeader";
 import ChatSidebar from "./Chatbox/ChatSidebar";
 
-const ChatsPage = async ({ chatId }: { chatId: string }) => {
+const ChatsPage = ({ chatId }: { chatId: string }) => {
   return (
     <div className="flex flex-col h-[82vh] ">
       <ChatHeader chatId={chatId} />

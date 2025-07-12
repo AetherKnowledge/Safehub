@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { chathistory } from "@/app/generated/prisma";
+import authOptions from "@/lib/auth/authOptions";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
-import AuthOptions from "@/app/components/AuthOptions";
-import { chathistory } from "@/app/generated/prisma";
+import { NextResponse } from "next/server";
 
 export async function GET() {
-  const session = await getServerSession(AuthOptions);
+  const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

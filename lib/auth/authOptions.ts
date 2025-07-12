@@ -1,4 +1,4 @@
-import { createManyChatsWithOthers } from "@/app/components/Utils";
+import { createManyChatsWithOthers } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcrypt";
@@ -6,7 +6,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
-export const AuthOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
@@ -79,4 +79,4 @@ export const AuthOptions: NextAuthOptions = {
   },
 };
 
-export default AuthOptions;
+export default authOptions;

@@ -152,11 +152,6 @@ export function useCalling() {
     }
 
     try {
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoInputDevices = devices.filter(
-        (device) => device.kind === "videoinput"
-      );
-
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: {

@@ -1,5 +1,5 @@
 "use client";
-import { Message, useMessaging } from "@/app/components/Socket/useMessaging";
+import { Message, useMessaging } from "@/lib/socket/useMessaging";
 import { ReactNode, useEffect, useRef } from "react";
 import ChatBubble from "./ChatBubble";
 import ChatboxInput from "./ChatboxInput";

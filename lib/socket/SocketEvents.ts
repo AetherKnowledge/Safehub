@@ -19,13 +19,24 @@ export enum SocketEventType {
   SDP = "sdp",
 }
 
-export interface SocketEvent<T = any> {
+export interface SocketEvent<
+  T =
+    | SocketMessage
+    | SocketInitiateCall
+    | SocketAnswerCall
+    | SocketLeaveCall
+    | SocketJoinChat
+    | SocketCallEnded
+    | SocketSdp
+    | SocketTyping
+    | SocketError,
+> {
   type: SocketEventType;
   payload: T;
 }
 
 export interface SocketMessage {
-  content: any;
+  content: string | ImageData;
   chatId: string;
 }
 

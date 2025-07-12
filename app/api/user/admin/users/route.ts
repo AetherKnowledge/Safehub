@@ -1,16 +1,14 @@
-import AuthOptions from "@/app/components/AuthOptions";
-import { updateUserSchema } from "@/app/components/Schemas";
-import {
-  authenticateUser,
-  createManyChatsWithOthers,
-} from "@/app/components/Utils";
 import { UserStatus, UserType } from "@/app/generated/prisma";
+import authOptions from "@/lib/auth/authOptions";
+import { isUserOnline } from "@/lib/redis";
+import { updateUserSchema } from "@/lib/schemas";
+import { authenticateUser, createManyChatsWithOthers } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const session = await getServerSession(AuthOptions);
+  const session = await getServerSession(authOptions);
 
   if (!session || !(await authenticateUser(session, UserType.Admin))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -25,36 +23,25 @@ export async function GET() {
       type: true,
       createdAt: true,
       updatedAt: true,
-      lastActiveAt: true,
-      status: true,
     },
     orderBy: {
       name: "asc",
     },
   });
 
-  const usersWithStatus = users.map((user) => {
-    const now = new Date();
-    const lastActive = user.lastActiveAt ? new Date(user.lastActiveAt) : null;
-
-    if (lastActive) {
-      const diffInMinutes = Math.floor(
-        (now.getTime() - lastActive.getTime()) / 60000
-      );
-
-      if (diffInMinutes < 1) {
-        user.status = UserStatus.Online;
-      }
-    }
-
-    return { ...user };
-  });
+  const usersWithStatus = await Promise.all(
+    users.map(async (user) =>
+      (await isUserOnline(user.id))
+        ? { ...user, status: UserStatus.Online }
+        : { ...user, status: UserStatus.Offline }
+    )
+  );
 
   return NextResponse.json(usersWithStatus, { status: 200 });
 }
 
 export async function PUT(request: Request) {
-  const session = await getServerSession(AuthOptions);
+  const session = await getServerSession(authOptions);
 
   if (!session || !(await authenticateUser(session, UserType.Admin))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

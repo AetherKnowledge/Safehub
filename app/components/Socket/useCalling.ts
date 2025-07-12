@@ -1,24 +1,179 @@
 import { CallStatus } from "@/app/generated/prisma";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Peer, { SignalData } from "simple-peer";
 import {
   CallAnswerType,
   SocketAnswerCall,
   SocketCallEnded,
+  SocketEvent,
   SocketEventType,
   SocketInitiateCall,
   SocketLeaveCall,
+  SocketSdp,
 } from "./SocketEvents";
 import { useSocket } from "./SocketProvider";
+
+export interface PeerData {
+  peerConnection: Peer.Instance;
+  stream?: MediaStream;
+  userId: string;
+}
 
 export function useCalling(chatId: string) {
   const session = useSession();
   const socket = useSocket().socket;
   const [calling, setCalling] = useState<SocketInitiateCall | null>(null);
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [callMembers, setCallMembers] = useState<string[]>([]);
   const onRecieveCall = useSocket().onRecieveCall;
   const onRecieveCallEnded = useSocket().onRecieveCallEnded;
   const onAnswerCall = useSocket().onAnswerCall;
   const onRecieveCallLeft = useSocket().onRecieveCallLeft;
+  const onSdp = useSocket().onSdp;
+  const [peers, setPeers] = useState<PeerData[]>([]);
+
+  const createPeer = useCallback(
+    (member: string, stream: MediaStream, initiator: boolean) => {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        console.warn("Socket not open. Cannot create peer for member.");
+        return;
+      }
+
+      if (!calling) {
+        console.warn("No active call to create peer for member:", member);
+        return;
+      }
+
+      if (!session.data?.user.id) {
+        console.warn("User not authenticated. Cannot create peer for member.");
+        return;
+      }
+
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        console.warn("Socket not open. Cannot create peer.");
+        return null;
+      }
+
+      const iceServers: RTCIceServer[] = [
+        {
+          urls: [
+            "stun:stun.l.google.com:19302",
+            "stun:stun1.l.google.com:19302",
+            "stun:stun2.l.google.com:19302",
+            "stun:stun3.l.google.com:19302",
+            "stun:stun4.l.google.com:19302",
+          ],
+        },
+      ];
+
+      console.log("Creating peer for member:", member);
+      const peer = new Peer({
+        stream,
+        initiator,
+        trickle: true,
+        config: { iceServers },
+      });
+
+      peer.on("signal", (signalData) => {
+        console.log("Sending SDP signal to member:", member);
+        const sdpData = {
+          type: SocketEventType.SDP,
+          payload: {
+            from: session.data?.user.id,
+            to: member,
+            callId: calling.callId,
+            chatId,
+            sdpData: JSON.stringify(signalData),
+          } as SocketSdp,
+        } as SocketEvent;
+        socket.send(JSON.stringify(sdpData));
+      });
+
+      peer.on("connect", () => {
+        console.log("yo");
+        peer.send("Hello from " + session.data?.user.id);
+      });
+
+      peer.on("stream", (remoteStream) => {
+        console.log("Peer connected:", peer.connected);
+        console.log("Received remote stream:", remoteStream);
+        console.log(
+          "Remote stream video tracks:",
+          remoteStream.getVideoTracks().length
+        );
+        console.log(
+          "Remote stream audio tracks:",
+          remoteStream.getAudioTracks().length
+        );
+
+        // Log resolution immediately when stream is received
+        remoteStream.getVideoTracks().forEach((track) => {
+          const settings = track.getSettings();
+          console.log(
+            `Remote stream resolution: ${settings.width}x${settings.height}`
+          );
+        });
+
+        // Update the peers state with the new remote stream
+        setPeers((prev) =>
+          prev.map((p) =>
+            p.userId === member ? { ...p, stream: remoteStream } : p
+          )
+        );
+      });
+
+      peer.on("error", (error) => {
+        console.error("Peer connection error:", error);
+      });
+
+      peer.on("close", () => {
+        console.log("Peer connection closed.");
+        leaveCall();
+      });
+
+      peer.on("data", (data) => {
+        console.log(data);
+      });
+
+      setPeers((prev) => [
+        ...prev,
+        { peerConnection: peer, userId: member, stream: undefined },
+      ]);
+
+      return peer;
+    },
+    [calling, setPeers]
+  );
+
+  const getMediaStream = useCallback(async () => {
+    if (localStream) {
+      return localStream; // Return existing stream if available
+    }
+
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoInputDevices = devices.filter(
+        (device) => device.kind === "videoinput"
+      );
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: {
+          width: { min: 640, ideal: 1280, max: 1920 },
+          height: { min: 480, ideal: 720, max: 1080 },
+          facingMode: "user", // Use "user" for front camera, "environment" for back camera
+        },
+      });
+
+      setLocalStream(stream);
+      return stream; // Return the new stream
+    } catch (error) {
+      console.error("Error accessing media devices.", error);
+      setLocalStream(null);
+      return null;
+    }
+  }, [localStream]);
 
   useEffect(() => {
     const recieveCall = onRecieveCall((data: SocketInitiateCall) => {
@@ -32,9 +187,9 @@ export function useCalling(chatId: string) {
     });
 
     return () => {
-      recieveCall();
+      recieveCall(); // Properly remove the listener
     };
-  }, [onRecieveCall]);
+  }, [onRecieveCall, chatId]);
 
   useEffect(() => {
     const answerCall = onAnswerCall((data: SocketAnswerCall) => {
@@ -43,12 +198,26 @@ export function useCalling(chatId: string) {
         // Handle the call answered event, e.g., show a notification or update state
         console.log(`Call answered in chat ${chatId} by ${data.userName}`);
       }
+
+      if (!calling) {
+        console.warn("No call to answer.");
+        return;
+      }
+
+      calling.status = CallStatus.Accepted; // Update the call status to accepted
+      setCallMembers((prev) => {
+        const updatedMembers = [...prev];
+        if (!updatedMembers.includes(data.userId)) {
+          updatedMembers.push(data.userId);
+        }
+        return updatedMembers;
+      });
     });
 
     return () => {
-      answerCall();
+      answerCall(); // Properly remove the listener
     };
-  }, [onAnswerCall]);
+  }, [onAnswerCall, chatId, calling]);
 
   useEffect(() => {
     const recieveCallLeft = onRecieveCallLeft((data: SocketLeaveCall) => {
@@ -60,9 +229,9 @@ export function useCalling(chatId: string) {
     });
 
     return () => {
-      recieveCallLeft();
+      recieveCallLeft(); // Properly remove the listener
     };
-  }, [onRecieveCallLeft]);
+  }, [onRecieveCallLeft, chatId]);
 
   useEffect(() => {
     const recieveCallEnded = onRecieveCallEnded((data: SocketCallEnded) => {
@@ -73,42 +242,139 @@ export function useCalling(chatId: string) {
       }
 
       setCalling(null); // Clear the calling state
+      setLocalStream(null); // Clear the local stream
     });
 
     return () => {
-      recieveCallEnded();
+      recieveCallEnded(); // Properly remove the listener
     };
-  }, [onRecieveCallEnded]);
+  }, [onRecieveCallEnded, chatId]);
 
-  const initiateCall = (receiverId: string) => {
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
-      console.warn("Socket not open. Cannot initiate call.");
-      return;
-    }
+  useEffect(() => {
+    console.log("Current peers:", peers);
+  }, [peers]);
 
-    if (!session.data?.user.id) {
-      console.warn("User not authenticated. Cannot initiate call.");
-      return;
-    }
-
-    const callData: SocketInitiateCall = {
-      status: CallStatus.Pending,
-      callId: crypto.randomUUID(),
-      callerId: session.data?.user.id, // Replace with actual user ID
-      receiverId,
-      chatId,
+  // Cleanup function to stop the local stream tracks when the component unmounts
+  useEffect(() => {
+    return () => {
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+      }
     };
+  }, [localStream]);
 
-    const message = {
-      type: "initiateCall",
-      payload: callData,
+  useEffect(() => {
+    // Ref to store debounce timers per user
+    const sdpTimers = new Map<string, NodeJS.Timeout>();
+
+    const sdpHandler = onSdp((data: SocketSdp) => {
+      console.log("Received SDP data:", data);
+
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        console.warn("Socket not open. Cannot handle SDP offer.");
+        return;
+      }
+
+      // If peer already exists, handle as usual
+      if (peers.some((peer) => peer.userId === data.from)) {
+        const peer = peers.find((peer) => peer.userId === data.from);
+        if (!peer) return;
+        try {
+          const sdp = JSON.parse(data.sdpData) as SignalData;
+          peer.peerConnection.signal(sdp);
+        } catch (error) {
+          console.error("Failed to parse SDP data:", error);
+        }
+        return;
+      }
+
+      // Debounce peer creation for this user
+      if (sdpTimers.has(data.from)) {
+        clearTimeout(sdpTimers.get(data.from)!);
+      }
+
+      sdpTimers.set(
+        data.from,
+        setTimeout(async () => {
+          let stream = localStream;
+          if (!stream) {
+            stream = await getMediaStream();
+            if (!stream) {
+              console.warn(
+                "Failed to get media stream. Cannot handle SDP offer."
+              );
+              return;
+            }
+          }
+
+          if (!calling) {
+            console.warn("No call to handle SDP offer.");
+            return;
+          }
+
+          const peer = createPeer(data.from, stream, false);
+          if (!peer) {
+            console.warn(`Failed to create peer for member ${data.from}`);
+            return;
+          }
+
+          try {
+            const sdp = JSON.parse(data.sdpData) as SignalData;
+            peer.signal(sdp);
+          } catch (error) {
+            console.error("Failed to parse SDP data:", error);
+          }
+          sdpTimers.delete(data.from);
+        }, 1) // 1ms debounce delay
+      );
+    });
+
+    return () => {
+      sdpHandler(); // Properly remove the listener
+      // Clear all timers on cleanup
+      sdpTimers.forEach((timer) => clearTimeout(timer));
+      sdpTimers.clear();
     };
+  }, [onSdp, peers, socket, createPeer]);
 
-    socket.send(JSON.stringify(message));
-    setCalling(callData);
-  };
+  const initiateCall = useCallback(
+    async (chatId: string) => {
+      const stream = await getMediaStream();
+      if (!stream) {
+        console.warn("No media stream available. Cannot initiate call.");
+        return;
+      }
 
-  const answerCall = () => {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        console.warn("Socket not open. Cannot initiate call.");
+        return;
+      }
+
+      if (!session.data?.user.id) {
+        console.warn("User not authenticated. Cannot initiate call.");
+        return;
+      }
+
+      const callData: SocketInitiateCall = {
+        status: CallStatus.Pending,
+        callId: crypto.randomUUID(),
+        callerId: session.data?.user.id, // Replace with actual user ID
+        chatId,
+      };
+
+      const message = {
+        type: SocketEventType.INITIATECALL,
+        payload: callData,
+      };
+
+      socket.send(JSON.stringify(message));
+      setCalling(callData);
+      setCallMembers([session.data?.user.id]);
+    },
+    [socket, session.data?.user.id, getMediaStream]
+  );
+
+  const answerCall = useCallback(async () => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       console.warn("Socket not open. Cannot answer call.");
       return;
@@ -116,6 +382,21 @@ export function useCalling(chatId: string) {
 
     if (!calling) {
       console.warn("No call to answer.");
+      return;
+    }
+
+    let stream = localStream;
+    if (!stream) {
+      console.log("No local stream available. Getting media stream...");
+      stream = await getMediaStream();
+      if (!stream) {
+        console.warn("Failed to get media stream. Cannot handle SDP offer.");
+        return;
+      }
+    }
+
+    if (!session.data?.user.id) {
+      console.warn("User not authenticated. Cannot answer call.");
       return;
     }
 
@@ -130,10 +411,28 @@ export function useCalling(chatId: string) {
       payload: answerData,
     };
 
-    socket.send(JSON.stringify(message));
-  };
+    const updatedMembers = [...callMembers];
+    if (!updatedMembers.includes(calling.callerId)) {
+      updatedMembers.push(calling.callerId);
+    }
+    if (!updatedMembers.includes(session.data?.user.id)) {
+      updatedMembers.push(session.data?.user.id);
+    }
+    setCallMembers(updatedMembers);
 
-  const rejectCall = () => {
+    console.log("Current call members:", updatedMembers);
+    for (const member of updatedMembers) {
+      if (member === session.data?.user.id) {
+        continue; // Skip the local user
+      }
+
+      createPeer(member, stream, true);
+    }
+
+    socket.send(JSON.stringify(message));
+  }, [socket, calling, peers, chatId, getMediaStream, createPeer, callMembers]);
+
+  const rejectCall = useCallback(() => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       console.warn("Socket not open. Cannot reject call.");
       return;
@@ -156,9 +455,9 @@ export function useCalling(chatId: string) {
     };
 
     socket.send(JSON.stringify(message));
-  };
+  }, [socket, calling]);
 
-  const leaveCall = () => {
+  const leaveCall = useCallback(() => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       console.warn("Socket not open. Cannot leave call.");
       return;
@@ -178,10 +477,31 @@ export function useCalling(chatId: string) {
       type: SocketEventType.LEAVECALL,
       payload: leaveData,
     };
+
+    // Destroy all peers
+    peers.forEach((p) => p.peerConnection.destroy());
+    setPeers([]);
+
+    // Existing cleanup logic
+    setCalling(null);
+    if (localStream) {
+      localStream.getTracks().forEach((track) => track.stop());
+      setLocalStream(null);
+    }
+
     // Send the leave call message to the server
     socket.send(JSON.stringify(message));
     setCalling(null); // Clear the calling state
-  };
+    setLocalStream(null); // Clear the local stream
+  }, [socket, calling, localStream, peers, chatId]);
 
-  return [calling, initiateCall, answerCall, rejectCall, leaveCall] as const;
+  return [
+    calling,
+    initiateCall,
+    answerCall,
+    rejectCall,
+    leaveCall,
+    localStream,
+    peers,
+  ] as const;
 }

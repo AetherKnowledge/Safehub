@@ -102,6 +102,7 @@ model Call {
 
 model CallMember {
   id       String   @id @default(cuid())
+  socketId String
   callId   String
   userId   String
   joinedAt DateTime @default(now())

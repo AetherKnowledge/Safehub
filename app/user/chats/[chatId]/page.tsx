@@ -1,12 +1,6 @@
 import ChatsPage from "@/app/components/Chats/ChatsPage";
 
-interface Props {
-  params: {
-    chatId: string;
-  };
-}
-
-const page = async ({ params }: Props) => {
+const page = async ({ params }: { params: Promise<{ chatId: string }> }) => {
   const { chatId } = await params;
 
   return <ChatsPage chatId={chatId} />;

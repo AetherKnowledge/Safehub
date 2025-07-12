@@ -16,6 +16,7 @@ export enum SocketEventType {
   JOINCHAT = "joinChat",
   LEAVECHAT = "leaveChat",
   TYPING = "typing",
+  SDP = "sdp",
 }
 
 export interface SocketEvent<T = any> {
@@ -38,13 +39,13 @@ export interface SocketInitiateCall {
   callerId: string;
   callerName?: string;
   callerImage?: string;
-  receiverId: string;
   chatId: string;
   status: CallStatus;
 }
 
 export interface SocketAnswerCall {
-  userName?: string;
+  userId: string;
+  userName: string;
   callId: string;
   chatId: string;
   answer: CallAnswerType;
@@ -65,4 +66,18 @@ export interface SocketJoinChat {
 export interface SocketCallEnded {
   callId: string;
   chatId: string;
+}
+
+export interface SocketSdp {
+  from: string;
+  to: string;
+  callId: string;
+  chatId: string;
+  sdpData: string;
+}
+
+export interface SocketTyping {
+  chatId: string;
+  userId: string;
+  userName?: string;
 }

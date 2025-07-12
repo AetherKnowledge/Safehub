@@ -8,6 +8,7 @@ import {
   joinChatSchema,
   leaveCallSchema,
   messageSchema,
+  sdpSchema,
 } from "../Schemas";
 import {
   CallAnswerType,
@@ -20,6 +21,7 @@ import {
   SocketJoinChat,
   SocketLeaveCall,
   SocketMessage,
+  SocketSdp,
 } from "./SocketEvents";
 import { Message } from "./useMessaging";
 
@@ -39,6 +41,7 @@ class ClientSocketServer {
     this.server = server;
     this.clientToken = token;
     this.client.userId = token.sub;
+    this.client.socketId = crypto.randomUUID(); // Assign a unique socket ID
 
     this.client.on("open", () => {
       console.log(
@@ -105,6 +108,9 @@ class ClientSocketServer {
         console.log("Leave chat event received:", event.payload);
         this.leaveChat();
         break;
+      case SocketEventType.SDP:
+        this.receiveSdpData(event.payload as SocketSdp);
+        break;
       case SocketEventType.TYPING:
         console.log("Typing event received:", event.payload);
         // Handle typing event logic here
@@ -126,12 +132,19 @@ class ClientSocketServer {
       return;
     }
 
-    const { chatId, receiverId, callerId } = validation.data;
+    const { chatId, callerId } = validation.data;
 
     const chat = await prisma.chat.findUnique({
       where: { id: chatId },
       include: {
-        call: true,
+        call: {
+          select: {
+            id: true,
+            callMember: {
+              select: { socketId: true },
+            },
+          },
+        },
         members: {
           select: {
             userId: true,
@@ -140,6 +153,10 @@ class ClientSocketServer {
         },
       },
     });
+
+    if (!this.client.socketId) {
+      this.client.socketId = crypto.randomUUID(); // Ensure socketId is set
+    }
 
     if (!chat) {
       console.error("Chat not found for ID:", chatId);
@@ -153,10 +170,27 @@ class ClientSocketServer {
       return;
     }
 
+    // Check if call already exists for this chat
     if (chat.call) {
-      console.error("Call already exists for chat:", chatId);
-      this.sendErrorResponseToSelf("Call already exists for this chat", 409);
-      return;
+      for (const ws of this.server.clients) {
+        if (
+          ws.readyState === WebSocket.OPEN &&
+          ws.chatId === chatId &&
+          ws.callId === chat.call.id &&
+          chat.call.callMember.filter(
+            (member) => member.socketId === ws.socketId
+          ).length > 1
+        ) {
+          console.error("Call already exists for chat:", chatId);
+          this.sendErrorResponseToSelf(
+            "Call already exists for this chat",
+            409
+          );
+          return;
+        } else {
+          this.deleteCall(chat.call.id);
+        }
+      }
     }
 
     const callerName = chat.members.find((member) => member.userId === callerId)
@@ -297,7 +331,8 @@ class ClientSocketServer {
     this.sendMessageToClient(
       SocketEventType.ANSWERCALL,
       {
-        userName: this.clientToken.name || undefined,
+        userId: this.clientToken.sub,
+        userName: this.clientToken.name,
         callId,
         chatId,
         answer: CallAnswerType.ACCEPT,
@@ -319,6 +354,85 @@ class ClientSocketServer {
 
     const { callId, chatId } = validation.data;
     await this.leaveCall(callId, chatId);
+  }
+
+  private async receiveSdpData(payload: SocketSdp) {
+    const validation = sdpSchema.safeParse(payload);
+    if (!validation.success || !validation.data) {
+      console.error("Invalid SDP offer payload:", payload, validation.error);
+      this.sendErrorResponseToSelf("Invalid SDP offer payload", 400);
+      return;
+    }
+
+    const { to, callId, chatId, sdpData } = validation.data;
+    console.log(
+      `Received SDP data from client: ${this.clientToken.name}, sending to peer: ${payload.to}`
+    );
+
+    // Handle the SDP offer (e.g., forward it to the appropriate peer)
+    const call = await prisma.call.findUnique({
+      where: { id: callId },
+      include: {
+        callMember: {
+          select: { userId: true },
+        },
+        chat: {
+          include: {
+            members: {
+              select: {
+                userId: true,
+                user: { select: { name: true, image: true } },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!call) {
+      console.error("Call not found for ID:", callId);
+      this.sendErrorResponseToSelf("Call not found", 404);
+      return;
+    }
+
+    if (!(await this.isMemberOfChat(chatId))) {
+      console.error("User is not a member of the chat:", chatId);
+      this.sendErrorResponseToSelf("You are not a member of this chat", 403);
+      return;
+    }
+
+    if (!(await this.isMemberOfChat(chatId, to))) {
+      console.error("User is not a member of the chat:", chatId);
+      this.sendErrorResponseToSelf("User is not a member of this chat", 403);
+      return;
+    }
+
+    if (call.chatId !== chatId) {
+      console.error("Call does not belong to the specified chat:", chatId);
+      this.sendErrorResponseToSelf("Call does not belong to this chat", 403);
+      return;
+    }
+
+    for (const ws of this.server.clients) {
+      if (
+        ws.readyState === WebSocket.OPEN &&
+        ws.userId === to &&
+        ws.callId === callId
+      ) {
+        ws.send(
+          JSON.stringify({
+            type: SocketEventType.SDP,
+            payload: {
+              from: this.clientToken.sub,
+              to,
+              callId,
+              chatId,
+              sdpData,
+            } as SocketSdp,
+          } as SocketEvent<SocketSdp>)
+        );
+      }
+    }
   }
 
   private async leaveCall(callId: string, chatId: string) {
@@ -400,8 +514,13 @@ class ClientSocketServer {
   }
 
   private async createCallMember(callId: string, userId: string) {
+    if (!this.client.socketId) {
+      this.client.socketId = crypto.randomUUID(); // Ensure socketId is set
+    }
+
     return await prisma.callMember.create({
       data: {
+        socketId: this.client.socketId,
         callId,
         userId,
       },
@@ -434,13 +553,11 @@ class ClientSocketServer {
     this.client.chatId = undefined; // Clear the chatId
   }
 
-  public async isMemberOfChat(chatId: string): Promise<boolean> {
-    console.log(
-      "Checking if user:",
-      this.clientToken.sub,
-      "is a member of chat:",
-      chatId
-    );
+  public async isMemberOfChat(
+    chatId: string,
+    userId: string = this.clientToken.sub!
+  ): Promise<boolean> {
+    console.log("Checking if user:", userId, "is a member of chat:", chatId);
     try {
       const chat = await prisma.chat.findUnique({
         where: { id: chatId },
@@ -700,7 +817,8 @@ class ClientSocketServer {
       }
 
       const answerData: SocketAnswerCall = {
-        userName: this.clientToken.name || undefined,
+        userId: this.clientToken.sub!,
+        userName: this.clientToken.name!,
         callId,
         chatId,
         answer: CallAnswerType.DID_NOT_ANSWER, // Automatically reject after timeout

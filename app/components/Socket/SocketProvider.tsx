@@ -15,6 +15,7 @@ import {
   SocketEventType,
   SocketInitiateCall,
   SocketLeaveCall,
+  SocketSdp,
 } from "./SocketEvents";
 import { Message } from "./useMessaging";
 import { useWebSocket } from "./useWebsocket";
@@ -31,6 +32,7 @@ interface SocketContextType {
   onRecieveCallLeft: (handler: (data: SocketLeaveCall) => void) => () => void;
   onRecieveCallEnded: (handler: (data: SocketCallEnded) => void) => () => void;
   onRecieveError: (handler: (error: SocketError) => void) => () => void;
+  onSdp: (handler: (data: SocketSdp) => void) => () => void;
   send: (event: SocketEventType, payload: any) => void;
 }
 
@@ -71,6 +73,9 @@ const SocketProvider = ({ children }: Prop) => {
   const recieveErrorHandlersRef = useRef<Set<(error: SocketError) => void>>(
     new Set()
   );
+  const recieveSdpHandlersRef = useRef<Set<(data: SocketSdp) => void>>(
+    new Set()
+  );
 
   useEffect(() => {
     if (socket) {
@@ -88,6 +93,7 @@ const SocketProvider = ({ children }: Prop) => {
               recieveCallHandlersRef.current.forEach((handler) => {
                 handler(socketEvent.payload as SocketInitiateCall);
               });
+              console.log("Call initiated:", socketEvent);
               break;
             case SocketEventType.ANSWERCALL:
               answerCallHandlersRef.current.forEach((handler) => {
@@ -109,7 +115,11 @@ const SocketProvider = ({ children }: Prop) => {
                 handler(socketEvent.payload as SocketError);
               });
               console.warn("Socket error received:", event.data as SocketError);
-
+              break;
+            case SocketEventType.SDP:
+              recieveSdpHandlersRef.current.forEach((handler) => {
+                handler(socketEvent.payload as SocketSdp);
+              });
               break;
             default:
               console.log("Unhandled socket event type:", socketEvent.type);
@@ -181,6 +191,15 @@ const SocketProvider = ({ children }: Prop) => {
     };
   };
 
+  const onSdp = (handler: (data: SocketSdp) => void) => {
+    recieveSdpHandlersRef.current.add(handler);
+
+    // Return cleanup function
+    return () => {
+      recieveSdpHandlersRef.current.delete(handler);
+    };
+  };
+
   const send = (event: SocketEventType, payload: any) => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       console.warn("Socket not open. Cannot send message.");
@@ -201,6 +220,7 @@ const SocketProvider = ({ children }: Prop) => {
         onRecieveCallLeft,
         onRecieveCallEnded,
         onRecieveError,
+        onSdp,
         send,
       }}
     >

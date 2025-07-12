@@ -82,38 +82,51 @@ class ClientSocketServer {
   private handlePayload(event: SocketEvent) {
     switch (event.type) {
       case SocketEventType.MESSAGE:
-        console.log("Message received:", event.payload);
+        console.log("Message received from client:" + this.clientToken.name);
         this.receiveMessage(event.payload as SocketMessage);
         break;
       case SocketEventType.INITIATECALL:
-        console.log("Call event received:", event.payload);
+        console.log("Call event received from client:" + this.clientToken.name);
         this.receiveInitiateCall(event.payload as SocketInitiateCall);
         break;
       case SocketEventType.ANSWERCALL:
-        console.log("Answer call event received:", event.payload);
+        console.log(
+          "Answer call event received from client:" + this.clientToken.name
+        );
         this.receiveAnswerCall(event.payload as SocketAnswerCall);
         break;
       case SocketEventType.LEAVECALL:
-        console.log("Leave call event received:", event.payload);
+        console.log(
+          "Leave call event received from client:" + this.clientToken.name
+        );
         this.receiveLeaveCall(event.payload as SocketLeaveCall);
         break;
       case SocketEventType.ERROR:
-        console.error("Error event received:", event.payload);
+        console.error(
+          "Error event received from client:" + this.clientToken.name + ":",
+          event.payload
+        );
         break;
       case SocketEventType.JOINCHAT:
-        console.log("Join chat event received:", event.payload);
+        console.log(
+          "Join chat event received from client:" + this.clientToken.name
+        );
         this.joinChat(event.payload as SocketJoinChat);
         break;
       case SocketEventType.LEAVECHAT:
-        console.log("Leave chat event received:", event.payload);
+        console.log(
+          "Leave chat event received from client:" + this.clientToken.name
+        );
         this.leaveChat();
         break;
       case SocketEventType.SDP:
-        console.log("SDP event received:", event.payload);
+        console.log("SDP event received from client:" + this.clientToken.name);
         this.receiveSdpData(event.payload as SocketSdp);
         break;
       case SocketEventType.TYPING:
-        console.log("Typing event received:", event.payload);
+        console.log(
+          "Typing event received from client:" + this.clientToken.name
+        );
         // Handle typing event logic here
         break;
       default:
@@ -124,7 +137,7 @@ class ClientSocketServer {
   private async receiveInitiateCall(payload: SocketInitiateCall) {
     const validation = initiateCallSchema.safeParse(payload);
     if (!validation.success || !validation.data) {
-      this.sendErrorResponseToSelf("Invalid initiate call payload", 400);
+      this.sendErrorResponseToSelf(`Invalid initiate call payload`, 400);
       return;
     }
     const { chatId, callerId } = validation.data;
@@ -147,14 +160,15 @@ class ClientSocketServer {
     if (!this.client.socketId) this.client.socketId = crypto.randomUUID();
 
     if (!chat) {
-      console.error("Chat not found for ID:", chatId);
-      this.sendErrorResponseToSelf("Chat not found", 404);
+      this.sendErrorResponseToSelf(`Chat not found for ID ${chatId}`, 404);
       return;
     }
 
     if (!(await this.isMemberOfChat(chatId))) {
-      console.error("User is not a member of the chat:", chatId);
-      this.sendErrorResponseToSelf("You are not a member of this chat", 403);
+      this.sendErrorResponseToSelf(
+        `User is not a member of the chat: ${chatId}`,
+        403
+      );
       return;
     }
 
@@ -167,8 +181,10 @@ class ClientSocketServer {
           ws.callId === chat.call!.id
       );
       if (activeSockets.length > 1) {
-        console.error("Call already exists for chat:", chatId);
-        this.sendErrorResponseToSelf("Call already exists for this chat", 409);
+        this.sendErrorResponseToSelf(
+          `Call already exists for this chat: ${chatId}`,
+          409
+        );
         return;
       } else {
         console.log("Deleting orphaned call for chat:", chatId);
@@ -245,27 +261,32 @@ class ClientSocketServer {
 
     if (!call) {
       console.error("Call not found for ID:", callId);
-      this.sendErrorResponseToSelf("Call not found", 404);
+      this.sendErrorResponseToSelf(`Call not found for ID ${callId}`, 404);
       return;
     }
     if (!(await this.isMemberOfChat(chatId))) {
-      console.error("User is not a member of the chat:", chatId);
-      this.sendErrorResponseToSelf("You are not a member of this chat", 403);
+      this.sendErrorResponseToSelf(
+        `User ${this.clientToken.name} is not a member of the chat: ${chatId}`,
+        403
+      );
       return;
     }
     if (call.chatId !== chatId) {
-      console.error("Call does not belong to the specified chat:", chatId);
-      this.sendErrorResponseToSelf("Call does not belong to this chat", 403);
+      this.sendErrorResponseToSelf(
+        `Call does not belong to this chat: ${chatId}`,
+        403
+      );
       return;
     }
     if (call.callerId === this.clientToken.sub) {
-      console.error("User cannot answer their own call:", this.clientToken.sub);
-      this.sendErrorResponseToSelf("You cannot answer your own call", 403);
+      this.sendErrorResponseToSelf(`User cannot answer their own call`, 403);
       return;
     }
     if (call.status !== CallStatus.Pending) {
-      console.error("Call is not in pending status:", call.status);
-      this.sendErrorResponseToSelf("Call is not in pending status", 400);
+      this.sendErrorResponseToSelf(
+        `Call is not in pending status: ${call.status}`,
+        400
+      );
       return;
     }
 
@@ -349,7 +370,7 @@ class ClientSocketServer {
     });
 
     if (!call) {
-      this.sendErrorResponseToSelf("Call not found", 404);
+      this.sendErrorResponseToSelf(`Call ${callId} not found`, 404);
       return;
     }
     if (!(await this.isMemberOfChat(chatId))) {
@@ -357,11 +378,17 @@ class ClientSocketServer {
       return;
     }
     if (!(await this.isMemberOfChat(chatId, to))) {
-      this.sendErrorResponseToSelf("User is not a member of this chat", 403);
+      this.sendErrorResponseToSelf(
+        `User ${to} is not a member of this chat`,
+        403
+      );
       return;
     }
     if (call.chatId !== chatId) {
-      this.sendErrorResponseToSelf("Call does not belong to this chat", 403);
+      this.sendErrorResponseToSelf(
+        `Call ${call.id} does not belong to chat ${chatId}`,
+        403
+      );
       return;
     }
 
@@ -411,17 +438,20 @@ class ClientSocketServer {
     console.log("Leaving call with ID:", callId, "in chat:", chatId);
 
     if (!call) {
-      console.error("Call not found for ID:", callId);
-      this.sendErrorResponseToSelf("Call not found", 404);
+      this.sendErrorResponseToSelf(
+        `Call ${callId} not found for ID: ${callId}`,
+        404
+      );
       return;
     }
     if (call.chatId !== chatId) {
-      console.error("Call does not belong to the specified chat:", chatId);
-      this.sendErrorResponseToSelf("Call does not belong to this chat", 403);
+      this.sendErrorResponseToSelf(
+        `Call ${call.id} does not belong to chat ${chatId}`,
+        403
+      );
       return;
     }
     if (callId !== this.client.callId) {
-      console.error("User is not a member of the call:", callId);
       this.sendErrorResponseToSelf("You are not a member of this call", 403);
       return;
     }
@@ -484,8 +514,10 @@ class ClientSocketServer {
     const { chatId } = validation.data;
     console.log("Joining chat with ID:", chatId);
     if (!(await this.isMemberOfChat(chatId))) {
-      console.error("User is not a member of the chat:", chatId);
-      this.sendErrorResponseToSelf("You are not a member of this chat", 403);
+      this.sendErrorResponseToSelf(
+        `You are not a member of chat ${chatId}`,
+        403
+      );
       return;
     }
     this.client.chatId = chatId;
@@ -575,14 +607,14 @@ class ClientSocketServer {
       );
       return;
     }
-    console.log("Handling message:", payload);
+    console.log("Handling message from client:", this.clientToken.name);
     const validation = messageSchema.safeParse(payload);
     if (!validation.success || !validation.data) {
       console.error("Invalid message format:", payload, validation.error);
       this.client.send(JSON.stringify({ error: "Invalid message format" }));
       return;
     }
-    console.log("Message content validated:", validation.data);
+    console.log("Message content validated");
     const chat = await prisma.chat.findUnique({
       where: { id: payload.chatId },
       include: {
@@ -645,7 +677,9 @@ class ClientSocketServer {
   }
 
   public sendErrorResponseToSelf(message: string, code?: number) {
-    console.error("Sending error response to self:", message, code);
+    console.error(
+      `Sending error response to self: ${this.clientToken.name} Error: ${message} Code: ${code}`
+    );
     this.sendMessageToSelf(SocketEventType.ERROR, {
       message,
       code,
@@ -676,8 +710,13 @@ class ClientSocketServer {
   }
 
   private async deleteCall(callId: string) {
-    await prisma.call.delete({ where: { id: callId } });
-    console.log(`Call with ID ${callId} deleted`);
+    try {
+      await prisma.call.delete({ where: { id: callId } });
+      console.log(`Call with ID ${callId} deleted`);
+    } catch (error) {
+      console.error(`Error deleting call with ID ${callId}:`, error);
+    }
+
     for (const ws of this.server.clients) {
       if (
         ws.readyState === WebSocket.OPEN &&

@@ -48,7 +48,10 @@ export const useSocket = () => {
 
 const SocketProvider = ({ children }: Prop) => {
   const url = useMemo(() => {
-    return () => `ws://${window.location.host}/api/user/socket`;
+    return () =>
+      process.env.NODE_ENV === "production"
+        ? `wss://${window.location.host}/api/user/socket`
+        : `ws://${window.location.host}/api/user/socket`;
   }, []);
   const { socket } = useWebSocket(url, {
     reconnect: true,

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import AuthProvider from "./components/AuthProvider";
+import CallPopupProvider from "./components/Chats/Chatbox/CallPopupProvider";
 import HeartbeatProvider from "./components/HeartbeatProvider";
 import Navbar from "./components/Navbar";
 import SocketProvider from "./components/Socket/SocketProvider";
@@ -28,9 +29,11 @@ export default function RootLayout({
           <AuthProvider>
             <HeartbeatProvider>
               <SocketProvider>
-                <Navbar />
-                {/* Let children take up remaining space */}
-                <main>{children}</main>
+                <CallPopupProvider>
+                  <Navbar />
+                  {/* Let children take up remaining space */}
+                  <main>{children}</main>
+                </CallPopupProvider>
               </SocketProvider>
             </HeartbeatProvider>
           </AuthProvider>

@@ -1,4 +1,6 @@
 import { CallStatus } from "@/app/generated/prisma";
+import { types } from "mediasoup";
+import { TransportOptions } from "mediasoup-client/lib/Transport";
 
 export enum CallAnswerType {
   ACCEPT = "accept",
@@ -17,6 +19,11 @@ export enum SocketEventType {
   LEAVECHAT = "leaveChat",
   TYPING = "typing",
   SDP = "sdp",
+  GET_ROUTER_CAPABILITIES = "getRouterRtpCapabilities",
+  CREATE_TRANSPORT = "createWebRtcTransport",
+  CONNECT_TRANSPORT = "connectTransport",
+  PRODUCE = "produce",
+  CONSUME = "consume",
 }
 
 export interface SocketEvent<
@@ -91,4 +98,24 @@ export interface SocketTyping {
   chatId: string;
   userId: string;
   userName?: string;
+}
+
+export interface SocketGetRouterCapabilities {
+  routerRtpCapabilities: string;
+}
+
+export interface SocketCreateTransport {
+  transportOptions: TransportOptions;
+}
+
+export interface SocketConnectTransport {
+  transportId: string;
+  dtlsParameters: types.DtlsParameters;
+}
+
+export interface SocketProduce {
+  transportId: string;
+  kind: "audio" | "video";
+  rtpParameters: types.RtpParameters;
+  appData?: Record<string, any>;
 }

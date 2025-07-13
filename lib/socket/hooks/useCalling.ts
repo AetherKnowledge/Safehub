@@ -11,8 +11,8 @@ import {
   SocketInitiateCall,
   SocketLeaveCall,
   SocketSdp,
-} from "./SocketEvents";
-import { useSocket } from "./SocketProvider";
+} from "../SocketEvents";
+import { useSocket } from "../SocketProvider";
 
 export interface PeerData {
   peerConnection: Peer.Instance;

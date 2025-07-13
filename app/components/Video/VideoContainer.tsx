@@ -1,3 +1,4 @@
+import { PeerData } from "@/lib/socket/hooks/useCalling";
 import React, { useCallback } from "react";
 import {
   FaMicrophone,
@@ -6,7 +7,6 @@ import {
   FaVideo,
   FaVideoSlash,
 } from "react-icons/fa";
-import { PeerData } from "../../../lib/socket/useCalling";
 
 interface Props {
   stream: MediaStream | null;

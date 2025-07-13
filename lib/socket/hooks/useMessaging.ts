@@ -1,8 +1,8 @@
 "use client";
 import { ChatMessage } from "@/app/generated/prisma";
 import { useCallback, useEffect, useState } from "react";
-import { SocketEventType, SocketMessage } from "./SocketEvents";
-import { useSocket } from "./SocketProvider";
+import { SocketEventType, SocketMessage } from "../SocketEvents";
+import { useSocket } from "../SocketProvider";
 
 export interface Message extends ChatMessage {
   name: string;

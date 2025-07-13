@@ -23,6 +23,8 @@
     "cross-env": "^7.0.3",
     "date-fns": "^4.1.0",
     "dotenv": "^17.0.1",
+    "mediasoup": "^3.16.6",
+    "mediasoup-client": "^3.12.5",
     "motion": "^12.20.1",
     "next": "15.3.4",
     "next-auth": "^4.24.11",

@@ -1,6 +1,6 @@
 import authOptions from "@/lib/auth/authOptions";
 import { messageSchema } from "@/lib/schemas";
-import { Message } from "@/lib/socket/useMessaging";
+import { Message } from "@/lib/socket/hooks/useMessaging";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
 import { getToken } from "next-auth/jwt";

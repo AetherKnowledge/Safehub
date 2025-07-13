@@ -1,12 +1,6 @@
 "use client";
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import { Message } from "@/lib/socket/hooks/useMessaging";
+import { useWebSocket } from "@/lib/socket/hooks/useWebsocket";
 import {
   SocketAnswerCall,
   SocketCallEnded,
@@ -16,9 +10,15 @@ import {
   SocketInitiateCall,
   SocketLeaveCall,
   SocketSdp,
-} from "../socket/SocketEvents";
-import { Message } from "../socket/useMessaging";
-import { useWebSocket } from "../socket/useWebsocket";
+} from "@/lib/socket/SocketEvents";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 
 interface Prop {
   children: ReactNode;

@@ -2,7 +2,7 @@
 import { ParsedChat } from "@/@types/network";
 import { ChatType, UserStatus } from "@/app/generated/prisma";
 import { useSocket } from "@/lib/socket/SocketProvider";
-import { Message } from "@/lib/socket/useMessaging";
+import { Message } from "@/lib/socket/hooks/useMessaging";
 import { imageGenerator } from "@/lib/utils";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";

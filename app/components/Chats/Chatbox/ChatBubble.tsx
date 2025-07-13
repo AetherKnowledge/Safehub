@@ -1,4 +1,4 @@
-import { Message } from "@/lib/socket/useMessaging";
+import { Message } from "@/lib/socket/hooks/useMessaging";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { ReactNode } from "react";

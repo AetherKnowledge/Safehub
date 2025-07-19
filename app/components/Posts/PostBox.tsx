@@ -1,12 +1,10 @@
 "use client";
 import { useState } from "react";
-import { AiFillDislike, AiFillHeart, AiFillLike } from "react-icons/ai";
-import { FaCommentAlt } from "react-icons/fa";
 import { HiDotsHorizontal } from "react-icons/hi";
 import ImageGrid from "./ImageGrid";
-import { dislikePost, likePost, PostProps } from "./PostActions";
+import { PostProps } from "./PostActions";
 import PostPopup from "./PostPopup"; // Add this import
-import StatButton from "./StatsButton";
+import PostStats from "./PostStats";
 
 const EventBox = ({
   id,
@@ -24,6 +22,7 @@ const EventBox = ({
   const [showPopup, setShowPopup] = useState(false);
 
   const toggleExpand = () => setExpanded(!expanded);
+  const [optimisticComments, setOptimisticComments] = useState(comments);
 
   return (
     <>
@@ -67,46 +66,14 @@ const EventBox = ({
           <ImageGrid images={images} />
 
           {/* STATS */}
-
-          <div className="divider my-[-4]" />
-          <div className="flex justify-between items-center text-sm text-base-content/80">
-            <div className="grid grid-cols-4 gap-4 items-center w-full">
-              <StatButton
-                onChange={async (value: boolean) => {
-                  await likePost(id, value);
-                }}
-                icon={AiFillLike}
-                value={likesStats}
-                label="Likes"
-                color="text-blue-500"
-              />
-              <StatButton
-                onChange={async (value: boolean) => {
-                  await dislikePost(id, value);
-                }}
-                icon={AiFillDislike}
-                value={dislikesStats}
-                label="Dislikes"
-                color="text-red-500"
-              />
-              <StatButton
-                onChange={async (value: boolean) => {}}
-                icon={AiFillHeart}
-                value={{ count: 4, selected: false }}
-                label="Saved"
-              />
-              <StatButton
-                onChange={async (value: boolean) => {
-                  setShowPopup(value);
-                }}
-                icon={FaCommentAlt}
-                value={{ count: comments.length, selected: showPopup }}
-                label="Comments"
-                color="text-yellow-500"
-                commentBtn
-              />
-            </div>
-          </div>
+          <PostStats
+            id={id}
+            likesStats={likesStats}
+            dislikesStats={dislikesStats}
+            comments={optimisticComments}
+            showPopup={showPopup}
+            setShowPopup={setShowPopup}
+          />
         </div>
       </div>
       {showPopup && (
@@ -129,6 +96,9 @@ const EventBox = ({
               likesStats={likesStats}
               dislikesStats={dislikesStats}
               comments={comments}
+              setComments={setOptimisticComments}
+              showPopup={showPopup}
+              setShowPopup={setShowPopup}
             />
           </div>
         </div>

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "concurrently \"next dev\" \"npx prisma studio\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -53,6 +53,7 @@
     "@types/react-dom": "^19",
     "@types/redis": "^4.0.10",
     "@types/ws": "^8.18.1",
+    "concurrently": "^8.2.2",
     "daisyui": "^5.0.43",
     "eslint": "^9",
     "eslint-config-next": "^15.3.5",

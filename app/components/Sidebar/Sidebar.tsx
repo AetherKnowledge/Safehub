@@ -92,6 +92,9 @@ const adminSidebar = () => {
       <SidebarButton href="/user/chats" icon={IoChatboxEllipses}>
         Chats
       </SidebarButton>
+      <SidebarButton href="/user/events" icon={FaCalendar}>
+        Events
+      </SidebarButton>
     </>
   );
 };

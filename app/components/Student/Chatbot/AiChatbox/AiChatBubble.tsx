@@ -1,3 +1,4 @@
+import { formatDatetime } from "@/lib/utils";
 import Image from "next/image";
 import { ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
@@ -82,26 +83,6 @@ function image(type: string, name?: string, src?: string): ReactNode {
       {name!.charAt(0).toUpperCase()}
     </div>
   );
-}
-
-export function formatDatetime(date: Date): string {
-  // const date = new Date(datetimeStr + " UTC");
-  date = new Date(date);
-
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const isCurrentYear = date.getFullYear() === currentYear;
-
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    day: "numeric",
-    ...(isCurrentYear ? {} : { year: "numeric" }),
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  return formatter.format(date).replace(",", "");
 }
 
 export default ChatBubble;

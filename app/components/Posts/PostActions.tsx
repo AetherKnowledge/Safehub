@@ -15,21 +15,22 @@ export type PostProps = {
   authorImage?: string;
   likesStats: PostStat;
   dislikesStats: PostStat;
-  comments: {
-    id: string;
-    createdAt: string;
-
-    user: {
-      name: string;
-      image?: string;
-    };
-    content: string;
-  }[];
+  comments: PostComment[];
 };
 
 export type PostStat = {
   count: number;
   selected: boolean;
+};
+
+export type PostComment = {
+  id: string;
+  createdAt: string;
+  user: {
+    name: string;
+    image?: string;
+  };
+  content: string;
 };
 
 export async function getPosts(): Promise<PostProps[]> {

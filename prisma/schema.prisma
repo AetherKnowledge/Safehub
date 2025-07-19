@@ -69,8 +69,33 @@ model User {
 
   chatMembers ChatMember[]
   messages    ChatMessage[]
-  call        Call[]
-  callMember  CallMember[]
+
+  call       Call[]
+  callMember CallMember[]
+
+  posts    Post[]
+  likes    Like[]
+  dislikes Dislike[]
+  comments Comment[]
+}
+
+model Student {
+  studentId    String        @id
+  user         User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+}
+
+model Counselor {
+  counselorId    String          @id
+  user           User            @relation(fields: [counselorId], references: [id], onDelete: Cascade)
+  appointments   Appointment[]
+  available      Boolean         @default(false)
+  AvailableSlots AvailableSlot[]
+}
+
+model Admin {
+  adminId String @id
+  user    User   @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
 
 model Chat {
@@ -85,31 +110,6 @@ model Chat {
 
   members  ChatMember[]
   messages ChatMessage[]
-}
-
-model Call {
-  id        String     @id @default(cuid())
-  chatId    String     @unique
-  status    CallStatus @default(Pending)
-  createdAt DateTime   @default(now())
-  callerId  String
-  chat      Chat       @relation(fields: [chatId], references: [id], onDelete: Cascade)
-
-  caller     User         @relation(fields: [callerId], references: [id], onDelete: Cascade)
-  callMember CallMember[]
-}
-
-model CallMember {
-  id       String   @id @default(cuid())
-  socketId String
-  callId   String
-  userId   String
-  joinedAt DateTime @default(now())
-
-  call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([callId, userId]) // Prevent duplicate members in a call
 }
 
 model ChatMember {
@@ -136,23 +136,29 @@ model ChatMessage {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Student {
-  studentId    String        @id
-  user         User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  appointments Appointment[]
+model Call {
+  id        String     @id @default(cuid())
+  chatId    String     @unique
+  status    CallStatus @default(Pending)
+  createdAt DateTime   @default(now())
+  callerId  String
+  chat      Chat       @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  caller     User         @relation(fields: [callerId], references: [id], onDelete: Cascade)
+  callMember CallMember[]
 }
 
-model Counselor {
-  counselorId    String          @id
-  user           User            @relation(fields: [counselorId], references: [id], onDelete: Cascade)
-  appointments   Appointment[]
-  available      Boolean         @default(false)
-  AvailableSlots AvailableSlot[]
-}
+model CallMember {
+  id       String   @id @default(cuid())
+  socketId String
+  callId   String
+  userId   String
+  joinedAt DateTime @default(now())
 
-model Admin {
-  adminId String @id
-  user    User   @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([callId, userId]) // Prevent duplicate members in a call
 }
 
 model AvailableSlot {
@@ -181,6 +187,58 @@ model Account {
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([provider, providerAccountId])
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  images    String[] @db.VarChar(255) // Array of image URLs
+
+  likes    Like[]
+  dislikes Dislike[]
+
+  comments Comment[]
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId]) // Prevent multiple likes from the same user on the same post
+}
+
+model Dislike {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId]) // Prevent multiple dislikes from the same user on the same post
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Session {

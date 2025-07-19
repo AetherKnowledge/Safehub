@@ -101,7 +101,7 @@ export interface SocketTyping {
 }
 
 export interface SocketGetRouterCapabilities {
-  routerRtpCapabilities: string;
+  routerRtpCapabilities: types.RtpCapabilities;
 }
 
 export interface SocketCreateTransport {
@@ -117,5 +117,10 @@ export interface SocketProduce {
   transportId: string;
   kind: "audio" | "video";
   rtpParameters: types.RtpParameters;
-  appData?: Record<string, any>;
+}
+
+export interface SocketConsume {
+  producerId: string;
+  rtpCapabilities: types.RtpCapabilities;
+  paused?: boolean;
 }

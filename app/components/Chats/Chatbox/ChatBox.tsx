@@ -1,8 +1,9 @@
 "use client";
 import { Message, useMessaging } from "@/lib/socket/hooks/useMessaging";
+import { useSession } from "next-auth/react";
 import { ReactNode, useEffect, useRef } from "react";
-import ChatBubble from "./ChatBubble";
 import ChatboxInput from "./ChatboxInput";
+import MessageBubble from "./MessageBubble";
 
 export function ChatBox({ chatId }: { chatId: string }) {
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -40,6 +41,8 @@ export function ChatBox({ chatId }: { chatId: string }) {
 }
 
 function renderChatHistory(loading: boolean, messages: Message[]): ReactNode {
+  const session = useSession();
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-4">
@@ -55,7 +58,17 @@ function renderChatHistory(loading: boolean, messages: Message[]): ReactNode {
     );
   }
 
-  return messages.map((chat) => <ChatBubble key={chat.id} message={chat} />);
+  return messages.map((chat) => (
+    <MessageBubble
+      key={chat.id}
+      name={chat.name}
+      image={chat.src}
+      imageSize={10}
+      content={chat.content}
+      createdAt={chat.createdAt}
+      self={session.data?.user.id === chat.userId}
+    />
+  ));
 }
 
 export default ChatBox;

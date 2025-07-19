@@ -1,5 +1,8 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/forms" {
+  strategy: "base"; /* only generate global styles; or */
+  strategy: "class"; /* only generate classes */
+}
 @plugin "@tailwindcss/typography";
 @plugin "daisyui" {
   themes: lcup --default;

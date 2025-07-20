@@ -1,7 +1,8 @@
 "use server";
 
 import authOptions from "@/lib/auth/authOptions";
-import { formatDatetime } from "@/lib/utils";
+import { CommentData, commentSchema } from "@/lib/schemas";
+import { authenticateUser, formatDatetime } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
 
@@ -35,6 +36,10 @@ export type PostComment = {
 
 export async function getPosts(): Promise<PostProps[]> {
   const session = await getServerSession(authOptions);
+  if (!session || !authenticateUser(session)) {
+    throw new Error("Unauthorized");
+  }
+
   const userId = session?.user?.id;
 
   const posts = await prisma.post.findMany({
@@ -101,7 +106,13 @@ export async function getPosts(): Promise<PostProps[]> {
 
 export async function likePost(postId: string, like: boolean) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("User not authenticated");
+  if (!session || !authenticateUser(session) || !session.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  if (typeof postId !== "string" || typeof like !== "boolean") {
+    throw new Error("Invalid request");
+  }
 
   const post = await prisma.post.findUnique({
     where: { id: parseInt(postId) },
@@ -137,7 +148,13 @@ export async function likePost(postId: string, like: boolean) {
 
 export async function dislikePost(postId: string, dislike: boolean) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("User not authenticated");
+  if (!session || !authenticateUser(session) || !session.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  if (typeof postId !== "string" || typeof dislike !== "boolean") {
+    throw new Error("Invalid request");
+  }
 
   const post = await prisma.post.findUnique({
     where: { id: parseInt(postId) },
@@ -171,12 +188,18 @@ export async function dislikePost(postId: string, dislike: boolean) {
   }
 }
 
-export async function addComment(
-  postId: string,
-  content: string
-): Promise<void> {
+export async function addComment(data: CommentData): Promise<void> {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("User not authenticated");
+  if (!session || !authenticateUser(session) || !session.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const parsed = commentSchema.safeParse(data);
+  if (!parsed.success) {
+    throw new Error("Invalid request");
+  }
+
+  const { postId, content } = parsed.data as CommentData;
 
   if (!content.trim()) throw new Error("Comment content cannot be empty");
 

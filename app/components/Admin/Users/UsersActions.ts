@@ -1,17 +1,29 @@
+"use server";
+
 import { UserStatus, UserType } from "@/app/generated/prisma";
 import authOptions from "@/lib/auth/authOptions";
 import { isUserOnline } from "@/lib/redis";
-import { updateUserSchema } from "@/lib/schemas";
+import { UpdateUserTypeData, updateUserSchema } from "@/lib/schemas";
 import { authenticateUser, createManyChatsWithOthers } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
 
-export async function GET() {
+export type UserWithStatus = {
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+  type: UserType;
+  createdAt: Date;
+  updatedAt: Date;
+  status: UserStatus;
+};
+
+export async function getUsers() {
   const session = await getServerSession(authOptions);
 
   if (!session || !(await authenticateUser(session, UserType.Admin))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    throw new Error("Unauthorized");
   }
 
   const users = await prisma.user.findMany({
@@ -23,40 +35,38 @@ export async function GET() {
       type: true,
       createdAt: true,
       updatedAt: true,
+      status: true, // Include status field
     },
     orderBy: {
       name: "asc",
     },
   });
 
-  const usersWithStatus = await Promise.all(
+  const usersWithStatus = (await Promise.all(
     users.map(async (user) =>
       (await isUserOnline(user.id))
         ? { ...user, status: UserStatus.Online }
         : { ...user, status: UserStatus.Offline }
     )
-  );
+  )) as UserWithStatus[];
 
-  return NextResponse.json(usersWithStatus, { status: 200 });
+  return usersWithStatus;
 }
 
-export async function PUT(request: Request) {
+export async function updateUserType(data: UpdateUserTypeData) {
   const session = await getServerSession(authOptions);
 
   if (!session || !(await authenticateUser(session, UserType.Admin))) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    throw new Error("Unauthorized");
   }
 
-  const body = await request.json();
-  const parsedBody = updateUserSchema.safeParse(body);
-  if (!parsedBody.success) {
-    return NextResponse.json(
-      { error: "Invalid request data" },
-      { status: 400 }
-    );
+  const validation = updateUserSchema.safeParse(data);
+  if (!validation.success) {
+    throw new Error("Invalid request data");
   }
 
-  const { id, type } = parsedBody.data;
+  const { id, type } = validation.data;
+
   const user = await prisma.user.findUnique({
     where: { id },
     select: {
@@ -65,14 +75,11 @@ export async function PUT(request: Request) {
   });
 
   if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    throw new Error("User not found");
   }
 
   if (user.type === type) {
-    return NextResponse.json(
-      { error: "User is already of this type" },
-      { status: 400 }
-    );
+    throw new Error("User is already of this type");
   }
 
   if (user.type === UserType.Admin) {
@@ -94,10 +101,7 @@ export async function PUT(request: Request) {
   });
 
   if (!updatedUser) {
-    return NextResponse.json(
-      { error: "Failed to update user" },
-      { status: 500 }
-    );
+    throw new Error("Failed to update user type");
   }
 
   const deleted = await prisma.chat.deleteMany({
@@ -133,11 +137,4 @@ export async function PUT(request: Request) {
 
     await createManyChatsWithOthers(UserType.Counselor, updatedUser.id);
   }
-
-  return NextResponse.json(
-    {
-      message: `Update of user ${updatedUser.name} to ${updatedUser.type} successful`,
-    },
-    { status: 200 }
-  );
 }

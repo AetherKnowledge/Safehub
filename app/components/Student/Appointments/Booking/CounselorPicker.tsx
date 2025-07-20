@@ -1,22 +1,11 @@
 "use client";
-import React, { useEffect } from "react";
-import { useState } from "react";
+import {
+  CounselorData,
+  getCounselors,
+} from "@/app/components/Student/Counselors/CounselorsActions";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { IoMdInformationCircleOutline } from "react-icons/io";
-
-export interface CounselorData {
-  id: string;
-  name: string;
-  image: string;
-  email: string;
-  Counselor: {
-    AvailableSlots: {
-      day: string;
-      startTime: string;
-      endTime: string;
-    }[];
-  };
-}
 
 interface Props {
   onChange?: (value: CounselorData) => void;
@@ -31,16 +20,8 @@ const CounselorPicker = ({ onChange }: Props) => {
   }, []);
 
   const refreshTable = async () => {
-    const res = await fetch("/api/user/student/counselors");
-    const data = await res.json();
-
-    if (!res.ok) {
-      console.error("Failed to fetch appointments:", data);
-      setLoading(false);
-      return;
-    }
-
-    setCounselors(data);
+    const counselors = await getCounselors();
+    setCounselors(counselors);
     setLoading(false);
   };
 
@@ -90,7 +71,7 @@ const CounselorBubble = ({ CounselorData, onChange }: CounselorBubbleProps) => {
         {CounselorData.image ? (
           <Image
             src={CounselorData.image}
-            alt={CounselorData.name}
+            alt={CounselorData.name || CounselorData.email}
             className="w-12 h-12 rounded-full"
             width={48}
             height={48}

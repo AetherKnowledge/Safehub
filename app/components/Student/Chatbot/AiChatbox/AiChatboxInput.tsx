@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { sendMessage } from "../AiChatbotActions";
 
 interface Props {
   onSend?: () => void;
@@ -49,16 +49,6 @@ const AiChatboxInput = ({ onSend }: Props) => {
       </form>
     </div>
   );
-};
-
-const sendMessage = async (message: string) => {
-  const res = await fetch("/api/user/student/sendmessage", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: message }),
-  });
-
-  return await res.json();
 };
 
 export default AiChatboxInput;

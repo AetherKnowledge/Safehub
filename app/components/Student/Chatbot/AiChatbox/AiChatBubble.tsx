@@ -17,13 +17,6 @@ const ChatBubble = ({ src, type, name, message, createdAt }: Props) => {
   }
 
   const defaultPosition = "chat chat-" + (type === "ai" ? "start" : "end");
-  // const [chatPosition, setChatPosition] = useState(defaultPosition);
-
-  // const togglePosition = () => {
-  //   setChatPosition((prev) =>
-  //     prev.includes("chat-end") ? "chat chat-start" : "chat chat-end"
-  //   );
-  // };
 
   return (
     <div className={defaultPosition}>

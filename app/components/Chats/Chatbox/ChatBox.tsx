@@ -6,6 +6,7 @@ import ChatboxInput from "./ChatboxInput";
 import MessageBubble from "./MessageBubble";
 
 export function ChatBox({ chatId }: { chatId: string }) {
+  const session = useSession();
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [messages, sendMessage, loading] = useMessaging(chatId);
 
@@ -27,7 +28,7 @@ export function ChatBox({ chatId }: { chatId: string }) {
     <>
       {/* Scrollable chat history */}
       <div className="flex-1 overflow-y-auto p-5" ref={chatContainerRef}>
-        {renderChatHistory(loading, messages)}
+        {renderChatHistory(loading, messages, session.data?.user.id || "")}
       </div>
 
       {/* Fixed input bar */}
@@ -40,9 +41,11 @@ export function ChatBox({ chatId }: { chatId: string }) {
   );
 }
 
-function renderChatHistory(loading: boolean, messages: Message[]): ReactNode {
-  const session = useSession();
-
+function renderChatHistory(
+  loading: boolean,
+  messages: Message[],
+  userId: string
+): ReactNode {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-4">
@@ -66,7 +69,7 @@ function renderChatHistory(loading: boolean, messages: Message[]): ReactNode {
       imageSize={10}
       content={chat.content}
       createdAt={chat.createdAt}
-      self={session.data?.user.id === chat.userId}
+      self={userId === chat.userId}
     />
   ));
 }

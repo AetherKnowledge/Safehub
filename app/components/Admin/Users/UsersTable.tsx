@@ -1,17 +1,13 @@
 "use client";
 
 import { UserType } from "@/app/generated/prisma";
+import { UpdateUserTypeData } from "@/lib/schemas";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import SelectBox from "../../SelectBox";
-import {
-  getUsers,
-  updateUserType,
-  UpdateUserTypeData,
-  UserWithStatus,
-} from "./UsersActions";
+import { getUsers, updateUserType, UserWithStatus } from "./UsersActions";
 
 const statusColorMap = {
   Online: { bg: "#d1fae5", text: "#047857" }, // green

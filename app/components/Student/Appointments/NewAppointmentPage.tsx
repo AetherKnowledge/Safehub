@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MdOutlineArrowBackIos } from "react-icons/md";
 import { CounselorData } from "../Counselors/CounselorsActions";
-import { createNewAppointment, NewAppointmentData } from "./AppointmentActions";
+import { createNewAppointment } from "./AppointmentActions";
 import ConcernPicker from "./Booking/ConcernPicker";
 import CounselorPicker from "./Booking/CounselorPicker";
 import DatePicker from "./Booking/DatePicker";
 import TimePicker from "./Booking/TimePicker";
+import { NewAppointmentData } from "@/lib/schemas";
 
 const BookAppointment = () => {
   const router = useRouter();

@@ -1,20 +1,21 @@
 "use server";
-import { Appointment, UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma";
 import authOptions from "@/lib/auth/authOptions";
 import { NewAppointmentData, newAppointmentSchema } from "@/lib/schemas";
 import { authenticateUser } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { AppointmentData } from "./AppointmentTable/AppointmentTable";
 
-export async function getAppointments(): Promise<Appointment[]> {
+export async function getAppointments(): Promise<AppointmentData[]> {
   const session = await getServerSession(authOptions);
 
   if (!session || !authenticateUser(session, UserType.Student)) {
     throw new Error("Unauthorized");
   }
 
-  const appointments: Appointment[] = await prisma.appointment.findMany({
+  const appointments = await prisma.appointment.findMany({
     where:
       session.user.type === UserType.Student
         ? { studentId: session.user.id }
@@ -22,7 +23,10 @@ export async function getAppointments(): Promise<Appointment[]> {
     orderBy: {
       createdAt: "asc",
     },
-    include: {
+    select: {
+      id: true,
+      schedule: true,
+      status: true,
       student: {
         select: {
           studentId: true,
@@ -50,7 +54,28 @@ export async function getAppointments(): Promise<Appointment[]> {
     },
   });
 
-  return appointments;
+  return appointments.map(
+    (appointment) =>
+      ({
+        id: appointment.id.toString(),
+        schedule: appointment.schedule,
+        status: appointment.status,
+        student: {
+          studentId: appointment.student.studentId,
+          user: {
+            name: appointment.student.user.name,
+            image: appointment.student.user.image,
+          },
+        },
+        counselor: {
+          counselorId: appointment.counselor.counselorId,
+          user: {
+            name: appointment.counselor.user.name,
+            image: appointment.counselor.user.image,
+          },
+        },
+      }) as AppointmentData
+  );
 }
 
 export async function createNewAppointment(

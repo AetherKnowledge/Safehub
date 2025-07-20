@@ -1,4 +1,5 @@
 "use client";
+import { getChatById } from "@/app/components/Chats/ChatsActions";
 import { ChatMessage } from "@/app/generated/prisma";
 import { useCallback, useEffect, useState } from "react";
 import { SocketEventType, SocketMessage } from "../SocketEvents";
@@ -17,7 +18,13 @@ export function useMessaging(chatId: string) {
 
   useEffect(() => {
     const loadData = async () => {
-      const serverMessages = await fetchMessages(chatId);
+      let serverMessages: Message[] = [];
+      try {
+        serverMessages = (await getChatById(chatId)) as Message[];
+      } catch (error) {
+        console.error("Failed to fetch chat messages:", error);
+      }
+
       setMessages(serverMessages);
       setLoading(false);
     };
@@ -79,16 +86,4 @@ export function useMessaging(chatId: string) {
   }, [socket, chatId]);
 
   return [messages, sendMessage, loading] as const;
-}
-
-async function fetchMessages(chatId: string): Promise<Message[]> {
-  const res = await fetch("/api/user/chats/" + chatId);
-  const data = await res.json();
-
-  if (!res.ok) {
-    console.error("Failed to fetch chat history:", data);
-    return [] as Message[];
-  }
-
-  return data as Message[];
 }

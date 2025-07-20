@@ -6,6 +6,7 @@ import { Message } from "@/lib/socket/hooks/useMessaging";
 import { imageGenerator } from "@/lib/utils";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
+import { getChats } from "../ChatsActions";
 
 export interface Chat {
   id: string;
@@ -23,11 +24,10 @@ const ChatSidebar = ({ chatId }: { chatId: string }) => {
 
   useEffect(() => {
     const fetchChats = async () => {
-      const response = await fetch("/api/user/chats");
-      const data = (await response.json()) as ParsedChat[];
+      const chats = (await getChats()) as ParsedChat[];
 
       const parsedData = await Promise.all(
-        data.map(
+        chats.map(
           async (chat) =>
             ({
               id: chat.id,

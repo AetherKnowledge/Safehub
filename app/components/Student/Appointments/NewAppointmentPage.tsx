@@ -1,13 +1,15 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { MdOutlineArrowBackIos } from "react-icons/md";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { MdOutlineArrowBackIos } from "react-icons/md";
+import { CounselorData } from "../Counselors/CounselorsActions";
+import { createNewAppointment, NewAppointmentData } from "./AppointmentActions";
+import ConcernPicker from "./Booking/ConcernPicker";
+import CounselorPicker from "./Booking/CounselorPicker";
 import DatePicker from "./Booking/DatePicker";
 import TimePicker from "./Booking/TimePicker";
-import CounselorPicker, { CounselorData } from "./Booking/CounselorPicker";
-import ConcernPicker from "./Booking/ConcernPicker";
 
 const BookAppointment = () => {
   const router = useRouter();
@@ -51,20 +53,10 @@ const BookAppointment = () => {
       counselorId: counselor.id,
       schedule: dateTime,
       concerns: concerns,
-    };
+    } as NewAppointmentData;
 
     try {
-      const response = await fetch("/api/user/student/appointments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(appointmentData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to book appointment");
-      }
+      await createNewAppointment(appointmentData);
 
       setTimeout(() => {
         setPage(0); // Redirect to appointments page after 2 seconds

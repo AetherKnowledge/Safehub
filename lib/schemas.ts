@@ -2,6 +2,25 @@ import { CallStatus, UserType } from "@/app/generated/prisma";
 import { CallAnswerType } from "@/lib/socket/SocketEvents";
 import { z } from "zod";
 
+export const updateUserSchema = z.object({
+  id: z.uuid(),
+  type: z.enum(UserType),
+});
+export type UpdateUserTypeData = z.infer<typeof updateUserSchema>;
+
+export const commentSchema = z.object({
+  postId: z.uuid(),
+  content: z.string().min(2).max(500),
+});
+export type CommentData = z.infer<typeof commentSchema>;
+
+export const newAppointmentSchema = z.object({
+  counselorId: z.string(),
+  schedule: z.date(),
+  concerns: z.array(z.string()),
+});
+export type NewAppointmentData = z.infer<typeof newAppointmentSchema>;
+
 export const messageSchema = z.object({
   chatId: z.string().min(1, "Chat ID is required"),
   content: z.string().trim().min(1).max(1000), // Increased for encrypted content
@@ -11,21 +30,6 @@ export const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.email("Invalid email address"),
   password: z.string(),
-});
-
-export const updateUserSchema = z.object({
-  id: z.string(),
-  type: z.enum(UserType),
-});
-
-export const newAppointmentSchema = z.object({
-  counselorId: z.string(),
-  schedule: z.string(),
-  concerns: z.array(z.string()),
-});
-
-export const deleteAppointmentSchema = z.object({
-  appointmentId: z.number(),
 });
 
 export const joinChatSchema = z.object({

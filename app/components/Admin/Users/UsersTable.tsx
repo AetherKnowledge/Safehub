@@ -1,11 +1,17 @@
 "use client";
 
-import { User, UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import SelectBox from "../../SelectBox";
+import {
+  getUsers,
+  updateUserType,
+  UpdateUserTypeData,
+  UserWithStatus,
+} from "./UsersActions";
 
 const statusColorMap = {
   Online: { bg: "#d1fae5", text: "#047857" }, // green
@@ -24,8 +30,8 @@ const UsersTable = ({ name }: { name?: string }) => {
   const roleFilter = searchParams.get("role") ?? undefined;
   const statusFilter = searchParams.get("status") ?? undefined;
 
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [allUsers, setAllUsers] = useState<UserWithStatus[]>([]);
+  const [users, setUsers] = useState<UserWithStatus[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,34 +52,19 @@ const UsersTable = ({ name }: { name?: string }) => {
   }, [roleFilter, statusFilter, allUsers, name]);
 
   async function refreshUsers() {
-    const res = await fetch("/api/user/admin/users");
-    const data = await res.json();
-
-    if (!res.ok) {
-      console.error("Failed to fetch users:", data);
-      return;
-    }
-
-    setAllUsers(data);
+    const users = await getUsers();
+    setAllUsers(users);
   }
 
   async function changeRole(userId: string, newRole: UserType) {
-    const res = await fetch("/api/user/admin/users", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: userId,
-        type: newRole,
-      }),
-    });
-
-    const result = await res.json();
-    if (!res.ok) {
-      console.error("Failed to update user role:", result);
+    try {
+      await updateUserType({ id: userId, type: newRole } as UpdateUserTypeData);
+    } catch (error) {
+      console.error("Failed to update user role:", error);
       return;
-    } else await refreshUsers();
+    }
+
+    await refreshUsers();
   }
 
   return (
@@ -194,7 +185,7 @@ const UsersTable = ({ name }: { name?: string }) => {
 };
 
 function filterUsers(
-  users: User[],
+  users: UserWithStatus[],
   role?: string,
   status?: string,
   name?: string

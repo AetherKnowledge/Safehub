@@ -1,10 +1,10 @@
 "use client";
 
-import { User } from "@/app/generated/prisma";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CounselorData, getCounselors } from "./CounselorsActions";
 
 const statusColorMap = {
   Online: { bg: "#d1fae5", text: "#047857" }, // green
@@ -17,8 +17,8 @@ const CounselorList = ({ name }: { name?: string }) => {
   const roleFilter = searchParams.get("role") ?? undefined;
   const statusFilter = searchParams.get("status") ?? undefined;
 
-  const [allCounselors, setAllCounselors] = useState<User[]>([]);
-  const [counselors, setCounselors] = useState<User[]>([]);
+  const [allCounselors, setAllCounselors] = useState<CounselorData[]>([]);
+  const [counselors, setCounselors] = useState<CounselorData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,15 +39,8 @@ const CounselorList = ({ name }: { name?: string }) => {
   }, [roleFilter, statusFilter, allCounselors, name]);
 
   async function refreshCounselors() {
-    const res = await fetch("/api/user/student/counselors");
-    const data = await res.json();
-
-    if (!res.ok) {
-      console.error("Failed to fetch counselors:", data);
-      return;
-    }
-
-    setAllCounselors(data);
+    const counselors = await getCounselors();
+    setAllCounselors(counselors);
   }
 
   return (
@@ -152,7 +145,7 @@ const CounselorList = ({ name }: { name?: string }) => {
 };
 
 function filterUsers(
-  counselor: User[],
+  counselor: CounselorData[],
   role?: string,
   status?: string,
   name?: string

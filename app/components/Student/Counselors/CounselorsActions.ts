@@ -1,15 +1,35 @@
-import { UserStatus, UserType } from "@/app/generated/prisma";
+"use server";
+
+import { Days, UserStatus, UserType } from "@/app/generated/prisma";
 import authOptions from "@/lib/auth/authOptions";
 import { isUserOnline } from "@/lib/redis";
+import { authenticateUser } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export type CounselorData = {
+  name: string | null;
+  type: UserType;
+  Counselor: {
+    AvailableSlots: {
+      counselorId: string;
+      id: string;
+      day: Days;
+      startTime: string;
+      endTime: string;
+    }[];
+  } | null;
+  id: string;
+  email: string;
+  image: string | null;
+  status: UserStatus;
+};
+
+export async function getCounselors() {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || !authenticateUser(session, UserType.Student)) {
+    throw new Error("Unauthorized");
   }
 
   const counselors = await prisma.user.findMany({
@@ -22,6 +42,7 @@ export async function GET(request: Request) {
     select: {
       id: true,
       name: true,
+      type: true,
       image: true,
       email: true,
       Counselor: {
@@ -29,6 +50,7 @@ export async function GET(request: Request) {
           AvailableSlots: true,
         },
       },
+      status: true,
     },
   });
 
@@ -40,5 +62,5 @@ export async function GET(request: Request) {
     )
   );
 
-  return NextResponse.json(counselorsWithStatus, { status: 200 });
+  return counselorsWithStatus as CounselorData[];
 }

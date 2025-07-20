@@ -1,36 +1,11 @@
 "use client";
-import React from "react";
-import AppointmentRow from "./ApointmentRow";
+import { Appointment } from "@/app/generated/prisma";
 import { useEffect, useState } from "react";
-import { AppointmentStatus } from "@/app/generated/prisma";
-export interface AppointmentData {
-  id: string;
-  studentId: string;
-  counselorId: string;
-  status: AppointmentStatus;
-  schedule: string;
-  createdAt: string;
-  concerns: string[];
-  student: {
-    studentId: string;
-    user: {
-      name: string;
-      email: string;
-      image: string;
-    };
-  };
-  counselor: {
-    counselorId: string;
-    user: {
-      name: string;
-      email: string;
-      image: string;
-    };
-  };
-}
+import { cancelAppointment, getAppointments } from "../AppointmentActions";
+import AppointmentRow from "./ApointmentRow";
 
 const AppointmentTable = () => {
-  const [appointments, setAppointments] = useState<AppointmentData[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,38 +17,22 @@ const AppointmentTable = () => {
   }, []);
 
   const refreshTable = async () => {
-    const res = await fetch("/api/user/student/appointments");
-    const data = await res.json();
+    const appointments = await getAppointments();
+    setAppointments(appointments);
 
-    if (!res.ok) {
-      console.error("Failed to fetch appointments:", data);
-      setLoading(false);
-      return;
-    }
-
-    setAppointments(data);
     setLoading(false);
   };
 
   const handleCancel = async (appointmentId: string) => {
     setLoading(true);
-    const res = await fetch("/api/user/student/appointments", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ appointmentId }),
-    });
-
-    if (!res.ok) {
-      const errorData = await res.json();
-      console.error("Failed to cancel appointment:", errorData);
+    try {
+      await cancelAppointment(appointmentId);
+    } catch (error) {
+      console.error("Error canceling appointment:", error);
+      setLoading(false);
       return;
     }
 
-    // setAppointments((prev) =>
-    //   prev.filter((appointment) => appointment.id !== appointmentId)
-    // );
     refreshTable();
   };
 

@@ -2,7 +2,7 @@ import { imageGenerator } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
 import MessageBubble from "../Chats/Chatbox/MessageBubble";
-import { addComment, PostComment } from "./PostActions";
+import { addComment, CommentData, PostComment } from "./PostActions";
 
 type PostCommentsProps = {
   id: string;
@@ -100,7 +100,7 @@ const PostComments = ({
                 },
               ]);
               try {
-                await addComment(id, value);
+                await addComment({ postId: id, content: value } as CommentData);
               } catch (error) {
                 setComments(prevComments);
               }

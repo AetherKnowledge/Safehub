@@ -2,13 +2,14 @@
 import { chathistory } from "@/app/generated/prisma";
 import { useSession } from "next-auth/react";
 import { ReactNode, useEffect, useRef, useState } from "react";
+import { getHistory } from "../AiChatbotActions";
 import AIChatboxInput from "./AiChatboxInput";
 import AIChatBubble from "./AiChatBubble";
 
-interface Message {
+type Message = {
   type: "human" | "ai";
   content: string;
-}
+};
 
 export function AiChatBox() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -28,16 +29,14 @@ export function AiChatBox() {
   }, []);
 
   const refreshChat = async () => {
-    const res = await fetch("/api/user/student/history");
-    const data = await res.json();
-
-    if (!res.ok) {
-      console.error("Failed to fetch chat history:", data);
+    const history = await getHistory();
+    if (!history) {
+      console.error("Failed to fetch chat history:", history);
       setLoading(false);
       return;
     }
 
-    setChatHistory(data);
+    setChatHistory(history);
     setTimeout(scrollToBottom, 50);
     setLoading(false);
   };
@@ -89,9 +88,9 @@ function renderChatHistory(
 }
 
 function makeChatBubble(chat: chathistory, imageUrl?: string): ReactNode {
-  const message: Message = JSON.parse(
-    chat.message?.toString() || ""
-  ) as Message;
+  console.log("Chat:", chat);
+
+  const message = chat.message as Message;
   return (
     <AIChatBubble
       key={chat.id}

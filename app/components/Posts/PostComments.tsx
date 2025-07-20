@@ -2,7 +2,8 @@ import { imageGenerator } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
 import MessageBubble from "../Chats/Chatbox/MessageBubble";
-import { addComment, CommentData, PostComment } from "./PostActions";
+import { addComment, PostComment } from "./PostActions";
+import { CommentData } from "@/lib/schemas";
 
 type PostCommentsProps = {
   id: string;

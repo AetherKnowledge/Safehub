@@ -1,11 +1,31 @@
 "use client";
-import { Appointment } from "@/app/generated/prisma";
+import { AppointmentStatus } from "@/app/generated/prisma";
 import { useEffect, useState } from "react";
 import { cancelAppointment, getAppointments } from "../AppointmentActions";
 import AppointmentRow from "./ApointmentRow";
 
+export type AppointmentData = {
+  id: string;
+  schedule: Date;
+  status: AppointmentStatus;
+  student: {
+    studentId: string;
+    user: {
+      name: string;
+      image?: string | null;
+    };
+  };
+  counselor: {
+    counselorId: string;
+    user: {
+      name: string;
+      image?: string | null;
+    };
+  };
+};
+
 const AppointmentTable = () => {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [appointments, setAppointments] = useState<AppointmentData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

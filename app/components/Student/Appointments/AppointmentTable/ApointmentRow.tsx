@@ -1,10 +1,9 @@
 "use client";
-import React from "react";
+import { AppointmentStatus, UserType } from "@/app/generated/prisma";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { GoDotFill } from "react-icons/go";
 import { AppointmentData } from "./AppointmentTable";
-import { useSession } from "next-auth/react";
-import { AppointmentStatus, UserType } from "@/app/generated/prisma";
-import Image from "next/image";
 
 interface Props {
   appointment: AppointmentData;

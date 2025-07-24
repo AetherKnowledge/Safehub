@@ -1,113 +1,79 @@
-"use client";
+import { fileTypeFromBuffer } from "file-type";
+import fs from "fs";
+import { writeFile } from "fs/promises";
+import { join } from "path";
 
-import TimePicker from "@/app/components/Student/Appointments/Booking/TimePicker";
-import { useCallback, useEffect } from "react";
-import Peer from "simple-peer";
+const storageDir = join(process.cwd(), "public", "storage");
+
+function getImages() {
+  // Only run on server
+  const files = fs.readdirSync(storageDir);
+  // Filter for image files (basic extension check)
+  return files.filter((f) => /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(f));
+}
 
 const Test = () => {
-  useEffect(() => {
-    // const peer1 = new Peer({
-    //   initiator: true,
-    //   trickle: false,
-    // });
-    // const peer2 = new Peer({
-    //   initiator: false,
-    //   trickle: false,
-    // });
+  const images = getImages();
 
-    // peer1.on("signal", (data) => {
-    //   console.log("Peer 1 signal:", data);
-    //   // Send this data to peer2 via your signaling server
-    //   peer2.signal(data);
-    // });
+  async function upload(formData: FormData) {
+    "use server";
 
-    // peer2.on("signal", (data) => {
-    //   console.log("Peer 2 signal:", data);
-    //   // Send this data to peer1 via your signaling server
-    //   peer1.signal(data);
-    // });
+    const file: File | null = formData.get("file") as unknown as File;
+    if (!file || !(file instanceof File) || file.size === 0) {
+      throw new Error("No file uploaded");
+    }
 
-    // peer1.on("connect", () => {
-    //   console.log("Peer 1 connected to Peer 2");
-    //   peer1.send("Hello from Peer 1");
-    // });
+    // Check MIME type and extension
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      throw new Error("Only image files are allowed");
+    }
+    if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)) {
+      throw new Error("File extension not allowed");
+    }
 
-    // peer2.on("connect", () => {
-    //   console.log("Peer 2 connected to Peer 1");
-    //   peer2.send("Hello from Peer 2");
-    // });
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
-    // peer1.on("data", (data) => {
-    //   console.log("Peer 1 received:", data.toString());
-    // });
+    // Validate actual file type using magic bytes
+    const type = await fileTypeFromBuffer(buffer);
+    if (!type || !type.mime.startsWith("image/")) {
+      throw new Error("Uploaded file is not a valid image");
+    }
 
-    // peer2.on("data", (data) => {
-    //   console.log("Peer 2 received:", data.toString());
-    // });
+    // Here you would typically save the buffer to a storage solution
+    const rootDir = process.cwd();
+    const ext = type?.ext || "bin";
+    const filename = crypto.randomUUID() + "." + ext;
+    const path = join(rootDir, "public", "storage", filename);
+    await writeFile(path, buffer);
+  }
 
-    const peer1 = createPeer("member1", true);
-    const peer2 = createPeer("member2", false);
-
-    peer1.on("signal", (data) => {
-      console.log("Peer 1 signal:", data);
-      // Send this data to peer2 via your signaling server
-      peer2.signal(data);
-    });
-
-    peer2.on("signal", (data) => {
-      console.log("Peer 2 signal:", data);
-      // Send this data to peer1 via your signaling server
-      peer1.signal(data);
-    });
-  }, []);
-
-  const createPeer = useCallback((member: string, initiator: boolean) => {
-    const iceServers: RTCIceServer[] = [
-      {
-        urls: ["turn:192.168.254.59:3478?transport=udp"],
-        username: "testuser",
-        credential: "testpass",
-      },
-    ];
-
-    console.log("Creating peer for member:", member);
-    const peer = new Peer({
-      initiator,
-      trickle: false,
-    });
-
-    peer.on("connect", () => {
-      console.log("yo");
-      peer.send("Hello from " + member);
-    });
-
-    peer.on("error", (error) => {
-      console.error("Peer connection error:", error);
-    });
-
-    peer.on("close", () => {
-      console.log("Peer connection closed.");
-    });
-
-    peer.on("data", (data) => {
-      console.log(data);
-    });
-
-    //what the fuck the tutorial scammed me the shit below broke everything
-    // const rtcPeerConnection: RTCPeerConnection = (peer as any)._pc;
-    // rtcPeerConnection.onicecandidate = (event) => {
-    //   if (
-    //     rtcPeerConnection.iceConnectionState === "disconnected" ||
-    //     rtcPeerConnection.iceConnectionState === "failed"
-    //   ) {
-    //     console.log("ICE connection failed");
-    //   }
-    // };
-
-    return peer;
-  }, []);
-
-  return <TimePicker />;
+  return (
+    <div>
+      <h1>Upload Test</h1>
+      <form action={upload}>
+        {/* Limit file input to images only */}
+        <input
+          type="file"
+          name="file"
+          accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
+        />
+        <button type="submit">Upload</button>
+      </form>
+      <h2>Images in storage:</h2>
+      <div>
+        {images.map((img) => (
+          <img
+            key={img}
+            src={`/storage/${img}`}
+            alt={img}
+            style={{ maxWidth: "200px", margin: "10px" }}
+          />
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default Test;

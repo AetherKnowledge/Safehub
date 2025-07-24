@@ -18,12 +18,7 @@ export function useMessaging(chatId: string) {
 
   useEffect(() => {
     const loadData = async () => {
-      let serverMessages: Message[] = [];
-      try {
-        serverMessages = (await getChatById(chatId)) as Message[];
-      } catch (error) {
-        console.error("Failed to fetch chat messages:", error);
-      }
+      let serverMessages = (await getChatById(chatId)) as Message[];
 
       setMessages(serverMessages);
       setLoading(false);

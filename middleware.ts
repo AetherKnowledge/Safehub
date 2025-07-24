@@ -29,9 +29,6 @@ export default withAuth(
         )
           return false;
 
-        // Allow all authenticated users to access /user/*
-        if (url.startsWith("/user") || url.startsWith("/api/user")) return true;
-
         return true; // Default allow
       },
     },
@@ -41,6 +38,7 @@ export default withAuth(
 export const config = {
   matcher: [
     "/user/:path*",
+    "/events/:path*",
     "/api/user/:path*",
     "/api/user/student/:path*",
     "/api/user/admin/:path*",

@@ -1,10 +1,14 @@
 "use server";
 
+import { UserType } from "@/app/generated/prisma";
 import authOptions from "@/lib/auth/authOptions";
-import { CommentData, commentSchema } from "@/lib/schemas";
+import { CommentData, commentSchema, newPostSchema } from "@/lib/schemas";
 import { authenticateUser, formatDatetime } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
+import { fileTypeFromBuffer } from "file-type";
+import { access, mkdir, writeFile } from "fs/promises";
 import { getServerSession } from "next-auth";
+import { join } from "path";
 
 export type PostProps = {
   id: string;
@@ -17,6 +21,7 @@ export type PostProps = {
   likesStats: PostStat;
   dislikesStats: PostStat;
   comments: PostComment[];
+  isPopup?: boolean;
 };
 
 export type PostStat = {
@@ -103,6 +108,134 @@ export async function getPosts(): Promise<PostProps[]> {
     })),
   }));
 }
+
+export async function createPost(formData: FormData): Promise<void> {
+  const session = await getServerSession(authOptions);
+  if (
+    !session ||
+    !authenticateUser(session, UserType.Admin) ||
+    !session.user?.id
+  ) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!(formData instanceof FormData)) {
+    throw new Error("Invalid request");
+  }
+
+  const validation = newPostSchema.safeParse({
+    title: formData.get("title"),
+    content: formData.get("content"),
+    images: formData.getAll("images") as File[],
+  });
+
+  if (!validation.success) {
+    console.log("Validation errors:", validation.error);
+    throw new Error("Invalid request");
+  }
+
+  const { title, content, images } = validation.data;
+
+  const post = await prisma.post.create({
+    data: {
+      title,
+      content,
+      authorId: session.user.id,
+    },
+  });
+
+  const postId = post.id;
+  const imageUrls: string[] = [];
+  if (images && images.length > 0) {
+    await Promise.all(
+      images.map(async (file) => {
+        const filename = await createFile(file, postId);
+        imageUrls.push(`/events/${postId}/${filename}`);
+      })
+    );
+  }
+
+  await prisma.post.update({
+    where: { id: postId },
+    data: {
+      images: imageUrls,
+    },
+  });
+}
+
+export async function createFile(file: File, postId: number): Promise<string> {
+  if (!file || !(file instanceof File) || file.size === 0) {
+    throw new Error("No file uploaded");
+  }
+
+  // Check MIME type and extension
+  const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error("Only image files are allowed");
+  }
+  if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)) {
+    throw new Error("File extension not allowed");
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  // Validate actual file type using magic bytes
+  const type = await fileTypeFromBuffer(buffer);
+  if (!type || !type.mime.startsWith("image/")) {
+    throw new Error("Uploaded file is not a valid image");
+  }
+
+  // Here you would typically save the buffer to a storage solution
+  const rootDir = process.cwd();
+  const ext = type?.ext || "bin";
+
+  // Ensure the directory exists (async way)
+  const dir = join(rootDir, "public", "events", postId.toString());
+  try {
+    await access(dir);
+  } catch {
+    await mkdir(dir, { recursive: true });
+  }
+
+  const filename = `${crypto.randomUUID()}.${ext}`;
+  const path = join(dir, filename);
+  await writeFile(path, buffer);
+
+  return filename;
+}
+
+// export async function getPostImage(
+//   postId: string,
+//   imageId: string
+// ): Promise<string> {
+//   const session = await getServerSession(authOptions);
+//   if (!session || !authenticateUser(session)) {
+//     throw new Error("Unauthorized");
+//   }
+
+//   if (!postId || typeof postId !== "string" || postId.trim() === "") {
+//     throw new Error("Invalid Post ID");
+//   }
+
+//   if (!imageId || typeof imageId !== "string" || imageId.trim() === "") {
+//     throw new Error("Invalid Image ID");
+//   }
+
+//   const post = await prisma.post.findUnique({
+//     where: { id: parseInt(postId) },
+//     select: {
+//       images: true,
+//     },
+//   });
+
+//   if (!post) throw new Error("Post not found");
+
+//   const imageUrl = post.images.find((img) => img.includes(imageId));
+//   if (!imageUrl) throw new Error("Image not found in post");
+
+//   return imageUrl;
+// }
 
 export async function likePost(postId: string, like: boolean) {
   const session = await getServerSession(authOptions);
@@ -194,6 +327,7 @@ export async function addComment(data: CommentData): Promise<void> {
     throw new Error("Unauthorized");
   }
 
+  console.log("Adding comment:", data);
   const parsed = commentSchema.safeParse(data);
   if (!parsed.success) {
     throw new Error("Invalid request");

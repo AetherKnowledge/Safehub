@@ -2,14 +2,28 @@ import { CallStatus, UserType } from "@/app/generated/prisma";
 import { CallAnswerType } from "@/lib/socket/SocketEvents";
 import { z } from "zod";
 
+export const IMAGE_SCHEMA = z
+  .instanceof(File)
+  .refine(
+    (file) =>
+      ["image/png", "image/jpeg", "image/jpg", "image/gif"].includes(file.type),
+    { message: "Invalid image file type" }
+  );
+
+export const newPostSchema = z.object({
+  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
+  content: z.string().max(500, "Content is too long").optional(),
+  images: z.array(IMAGE_SCHEMA).max(5).optional(),
+});
+
 export const updateUserSchema = z.object({
-  id: z.uuid(),
+  id: z.string(),
   type: z.enum(UserType),
 });
 export type UpdateUserTypeData = z.infer<typeof updateUserSchema>;
 
 export const commentSchema = z.object({
-  postId: z.uuid(),
+  postId: z.string(),
   content: z.string().min(2).max(500),
 });
 export type CommentData = z.infer<typeof commentSchema>;

@@ -30,7 +30,7 @@ const PostPopup = ({
 
   return (
     <div
-      className={`card bg-base-100 shadow-br max-w-2xl mx-auto my-8 max-h-[80vh] overflow-hidden`}
+      className={`card bg-base-100 shadow-br max-w-2xl mx-auto my-8 max-h-[80vh] w-[80vw] overflow-hidden`}
     >
       <div className="card-body flex flex-col max-h-[80vh]">
         <div>

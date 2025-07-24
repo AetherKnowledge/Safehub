@@ -1,9 +1,9 @@
+import { CommentData } from "@/lib/schemas";
 import { imageGenerator } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
 import MessageBubble from "../Chats/Chatbox/MessageBubble";
 import { addComment, PostComment } from "./PostActions";
-import { CommentData } from "@/lib/schemas";
 
 type PostCommentsProps = {
   id: string;
@@ -78,7 +78,7 @@ const PostComments = ({
               inputRef.current.value.trim()
             ) {
               const value = inputRef.current.value.trim();
-              const prevComments = { ...comments };
+              const prevComments = [...comments];
 
               setComments([
                 ...comments,
@@ -103,6 +103,7 @@ const PostComments = ({
               try {
                 await addComment({ postId: id, content: value } as CommentData);
               } catch (error) {
+                console.log(prevComments);
                 setComments(prevComments);
               }
               inputRef.current.value = "";

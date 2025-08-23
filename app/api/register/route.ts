@@ -32,6 +32,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Create student record
+    const student = await prisma.student.create({
+      data: {
+        studentId: newUser.id,
+      },
+    });
+
     return NextResponse.json(
       { message: "User registered successfully", user: newUser },
       { status: 201 }

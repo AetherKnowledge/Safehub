@@ -18,7 +18,7 @@ export function useMessaging(chatId: string) {
 
   useEffect(() => {
     const loadData = async () => {
-      let serverMessages = (await getChatById(chatId)) as Message[];
+      const serverMessages = (await getChatById(chatId)) as Message[];
 
       setMessages(serverMessages);
       setLoading(false);

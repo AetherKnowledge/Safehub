@@ -1,20 +1,7 @@
+import { bucket } from "@/lib/supabaseClient";
 import { fileTypeFromBuffer } from "file-type";
-import fs from "fs";
-import { writeFile } from "fs/promises";
-import { join } from "path";
-
-const storageDir = join(process.cwd(), "public", "storage");
-
-function getImages() {
-  // Only run on server
-  const files = fs.readdirSync(storageDir);
-  // Filter for image files (basic extension check)
-  return files.filter((f) => /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(f));
-}
 
 const Test = () => {
-  const images = getImages();
-
   async function upload(formData: FormData) {
     "use server";
 
@@ -42,36 +29,36 @@ const Test = () => {
     }
 
     // Here you would typically save the buffer to a storage solution
-    const rootDir = process.cwd();
     const ext = type?.ext || "bin";
-    const filename = crypto.randomUUID() + "." + ext;
-    const path = join(rootDir, "public", "storage", filename);
-    await writeFile(path, buffer);
+    const filename = crypto.randomUUID();
+
+    const { data, error } = await bucket.upload(filename, buffer, {
+      contentType: type.mime,
+      upsert: false,
+    });
+
+    console.log("Upload result:", data, error);
   }
 
   return (
-    <div>
+    <div className="text-base-content">
       <h1>Upload Test</h1>
       <form action={upload}>
         {/* Limit file input to images only */}
         <input
+          className="file-input"
           type="file"
           name="file"
           accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
         />
-        <button type="submit">Upload</button>
+        <button
+          className="btn-primary bg-primary text-white p-2 rounded-2xl"
+          type="submit"
+        >
+          Upload
+        </button>
       </form>
       <h2>Images in storage:</h2>
-      <div>
-        {images.map((img) => (
-          <img
-            key={img}
-            src={`/storage/${img}`}
-            alt={img}
-            style={{ maxWidth: "200px", margin: "10px" }}
-          />
-        ))}
-      </div>
     </div>
   );
 };

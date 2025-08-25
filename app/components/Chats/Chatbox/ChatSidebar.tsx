@@ -8,7 +8,7 @@ import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 import { getChats } from "../ChatsActions";
 
-export interface Chat {
+export type Chat = {
   id: string;
   name: string;
   type: ChatType;
@@ -16,9 +16,13 @@ export interface Chat {
   src: ReactNode;
   status: UserStatus;
   latestMessageAt?: Date;
-}
+};
 
-const ChatSidebar = ({ chatId }: { chatId: string }) => {
+type ChatSidebarProps = {
+  chatId?: string;
+};
+
+const ChatSidebar = ({ chatId }: ChatSidebarProps) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const onMessage = useSocket().onMessage;
 
@@ -67,7 +71,7 @@ const ChatSidebar = ({ chatId }: { chatId: string }) => {
   }, [onMessage]);
 
   return (
-    <div className="flex flex-col overflow-y-auto">
+    <div className="flex flex-col overflow-y-auto w-full">
       {chats
         .slice()
         .sort((a, b) => {
@@ -85,7 +89,7 @@ const ChatSidebar = ({ chatId }: { chatId: string }) => {
             role="button"
             className={
               (chatId === chat.id ? "bg-base-300" : "hover:bg-base-200") +
-              " button px-2 py-2 transition-opacity flex items-center justify-between gap-4 w-[20vw]"
+              " button px-2 py-2 transition-opacity flex items-center justify-between gap-4 w-full"
             }
             href={"/user/chats/" + chat.id}
           >

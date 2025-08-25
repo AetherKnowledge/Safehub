@@ -6,7 +6,7 @@ interface Props {
 
 const Layout = ({ children }: Props) => {
   return (
-    <div className="flex bg-base-200 min-h-screen p-10 gap-8">
+    <div className="flex bg-base-200 min-h-screen p-6 gap-6">
       {/* Resizable Floating Sidebar */}
       <div className="pt-25">
         <Sidebar />

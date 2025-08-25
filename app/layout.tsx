@@ -1,6 +1,6 @@
 import NotificationProvider from "@/lib/NotificationProvider";
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Inter, Manrope } from "next/font/google";
 import AuthProvider from "../lib/auth/AuthProvider";
 import SocketProvider from "../lib/socket/SocketProvider";
 import CallPopupProvider from "./components/Chats/Chatbox/CallPopupProvider";
@@ -11,6 +11,8 @@ const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
 });
+
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${manrope.variable} antialiased`}>
+      <body className={`${inter.variable} antialiased`}>
         <div className="flex flex-col min-h-screen">
           <AuthProvider>
             <SocketProvider>

@@ -1,17 +1,21 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
+  provider        = "prisma-client-js"
+  output          = "../app/generated/prisma"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["next_auth", "public"]
 }
 
 enum UserType {
   Student
   Counselor
   Admin
+
+  @@schema("public")
 }
 
 enum AppointmentStatus {
@@ -19,6 +23,8 @@ enum AppointmentStatus {
   Pending
   Completed
   Rejected
+
+  @@schema("public")
 }
 
 enum Days {
@@ -29,11 +35,15 @@ enum Days {
   Friday
   Saturday
   Sunday
+
+  @@schema("public")
 }
 
 enum ChatType {
   GROUP
   DIRECT
+
+  @@schema("public")
 }
 
 enum CallStatus {
@@ -41,61 +51,40 @@ enum CallStatus {
   Accepted
   Rejected
   Ended
+
+  @@schema("public")
 }
 
 enum UserStatus {
   Online
   Offline
-}
 
-model User {
-  id            String        @id @default(cuid())
-  name          String?
-  type          UserType      @default(Student)
-  email         String        @unique
-  emailVerified DateTime?
-  password      String?
-  image         String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  status        UserStatus    @default(Offline)
-  accounts      Account[]
-  sessions      Session[]
-  chatHistory   chathistory[]
-
-  Student   Student?
-  Counselor Counselor?
-  Admin     Admin?
-
-  chatMembers ChatMember[]
-  messages    ChatMessage[]
-
-  call       Call[]
-  callMember CallMember[]
-
-  posts    Post[]
-  likes    Like[]
-  dislikes Dislike[]
-  comments Comment[]
+  @@schema("public")
 }
 
 model Student {
   studentId    String        @id
-  user         User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  user         users         @relation(fields: [studentId], references: [id], onDelete: Cascade)
   appointments Appointment[]
+
+  @@schema("public")
 }
 
 model Counselor {
   counselorId    String          @id
-  user           User            @relation(fields: [counselorId], references: [id], onDelete: Cascade)
+  user           users           @relation(fields: [counselorId], references: [id], onDelete: Cascade)
   appointments   Appointment[]
   available      Boolean         @default(false)
   AvailableSlots AvailableSlot[]
+
+  @@schema("public")
 }
 
 model Admin {
   adminId String @id
-  user    User   @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  user    users  @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@schema("public")
 }
 
 model Chat {
@@ -110,6 +99,8 @@ model Chat {
 
   members  ChatMember[]
   messages ChatMessage[]
+
+  @@schema("public")
 }
 
 model ChatMember {
@@ -118,10 +109,11 @@ model ChatMember {
   userId   String
   joinedAt DateTime @default(now())
 
-  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat Chat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([chatId, userId]) // Prevent duplicate members
+  @@schema("public")
 }
 
 model ChatMessage {
@@ -132,8 +124,10 @@ model ChatMessage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat Chat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@schema("public")
 }
 
 model Call {
@@ -144,8 +138,10 @@ model Call {
   callerId  String
   chat      Chat       @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
-  caller     User         @relation(fields: [callerId], references: [id], onDelete: Cascade)
+  caller     users        @relation(fields: [callerId], references: [id], onDelete: Cascade)
   callMember CallMember[]
+
+  @@schema("public")
 }
 
 model CallMember {
@@ -155,10 +151,11 @@ model CallMember {
   userId   String
   joinedAt DateTime @default(now())
 
-  call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  call Call  @relation(fields: [callId], references: [id], onDelete: Cascade)
+  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([callId, userId]) // Prevent duplicate members in a call
+  @@schema("public")
 }
 
 model AvailableSlot {
@@ -168,25 +165,8 @@ model AvailableSlot {
   day         Days
   startTime   String // Format: "09:00"
   endTime     String // Format: "12:00"
-}
 
-model Account {
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([provider, providerAccountId])
+  @@schema("public")
 }
 
 model Post {
@@ -202,7 +182,9 @@ model Post {
   dislikes Dislike[]
 
   comments Comment[]
-  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author   users     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@schema("public")
 }
 
 model Like {
@@ -211,10 +193,11 @@ model Like {
   userId    String
   createdAt DateTime @default(now())
 
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId]) // Prevent multiple likes from the same user on the same post
+  @@schema("public")
 }
 
 model Dislike {
@@ -223,10 +206,11 @@ model Dislike {
   userId    String
   createdAt DateTime @default(now())
 
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId]) // Prevent multiple dislikes from the same user on the same post
+  @@schema("public")
 }
 
 model Comment {
@@ -237,33 +221,20 @@ model Comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
+  post Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-model Session {
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@id([identifier, token])
+  @@schema("public")
 }
 
 model chathistory {
   id         Int      @id @default(autoincrement())
   session_id String   @db.VarChar(255)
   message    Json
-  user       User     @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  user       users    @relation(fields: [session_id], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
+
+  @@schema("public")
 }
 
 model Appointment {
@@ -276,4 +247,83 @@ model Appointment {
   student     Student           @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
   counselor   Counselor         @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)
   concerns    String?
+
+  @@schema("public")
+}
+
+model accounts {
+  id                 String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         BigInt?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  oauth_token_secret String?
+  oauth_token        String?
+  userId             String? @db.Uuid
+  users              users?  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([provider, providerAccountId], map: "provider_unique")
+  @@schema("next_auth")
+}
+
+model sessions {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  expires      DateTime @db.Timestamptz(6)
+  sessionToken String   @unique(map: "sessiontoken_unique")
+  userId       String?  @db.Uuid
+  users        users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("next_auth")
+}
+
+model users {
+  id            String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name          String?
+  email         String?    @unique(map: "email_unique")
+  emailVerified DateTime?  @db.Timestamptz(6)
+  image         String?
+  accounts      accounts[]
+  sessions      sessions[]
+
+  //Extras
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type     UserType   @default(Student)
+  password String?
+  status   UserStatus @default(Offline)
+
+  chatHistory chathistory[]
+
+  Student   Student?
+  Counselor Counselor?
+  Admin     Admin?
+
+  chatMembers ChatMember[]
+  messages    ChatMessage[]
+
+  call       Call[]
+  callMember CallMember[]
+
+  posts    Post[]
+  likes    Like[]
+  dislikes Dislike[]
+  comments Comment[]
+
+  @@schema("next_auth")
+}
+
+model verification_tokens {
+  identifier String?
+  token      String   @id
+  expires    DateTime @db.Timestamptz(6)
+
+  @@unique([token, identifier], map: "token_identifier_unique")
+  @@schema("next_auth")
 }

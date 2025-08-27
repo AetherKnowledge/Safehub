@@ -1,13 +1,17 @@
 import { createManyChatsWithOthers } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { SupabaseAdapter } from "@auth/supabase-adapter";
 import bcrypt from "bcrypt";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import process from "process";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: SupabaseAdapter({
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  }),
   providers: [
     CredentialsProvider({
       name: "Credentials",

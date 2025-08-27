@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "5mb",
     },
   },
+  allowedDevOrigins: ["*.jcserver.net"],
 };
 
 export default nextConfig;

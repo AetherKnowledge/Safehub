@@ -1,4 +1,4 @@
-import { bucket } from "@/lib/supabaseClient";
+import { bucket } from "@/lib/supabase/client";
 import { fileTypeFromBuffer } from "file-type";
 
 const Test = () => {

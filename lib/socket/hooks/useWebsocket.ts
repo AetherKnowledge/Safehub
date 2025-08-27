@@ -35,55 +35,46 @@ export function useWebSocket(
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const connect = useCallback(() => {
-    if (socketRef.current) return;
-
-    const socket = new WebSocket(urlFn());
-
-    socket.onopen = () => {
-      setIsConnected(true);
-      setError(null);
-      reconnectAttempts.current = 0;
-      console.log("[WebSocket] Connected");
-    };
-
-    socket.onclose = (event) => {
-      console.log("[WebSocket] Closed", event);
-      console.log(event.code, event.reason);
-      setIsConnected(false);
-      socketRef.current = null;
-
-      if (event.code !== 1000) {
-        // Only set error if the closure was not intentional (code 1000 means normal closure)
-        console.log("WebSocket connection closed unexpectedly.");
-      }
-
-      if (
-        reconnect &&
-        (maxReconnectAttempts === 0 ||
-          reconnectAttempts.current < maxReconnectAttempts)
-      ) {
-        const delay =
-          reconnectIntervalMs * 2 ** reconnectAttempts.current > 10000
-            ? 10000
-            : reconnectIntervalMs * 2 ** reconnectAttempts.current;
-        reconnectAttempts.current += 1;
-
-        console.log(
-          `[WebSocket] Attempting reconnect #${reconnectAttempts.current} in ${delay}ms`
-        );
-
-        reconnectTimeout.current = setTimeout(() => {
-          connect();
-        }, delay);
-      }
-    };
-
-    socket.onerror = (event) => {
-      console.error("[WebSocket] Error:", event);
-      setError("WebSocket encountered an error.");
-    };
-
-    socketRef.current = socket;
+    // if (socketRef.current) return;
+    // const socket = new WebSocket(urlFn());
+    // socket.onopen = () => {
+    //   setIsConnected(true);
+    //   setError(null);
+    //   reconnectAttempts.current = 0;
+    //   console.log("[WebSocket] Connected");
+    // };
+    // socket.onclose = (event) => {
+    //   console.log("[WebSocket] Closed", event);
+    //   console.log(event.code, event.reason);
+    //   setIsConnected(false);
+    //   socketRef.current = null;
+    //   if (event.code !== 1000) {
+    //     // Only set error if the closure was not intentional (code 1000 means normal closure)
+    //     console.log("WebSocket connection closed unexpectedly.");
+    //   }
+    //   if (
+    //     reconnect &&
+    //     (maxReconnectAttempts === 0 ||
+    //       reconnectAttempts.current < maxReconnectAttempts)
+    //   ) {
+    //     const delay =
+    //       reconnectIntervalMs * 2 ** reconnectAttempts.current > 10000
+    //         ? 10000
+    //         : reconnectIntervalMs * 2 ** reconnectAttempts.current;
+    //     reconnectAttempts.current += 1;
+    //     console.log(
+    //       `[WebSocket] Attempting reconnect #${reconnectAttempts.current} in ${delay}ms`
+    //     );
+    //     reconnectTimeout.current = setTimeout(() => {
+    //       connect();
+    //     }, delay);
+    //   }
+    // };
+    // socket.onerror = (event) => {
+    //   console.error("[WebSocket] Error:", event);
+    //   setError("WebSocket encountered an error.");
+    // };
+    // socketRef.current = socket;
   }, [urlFn, reconnect, reconnectIntervalMs, maxReconnectAttempts]);
 
   const disconnect = useCallback(() => {

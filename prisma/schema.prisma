@@ -1,7 +1,6 @@
 generator client {
-  provider        = "prisma-client-js"
-  output          = "../app/generated/prisma"
-  previewFeatures = ["multiSchema"]
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
 }
 
 datasource db {
@@ -62,17 +61,51 @@ enum UserStatus {
   @@schema("public")
 }
 
+model User {
+  id    String  @id @db.Uuid
+  name  String?
+  email String? @unique(map: "email_unique")
+  image String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type   UserType   @default(Student)
+  status UserStatus @default(Offline)
+
+  chatHistory chathistory[]
+
+  Student   Student?
+  Counselor Counselor?
+  Admin     Admin?
+
+  chatMembers ChatMember[]
+  messages    ChatMessage[]
+
+  call       Call[]
+  callMember CallMember[]
+
+  posts    Post[]
+  likes    Like[]
+  dislikes Dislike[]
+  comments Comment[]
+
+  next_auth_user users @relation(fields: [id], references: [id])
+
+  @@schema("public")
+}
+
 model Student {
-  studentId    String        @id
-  user         users         @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId    String        @id @db.Uuid
+  user         User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
   appointments Appointment[]
 
   @@schema("public")
 }
 
 model Counselor {
-  counselorId    String          @id
-  user           users           @relation(fields: [counselorId], references: [id], onDelete: Cascade)
+  counselorId    String          @id @db.Uuid
+  user           User            @relation(fields: [counselorId], references: [id], onDelete: Cascade)
   appointments   Appointment[]
   available      Boolean         @default(false)
   AvailableSlots AvailableSlot[]
@@ -81,8 +114,8 @@ model Counselor {
 }
 
 model Admin {
-  adminId String @id
-  user    users  @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  adminId String @id @db.Uuid
+  user    User   @relation(fields: [adminId], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
@@ -106,11 +139,11 @@ model Chat {
 model ChatMember {
   id       String   @id @default(cuid())
   chatId   String
-  userId   String
+  userId   String   @db.Uuid
   joinedAt DateTime @default(now())
 
-  chat Chat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([chatId, userId]) // Prevent duplicate members
   @@schema("public")
@@ -119,13 +152,13 @@ model ChatMember {
 model ChatMessage {
   id        Int      @id @default(autoincrement())
   chatId    String
-  userId    String
+  userId    String   @db.Uuid
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  chat Chat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
@@ -135,10 +168,10 @@ model Call {
   chatId    String     @unique
   status    CallStatus @default(Pending)
   createdAt DateTime   @default(now())
-  callerId  String
+  callerId  String     @db.Uuid
   chat      Chat       @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
-  caller     users        @relation(fields: [callerId], references: [id], onDelete: Cascade)
+  caller     User         @relation(fields: [callerId], references: [id], onDelete: Cascade)
   callMember CallMember[]
 
   @@schema("public")
@@ -148,11 +181,11 @@ model CallMember {
   id       String   @id @default(cuid())
   socketId String
   callId   String
-  userId   String
+  userId   String   @db.Uuid
   joinedAt DateTime @default(now())
 
-  call Call  @relation(fields: [callId], references: [id], onDelete: Cascade)
-  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([callId, userId]) // Prevent duplicate members in a call
   @@schema("public")
@@ -161,7 +194,7 @@ model CallMember {
 model AvailableSlot {
   id          String    @id @default(cuid())
   counselor   Counselor @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)
-  counselorId String
+  counselorId String    @db.Uuid
   day         Days
   startTime   String // Format: "09:00"
   endTime     String // Format: "12:00"
@@ -173,7 +206,7 @@ model Post {
   id        Int      @id @default(autoincrement())
   title     String
   content   String?
-  authorId  String
+  authorId  String   @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   images    String[] @db.VarChar(255) // Array of image URLs
@@ -182,7 +215,7 @@ model Post {
   dislikes Dislike[]
 
   comments Comment[]
-  author   users     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
@@ -190,11 +223,11 @@ model Post {
 model Like {
   id        Int      @id @default(autoincrement())
   postId    Int
-  userId    String
+  userId    String   @db.Uuid
   createdAt DateTime @default(now())
 
-  post Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId]) // Prevent multiple likes from the same user on the same post
   @@schema("public")
@@ -203,11 +236,11 @@ model Like {
 model Dislike {
   id        Int      @id @default(autoincrement())
   postId    Int
-  userId    String
+  userId    String   @db.Uuid
   createdAt DateTime @default(now())
 
-  post Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId]) // Prevent multiple dislikes from the same user on the same post
   @@schema("public")
@@ -216,22 +249,22 @@ model Dislike {
 model Comment {
   id        Int      @id @default(autoincrement())
   postId    Int
-  userId    String
+  userId    String   @db.Uuid
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  post Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
 
 model chathistory {
   id         Int      @id @default(autoincrement())
-  session_id String   @db.VarChar(255)
+  session_id String   @db.Uuid
   message    Json
-  user       users    @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [session_id], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
 
   @@schema("public")
@@ -239,8 +272,8 @@ model chathistory {
 
 model Appointment {
   id          Int               @id @default(autoincrement())
-  studentId   String
-  counselorId String
+  studentId   String            @db.Uuid
+  counselorId String            @db.Uuid
   status      AppointmentStatus @default(Pending)
   schedule    DateTime
   createdAt   DateTime          @default(now())
@@ -286,35 +319,13 @@ model users {
   id            String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name          String?
   email         String?    @unique(map: "email_unique")
+  password      String?
   emailVerified DateTime?  @db.Timestamptz(6)
   image         String?
   accounts      accounts[]
   sessions      sessions[]
 
-  //Extras
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  type     UserType   @default(Student)
-  password String?
-  status   UserStatus @default(Offline)
-
-  chatHistory chathistory[]
-
-  Student   Student?
-  Counselor Counselor?
-  Admin     Admin?
-
-  chatMembers ChatMember[]
-  messages    ChatMessage[]
-
-  call       Call[]
-  callMember CallMember[]
-
-  posts    Post[]
-  likes    Like[]
-  dislikes Dislike[]
-  comments Comment[]
+  public_user User?
 
   @@schema("next_auth")
 }

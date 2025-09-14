@@ -1,12 +1,6 @@
-import { CallStatus } from "@/app/generated/prisma";
+import { CallStatus, User } from "@/app/generated/prisma";
 import { types } from "mediasoup";
 import { TransportOptions } from "mediasoup-client/lib/Transport";
-
-export enum CallAnswerType {
-  ACCEPT = "accept",
-  REJECT = "reject",
-  DID_NOT_ANSWER = "didNotAnswer",
-}
 
 export enum SocketEventType {
   MESSAGE = "message",
@@ -25,6 +19,23 @@ export enum SocketEventType {
   PRODUCE = "produce",
   CONSUME = "consume",
 }
+
+export enum SocketErrorCallType {
+  NO_ANSWER = "noAnswer",
+  CONFLICT = "conflict",
+}
+
+export enum SocketErrorRequestType {
+  INVALID_DATA = "invalidData",
+  TIMEOUT = "timeout",
+  NOT_FOUND = "notFound",
+  UNAUTHORIZED = "unauthorized",
+  FORBIDDEN = "forbidden",
+  RATE_LIMIT_EXCEEDED = "rateLimitExceeded",
+  INTERNAL_SERVER_ERROR = "internalServerError",
+}
+
+export type SocketErrorType = SocketErrorCallType | SocketErrorRequestType;
 
 export interface SocketEvent<
   T =
@@ -49,15 +60,19 @@ export interface SocketMessage {
 
 export interface SocketError {
   message: string;
-  code?: number;
+  errorType: SocketErrorType;
 }
+
+export type Recipient = Pick<User, "id" | "name" | "image">;
 
 export interface SocketInitiateCall {
   callId: string;
   callerId: string;
   callerName?: string;
   callerImage?: string;
+  recipients?: Recipient[];
   chatId: string;
+  chatName?: string;
   status: CallStatus;
 }
 
@@ -66,7 +81,7 @@ export interface SocketAnswerCall {
   userName: string;
   callId: string;
   chatId: string;
-  answer: CallAnswerType;
+  answer: CallStatus;
 }
 
 export interface SocketLeaveCall {

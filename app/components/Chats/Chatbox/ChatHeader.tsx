@@ -7,13 +7,12 @@ type ChatHeaderProps = {
 };
 
 const ChatHeader = ({ chatId }: ChatHeaderProps) => {
-  const { initiateCall, setVideoPopup } = useCallPopup();
+  const { initiateCall } = useCallPopup();
 
   const handleInitiateCall = () => {
     if (!chatId) return;
 
     initiateCall(chatId);
-    setVideoPopup(true); // Show the video popup when initiating a call
   };
 
   return (

@@ -3,9 +3,10 @@ import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
 import Peer, { SignalData } from "simple-peer";
 import {
-  CallAnswerType,
+  Recipient,
   SocketAnswerCall,
   SocketCallEnded,
+  SocketErrorCallType,
   SocketEvent,
   SocketEventType,
   SocketInitiateCall,
@@ -14,23 +15,22 @@ import {
 } from "../SocketEvents";
 import { useSocket } from "../SocketProvider";
 
-export interface PeerData {
+export type PeerData = {
   peerConnection: Peer.Instance;
   stream?: MediaStream;
   userId: string;
-}
+};
+
+// TODO: Fix bug reject call not closing call for caller
 
 export function useCalling() {
   const session = useSession();
   const socket = useSocket().socket;
+  const onRecieveData = useSocket().onRecieveData;
+  const onRecieveError = useSocket().onRecieveError;
   const [calling, setCalling] = useState<SocketInitiateCall | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [callMembers, setCallMembers] = useState<string[]>([]);
-  const onRecieveCall = useSocket().onRecieveCall;
-  const onRecieveCallEnded = useSocket().onRecieveCallEnded;
-  const onAnswerCall = useSocket().onAnswerCall;
-  const onRecieveCallLeft = useSocket().onRecieveCallLeft;
-  const onSdp = useSocket().onSdp;
   const [peers, setPeers] = useState<PeerData[]>([]);
 
   const createPeer = useCallback(
@@ -129,7 +129,12 @@ export function useCalling() {
 
       peer.on("close", () => {
         console.log("Peer connection closed.");
-        leaveCall();
+        setPeers((prev) => prev.filter((p) => p.userId !== member));
+
+        // TODO: Remove peers one by one if no peer left leave the call
+        if (peers.length === 0) {
+          leaveCall();
+        }
       });
 
       peer.on("data", (data) => {
@@ -171,88 +176,6 @@ export function useCalling() {
   }, [localStream]);
 
   useEffect(() => {
-    const recieveCall = onRecieveCall((data: SocketInitiateCall) => {
-      console.log("Received call data:", data);
-      console.log(
-        `Incoming call from ${data.callerName} in chat ${data.chatId}`
-      );
-
-      // Set the calling state to the received call data
-      setCalling(data);
-    });
-
-    return () => {
-      recieveCall(); // Properly remove the listener
-    };
-  }, [onRecieveCall, calling]);
-
-  useEffect(() => {
-    const answerCall = onAnswerCall((data: SocketAnswerCall) => {
-      console.log("Call answered:", data);
-      if (data.chatId === calling?.chatId) {
-        // Handle the call answered event, e.g., show a notification or update state
-        console.log(
-          `Call answered in chat ${calling?.chatId} by ${data.userName}`
-        );
-      }
-
-      if (!calling) {
-        console.warn("No call to answer.");
-        return;
-      }
-
-      calling.status = CallStatus.Accepted; // Update the call status to accepted
-      setCallMembers((prev) => {
-        const updatedMembers = [...prev];
-        if (!updatedMembers.includes(data.userId)) {
-          updatedMembers.push(data.userId);
-        }
-        return updatedMembers;
-      });
-    });
-
-    return () => {
-      answerCall(); // Properly remove the listener
-    };
-  }, [onAnswerCall, calling]);
-
-  useEffect(() => {
-    const recieveCallLeft = onRecieveCallLeft((data: SocketLeaveCall) => {
-      console.log("Call left:", data);
-      if (data.chatId === calling?.chatId) {
-        // Handle the call left event, e.g., show a notification or update state
-        console.log(`Call left in chat ${calling?.chatId} by ${data.userName}`);
-      }
-    });
-
-    return () => {
-      recieveCallLeft(); // Properly remove the listener
-    };
-  }, [onRecieveCallLeft, calling, peers]);
-
-  useEffect(() => {
-    const recieveCallEnded = onRecieveCallEnded((data: SocketCallEnded) => {
-      if (!calling) {
-        console.warn("No active call to handle call ended event.");
-        return;
-      }
-
-      console.log("Call ended:", data);
-      if (data.chatId === calling?.chatId) {
-        // Handle the call ended event, e.g., show a notification or update state
-        console.log(`Call ended in chat ${calling?.chatId}`);
-      }
-
-      setCalling(null); // Clear the calling state
-      setLocalStream(null); // Clear the local stream
-    });
-
-    return () => {
-      recieveCallEnded(); // Properly remove the listener
-    };
-  }, [onRecieveCallEnded, calling]);
-
-  useEffect(() => {
     console.log("Current peers:", peers);
   }, [peers]);
 
@@ -269,7 +192,69 @@ export function useCalling() {
     // Ref to store debounce timers per user
     const sdpTimers = new Map<string, NodeJS.Timeout>();
 
-    const sdpHandler = onSdp((data: SocketSdp) => {
+    function recievedCallHandler(data: SocketInitiateCall) {
+      console.log("Received call data:", data);
+      console.log(
+        `Incoming call from ${data.callerName} in chat ${data.chatId}`
+      );
+
+      // Set the calling state to the received call data
+      setCalling(data);
+    }
+
+    function answeredCallHandler(data: SocketAnswerCall) {
+      console.log("Call answered:", data);
+      if (data.chatId === calling?.chatId) {
+        // Handle the call answered event, e.g., show a notification or update state
+        console.log(
+          `Call answered in chat ${calling?.chatId} by ${data.userName}`
+        );
+      }
+
+      if (!calling) {
+        console.warn("No call to answer.");
+        return;
+      }
+
+      // TODO: Check if using setCalling works properly
+      // calling.status = CallStatus.Accepted;
+      // Update the call status to accepted
+
+      setCalling((prev) => (prev ? { ...prev, status: data.answer } : prev));
+      setCallMembers((prev) => {
+        const updatedMembers = [...prev];
+        if (!updatedMembers.includes(data.userId)) {
+          updatedMembers.push(data.userId);
+        }
+        return updatedMembers;
+      });
+    }
+
+    function recieveCallLeftHandler(data: SocketLeaveCall) {
+      console.log("Call left:", data);
+      if (data.chatId === calling?.chatId) {
+        // Handle the call left event, e.g., show a notification or update state
+        console.log(`Call left in chat ${calling?.chatId} by ${data.userName}`);
+      }
+    }
+
+    function recieveCallEnded(data: SocketCallEnded) {
+      if (!calling) {
+        console.warn("No active call to handle call ended event.");
+        return;
+      }
+
+      console.log("Call ended:", data);
+      if (data.chatId === calling?.chatId) {
+        // Handle the call ended event, e.g., show a notification or update state
+        console.log(`Call ended in chat ${calling?.chatId}`);
+      }
+
+      setCalling(null); // Clear the calling state
+      setLocalStream(null); // Clear the local stream
+    }
+
+    function sdpHandler(data: SocketSdp) {
       console.log("Received SDP data:", data);
 
       if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -288,6 +273,12 @@ export function useCalling() {
           console.error("Failed to parse SDP data:", error);
         }
         return;
+      }
+
+      // Debounce peer creation for this user
+      // Without the debounce timer, multiple SDP offers could be sent in quick succession
+      if (sdpTimers.has(data.from)) {
+        clearTimeout(sdpTimers.get(data.from)!);
       }
 
       // Debounce peer creation for this user
@@ -329,18 +320,51 @@ export function useCalling() {
           sdpTimers.delete(data.from);
         }, 1) // 1ms debounce delay
       );
+    }
+
+    const unsubscribe = onRecieveData((event) => {
+      switch (event.type) {
+        case SocketEventType.INITIATECALL:
+          recievedCallHandler(event.payload as SocketInitiateCall);
+          break;
+        case SocketEventType.ANSWERCALL:
+          answeredCallHandler(event.payload as SocketAnswerCall);
+          break;
+        case SocketEventType.LEAVECALL:
+          recieveCallLeftHandler(event.payload as SocketLeaveCall);
+          break;
+        case SocketEventType.CALLENDED:
+          recieveCallEnded(event.payload as SocketCallEnded);
+          break;
+        case SocketEventType.SDP:
+          sdpHandler(event.payload as SocketSdp);
+          break;
+      }
     });
 
     return () => {
-      sdpHandler(); // Properly remove the listener
-      // Clear all timers on cleanup
+      unsubscribe();
       sdpTimers.forEach((timer) => clearTimeout(timer));
       sdpTimers.clear();
     };
-  }, [onSdp, peers, socket, createPeer]);
+  }, [onRecieveData, socket, peers, createPeer]);
+
+  useEffect(() => {
+    const unsubscribe = onRecieveError((error) => {
+      if (error.errorType === SocketErrorCallType.NO_ANSWER) {
+        setCalling((prev) =>
+          prev ? { ...prev, status: CallStatus.No_Answer } : prev
+        );
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [onRecieveError]);
 
   const initiateCall = useCallback(
-    async (chatId: string) => {
+    async (chatId: string, recipients: Recipient[], chatName?: string) => {
       const stream = await getMediaStream();
       if (!stream) {
         console.warn("No media stream available. Cannot initiate call.");
@@ -361,7 +385,9 @@ export function useCalling() {
         status: CallStatus.Pending,
         callId: crypto.randomUUID(),
         callerId: session.data?.user.id, // Replace with actual user ID
+        recipients,
         chatId,
+        chatName,
       };
 
       const message = {
@@ -405,7 +431,7 @@ export function useCalling() {
     const answerData = {
       callId: calling?.callId,
       chatId: calling?.chatId,
-      answer: CallAnswerType.ACCEPT,
+      answer: CallStatus.Accepted,
     } as SocketAnswerCall;
 
     const message = {
@@ -448,7 +474,7 @@ export function useCalling() {
     const answerData = {
       callId: calling?.callId,
       chatId: calling?.chatId,
-      answer: CallAnswerType.REJECT,
+      answer: CallStatus.Rejected,
     } as SocketAnswerCall;
 
     const message = {

@@ -5,6 +5,8 @@ import {
   SocketAnswerCall,
   SocketCallEnded,
   SocketError,
+  SocketErrorRequestType,
+  SocketErrorType,
   SocketEvent,
   SocketEventType,
   SocketInitiateCall,
@@ -23,7 +25,7 @@ export async function receiveMessage(
     sendErrorResponseToSelf(
       client,
       "Rate limit exceeded. Please slow down.",
-      429
+      SocketErrorRequestType.RATE_LIMIT_EXCEEDED
     );
     return;
   }
@@ -136,13 +138,13 @@ export async function sendMessageToClient(
 export async function sendErrorResponseToSelf(
   client: ClientSocketServer,
   message: string,
-  code?: number
+  errorType: SocketErrorType
 ) {
   console.error(
-    `Sending error response to self: ${client.clientToken.name} Error: ${message} Code: ${code}`
+    `Sending error response to self: ${client.clientToken.name} Error: ${message} Code: ${errorType}`
   );
   sendMessageToSelf(client, SocketEventType.ERROR, {
     message,
-    code,
+    errorType,
   } as SocketError);
 }

@@ -14,7 +14,11 @@ export function useMessaging(chatId: string) {
   const socket = useSocket().socket;
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
-  const onMessage = useSocket().onMessage;
+  const onRecieveData = useSocket().onRecieveData;
+  const onMessage = useCallback((event: Message) => {
+    console.log("Received socket message:", event);
+    setMessages((prev) => [...prev, event]);
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -28,14 +32,15 @@ export function useMessaging(chatId: string) {
   }, []);
 
   useEffect(() => {
-    const receiveMessage = onMessage((data: Message) => {
-      console.log("Received socket message:", data);
-      setMessages((prev) => [...prev, data]);
+    const unsubscribe = onRecieveData((event) => {
+      if (event.type === SocketEventType.MESSAGE) {
+        onMessage(event.payload as Message);
+      }
     });
     return () => {
-      receiveMessage();
+      unsubscribe();
     };
-  }, [onMessage]);
+  }, [onRecieveData]);
 
   const sendMessage = useCallback(
     (content: SocketMessage) => {
@@ -80,5 +85,5 @@ export function useMessaging(chatId: string) {
     };
   }, [socket, chatId]);
 
-  return [messages, sendMessage, loading] as const;
+  return [messages, onMessage, sendMessage, loading] as const;
 }

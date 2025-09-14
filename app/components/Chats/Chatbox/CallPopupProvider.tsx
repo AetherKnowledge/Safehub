@@ -1,9 +1,15 @@
 "use client";
 
+import { CallStatus } from "@/app/generated/prisma";
 import { useSession } from "next-auth/react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useCalling } from "../../../../lib/socket/hooks/useCalling";
 import VideoContainer from "../../Video/VideoContainer";
+import { getChatInfo } from "../ChatsActions";
+import InitiateCallPopup from "./InitiateCallPopup";
+import RingingPopup from "./RingingPopup";
+
+// #TODO: Fix bug when rejecting call videoPopup shows up for a split second
 
 interface CallPopupContextType {
   initiateCall: (chatId: string) => void;
@@ -45,43 +51,86 @@ const CallPopup = ({ children }: Props) => {
     setRingingPopup: (value: boolean) => {
       setRingingPopup(value);
     },
-    initiateCall: (chatId: string) => {
-      initiateCall(chatId);
-      setVideoPopup(true); // Show the video popup when initiating a call
+    initiateCall: async (chatId: string) => {
+      const chatInfo = await getChatInfo(chatId);
+      if (!chatInfo) {
+        console.error("No chat information found");
+        return;
+      }
+
+      if (!session?.data?.user) {
+        console.error("No user information found");
+        return;
+      }
+
+      console.log(chatInfo.recipients);
+
+      // filter out self from recipients
+      const recipients = chatInfo.recipients.filter(
+        (recipient) => recipient.id !== session?.data?.user?.id
+      );
+
+      initiateCall(chatId, recipients);
     },
   };
 
   const session = useSession();
   const [ringingPopup, setRingingPopup] = useState(false);
   const [videoPopup, setVideoPopup] = useState(false);
+  const [initiatingCall, setInitiatingCall] = useState(false);
 
   useEffect(() => {
     if (calling && calling.callerId !== session.data?.user.id) {
       console.log("Incoming call:", calling);
       setRingingPopup(true); // Show the popup when there is an incoming call
-    } else if (calling && calling.callerId === session.data?.user.id) {
+    } else if (
+      calling &&
+      calling.callerId === session.data?.user.id &&
+      (calling.status === CallStatus.Pending ||
+        calling.status === CallStatus.No_Answer)
+    ) {
       console.log("Outgoing call initiated:", calling);
-      setVideoPopup(true); // Show the video popup when initiating a call
+      setInitiatingCall(true);
+    } else if (
+      calling &&
+      calling.callerId === session.data?.user.id &&
+      calling.status === CallStatus.Accepted
+    ) {
+      console.log("Outgoing call accepted:", calling);
+      setVideoPopup(true);
     } else {
+      setInitiatingCall(false);
       setRingingPopup(false); // Hide the popup when there is no call
       setVideoPopup(false); // Hide the video popup when there is no call
     }
-  }, [calling]);
+  }, [calling, calling?.status]);
 
-  const handleAnswer = () => {
+  function resetPopups() {
+    setInitiatingCall(false);
+    setRingingPopup(false);
+    setVideoPopup(false);
+  }
+
+  const handleAnswerCall = () => {
+    if (!calling) return;
+
     answerCall();
-    setRingingPopup(false); // Close the popup
-    setVideoPopup(true); // Show the video popup when answering a call
+    resetPopups();
+    setVideoPopup(true);
   };
 
-  const handleReject = () => {
+  const handleRejectCall = () => {
+    if (!calling) return;
+
     rejectCall();
-    setRingingPopup(false); // Close the popup
+    resetPopups();
   };
 
   const handleLeaveCall = () => {
+    if (!calling) return;
+
     leaveCall();
-    setVideoPopup(false);
+    resetPopups();
   };
 
   useEffect(() => {
@@ -91,28 +140,22 @@ const CallPopup = ({ children }: Props) => {
   }, [peers, localStream]);
 
   return (
-    <div>
+    <>
       {ringingPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-10 backdrop-blur-sm z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-            <h3 className="text-xl font-bold mb-4">Incoming Call</h3>
-            <p className="mb-4">{calling?.callerName || "Unknown Caller"}</p>
-            <div className="flex justify-center gap-4">
-              <button
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                onClick={handleAnswer}
-              >
-                Answer
-              </button>
-              <button
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                onClick={handleReject}
-              >
-                Reject
-              </button>
-            </div>
-          </div>
-        </div>
+        <RingingPopup
+          callerName={calling?.callerName || "Unknown Caller"}
+          callerImage={calling?.callerImage}
+          onAnswer={handleAnswerCall}
+          onReject={handleRejectCall}
+        />
+      )}
+      {initiatingCall && (
+        <InitiateCallPopup
+          recipients={calling?.recipients || []}
+          chatName={calling?.chatName}
+          onCancel={handleLeaveCall}
+          status={calling?.status || CallStatus.Pending}
+        />
       )}
       {videoPopup && (
         <VideoContainer
@@ -125,7 +168,7 @@ const CallPopup = ({ children }: Props) => {
       <CallPopupContext.Provider value={callPopupContextValue}>
         {children}
       </CallPopupContext.Provider>
-    </div>
+    </>
   );
 };
 

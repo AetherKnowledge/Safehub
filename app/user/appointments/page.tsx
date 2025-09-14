@@ -10,7 +10,7 @@ const NewAppointmentsPage = async () => {
     return redirect("/user/dashboard");
 
   return (
-    <div className="flex-1 pt-25">
+    <div className="flex-1">
       <div className="bg-base-100 shadow-br rounded-xl">
         <StudentAppointmentPage />
       </div>

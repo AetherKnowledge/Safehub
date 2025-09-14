@@ -1,7 +1,7 @@
 import { joinChatSchema } from "@/lib/schemas";
 import { prisma } from "@/prisma/client";
 import ClientSocketServer from "../ClientSocketServer";
-import { SocketJoinChat } from "../SocketEvents";
+import { SocketErrorRequestType, SocketJoinChat } from "../SocketEvents";
 import { sendErrorResponseToSelf } from "./messaging";
 
 export async function joinChat(
@@ -10,7 +10,11 @@ export async function joinChat(
 ) {
   const validation = joinChatSchema.safeParse(payload);
   if (!validation.success || !validation.data) {
-    sendErrorResponseToSelf(client, "Invalid join chat payload", 400);
+    sendErrorResponseToSelf(
+      client,
+      "Invalid join chat payload",
+      SocketErrorRequestType.INVALID_DATA
+    );
     return;
   }
   const { chatId } = validation.data;
@@ -19,7 +23,7 @@ export async function joinChat(
     sendErrorResponseToSelf(
       client,
       `You are not a member of chat ${chatId}`,
-      403
+      SocketErrorRequestType.FORBIDDEN
     );
     return;
   }

@@ -15,6 +15,9 @@ async function main() {
   const uuid = "52866741-dc71-4ced-b5ad-993419a730be";
   const now = new Date();
 
+  // Enable pgcrypto extension for gen_random_uuid()
+  await client.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
+
   // Create Admin user
   await client.query(
     `

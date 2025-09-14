@@ -12,7 +12,7 @@ const UsersPage = async () => {
   }
 
   return (
-    <div className="flex-1 pt-25">
+    <div className="flex-1">
       <div className="bg-base-100 shadow-br rounded-xl">
         <AdminUsersPage />
       </div>

@@ -1,15 +1,16 @@
 "use client";
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "motion/react";
+import { ReactNode } from "react";
 import { IconType } from "react-icons";
-import { ReactNode, useEffect, useState } from "react";
 
 interface ButtonProps {
   icon?: IconType;
   color?: string;
   children?: string;
   href: string;
+  isLarge: boolean;
 }
 
 const SidebarButton = (props: ButtonProps) => {
@@ -22,9 +23,7 @@ const SidebarButton = (props: ButtonProps) => {
     ? "text-primary"
     : "text-base-content hover:text-base-content/70";
 
-  const isLarge = useIsLargeScreen();
-
-  return buttonWithAnimatedText(props, color, isActive, text, isLarge);
+  return buttonWithAnimatedText(props, color, isActive, text, props.isLarge);
 };
 
 function buttonWithAnimatedText(
@@ -82,20 +81,6 @@ function buttonWithAnimatedText(
       )}
     </motion.div>
   );
-}
-
-export function useIsLargeScreen() {
-  const [isLarge, setIsLarge] = useState(false);
-
-  useEffect(() => {
-    const checkScreen = () => setIsLarge(window.innerWidth >= 1024);
-    checkScreen();
-
-    window.addEventListener("resize", checkScreen);
-    return () => window.removeEventListener("resize", checkScreen);
-  }, []);
-
-  return isLarge;
 }
 
 export default SidebarButton;

@@ -5,9 +5,12 @@ import { UserStatus } from "@/app/generated/prisma";
 import authOptions from "@/lib/auth/authOptions";
 import { isUserOnline } from "@/lib/redis";
 import { Message } from "@/lib/socket/hooks/useMessaging";
+import { Recipient } from "@/lib/socket/SocketEvents";
 import { authenticateUser } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { getServerSession } from "next-auth";
+
+// TODO: Make it so chat name is dependent on the other user's name if it is direct
 
 export async function getChats(): Promise<ParsedChat[]> {
   console.log("Fetching chats...");
@@ -85,6 +88,52 @@ export async function getChats(): Promise<ParsedChat[]> {
   );
 
   return parsedChats;
+}
+
+export type ChatInfo = {
+  chatId: string;
+  chatName?: string;
+  recipients: Recipient[];
+};
+
+export async function getChatInfo(id: string): Promise<ChatInfo | null> {
+  const session = await getServerSession(authOptions);
+  if (!session || !authenticateUser(session)) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!id || typeof id !== "string") {
+    throw new Error("Invalid chat ID");
+  }
+
+  const chat = await prisma.chat.findUnique({
+    where: { id },
+    select: {
+      members: {
+        select: { user: { select: { id: true, image: true, name: true } } },
+      },
+      name: true,
+      id: true,
+    },
+  });
+
+  if (!chat) {
+    throw new Error("Chat not found");
+  }
+
+  if (!chat.members.some((member) => member.user.id === session.user.id)) {
+    throw new Error("You are not a member of this chat");
+  }
+
+  return {
+    chatId: chat.id,
+    chatName: chat.name,
+    recipients: chat.members.map((member) => ({
+      id: member.user.id,
+      name: member.user.name,
+      image: member.user.image,
+    })),
+  } as ChatInfo;
 }
 
 export async function getChatById(id: string): Promise<Message[]> {

@@ -1,5 +1,4 @@
 import { CallStatus, UserType } from "@/app/generated/prisma";
-import { CallAnswerType } from "@/lib/socket/SocketEvents";
 import { z } from "zod";
 
 export const IMAGE_SCHEMA = z
@@ -62,7 +61,7 @@ export const initiateCallSchema = z.object({
 export const answerCallSchema = z.object({
   callId: z.string().min(1, "Call ID is required"),
   chatId: z.string().min(1, "Chat ID is required"),
-  answer: z.enum(CallAnswerType), // Using CallAnswerType enum for answer
+  answer: z.enum(CallStatus), // Using CallStatus enum for answer
 });
 
 export const leaveCallSchema = z.object({

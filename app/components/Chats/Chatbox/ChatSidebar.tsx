@@ -1,5 +1,6 @@
 "use client";
 import { ChatType, UserStatus } from "@/app/generated/prisma";
+import { SocketEvent } from "@/lib/socket/SocketEvents";
 import { useSocket } from "@/lib/socket/SocketProvider";
 import { Message } from "@/lib/socket/hooks/useMessaging";
 import { imageGenerator } from "@/lib/utils";
@@ -21,9 +22,11 @@ type ChatSidebarProps = {
   chatId?: string;
 };
 
+// TODO: Change to notification provider
+
 const ChatSidebar = ({ chatId }: ChatSidebarProps) => {
   const [chats, setChats] = useState<Chat[]>([]);
-  const onMessage = useSocket().onMessage;
+  const onRecieveData = useSocket().onRecieveData;
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -50,14 +53,16 @@ const ChatSidebar = ({ chatId }: ChatSidebarProps) => {
   }, []);
 
   useEffect(() => {
-    const receiveMessage = onMessage((data: Message) => {
+    const receiveMessage = onRecieveData((data: SocketEvent) => {
+      const message = data.payload as Message;
+
       setChats((prevChats) =>
         prevChats.map((prev) => {
-          if (prev.id === data.chatId) {
+          if (prev.id === message.chatId) {
             return {
               ...prev,
-              latestMessage: data.content,
-              latestMessageAt: new Date(data.createdAt),
+              latestMessage: message.content,
+              latestMessageAt: new Date(message.createdAt),
             };
           }
           return prev;
@@ -67,7 +72,7 @@ const ChatSidebar = ({ chatId }: ChatSidebarProps) => {
     return () => {
       receiveMessage();
     };
-  }, [onMessage]);
+  }, [onRecieveData]);
 
   return (
     <div className="flex flex-col overflow-y-auto w-full">

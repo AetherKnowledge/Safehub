@@ -8,7 +8,7 @@ import MessageBubble from "./MessageBubble";
 export function ChatBox({ chatId }: { chatId: string }) {
   const session = useSession();
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const [messages, sendMessage, loading] = useMessaging(chatId);
+  const [messages, onMessage, sendMessage, loading] = useMessaging(chatId);
 
   useEffect(() => {
     setTimeout(scrollToBottom, 50);

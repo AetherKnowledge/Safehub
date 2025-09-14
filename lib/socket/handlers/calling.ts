@@ -8,9 +8,10 @@ import {
 import ClientSocketServer from "@/lib/socket/ClientSocketServer";
 import { prisma } from "@/prisma/client";
 import {
-  CallAnswerType,
   SocketAnswerCall,
   SocketCallEnded,
+  SocketErrorCallType,
+  SocketErrorRequestType,
   SocketEvent,
   SocketEventType,
   SocketInitiateCall,
@@ -26,7 +27,11 @@ export async function receiveInitiateCall(
 ) {
   const validation = initiateCallSchema.safeParse(payload);
   if (!validation.success || !validation.data) {
-    sendErrorResponseToSelf(client, `Invalid initiate call payload`, 400);
+    sendErrorResponseToSelf(
+      client,
+      `Invalid initiate call payload`,
+      SocketErrorRequestType.INVALID_DATA
+    );
     return;
   }
   const { chatId, callerId } = validation.data;
@@ -50,7 +55,11 @@ export async function receiveInitiateCall(
     client.clientSocket.socketId = crypto.randomUUID();
 
   if (!chat) {
-    sendErrorResponseToSelf(client, `Chat not found for ID ${chatId}`, 404);
+    sendErrorResponseToSelf(
+      client,
+      `Chat not found for ID ${chatId}`,
+      SocketErrorRequestType.NOT_FOUND
+    );
     return;
   }
 
@@ -58,7 +67,7 @@ export async function receiveInitiateCall(
     sendErrorResponseToSelf(
       client,
       `User is not a member of the chat: ${chatId}`,
-      403
+      SocketErrorRequestType.UNAUTHORIZED
     );
     return;
   }
@@ -75,7 +84,7 @@ export async function receiveInitiateCall(
       sendErrorResponseToSelf(
         client,
         `Call already exists for client chat: ${chatId}`,
-        409
+        SocketErrorCallType.CONFLICT
       );
       return;
     } else {
@@ -91,6 +100,7 @@ export async function receiveInitiateCall(
     callerImage: member?.user.image || client.clientToken.picture || undefined,
   };
 
+  // Create call in database first before sending socket events to prevent answering call before creating call in database
   await prisma.call.create({
     data: {
       id: initiateCallData.callId,
@@ -102,13 +112,14 @@ export async function receiveInitiateCall(
 
   await createCallMember(client, initiateCallData.callId, callerId);
 
-  // Notify all chat members except caller
+  let recipientCount = 0;
   for (const ws of client.server.clients) {
     if (
       ws.readyState === WebSocket.OPEN &&
-      chat.members.some((m) => m.userId === ws.userId) &&
+      chat.members.some((member) => member.userId === ws.userId) &&
       ws.userId !== callerId
     ) {
+      recipientCount++;
       ws.send(
         JSON.stringify({
           type: SocketEventType.INITIATECALL,
@@ -116,6 +127,15 @@ export async function receiveInitiateCall(
         } as SocketEvent<SocketInitiateCall>)
       );
     }
+  }
+  if (recipientCount === 0) {
+    sendErrorResponseToSelf(
+      client,
+      `No recipients found for call: ${initiateCallData.callId}`,
+      SocketErrorCallType.NO_ANSWER
+    );
+    deleteCall(client, initiateCallData.callId);
+    return;
   }
 
   client.setupCallTimeout(initiateCallData.callId, chatId);
@@ -132,7 +152,11 @@ export async function receiveAnswerCall(
 ) {
   const validation = answerCallSchema.safeParse(payload);
   if (!validation.success || !validation.data) {
-    sendErrorResponseToSelf(client, "Invalid answer call payload", 400);
+    sendErrorResponseToSelf(
+      client,
+      "Invalid answer call payload",
+      SocketErrorRequestType.INVALID_DATA
+    );
     return;
   }
   const { callId, chatId, answer } = validation.data;
@@ -156,14 +180,18 @@ export async function receiveAnswerCall(
 
   if (!call) {
     console.error("Call not found for ID:", callId);
-    sendErrorResponseToSelf(client, `Call not found for ID ${callId}`, 404);
+    sendErrorResponseToSelf(
+      client,
+      `Call not found for ID ${callId}`,
+      SocketErrorRequestType.NOT_FOUND
+    );
     return;
   }
   if (!(await isMemberOfChat(client, chatId))) {
     sendErrorResponseToSelf(
       client,
       `User ${client.clientToken.name} is not a member of the chat: ${chatId}`,
-      403
+      SocketErrorRequestType.UNAUTHORIZED
     );
     return;
   }
@@ -171,33 +199,34 @@ export async function receiveAnswerCall(
     sendErrorResponseToSelf(
       client,
       `Call does not belong to client chat: ${chatId}`,
-      403
+      SocketErrorRequestType.FORBIDDEN
     );
     return;
   }
   if (call.callerId === client.clientToken.sub) {
-    sendErrorResponseToSelf(client, `User cannot answer their own call`, 403);
+    sendErrorResponseToSelf(
+      client,
+      `User cannot answer their own call`,
+      SocketErrorRequestType.FORBIDDEN
+    );
     return;
   }
   if (call.status !== CallStatus.Pending) {
     sendErrorResponseToSelf(
       client,
       `Call is not in pending status: ${call.status}`,
-      400
+      SocketErrorRequestType.FORBIDDEN
     );
     return;
   }
 
   client.clearCallTimeout();
-  if (
-    answer === CallAnswerType.REJECT ||
-    answer === CallAnswerType.DID_NOT_ANSWER
-  ) {
+  if (answer === CallStatus.Rejected || answer === CallStatus.No_Answer) {
     console.log("Call rejected by user:", client.clientToken.name);
     sendMessageToClient(
       client,
       SocketEventType.ANSWERCALL,
-      { callId, chatId, answer: CallAnswerType.REJECT } as SocketAnswerCall,
+      { callId, chatId, answer: CallStatus.Rejected } as SocketAnswerCall,
       call.callerId
     );
     if (call.callMember.length < 2) {
@@ -224,7 +253,7 @@ export async function receiveAnswerCall(
       userName: client.clientToken.name,
       callId,
       chatId,
-      answer: CallAnswerType.ACCEPT,
+      answer: CallStatus.Accepted,
     } as SocketAnswerCall,
     call.callerId
   );
@@ -240,7 +269,11 @@ export async function receiveLeaveCall(
 ) {
   const validation = leaveCallSchema.safeParse(payload);
   if (!validation.success || !validation.data) {
-    sendErrorResponseToSelf(client, "Invalid leave call payload", 400);
+    sendErrorResponseToSelf(
+      client,
+      "Invalid leave call payload",
+      SocketErrorRequestType.INVALID_DATA
+    );
     return;
   }
   const { callId, chatId } = validation.data;
@@ -253,7 +286,11 @@ export async function receiveSdpData(
 ) {
   const validation = sdpSchema.safeParse(payload);
   if (!validation.success || !validation.data) {
-    sendErrorResponseToSelf(client, "Invalid SDP offer payload", 400);
+    sendErrorResponseToSelf(
+      client,
+      "Invalid SDP offer payload",
+      SocketErrorRequestType.INVALID_DATA
+    );
     return;
   }
   const { to, callId, chatId, sdpData } = validation.data;
@@ -276,18 +313,26 @@ export async function receiveSdpData(
   });
 
   if (!call) {
-    sendErrorResponseToSelf(client, `Call ${callId} not found`, 404);
+    sendErrorResponseToSelf(
+      client,
+      `Call ${callId} not found`,
+      SocketErrorRequestType.NOT_FOUND
+    );
     return;
   }
   if (!(await isMemberOfChat(client, chatId))) {
-    sendErrorResponseToSelf(client, "You are not a member of client chat", 403);
+    sendErrorResponseToSelf(
+      client,
+      "You are not a member of client chat",
+      SocketErrorRequestType.UNAUTHORIZED
+    );
     return;
   }
   if (!(await isMemberOfChat(client, chatId, to))) {
     sendErrorResponseToSelf(
       client,
       `User ${to} is not a member of client chat`,
-      403
+      SocketErrorRequestType.FORBIDDEN
     );
     return;
   }
@@ -295,7 +340,7 @@ export async function receiveSdpData(
     sendErrorResponseToSelf(
       client,
       `Call ${call.id} does not belong to chat ${chatId}`,
-      403
+      SocketErrorRequestType.FORBIDDEN
     );
     return;
   }
@@ -353,7 +398,7 @@ export async function leaveCall(
     sendErrorResponseToSelf(
       client,
       `Call ${callId} not found for ID: ${callId}`,
-      404
+      SocketErrorRequestType.NOT_FOUND
     );
     return;
   }
@@ -361,12 +406,16 @@ export async function leaveCall(
     sendErrorResponseToSelf(
       client,
       `Call ${call.id} does not belong to chat ${chatId}`,
-      403
+      SocketErrorRequestType.FORBIDDEN
     );
     return;
   }
   if (callId !== client.clientSocket.callId) {
-    sendErrorResponseToSelf(client, "You are not a member of client call", 403);
+    sendErrorResponseToSelf(
+      client,
+      "You are not a member of client call",
+      SocketErrorRequestType.FORBIDDEN
+    );
     return;
   }
 

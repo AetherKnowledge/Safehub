@@ -50,6 +50,7 @@ enum CallStatus {
   Accepted
   Rejected
   Ended
+  No_Answer
 
   @@schema("public")
 }
@@ -285,7 +286,7 @@ model Appointment {
 }
 
 model accounts {
-  id                 String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                 String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   type               String
   provider           String
   providerAccountId  String
@@ -306,7 +307,7 @@ model accounts {
 }
 
 model sessions {
-  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   expires      DateTime @db.Timestamptz(6)
   sessionToken String   @unique(map: "sessiontoken_unique")
   userId       String?  @db.Uuid
@@ -316,7 +317,7 @@ model sessions {
 }
 
 model users {
-  id            String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String?
   email         String?    @unique(map: "email_unique")
   password      String?

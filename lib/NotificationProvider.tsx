@@ -3,13 +3,14 @@ import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import { useSocket } from "./socket/SocketProvider";
+import { Message } from "./socket/hooks/useMessaging";
 
 interface Props {
   children: React.ReactNode;
 }
 
 const NotificationProvider = ({ children }: Props) => {
-  const onMessage = useSocket().onMessage;
+  const onRecieveData = useSocket().onRecieveData;
   const session = useSession();
   const pathname = usePathname();
 
@@ -30,16 +31,18 @@ const NotificationProvider = ({ children }: Props) => {
   );
 
   useEffect(() => {
-    const receiveMessage = onMessage((data) => {
+    const receiveMessage = onRecieveData((data) => {
       // Don't show notification if user is in /user/chats/*
+
+      const message = data.payload as Message;
       if (
-        data.userId !== session.data?.user.id &&
+        message.userId !== session.data?.user.id &&
         !(pathname && pathname.startsWith("/user/chats/"))
       ) {
-        console.log("Showing notification for message:", data);
-        showNotification(data.name, {
-          icon: data.src,
-          body: data.content,
+        console.log("Showing notification for message:", message);
+        showNotification(message.name, {
+          icon: message.src,
+          body: message.content,
         });
       }
     });
@@ -47,7 +50,7 @@ const NotificationProvider = ({ children }: Props) => {
     return () => {
       receiveMessage();
     };
-  }, [onMessage, pathname, session.data?.user.id]);
+  }, [onRecieveData, pathname, session.data?.user.id]);
 
   return <>{children}</>;
 };

@@ -17,8 +17,8 @@ import {
   sendMessageToSelf,
 } from "./handlers/messaging";
 import {
-  CallAnswerType,
   SocketAnswerCall,
+  SocketErrorRequestType,
   SocketEvent,
   SocketEventType,
   SocketInitiateCall,
@@ -74,7 +74,11 @@ class ClientSocketServer {
 
     this.clientSocket.on("error", (error: Error) => {
       console.error("WebSocket error:", error);
-      sendErrorResponseToSelf(this, `WebSocket error: ${error.message}`, 500);
+      sendErrorResponseToSelf(
+        this,
+        `WebSocket error: ${error.message}`,
+        SocketErrorRequestType.INTERNAL_SERVER_ERROR
+      );
     });
 
     this.clientSocket.on("close", (code, reason) => {
@@ -192,7 +196,7 @@ class ClientSocketServer {
         userName: this.clientToken.name!,
         callId,
         chatId,
-        answer: CallAnswerType.DID_NOT_ANSWER,
+        answer: CallStatus.No_Answer,
       };
       await deleteCall(this, callId);
       sendMessageToSelf(this, SocketEventType.ANSWERCALL, answerData);

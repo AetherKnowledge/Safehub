@@ -6,12 +6,15 @@ import jwt from "jsonwebtoken";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { env } from "next-runtime-env";
 import process from "process";
+
+// TODO: Change to database session strategy
 
 export const authOptions: NextAuthOptions = {
   adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    url: env("NEXT_PUBLIC_SUPABASE_URL")!,
+    secret: env("SUPABASE_SERVICE_ROLE_KEY")!,
   }),
   providers: [
     CredentialsProvider({

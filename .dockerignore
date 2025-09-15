@@ -1,0 +1,8 @@
+node_modules
+npm-debug.log
+.next/cache
+.env
+.env.local
+.env.development
+.env.production
+.DS_Store

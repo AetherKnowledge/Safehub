@@ -5,6 +5,7 @@ import AuthProvider from "../lib/auth/AuthProvider";
 import SocketProvider from "../lib/socket/SocketProvider";
 import CallPopupProvider from "./components/Chats/Chatbox/CallPopupProvider";
 import "./globals.css";
+import { PublicEnvScript } from "next-runtime-env";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -25,6 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <PublicEnvScript />
+      </head>
       <body className={`${inter.variable} antialiased`}>
         <div className="flex flex-col min-h-screen">
           <AuthProvider>

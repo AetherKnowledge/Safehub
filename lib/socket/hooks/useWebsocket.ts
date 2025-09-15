@@ -1,5 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
+import { env } from "next-runtime-env";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseWebSocketOptions {
@@ -18,7 +19,7 @@ interface UseWebSocketReturn {
 
 export function useWebSocket(
   urlFn: () => string = () =>
-    process.env.NEXT_PUBLIC_URL?.startsWith("https")
+    env("NEXT_PUBLIC_URL")?.startsWith("https")
       ? `wss://${window.location.host}/api/user/socket`
       : `ws://${window.location.host}/api/user/socket`,
   options: UseWebSocketOptions = {}

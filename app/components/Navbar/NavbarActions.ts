@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 export const signIn = async () => {
   const supabase = await createClient();
   console.log("Sign in with Google");
-  const origin = process.env.NEXT_PUBLIC_BASE_URL;
+  const origin = process.env.NEXT_PUBLIC_URL;
 
   console.log("Origin:", origin);
 

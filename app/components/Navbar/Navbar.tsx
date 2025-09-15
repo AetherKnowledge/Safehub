@@ -5,7 +5,13 @@ const Navbar = () => {
   return (
     <div className="navbar bg-base-100 p-5 fixed top-0 left-0 w-full z-1">
       <div className="navbar-start">
-        <Image src="/safehub.svg" alt="logo" width={120} height={60} priority />
+        <Image
+          src="/images/safehub.svg"
+          alt="logo"
+          width={120}
+          height={60}
+          priority
+        />
       </div>
 
       <div className="navbar-end gap-5">

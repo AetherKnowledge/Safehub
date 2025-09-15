@@ -5,12 +5,12 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { AiFillHome } from "react-icons/ai";
 import { FaCalendar, FaRobot, FaUsers } from "react-icons/fa";
-import { FaChevronRight } from "react-icons/fa6";
 import { IoIosSettings } from "react-icons/io";
 import { IoChatboxEllipses } from "react-icons/io5";
 import Divider from "../Divider";
-import SafehubIcon from "../Icons/SafehubIcon";
+import CollapseButton from "./CollapseButton";
 import SidebarButton from "./SidebarButton";
+import SidebarLogo from "./SidebarLogo";
 
 const Sidebar = () => {
   const [isLarge, setIsLarge] = useState(true);
@@ -35,47 +35,46 @@ const Sidebar = () => {
 
   return (
     <motion.div
-      animate={{ width: isLarge ? "25vw" : "2.5rem" }} // 2.5rem = w-10
+      animate={{ width: isLarge ? "185px" : "60px" }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="flex flex-col space-y-4 sticky top-6 h-[93vh] min-w-[60px] max-w-[300px] bg-base-100 shadow-br rounded-lg pt-1 z-10 overflow-hidden"
+      className="flex flex-col justify-between sticky top-6 h-[93vh] min-w-[60px] max-w-[185px] bg-base-100 shadow-br rounded-lg pt-1 z-10 overflow-hidden"
     >
-      <div className="flex w-full items-center justify-center pt-2">
-        <SafehubIcon className="w-10 h-10" />
+      {/* Top Section */}
+      <div className="flex flex-col items-center space-y-4">
+        <SidebarLogo isLarge={isLarge} />
+
+        <div className="w-full px-3">
+          <Divider className="w-full" />
+        </div>
+
+        {session.data.user.type === UserType.Student
+          ? studentSidebar(isLarge)
+          : session.data.user.type === UserType.Admin
+          ? adminSidebar(isLarge)
+          : session.data.user.type === UserType.Counselor
+          ? counselorSidebar(isLarge)
+          : null}
+
+        <div className="w-full px-3">
+          <Divider className="w-full" />
+        </div>
+
+        <SidebarButton
+          href="/user/settings"
+          icon={IoIosSettings}
+          isLarge={isLarge}
+        >
+          Settings
+        </SidebarButton>
       </div>
 
-      <div className="w-full px-3">
-        <Divider className="w-full" />
+      {/* Bottom Section */}
+      <div className="pb-2">
+        <CollapseButton
+          isLarge={isLarge}
+          onClick={() => setIsLarge(!isLarge)}
+        />
       </div>
-
-      {session.data.user.type === UserType.Student
-        ? studentSidebar(isLarge)
-        : session.data.user.type === UserType.Admin
-        ? adminSidebar(isLarge)
-        : session.data.user.type === UserType.Counselor
-        ? counselorSidebar(isLarge)
-        : null}
-
-      <div className="w-full px-3">
-        <Divider className="w-full" />
-      </div>
-
-      <SidebarButton
-        href="/user/settings"
-        icon={IoIosSettings}
-        isLarge={isLarge}
-      >
-        Settings
-      </SidebarButton>
-
-      <motion.button
-        className="flex items-center justify-center mb-4 text-base-content"
-        onClick={() => setIsLarge(!isLarge)}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: "tween", duration: 0.2, ease: "easeOut" }}
-      >
-        <FaChevronRight className="w-6 h-6" />
-      </motion.button>
     </motion.div>
   );
 };

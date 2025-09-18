@@ -51,7 +51,7 @@ enum UserStatus {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String?
   email         String    @unique
   password      String?
@@ -85,13 +85,13 @@ model User {
 }
 
 model Student {
-  studentId    String        @id @default(cuid())
+  studentId    String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user         User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
   appointments Appointment[]
 }
 
 model Counselor {
-  counselorId    String          @id @default(cuid())
+  counselorId    String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user           User            @relation(fields: [counselorId], references: [id], onDelete: Cascade)
   appointments   Appointment[]
   available      Boolean         @default(false)
@@ -99,12 +99,12 @@ model Counselor {
 }
 
 model Admin {
-  adminId String @id @default(cuid())
+  adminId String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user    User   @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
 
 model Chat {
-  id            String   @id @default(cuid())
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   type          ChatType @default(DIRECT)
   name          String?
   description   String?
@@ -118,9 +118,9 @@ model Chat {
 }
 
 model ChatMember {
-  id       String   @id @default(cuid())
-  chatId   String
-  userId   String
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  chatId   String   @db.Uuid
+  userId   String   @db.Uuid
   joinedAt DateTime @default(now())
 
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
@@ -130,9 +130,9 @@ model ChatMember {
 }
 
 model ChatMessage {
-  id        String   @id @default(cuid())
-  chatId    String
-  userId    String
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  chatId    String   @db.Uuid
+  userId    String   @db.Uuid
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -142,11 +142,11 @@ model ChatMessage {
 }
 
 model Call {
-  id        String     @id @default(cuid())
-  chatId    String     @unique
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  chatId    String     @unique @db.Uuid
   status    CallStatus @default(Pending)
   createdAt DateTime   @default(now())
-  callerId  String
+  callerId  String     @db.Uuid
 
   chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
   caller User @relation(fields: [callerId], references: [id], onDelete: Cascade)
@@ -155,10 +155,10 @@ model Call {
 }
 
 model CallMember {
-  id       String   @id @default(cuid())
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   socketId String
-  callId   String
-  userId   String
+  callId   String   @db.Uuid
+  userId   String   @db.Uuid
   joinedAt DateTime @default(now())
 
   call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
@@ -168,8 +168,8 @@ model CallMember {
 }
 
 model AvailableSlot {
-  id          String @id @default(cuid())
-  counselorId String
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  counselorId String @db.Uuid
   day         Days
   startTime   String
   endTime     String
@@ -178,10 +178,10 @@ model AvailableSlot {
 }
 
 model Post {
-  id        String   @id @default(cuid())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title     String
   content   String?
-  authorId  String
+  authorId  String   @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   images    String[] @db.VarChar(255)
@@ -194,9 +194,9 @@ model Post {
 }
 
 model Like {
-  id        String   @id @default(cuid())
-  postId    String
-  userId    String
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId    String   @db.Uuid
+  userId    String   @db.Uuid
   createdAt DateTime @default(now())
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -206,9 +206,9 @@ model Like {
 }
 
 model Dislike {
-  id        String   @id @default(cuid())
-  postId    String
-  userId    String
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId    String   @db.Uuid
+  userId    String   @db.Uuid
   createdAt DateTime @default(now())
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -218,9 +218,9 @@ model Dislike {
 }
 
 model Comment {
-  id        String   @id @default(cuid())
-  postId    String
-  userId    String
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId    String   @db.Uuid
+  userId    String   @db.Uuid
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -230,8 +230,8 @@ model Comment {
 }
 
 model chathistory {
-  id         String   @id @default(cuid())
-  session_id String
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id String   @db.Uuid
   message    Json
   createdAt  DateTime @default(now())
 
@@ -239,9 +239,9 @@ model chathistory {
 }
 
 model Appointment {
-  id          String            @id @default(cuid())
-  studentId   String
-  counselorId String
+  id          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId   String            @db.Uuid
+  counselorId String            @db.Uuid
   status      AppointmentStatus @default(Pending)
   schedule    DateTime
   createdAt   DateTime          @default(now())
@@ -252,7 +252,7 @@ model Appointment {
 }
 
 model Account {
-  userId            String
+  userId            String  @db.Uuid
   type              String
   provider          String
   providerAccountId String
@@ -273,8 +273,8 @@ model Account {
 }
 
 model Session {
-  sessionToken String   @id @default(cuid())
-  userId       String
+  sessionToken String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String   @db.Uuid
   expires      DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

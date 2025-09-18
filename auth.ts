@@ -68,11 +68,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           sub: user?.id,
           email: user?.email,
           role: "authenticated",
+          type: user?.type,
         };
         session.supabaseAccessToken = jwt.sign(payload, signingSecret);
       }
 
       return session;
+    },
+    authorized: async ({ auth }) => {
+      if (!auth) return false;
+
+      return true; // Default allow
     },
   },
   events: {

@@ -1,5 +1,14 @@
-// export { default } from "next-auth/middleware";
+// TODO: Fix middleware to work with NextAuth
 
-// export const config = {
-//   matcher: [],
-// };
+export { auth as middleware } from "@/auth";
+
+export const config = {
+  matcher: [
+    "/user/:path*",
+    "/events/:path*",
+    "/api/user/:path*",
+    "/api/user/student/:path*",
+    "/api/user/admin/:path*",
+    "/api/user/counselor/:path*",
+  ],
+};

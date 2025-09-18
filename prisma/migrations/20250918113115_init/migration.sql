@@ -18,9 +18,10 @@ CREATE TYPE "public"."UserStatus" AS ENUM ('Online', 'Offline');
 
 -- CreateTable
 CREATE TABLE "public"."User" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "name" TEXT,
     "email" TEXT NOT NULL,
+    "password" TEXT,
     "emailVerified" TIMESTAMP(3),
     "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -33,14 +34,14 @@ CREATE TABLE "public"."User" (
 
 -- CreateTable
 CREATE TABLE "public"."Student" (
-    "studentId" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "studentId" UUID NOT NULL DEFAULT uuid_generate_v4(),
 
     CONSTRAINT "Student_pkey" PRIMARY KEY ("studentId")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Counselor" (
-    "counselorId" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "counselorId" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "available" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Counselor_pkey" PRIMARY KEY ("counselorId")
@@ -48,14 +49,14 @@ CREATE TABLE "public"."Counselor" (
 
 -- CreateTable
 CREATE TABLE "public"."Admin" (
-    "adminId" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "adminId" UUID NOT NULL DEFAULT uuid_generate_v4(),
 
     CONSTRAINT "Admin_pkey" PRIMARY KEY ("adminId")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Chat" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "type" "public"."ChatType" NOT NULL DEFAULT 'DIRECT',
     "name" TEXT,
     "description" TEXT,
@@ -68,7 +69,7 @@ CREATE TABLE "public"."Chat" (
 
 -- CreateTable
 CREATE TABLE "public"."ChatMember" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "chatId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -78,7 +79,7 @@ CREATE TABLE "public"."ChatMember" (
 
 -- CreateTable
 CREATE TABLE "public"."ChatMessage" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "chatId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "content" TEXT NOT NULL,
@@ -90,7 +91,7 @@ CREATE TABLE "public"."ChatMessage" (
 
 -- CreateTable
 CREATE TABLE "public"."Call" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "chatId" UUID NOT NULL,
     "status" "public"."CallStatus" NOT NULL DEFAULT 'Pending',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -101,7 +102,7 @@ CREATE TABLE "public"."Call" (
 
 -- CreateTable
 CREATE TABLE "public"."CallMember" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "socketId" TEXT NOT NULL,
     "callId" UUID NOT NULL,
     "userId" UUID NOT NULL,
@@ -112,7 +113,7 @@ CREATE TABLE "public"."CallMember" (
 
 -- CreateTable
 CREATE TABLE "public"."AvailableSlot" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "counselorId" UUID NOT NULL,
     "day" "public"."Days" NOT NULL,
     "startTime" TEXT NOT NULL,
@@ -123,7 +124,7 @@ CREATE TABLE "public"."AvailableSlot" (
 
 -- CreateTable
 CREATE TABLE "public"."Post" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "title" TEXT NOT NULL,
     "content" TEXT,
     "authorId" UUID NOT NULL,
@@ -136,7 +137,7 @@ CREATE TABLE "public"."Post" (
 
 -- CreateTable
 CREATE TABLE "public"."Like" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "postId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -146,7 +147,7 @@ CREATE TABLE "public"."Like" (
 
 -- CreateTable
 CREATE TABLE "public"."Dislike" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "postId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -156,7 +157,7 @@ CREATE TABLE "public"."Dislike" (
 
 -- CreateTable
 CREATE TABLE "public"."Comment" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "postId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "content" TEXT NOT NULL,
@@ -168,7 +169,7 @@ CREATE TABLE "public"."Comment" (
 
 -- CreateTable
 CREATE TABLE "public"."chathistory" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "session_id" UUID NOT NULL,
     "message" JSONB NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -178,7 +179,7 @@ CREATE TABLE "public"."chathistory" (
 
 -- CreateTable
 CREATE TABLE "public"."Appointment" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "studentId" UUID NOT NULL,
     "counselorId" UUID NOT NULL,
     "status" "public"."AppointmentStatus" NOT NULL DEFAULT 'Pending',
@@ -210,7 +211,7 @@ CREATE TABLE "public"."Account" (
 
 -- CreateTable
 CREATE TABLE "public"."Session" (
-    "sessionToken" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "sessionToken" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "userId" UUID NOT NULL,
     "expires" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -221,8 +222,8 @@ CREATE TABLE "public"."Session" (
 
 -- CreateTable
 CREATE TABLE "public"."VerificationToken" (
-    "identifier" UUID NOT NULL,
-    "token" UUID NOT NULL,
+    "identifier" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
     "expires" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "VerificationToken_pkey" PRIMARY KEY ("identifier","token")

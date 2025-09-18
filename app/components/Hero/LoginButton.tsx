@@ -7,7 +7,7 @@ const LoginButton = async () => {
 
   return (
     <>
-      {!session ? (
+      {session ? (
         <Link
           href="/login"
           className="btn btn-primary min-w-50 mx-auto lg:mx-0 py-[clamp(1.25rem,2vw,2.5rem)] text-step-1 font-medium"

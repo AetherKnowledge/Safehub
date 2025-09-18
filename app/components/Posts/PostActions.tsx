@@ -1,14 +1,13 @@
 "use server";
 
 import { UserType } from "@/app/generated/prisma";
-import authOptions from "@/lib/auth/authOptions";
+import { auth } from "@/auth";
 import { CommentData, commentSchema, newPostSchema } from "@/lib/schemas";
 import { Buckets, getBucket } from "@/lib/supabase/client";
 import { authenticateUser, formatDatetime } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import StorageFileApi from "@supabase/storage-js/dist/module/packages/StorageFileApi";
 import { fileTypeFromBuffer } from "file-type";
-import { getServerSession } from "next-auth";
 import path from "path";
 
 export type PostProps = {
@@ -41,7 +40,7 @@ export type PostComment = {
 };
 
 export async function getPosts(): Promise<PostProps[]> {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session || !authenticateUser(session)) {
     throw new Error("Unauthorized");
   }
@@ -111,7 +110,7 @@ export async function getPosts(): Promise<PostProps[]> {
 }
 
 export async function createPost(formData: FormData): Promise<void> {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   const bucket = await getBucket(
     Buckets.Posts,
     session?.supabaseAccessToken || ""
@@ -187,7 +186,7 @@ export async function createPost(formData: FormData): Promise<void> {
 
 export async function createFile(
   file: File,
-  postId: number,
+  postId: string,
   bucket: StorageFileApi,
   userId: string
 ): Promise<string> {
@@ -237,7 +236,7 @@ export async function createFile(
 //   postId: string,
 //   imageId: string
 // ): Promise<string> {
-//   const session = await getServerSession(authOptions);
+//   const session = await auth();
 //   if (!session || !authenticateUser(session)) {
 //     throw new Error("Unauthorized");
 //   }
@@ -266,7 +265,7 @@ export async function createFile(
 // }
 
 export async function likePost(postId: string, like: boolean) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session || !authenticateUser(session) || !session.user?.id) {
     throw new Error("Unauthorized");
   }
@@ -276,7 +275,7 @@ export async function likePost(postId: string, like: boolean) {
   }
 
   const post = await prisma.post.findUnique({
-    where: { id: parseInt(postId) },
+    where: { id: postId },
     include: {
       likes: { where: { userId: session.user.id } },
       dislikes: { where: { userId: session.user.id } },
@@ -293,22 +292,22 @@ export async function likePost(postId: string, like: boolean) {
 
   if (alreadyLiked) {
     await prisma.like.deleteMany({
-      where: { postId: parseInt(postId), userId: session.user.id },
+      where: { postId: postId, userId: session.user.id },
     });
   } else {
     if (alreadyDisliked) {
       await prisma.dislike.deleteMany({
-        where: { postId: parseInt(postId), userId: session.user.id },
+        where: { postId: postId, userId: session.user.id },
       });
     }
     await prisma.like.create({
-      data: { postId: parseInt(postId), userId: session.user.id },
+      data: { postId: postId, userId: session.user.id },
     });
   }
 }
 
 export async function dislikePost(postId: string, dislike: boolean) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session || !authenticateUser(session) || !session.user?.id) {
     throw new Error("Unauthorized");
   }
@@ -318,7 +317,7 @@ export async function dislikePost(postId: string, dislike: boolean) {
   }
 
   const post = await prisma.post.findUnique({
-    where: { id: parseInt(postId) },
+    where: { id: postId },
     include: {
       likes: { where: { userId: session.user.id } },
       dislikes: { where: { userId: session.user.id } },
@@ -335,22 +334,22 @@ export async function dislikePost(postId: string, dislike: boolean) {
 
   if (alreadyDisliked) {
     await prisma.dislike.deleteMany({
-      where: { postId: parseInt(postId), userId: session.user.id },
+      where: { postId: postId, userId: session.user.id },
     });
   } else {
     if (alreadyLiked) {
       await prisma.like.deleteMany({
-        where: { postId: parseInt(postId), userId: session.user.id },
+        where: { postId: postId, userId: session.user.id },
       });
     }
     await prisma.dislike.create({
-      data: { postId: parseInt(postId), userId: session.user.id },
+      data: { postId: postId, userId: session.user.id },
     });
   }
 }
 
 export async function addComment(data: CommentData): Promise<void> {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session || !authenticateUser(session) || !session.user?.id) {
     throw new Error("Unauthorized");
   }
@@ -367,7 +366,7 @@ export async function addComment(data: CommentData): Promise<void> {
 
   await prisma.comment.create({
     data: {
-      postId: parseInt(postId),
+      postId: postId,
       userId: session.user.id,
       content,
     },

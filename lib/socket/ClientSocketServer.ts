@@ -1,7 +1,7 @@
 import { CallStatus } from "@/app/generated/prisma";
 import { isUserOnline, setUserOnline } from "@/lib/redis";
 import { prisma } from "@/prisma/client";
-import { JWT } from "next-auth/jwt/types";
+import { User } from "next-auth";
 import { WebSocket, WebSocketServer } from "ws";
 import {
   deleteCall,
@@ -32,7 +32,7 @@ import {
 
 class ClientSocketServer {
   public clientSocket: WebSocket;
-  public clientToken: JWT;
+  public socketUser: User;
   public server: WebSocketServer;
   private lastMessageTime: number = 0;
   private messageCount: number = 0;
@@ -41,19 +41,19 @@ class ClientSocketServer {
   private heartbeatInterval?: NodeJS.Timeout;
   private callTimeout?: NodeJS.Timeout;
 
-  constructor(client: WebSocket, server: WebSocketServer, token: JWT) {
+  constructor(client: WebSocket, server: WebSocketServer, socketUser: User) {
     this.clientSocket = client;
     this.server = server;
-    this.clientToken = token;
-    this.clientSocket.userId = token.sub;
+    this.socketUser = socketUser;
+    this.clientSocket.userId = socketUser.id;
     this.clientSocket.socketId = crypto.randomUUID(); // Assign a unique socket ID
     setUserOnline(this.clientSocket.userId);
 
-    console.log(this.clientToken.sub);
+    console.log(this.socketUser.id);
 
     this.clientSocket.on("open", () => {
       console.log(
-        `WebSocket connection established for user: ${this.clientToken.name}`
+        `WebSocket connection established for user: ${this.socketUser.name}`
       );
     });
 
@@ -83,7 +83,7 @@ class ClientSocketServer {
 
     this.clientSocket.on("close", (code, reason) => {
       console.log(
-        `WebSocket connection closed for user: ${this.clientToken.name}, code: ${code}, reason: ${reason}`
+        `WebSocket connection closed for user: ${this.socketUser.name}, code: ${code}, reason: ${reason}`
       );
       this.cleanup();
     });
@@ -95,50 +95,50 @@ class ClientSocketServer {
   private handlePayload(event: SocketEvent) {
     switch (event.type) {
       case SocketEventType.MESSAGE:
-        console.log("Message received from client:" + this.clientToken.name);
+        console.log("Message received from client:" + this.socketUser.name);
         receiveMessage(this, event.payload as SocketMessage);
         break;
       case SocketEventType.INITIATECALL:
-        console.log("Call event received from client:" + this.clientToken.name);
+        console.log("Call event received from client:" + this.socketUser.name);
         receiveInitiateCall(this, event.payload as SocketInitiateCall);
         break;
       case SocketEventType.ANSWERCALL:
         console.log(
-          "Answer call event received from client:" + this.clientToken.name
+          "Answer call event received from client:" + this.socketUser.name
         );
         receiveAnswerCall(this, event.payload as SocketAnswerCall);
         break;
       case SocketEventType.LEAVECALL:
         console.log(
-          "Leave call event received from client:" + this.clientToken.name
+          "Leave call event received from client:" + this.socketUser.name
         );
         receiveLeaveCall(this, event.payload as SocketLeaveCall);
         break;
       case SocketEventType.ERROR:
         console.error(
-          "Error event received from client:" + this.clientToken.name + ":",
+          "Error event received from client:" + this.socketUser.name + ":",
           event.payload
         );
         break;
       case SocketEventType.JOINCHAT:
         console.log(
-          "Join chat event received from client:" + this.clientToken.name
+          "Join chat event received from client:" + this.socketUser.name
         );
         joinChat(this, event.payload as SocketJoinChat);
         break;
       case SocketEventType.LEAVECHAT:
         console.log(
-          "Leave chat event received from client:" + this.clientToken.name
+          "Leave chat event received from client:" + this.socketUser.name
         );
         leaveChat(this);
         break;
       case SocketEventType.SDP:
-        console.log("SDP event received from client:" + this.clientToken.name);
+        console.log("SDP event received from client:" + this.socketUser.name);
         receiveSdpData(this, event.payload as SocketSdp);
         break;
       case SocketEventType.TYPING:
         console.log(
-          "Typing event received from client:" + this.clientToken.name
+          "Typing event received from client:" + this.socketUser.name
         );
         // Handle typing event logic here
         break;
@@ -155,14 +155,14 @@ class ClientSocketServer {
     }
     this.messageCount++;
     if (this.messageCount > this.MESSAGE_RATE_LIMIT) {
-      console.warn(`Rate limit exceeded for user: ${this.clientToken.name}`);
+      console.warn(`Rate limit exceeded for user: ${this.socketUser.name}`);
       return true;
     }
     return false;
   }
 
   private async cleanup() {
-    console.log(`Cleaning up resources for user: ${this.clientToken.name}`);
+    console.log(`Cleaning up resources for user: ${this.socketUser.name}`);
 
     this.clientSocket.chatId = undefined;
     this.clientSocket.userId = undefined;
@@ -175,7 +175,7 @@ class ClientSocketServer {
       await deleteCall(this, this.clientSocket.callId);
     }
 
-    console.log(`Cleaned up resources for user: ${this.clientToken.name}`);
+    console.log(`Cleaned up resources for user: ${this.socketUser.name}`);
   }
 
   public clearCallTimeout() {
@@ -192,8 +192,8 @@ class ClientSocketServer {
       const call = await prisma.call.findUnique({ where: { id: callId } });
       if (call?.status !== CallStatus.Pending) return;
       const answerData: SocketAnswerCall = {
-        userId: this.clientToken.sub!,
-        userName: this.clientToken.name!,
+        userId: this.socketUser.id!,
+        userName: this.socketUser.name!,
         callId,
         chatId,
         answer: CallStatus.No_Answer,
@@ -207,11 +207,11 @@ class ClientSocketServer {
     this.heartbeatInterval = setInterval(() => {
       if (this.clientSocket.readyState === WebSocket.OPEN) {
         this.clientSocket.ping();
-        console.log(`Sent heartbeat ping to user: ${this.clientToken.name}`);
+        console.log(`Sent heartbeat ping to user: ${this.socketUser.name}`);
       }
     }, 30000);
     this.clientSocket.on("pong", async () => {
-      console.log(`Heartbeat received from user: ${this.clientToken.name}`);
+      console.log(`Heartbeat received from user: ${this.socketUser.name}`);
       await setUserOnline(this.clientSocket.userId);
     });
   }
@@ -221,7 +221,7 @@ class ClientSocketServer {
   }
 
   private close() {
-    console.log(`Closing WebSocket for user: ${this.clientToken.name}`);
+    console.log(`Closing WebSocket for user: ${this.socketUser.name}`);
     this.clientSocket.close();
   }
 }

@@ -1,12 +1,11 @@
 "use server";
 
 import { UserStatus, UserType } from "@/app/generated/prisma";
-import authOptions from "@/lib/auth/authOptions";
+import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
 import { UpdateUserTypeData, updateUserSchema } from "@/lib/schemas";
 import { authenticateUser, createManyChatsWithOthers } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
-import { getServerSession } from "next-auth";
 
 export type UserWithStatus = {
   id: string;
@@ -20,7 +19,7 @@ export type UserWithStatus = {
 };
 
 export async function getUsers() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session || !(await authenticateUser(session, UserType.Admin))) {
     throw new Error("Unauthorized");
@@ -54,7 +53,7 @@ export async function getUsers() {
 }
 
 export async function updateUserType(data: UpdateUserTypeData) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session || !(await authenticateUser(session, UserType.Admin))) {
     throw new Error("Unauthorized");

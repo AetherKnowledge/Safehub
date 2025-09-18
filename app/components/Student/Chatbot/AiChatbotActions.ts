@@ -1,13 +1,12 @@
 "use server";
 
 import { chathistory } from "@/app/generated/prisma";
-import authOptions from "@/lib/auth/authOptions";
+import { auth } from "@/auth";
 import { authenticateUser } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
-import { getServerSession } from "next-auth";
 
 export async function sendMessage(message: string): Promise<any> {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session || !authenticateUser(session)) {
     throw new Error("Unauthorized");
   }
@@ -35,7 +34,7 @@ export async function sendMessage(message: string): Promise<any> {
 }
 
 export async function getHistory(): Promise<chathistory[]> {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session || !authenticateUser(session)) {
     throw new Error("Unauthorized");

@@ -1,11 +1,10 @@
 "use server";
 
 import { Days, UserStatus, UserType } from "@/app/generated/prisma";
-import authOptions from "@/lib/auth/authOptions";
+import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
 import { authenticateUser } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
-import { getServerSession } from "next-auth";
 
 export type CounselorData = {
   name: string | null;
@@ -26,7 +25,7 @@ export type CounselorData = {
 };
 
 export async function getCounselors() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session || !authenticateUser(session, UserType.Student)) {
     throw new Error("Unauthorized");

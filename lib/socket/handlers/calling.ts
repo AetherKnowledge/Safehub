@@ -96,8 +96,8 @@ export async function receiveInitiateCall(
   const member = chat.members.find((m) => m.userId === callerId);
   const initiateCallData: SocketInitiateCall = {
     ...validation.data,
-    callerName: member?.user.name || client.clientToken.name || "Unknown",
-    callerImage: member?.user.image || client.clientToken.picture || undefined,
+    callerName: member?.user.name || client.socketUser.name || "Unknown",
+    callerImage: member?.user.image || client.socketUser.image || undefined,
   };
 
   // Create call in database first before sending socket events to prevent answering call before creating call in database
@@ -190,7 +190,7 @@ export async function receiveAnswerCall(
   if (!(await isMemberOfChat(client, chatId))) {
     sendErrorResponseToSelf(
       client,
-      `User ${client.clientToken.name} is not a member of the chat: ${chatId}`,
+      `User ${client.socketUser.name} is not a member of the chat: ${chatId}`,
       SocketErrorRequestType.UNAUTHORIZED
     );
     return;
@@ -203,7 +203,7 @@ export async function receiveAnswerCall(
     );
     return;
   }
-  if (call.callerId === client.clientToken.sub) {
+  if (call.callerId === client.socketUser.id) {
     sendErrorResponseToSelf(
       client,
       `User cannot answer their own call`,
@@ -222,7 +222,7 @@ export async function receiveAnswerCall(
 
   client.clearCallTimeout();
   if (answer === CallStatus.Rejected || answer === CallStatus.No_Answer) {
-    console.log("Call rejected by user:", client.clientToken.name);
+    console.log("Call rejected by user:", client.socketUser.name);
     sendMessageToClient(
       client,
       SocketEventType.ANSWERCALL,
@@ -239,7 +239,7 @@ export async function receiveAnswerCall(
     return;
   }
 
-  console.log("Call accepted by user:", client.clientToken.name);
+  console.log("Call accepted by user:", client.socketUser.name);
   await prisma.call.update({
     where: { id: callId },
     data: { status: CallStatus.Accepted },
@@ -249,8 +249,8 @@ export async function receiveAnswerCall(
     client,
     SocketEventType.ANSWERCALL,
     {
-      userId: client.clientToken.sub,
-      userName: client.clientToken.name,
+      userId: client.socketUser.id,
+      userName: client.socketUser.name,
       callId,
       chatId,
       answer: CallStatus.Accepted,
@@ -258,7 +258,7 @@ export async function receiveAnswerCall(
     call.callerId
   );
 
-  await createCallMember(client, callId, client.clientToken.sub!);
+  await createCallMember(client, callId, client.socketUser.id!);
   client.clientSocket.callId = callId;
   console.log("Answer call setup complete for callId:", callId);
 }
@@ -346,7 +346,7 @@ export async function receiveSdpData(
   }
 
   console.log(
-    `Received SDP data from client: ${client.clientToken.name}, sending to peer: ${to}`
+    `Received SDP data from client: ${client.socketUser.name}, sending to peer: ${to}`
   );
   for (const ws of client.server.clients) {
     if (
@@ -358,7 +358,7 @@ export async function receiveSdpData(
         JSON.stringify({
           type: SocketEventType.SDP,
           payload: {
-            from: client.clientToken.sub,
+            from: client.socketUser.id,
             to,
             callId,
             chatId,
@@ -422,7 +422,7 @@ export async function leaveCall(
   try {
     await prisma.callMember.delete({
       where: {
-        callId_userId: { callId, userId: client.clientToken.sub! },
+        callId_userId: { callId, userId: client.socketUser.id! },
       },
     });
   } catch (error) {
@@ -440,14 +440,14 @@ export async function leaveCall(
     if (
       ws.readyState === WebSocket.OPEN &&
       ws.chatId === chatId &&
-      ws.userId !== client.clientToken.sub
+      ws.userId !== client.socketUser.id
     ) {
       ws.send(
         JSON.stringify({
           type: SocketEventType.LEAVECALL,
           payload: {
-            userId: client.clientToken.sub,
-            userName: client.clientToken.name || undefined,
+            userId: client.socketUser.id,
+            userName: client.socketUser.name || undefined,
             callId,
             chatId,
           },
@@ -489,7 +489,7 @@ export async function deleteCall(client: ClientSocketServer, callId: string) {
     if (
       ws.readyState === WebSocket.OPEN &&
       ws.callId === callId &&
-      ws.userId !== client.clientToken.sub
+      ws.userId !== client.socketUser.id
     ) {
       console.log(`Notifying client ${ws.userId} about call end`);
       sendMessageToClient(

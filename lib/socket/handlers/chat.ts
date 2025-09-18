@@ -39,7 +39,7 @@ export async function leaveChat(client: ClientSocketServer) {
 export async function isMemberOfChat(
   client: ClientSocketServer,
   chatId: string,
-  userId: string = client.clientToken.sub!
+  userId: string = client.socketUser.id!
 ): Promise<boolean> {
   console.log("Checking if user:", userId, "is a member of chat:", chatId);
   try {

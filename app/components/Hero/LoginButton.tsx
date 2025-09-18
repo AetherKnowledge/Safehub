@@ -1,42 +1,38 @@
-"use client";
-import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { auth, signIn } from "@/auth";
+import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 
-const LoginButton = () => {
-  const { status, data: session } = useSession();
-  const router = useRouter();
-
-  const handleClick = () => {
-    if (status === "unauthenticated") {
-      signIn();
-    } else if (status === "authenticated") {
-      router.push("/user/dashboard");
-    }
-  };
-
-  if (status === "loading") {
-    return (
-      <button className="flex items-center justify-center btn btn-primary gap-3 min-w-50 mx-auto lg:mx-0 py-[clamp(1.25rem,2vw,2.5rem)]">
-        <div className="loading loading-spinner loading-md text-white"></div>
-      </button>
-    );
-  }
+const LoginButton = async () => {
+  const session = await auth();
 
   return (
-    <button
-      className="flex items-center justify-center btn btn-primary gap-3 min-w-50 mx-auto lg:mx-0 py-[clamp(1.25rem,2vw,2.5rem)]"
-      onClick={handleClick}
-    >
-      {status === "unauthenticated" && (
-        <div className="bg-white rounded-full w-[clamp(1.25rem,2vw,2.5rem)] h-[clamp(1.25rem,2vw,2.5rem)] flex items-center justify-center">
-          <FcGoogle className="w-[clamp(1.25rem,2vw,2.5rem)] h-[clamp(1.25rem,2vw,2.5rem)]" />
-        </div>
+    <>
+      {!session ? (
+        <Link
+          href="/login"
+          className="btn btn-primary min-w-50 mx-auto lg:mx-0 py-[clamp(1.25rem,2vw,2.5rem)] text-step-1 font-medium"
+        >
+          Go To Dashboard
+        </Link>
+      ) : (
+        <form
+          action={async () => {
+            "use server";
+            await signIn();
+          }}
+        >
+          <button
+            className="flex items-center justify-center btn btn-primary gap-3 min-w-50 mx-auto lg:mx-0 py-[clamp(1.25rem,2vw,2.5rem)]"
+            type="submit"
+          >
+            <div className="bg-white rounded-full w-[clamp(1.25rem,2vw,2.5rem)] h-[clamp(1.25rem,2vw,2.5rem)] flex items-center justify-center">
+              <FcGoogle className="w-[clamp(1.25rem,2vw,2.5rem)] h-[clamp(1.25rem,2vw,2.5rem)]" />
+            </div>
+            <p className="text-step-1 font-medium">Register Now</p>
+          </button>
+        </form>
       )}
-      <p className="text-step-1 font-medium">
-        {status === "unauthenticated" ? "Register Now" : "Go To Dashboard"}
-      </p>
-    </button>
+    </>
   );
 };
 

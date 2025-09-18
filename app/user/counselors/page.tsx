@@ -1,11 +1,10 @@
 import CounselorList from "@/app/components/Student/Counselors/CounselorList";
 import { UserType } from "@/app/generated/prisma";
-import authOptions from "@/lib/auth/authOptions";
-import { getServerSession } from "next-auth";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
 const CounselorsPage = async () => {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session) return;
 
   return (

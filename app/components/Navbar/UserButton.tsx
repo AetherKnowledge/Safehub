@@ -1,28 +1,30 @@
-"use client";
+import { auth, signIn, signOut } from "@/auth";
 import { Session } from "next-auth";
-import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { FaChevronDown } from "react-icons/fa6";
 
-const UserButton = () => {
-  const { status, data: session } = useSession();
-
-  if (status === "loading")
-    return (
-      <div className="loading loading-spinner loading-md text-primary"></div>
-    );
+const UserButton = async () => {
+  const session = await auth();
 
   return (
     <div className="flex items-center gap-2 hover:cursor-pointer">
-      {status === "unauthenticated" && (
-        <button
-          className="btn btn-primary w-25 font-semibold duration-150 ease-in-out hover:scale-105"
-          onClick={() => signIn(undefined)}
+      {session ? (
+        AuthenticatedUserButton(session)
+      ) : (
+        <form
+          action={async () => {
+            "use server";
+            await signIn();
+          }}
         >
-          Login
-        </button>
+          <button
+            className="btn btn-primary w-25 font-semibold duration-150 ease-in-out hover:scale-105"
+            type="submit"
+          >
+            Sign in
+          </button>
+        </form>
       )}
-      {status === "authenticated" && AuthenticatedUserButton(session)}
     </div>
   );
 };
@@ -77,7 +79,14 @@ const AuthenticatedUserButton = (session: Session) => {
             </label>
           </li>
           <li>
-            <button onClick={() => signOut()}>Sign Out</button>
+            <form
+              action={async () => {
+                "use server";
+                await signOut();
+              }}
+            >
+              <button type="submit">Sign Out</button>
+            </form>
           </li>
         </ul>
       </div>

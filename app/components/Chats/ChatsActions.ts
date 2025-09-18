@@ -2,19 +2,18 @@
 
 import { ParsedChat } from "@/@types/network";
 import { UserStatus } from "@/app/generated/prisma";
-import authOptions from "@/lib/auth/authOptions";
+import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
 import { Message } from "@/lib/socket/hooks/useMessaging";
 import { Recipient } from "@/lib/socket/SocketEvents";
 import { authenticateUser } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
-import { getServerSession } from "next-auth";
 
 // TODO: Make it so chat name is dependent on the other user's name if it is direct
 
 export async function getChats(): Promise<ParsedChat[]> {
   console.log("Fetching chats...");
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session || !(await authenticateUser(session))) {
     throw new Error("Unauthorized");
@@ -97,7 +96,7 @@ export type ChatInfo = {
 };
 
 export async function getChatInfo(id: string): Promise<ChatInfo | null> {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session || !authenticateUser(session)) {
     throw new Error("Unauthorized");
   }
@@ -137,7 +136,7 @@ export async function getChatInfo(id: string): Promise<ChatInfo | null> {
 }
 
 export async function getChatById(id: string): Promise<Message[]> {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session || !authenticateUser(session)) {
     throw new Error("Unauthorized");
   }

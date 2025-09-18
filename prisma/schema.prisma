@@ -1,20 +1,18 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../app/generated/prisma"
+  binaryTargets = ["native", "windows", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["next_auth", "public"]
 }
 
 enum UserType {
   Student
   Counselor
   Admin
-
-  @@schema("public")
 }
 
 enum AppointmentStatus {
@@ -22,8 +20,6 @@ enum AppointmentStatus {
   Pending
   Completed
   Rejected
-
-  @@schema("public")
 }
 
 enum Days {
@@ -34,15 +30,11 @@ enum Days {
   Friday
   Saturday
   Sunday
-
-  @@schema("public")
 }
 
 enum ChatType {
   GROUP
   DIRECT
-
-  @@schema("public")
 }
 
 enum CallStatus {
@@ -51,22 +43,22 @@ enum CallStatus {
   Rejected
   Ended
   No_Answer
-
-  @@schema("public")
 }
 
 enum UserStatus {
   Online
   Offline
-
-  @@schema("public")
 }
 
 model User {
-  id    String  @id @db.Uuid
-  name  String?
-  email String? @unique(map: "email_unique")
-  image String?
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,35 +82,25 @@ model User {
   likes    Like[]
   dislikes Dislike[]
   comments Comment[]
-
-  next_auth_user users @relation(fields: [id], references: [id])
-
-  @@schema("public")
 }
 
 model Student {
-  studentId    String        @id @db.Uuid
+  studentId    String        @id @default(cuid())
   user         User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
   appointments Appointment[]
-
-  @@schema("public")
 }
 
 model Counselor {
-  counselorId    String          @id @db.Uuid
+  counselorId    String          @id @default(cuid())
   user           User            @relation(fields: [counselorId], references: [id], onDelete: Cascade)
   appointments   Appointment[]
   available      Boolean         @default(false)
   AvailableSlots AvailableSlot[]
-
-  @@schema("public")
 }
 
 model Admin {
-  adminId String @id @db.Uuid
+  adminId String @id @default(cuid())
   user    User   @relation(fields: [adminId], references: [id], onDelete: Cascade)
-
-  @@schema("public")
 }
 
 model Chat {
@@ -133,35 +115,30 @@ model Chat {
 
   members  ChatMember[]
   messages ChatMessage[]
-
-  @@schema("public")
 }
 
 model ChatMember {
   id       String   @id @default(cuid())
   chatId   String
-  userId   String   @db.Uuid
+  userId   String
   joinedAt DateTime @default(now())
 
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([chatId, userId]) // Prevent duplicate members
-  @@schema("public")
+  @@unique([chatId, userId])
 }
 
 model ChatMessage {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   chatId    String
-  userId    String   @db.Uuid
+  userId    String
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@schema("public")
 }
 
 model Call {
@@ -169,173 +146,146 @@ model Call {
   chatId    String     @unique
   status    CallStatus @default(Pending)
   createdAt DateTime   @default(now())
-  callerId  String     @db.Uuid
-  chat      Chat       @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  callerId  String
 
-  caller     User         @relation(fields: [callerId], references: [id], onDelete: Cascade)
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  caller User @relation(fields: [callerId], references: [id], onDelete: Cascade)
+
   callMember CallMember[]
-
-  @@schema("public")
 }
 
 model CallMember {
   id       String   @id @default(cuid())
   socketId String
   callId   String
-  userId   String   @db.Uuid
+  userId   String
   joinedAt DateTime @default(now())
 
   call Call @relation(fields: [callId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([callId, userId]) // Prevent duplicate members in a call
-  @@schema("public")
+  @@unique([callId, userId])
 }
 
 model AvailableSlot {
-  id          String    @id @default(cuid())
-  counselor   Counselor @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)
-  counselorId String    @db.Uuid
+  id          String @id @default(cuid())
+  counselorId String
   day         Days
-  startTime   String // Format: "09:00"
-  endTime     String // Format: "12:00"
+  startTime   String
+  endTime     String
 
-  @@schema("public")
+  counselor Counselor @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   title     String
   content   String?
-  authorId  String   @db.Uuid
+  authorId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  images    String[] @db.VarChar(255) // Array of image URLs
+  images    String[] @db.VarChar(255)
 
   likes    Like[]
   dislikes Dislike[]
-
   comments Comment[]
-  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  @@schema("public")
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 model Like {
-  id        Int      @id @default(autoincrement())
-  postId    Int
-  userId    String   @db.Uuid
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
   createdAt DateTime @default(now())
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([postId, userId]) // Prevent multiple likes from the same user on the same post
-  @@schema("public")
+  @@unique([postId, userId])
 }
 
 model Dislike {
-  id        Int      @id @default(autoincrement())
-  postId    Int
-  userId    String   @db.Uuid
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
   createdAt DateTime @default(now())
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([postId, userId]) // Prevent multiple dislikes from the same user on the same post
-  @@schema("public")
+  @@unique([postId, userId])
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  postId    Int
-  userId    String   @db.Uuid
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@schema("public")
 }
 
 model chathistory {
-  id         Int      @id @default(autoincrement())
-  session_id String   @db.Uuid
+  id         String   @id @default(cuid())
+  session_id String
   message    Json
-  user       User     @relation(fields: [session_id], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
 
-  @@schema("public")
+  user User @relation(fields: [session_id], references: [id], onDelete: Cascade)
 }
 
 model Appointment {
-  id          Int               @id @default(autoincrement())
-  studentId   String            @db.Uuid
-  counselorId String            @db.Uuid
+  id          String            @id @default(cuid())
+  studentId   String
+  counselorId String
   status      AppointmentStatus @default(Pending)
   schedule    DateTime
   createdAt   DateTime          @default(now())
-  student     Student           @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
-  counselor   Counselor         @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)
   concerns    String?
 
-  @@schema("public")
+  student   Student   @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
+  counselor Counselor @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)
 }
 
-model accounts {
-  id                 String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?
-  access_token       String?
-  expires_at         BigInt?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
-  oauth_token_secret String?
-  oauth_token        String?
-  userId             String? @db.Uuid
-  users              users?  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
-  @@unique([provider, providerAccountId], map: "provider_unique")
-  @@schema("next_auth")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
 }
 
-model sessions {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  expires      DateTime @db.Timestamptz(6)
-  sessionToken String   @unique(map: "sessiontoken_unique")
-  userId       String?  @db.Uuid
-  users        users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model Session {
+  sessionToken String   @id @default(cuid())
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  @@schema("next_auth")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model users {
-  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String?
-  email         String?    @unique(map: "email_unique")
-  password      String?
-  emailVerified DateTime?  @db.Timestamptz(6)
-  image         String?
-  accounts      accounts[]
-  sessions      sessions[]
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
 
-  public_user User?
-
-  @@schema("next_auth")
-}
-
-model verification_tokens {
-  identifier String?
-  token      String   @id
-  expires    DateTime @db.Timestamptz(6)
-
-  @@unique([token, identifier], map: "token_identifier_unique")
-  @@schema("next_auth")
+  @@id([identifier, token])
 }

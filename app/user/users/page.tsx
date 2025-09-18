@@ -1,11 +1,10 @@
 import AdminUsersPage from "@/app/components/Admin/Users/UsersPage";
 import { UserType } from "@/app/generated/prisma";
-import authOptions from "@/lib/auth/authOptions";
-import { getServerSession } from "next-auth";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
 const UsersPage = async () => {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session || session.user.type !== UserType.Admin) {
     redirect("/user/dashboard");

@@ -1,15 +1,14 @@
 "use server";
 import { UserType } from "@/app/generated/prisma";
-import authOptions from "@/lib/auth/authOptions";
+import { auth } from "@/auth";
 import { NewAppointmentData, newAppointmentSchema } from "@/lib/schemas";
 import { authenticateUser } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { AppointmentData } from "./AppointmentTable/AppointmentTable";
 
 export async function getAppointments(): Promise<AppointmentData[]> {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session || !authenticateUser(session, UserType.Student)) {
     throw new Error("Unauthorized");
@@ -81,7 +80,7 @@ export async function getAppointments(): Promise<AppointmentData[]> {
 export async function createNewAppointment(
   appointmentData: NewAppointmentData
 ) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (
     !session ||
@@ -111,7 +110,7 @@ export async function createNewAppointment(
 }
 
 export async function cancelAppointment(appointmentId: string) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -121,14 +120,9 @@ export async function cancelAppointment(appointmentId: string) {
     throw new Error("Appointment ID is required");
   }
 
-  const id = parseInt(appointmentId, 10);
-  if (isNaN(id)) {
-    throw new Error("Invalid Appointment ID");
-  }
-
   const appointment = await prisma.appointment.findUnique({
     where: {
-      id,
+      id: appointmentId,
       studentId: session.user.id, // Ensure the student owns the appointment
     },
   });
@@ -138,7 +132,7 @@ export async function cancelAppointment(appointmentId: string) {
   }
 
   await prisma.appointment.delete({
-    where: { id },
+    where: { id: appointmentId },
   });
-  console.log("Deleted appointment with ID:", id);
+  console.log("Deleted appointment with ID:", appointmentId);
 }

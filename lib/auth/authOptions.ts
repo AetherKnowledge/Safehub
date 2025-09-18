@@ -3,15 +3,19 @@ import { prisma } from "@/prisma/client";
 import { SupabaseAdapter } from "@auth/supabase-adapter";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth";
+
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { env } from "next-runtime-env";
 import process from "process";
 
-export const authOptions: NextAuthOptions = {
+// TODO: Change to database session strategy
+
+export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    url: env("NEXT_PUBLIC_SUPABASE_URL")!,
+    secret: env("SUPABASE_SERVICE_ROLE_KEY")!,
   }),
   providers: [
     CredentialsProvider({
@@ -27,13 +31,13 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials.password) return null;
 
-        const user = await prisma.users.findUnique({
-          where: { email: credentials.email },
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email as string },
         });
         if (!user) return null;
 
         const passwordMatch = await bcrypt.compare(
-          credentials.password,
+          credentials.password as string,
           user.password!
         );
 
@@ -63,7 +67,7 @@ export const authOptions: NextAuthOptions = {
         where: { email: session.user.email! },
       });
 
-      session.user.id = user?.id;
+      session.user.id = user?.id || "";
       session.user.type = user?.type;
       token.id = user?.id;
       token.type = user?.type;
@@ -98,6 +102,4 @@ export const authOptions: NextAuthOptions = {
       createManyChatsWithOthers(newUser.type, newUser.id);
     },
   },
-};
-
-export default authOptions;
+});

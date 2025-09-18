@@ -2,6 +2,8 @@ import { CallStatus, User } from "@/app/generated/prisma";
 import { types } from "mediasoup";
 import { TransportOptions } from "mediasoup-client/lib/Transport";
 
+export type SocketUser = Pick<User, "id" | "name" | "image" | "type" | "email">;
+
 export enum SocketEventType {
   MESSAGE = "message",
   INITIATECALL = "initiateCall",

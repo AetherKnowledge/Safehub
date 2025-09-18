@@ -21,7 +21,7 @@ export async function receiveMessage(
   rateLimited: boolean = false
 ) {
   if (rateLimited) {
-    console.warn(`Rate limit exceeded for user: ${client.clientToken.name}`);
+    console.warn(`Rate limit exceeded for user: ${client.socketUser.name}`);
     sendErrorResponseToSelf(
       client,
       "Rate limit exceeded. Please slow down.",
@@ -30,7 +30,7 @@ export async function receiveMessage(
     return;
   }
 
-  console.log("Handling message from client:", client.clientToken.name);
+  console.log("Handling message from client:", client.socketUser.name);
   const validation = messageSchema.safeParse(payload);
   if (!validation.success || !validation.data) {
     console.error("Invalid message format:", payload, validation.error);
@@ -53,7 +53,7 @@ export async function receiveMessage(
     client.clientSocket.close(1008, "Chat not found");
     return;
   }
-  if (!chat.members.some((m) => m.userId === client.clientToken.sub)) {
+  if (!chat.members.some((m) => m.userId === client.socketUser.id)) {
     console.log("User is not a member of the chat");
     client.clientSocket.close(1008, "You are not a member of this chat");
     return;
@@ -61,7 +61,7 @@ export async function receiveMessage(
   const newMessage = await prisma.chatMessage.create({
     data: {
       chatId: payload.chatId,
-      userId: client.clientToken.sub!,
+      userId: client.socketUser.id!,
       content: validation.data.content,
     },
   });
@@ -82,8 +82,8 @@ export async function receiveMessage(
           type: SocketEventType.MESSAGE,
           payload: {
             ...newMessage,
-            name: client.clientToken.name,
-            src: client.clientToken.picture,
+            name: client.socketUser.name,
+            src: client.socketUser.image,
           },
         } as SocketEvent<Message>)
       );
@@ -102,7 +102,7 @@ export async function sendMessageToSelf(
     | SocketError
 ) {
   if (client.clientSocket.readyState !== WebSocket.OPEN) return;
-  console.log(`Sending message to self: ${client.clientToken.name}`, {
+  console.log(`Sending message to self: ${client.socketUser.name}`, {
     eventType,
     payload,
   });
@@ -120,7 +120,7 @@ export async function sendMessageToClient(
     | SocketError,
   id: string
 ) {
-  if (id === client.clientToken.sub) {
+  if (id === client.socketUser.id) {
     sendMessageToSelf(client, eventType, payload);
     return;
   }
@@ -141,7 +141,7 @@ export async function sendErrorResponseToSelf(
   errorType: SocketErrorType
 ) {
   console.error(
-    `Sending error response to self: ${client.clientToken.name} Error: ${message} Code: ${errorType}`
+    `Sending error response to self: ${client.socketUser.name} Error: ${message} Code: ${errorType}`
   );
   sendMessageToSelf(client, SocketEventType.ERROR, {
     message,

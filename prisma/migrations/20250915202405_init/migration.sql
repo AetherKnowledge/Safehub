@@ -1,6 +1,3 @@
--- CreateSchema
-CREATE SCHEMA IF NOT EXISTS "next_auth";
-
 -- CreateEnum
 CREATE TYPE "public"."UserType" AS ENUM ('Student', 'Counselor', 'Admin');
 
@@ -21,9 +18,10 @@ CREATE TYPE "public"."UserStatus" AS ENUM ('Online', 'Offline');
 
 -- CreateTable
 CREATE TABLE "public"."User" (
-    "id" UUID NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "name" TEXT,
-    "email" TEXT,
+    "email" TEXT NOT NULL,
+    "emailVerified" TIMESTAMP(3),
     "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -35,14 +33,14 @@ CREATE TABLE "public"."User" (
 
 -- CreateTable
 CREATE TABLE "public"."Student" (
-    "studentId" UUID NOT NULL,
+    "studentId" UUID NOT NULL DEFAULT gen_random_uuid(),
 
     CONSTRAINT "Student_pkey" PRIMARY KEY ("studentId")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Counselor" (
-    "counselorId" UUID NOT NULL,
+    "counselorId" UUID NOT NULL DEFAULT gen_random_uuid(),
     "available" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Counselor_pkey" PRIMARY KEY ("counselorId")
@@ -50,14 +48,14 @@ CREATE TABLE "public"."Counselor" (
 
 -- CreateTable
 CREATE TABLE "public"."Admin" (
-    "adminId" UUID NOT NULL,
+    "adminId" UUID NOT NULL DEFAULT gen_random_uuid(),
 
     CONSTRAINT "Admin_pkey" PRIMARY KEY ("adminId")
 );
 
 -- CreateTable
 CREATE TABLE "public"."Chat" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "type" "public"."ChatType" NOT NULL DEFAULT 'DIRECT',
     "name" TEXT,
     "description" TEXT,
@@ -70,8 +68,8 @@ CREATE TABLE "public"."Chat" (
 
 -- CreateTable
 CREATE TABLE "public"."ChatMember" (
-    "id" TEXT NOT NULL,
-    "chatId" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "chatId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -80,8 +78,8 @@ CREATE TABLE "public"."ChatMember" (
 
 -- CreateTable
 CREATE TABLE "public"."ChatMessage" (
-    "id" SERIAL NOT NULL,
-    "chatId" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "chatId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "content" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -92,8 +90,8 @@ CREATE TABLE "public"."ChatMessage" (
 
 -- CreateTable
 CREATE TABLE "public"."Call" (
-    "id" TEXT NOT NULL,
-    "chatId" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "chatId" UUID NOT NULL,
     "status" "public"."CallStatus" NOT NULL DEFAULT 'Pending',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "callerId" UUID NOT NULL,
@@ -103,9 +101,9 @@ CREATE TABLE "public"."Call" (
 
 -- CreateTable
 CREATE TABLE "public"."CallMember" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "socketId" TEXT NOT NULL,
-    "callId" TEXT NOT NULL,
+    "callId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -114,7 +112,7 @@ CREATE TABLE "public"."CallMember" (
 
 -- CreateTable
 CREATE TABLE "public"."AvailableSlot" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "counselorId" UUID NOT NULL,
     "day" "public"."Days" NOT NULL,
     "startTime" TEXT NOT NULL,
@@ -125,7 +123,7 @@ CREATE TABLE "public"."AvailableSlot" (
 
 -- CreateTable
 CREATE TABLE "public"."Post" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "title" TEXT NOT NULL,
     "content" TEXT,
     "authorId" UUID NOT NULL,
@@ -138,8 +136,8 @@ CREATE TABLE "public"."Post" (
 
 -- CreateTable
 CREATE TABLE "public"."Like" (
-    "id" SERIAL NOT NULL,
-    "postId" INTEGER NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "postId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -148,8 +146,8 @@ CREATE TABLE "public"."Like" (
 
 -- CreateTable
 CREATE TABLE "public"."Dislike" (
-    "id" SERIAL NOT NULL,
-    "postId" INTEGER NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "postId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -158,8 +156,8 @@ CREATE TABLE "public"."Dislike" (
 
 -- CreateTable
 CREATE TABLE "public"."Comment" (
-    "id" SERIAL NOT NULL,
-    "postId" INTEGER NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "postId" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "content" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -170,7 +168,7 @@ CREATE TABLE "public"."Comment" (
 
 -- CreateTable
 CREATE TABLE "public"."chathistory" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "session_id" UUID NOT NULL,
     "message" JSONB NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -180,7 +178,7 @@ CREATE TABLE "public"."chathistory" (
 
 -- CreateTable
 CREATE TABLE "public"."Appointment" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "studentId" UUID NOT NULL,
     "counselorId" UUID NOT NULL,
     "status" "public"."AppointmentStatus" NOT NULL DEFAULT 'Pending',
@@ -192,58 +190,46 @@ CREATE TABLE "public"."Appointment" (
 );
 
 -- CreateTable
-CREATE TABLE "next_auth"."accounts" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+CREATE TABLE "public"."Account" (
+    "userId" UUID NOT NULL,
     "type" TEXT NOT NULL,
     "provider" TEXT NOT NULL,
     "providerAccountId" TEXT NOT NULL,
     "refresh_token" TEXT,
     "access_token" TEXT,
-    "expires_at" BIGINT,
+    "expires_at" INTEGER,
     "token_type" TEXT,
     "scope" TEXT,
     "id_token" TEXT,
     "session_state" TEXT,
-    "oauth_token_secret" TEXT,
-    "oauth_token" TEXT,
-    "userId" UUID,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "accounts_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Account_pkey" PRIMARY KEY ("provider","providerAccountId")
 );
 
 -- CreateTable
-CREATE TABLE "next_auth"."sessions" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "expires" TIMESTAMPTZ(6) NOT NULL,
-    "sessionToken" TEXT NOT NULL,
-    "userId" UUID,
+CREATE TABLE "public"."Session" (
+    "sessionToken" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "userId" UUID NOT NULL,
+    "expires" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "sessions_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Session_pkey" PRIMARY KEY ("sessionToken")
 );
 
 -- CreateTable
-CREATE TABLE "next_auth"."users" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "name" TEXT,
-    "email" TEXT,
-    "password" TEXT,
-    "emailVerified" TIMESTAMPTZ(6),
-    "image" TEXT,
+CREATE TABLE "public"."VerificationToken" (
+    "identifier" UUID NOT NULL,
+    "token" UUID NOT NULL,
+    "expires" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "next_auth"."verification_tokens" (
-    "identifier" TEXT,
-    "token" TEXT NOT NULL,
-    "expires" TIMESTAMPTZ(6) NOT NULL,
-
-    CONSTRAINT "verification_tokens_pkey" PRIMARY KEY ("token")
+    CONSTRAINT "VerificationToken_pkey" PRIMARY KEY ("identifier","token")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "email_unique" ON "public"."User"("email");
+CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ChatMember_chatId_userId_key" ON "public"."ChatMember"("chatId", "userId");
@@ -259,21 +245,6 @@ CREATE UNIQUE INDEX "Like_postId_userId_key" ON "public"."Like"("postId", "userI
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Dislike_postId_userId_key" ON "public"."Dislike"("postId", "userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "provider_unique" ON "next_auth"."accounts"("provider", "providerAccountId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "sessiontoken_unique" ON "next_auth"."sessions"("sessionToken");
-
--- CreateIndex
-CREATE UNIQUE INDEX "email_unique" ON "next_auth"."users"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "token_identifier_unique" ON "next_auth"."verification_tokens"("token", "identifier");
-
--- AddForeignKey
-ALTER TABLE "public"."User" ADD CONSTRAINT "User_id_fkey" FOREIGN KEY ("id") REFERENCES "next_auth"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Student" ADD CONSTRAINT "Student_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -342,7 +313,7 @@ ALTER TABLE "public"."Appointment" ADD CONSTRAINT "Appointment_studentId_fkey" F
 ALTER TABLE "public"."Appointment" ADD CONSTRAINT "Appointment_counselorId_fkey" FOREIGN KEY ("counselorId") REFERENCES "public"."Counselor"("counselorId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "next_auth"."accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "next_auth"."users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "next_auth"."sessions" ADD CONSTRAINT "sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "next_auth"."users"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

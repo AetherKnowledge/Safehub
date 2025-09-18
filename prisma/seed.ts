@@ -21,20 +21,11 @@ async function main() {
   // Create Admin user
   await client.query(
     `
-    INSERT INTO next_auth.users (id, email, name, password)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO public."User" (id, email, name, password, image, "createdAt", "updatedAt")
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
     ON CONFLICT (email) DO NOTHING
     `,
-    [uuid, "admin@admin.com", "Admin", hashedPassword]
-  );
-
-  await client.query(
-    `
-    INSERT INTO public."User" (id, email, name, image, "createdAt", "updatedAt")
-    VALUES ($1, $2, $3, $4, $5, $6)
-    ON CONFLICT (email) DO NOTHING
-    `,
-    [uuid, "admin@admin.com", "Admin", null, now, now]
+    [uuid, "admin@admin.com", "Admin", hashedPassword, null, now, now]
   );
 
   await client.query(
@@ -90,16 +81,16 @@ async function main() {
   // === GRANTS & FUNCTIONS ===
 
   // Grants on schemas
-  await client.query(`GRANT USAGE ON SCHEMA next_auth TO service_role;`);
-  await client.query(`GRANT ALL ON SCHEMA next_auth TO postgres;`);
+  await client.query(`GRANT USAGE ON SCHEMA public TO service_role;`);
+  await client.query(`GRANT ALL ON SCHEMA public TO postgres;`);
 
   // Grants on users table
-  await client.query(`GRANT ALL ON TABLE next_auth.users TO postgres;`);
-  await client.query(`GRANT ALL ON TABLE next_auth.users TO service_role;`);
+  await client.query(`GRANT ALL ON TABLE public."User" TO postgres;`);
+  await client.query(`GRANT ALL ON TABLE public."User" TO service_role;`);
 
-  // Function next_auth.uid()
+  // Function public.uid()
   await client.query(`
-  CREATE OR REPLACE FUNCTION next_auth.uid() RETURNS uuid
+  CREATE OR REPLACE FUNCTION public.uid() RETURNS uuid
       LANGUAGE sql STABLE
       AS $$
     SELECT
@@ -111,19 +102,19 @@ async function main() {
 `);
 
   // Grants on sessions
-  await client.query(`GRANT ALL ON TABLE next_auth.sessions TO postgres;`);
-  await client.query(`GRANT ALL ON TABLE next_auth.sessions TO service_role;`);
+  await client.query(`GRANT ALL ON TABLE public."Session" TO postgres;`);
+  await client.query(`GRANT ALL ON TABLE public."Session" TO service_role;`);
 
   // Grants on accounts
-  await client.query(`GRANT ALL ON TABLE next_auth.accounts TO postgres;`);
-  await client.query(`GRANT ALL ON TABLE next_auth.accounts TO service_role;`);
+  await client.query(`GRANT ALL ON TABLE public."Account" TO postgres;`);
+  await client.query(`GRANT ALL ON TABLE public."Account" TO service_role;`);
 
   // Grants on verification_tokens
   await client.query(
-    `GRANT ALL ON TABLE next_auth.verification_tokens TO postgres;`
+    `GRANT ALL ON TABLE public."VerificationToken" TO postgres;`
   );
   await client.query(
-    `GRANT ALL ON TABLE next_auth.verification_tokens TO service_role;`
+    `GRANT ALL ON TABLE public."VerificationToken" TO service_role;`
   );
 
   // Enable RLS on User
@@ -133,37 +124,13 @@ async function main() {
   await client.query(`
   CREATE POLICY "Can view own user data."
   ON public."User" FOR SELECT
-  USING (next_auth.uid() = id);
+  USING (public.uid() = id);
 `);
 
   await client.query(`
   CREATE POLICY "Can update own user data."
   ON public."User" FOR UPDATE
-  USING (next_auth.uid() = id);
-`);
-
-  // Trigger function for new users
-  await client.query(`
-  CREATE OR REPLACE FUNCTION public.handle_new_user()
-  RETURNS trigger AS $$
-  BEGIN
-    INSERT INTO public."User" (id, name, email, image, "updatedAt")
-    VALUES (NEW.id, NEW.name, NEW.email, NEW.image, current_timestamp);
-    RETURN NEW;
-  END;
-  $$ LANGUAGE plpgsql SECURITY DEFINER;
-`);
-
-  // Drop old trigger if exists
-  await client.query(
-    `DROP TRIGGER IF EXISTS on_auth_user_created ON next_auth.users;`
-  );
-
-  // Create new trigger
-  await client.query(`
-  CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON next_auth.users
-  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+  USING (public.uid() = id);
 `);
 
   console.log(

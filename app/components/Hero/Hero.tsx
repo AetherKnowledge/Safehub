@@ -1,3 +1,4 @@
+import Image from "next/image";
 import SafehubIcon from "../Icons/SafehubIcon";
 import Navbar from "../Navbar";
 import LoginButton from "./LoginButton";
@@ -11,13 +12,15 @@ const Hero = () => {
         className="hero w-full h-screen bg-gradient-to-r from-black/95 to-gray-700/95 overflow-hidden py-6"
       >
         {/* Background image layer */}
-        <div
-          className="absolute h-screen inset-0 bg-cover bg-center z-0"
-          style={{
-            backgroundImage: `url(${"/images/lcupBg.png"})`,
-            opacity: 0.33, // Adjust this value (0 to 1)
-          }}
-        />
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/lcupBg.png"
+            alt="LCUP background"
+            fill
+            priority
+            className="object-cover object-center opacity-30" // opacity applied here
+          />
+        </div>
 
         {/* Content layer */}
         <div className="flex isolate items-center gap-5 text-white lg:pl-20 flex-col w-full lg:flex-row">

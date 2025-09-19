@@ -22,7 +22,7 @@ const MessageBubble = ({
   self = false,
   showStatus = true,
 }: Props) => {
-  const defaultPosition = "chat chat-" + (self ? "end" : "start");
+  const defaultPosition = self ? "chat chat-end" : "chat chat-start";
 
   return (
     <div className={defaultPosition}>

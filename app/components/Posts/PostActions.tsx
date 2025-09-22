@@ -4,7 +4,7 @@ import { UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { CommentData, commentSchema, newPostSchema } from "@/lib/schemas";
 import { Buckets, getBucket } from "@/lib/supabase/client";
-import { authenticateUser, formatDatetime } from "@/lib/utils";
+import { authenticateUser } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import StorageFileApi from "@supabase/storage-js/dist/module/packages/StorageFileApi";
 import { fileTypeFromBuffer } from "file-type";
@@ -12,7 +12,7 @@ import path from "path";
 
 export type PostProps = {
   id: string;
-  date: string;
+  date: Date;
   title: string;
   content: string;
   images: string[];
@@ -83,7 +83,7 @@ export async function getPosts(): Promise<PostProps[]> {
 
   return posts.map((post) => ({
     id: post.id.toString(),
-    date: formatDatetime(post.createdAt),
+    date: post.createdAt,
     title: post.title,
     content: post.content || "",
     images: post.images || [],

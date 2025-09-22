@@ -25,6 +25,7 @@
     "cross-env": "^10.0.0",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.1",
+    "fast-sort": "^3.4.1",
     "file-type": "^21.0.0",
     "jsonwebtoken": "^9.0.2",
     "mediasoup": "^3.19.0",

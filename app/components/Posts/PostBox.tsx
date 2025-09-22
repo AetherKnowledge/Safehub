@@ -1,4 +1,5 @@
 "use client";
+import { formatDatetime } from "@/lib/utils";
 import { useState } from "react";
 import ImageGrid from "./ImageGrid";
 import { PostProps } from "./PostActions";
@@ -48,16 +49,16 @@ const EventBox = ({
             />
           </div>
 
-          <div>
-            {/* Date */}
-            {/* <div className="flex justify-between items-end text-sm text-base-content/60">
-              <span>{date}</span>
-            </div> */}
-
+          <div className="flex flex-row justify-between items-center">
             {/* Title */}
             <h2 className="text-base-content font-bold leading-tight br text-2xl">
               {title}
             </h2>
+
+            {/* Date */}
+            <div className="flex justify-between items-end text-xs text-base-content">
+              <span>{formatDatetime(date)}</span>
+            </div>
           </div>
 
           {/* Text */}

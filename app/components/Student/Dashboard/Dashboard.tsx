@@ -38,7 +38,7 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
   );
 };
 
-function sort(posts: PostProps[], sortBy?: SortBy, order?: Order) {
+function sort(posts: PostProps[], sortBy = SortBy.Date, order = Order.Desc) {
   if (!posts) return [];
   if (!sortBy || !order) return posts;
 

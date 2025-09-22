@@ -16,7 +16,7 @@ type SorterProps = {
   order?: Order;
 };
 
-const Sorter = ({ sortBy, order }: SorterProps) => {
+const Sorter = ({ sortBy = SortBy.Date, order = Order.Desc }: SorterProps) => {
   const router = useRouter();
 
   const updateQuery = (newSortBy?: SortBy, newOrder?: Order) => {

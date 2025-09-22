@@ -2,7 +2,7 @@ import UserButton from "./UserButton";
 
 const UserNavbar = () => {
   return (
-    <div className="flex flex-row gap-5 sticky top-6 z-10 items-center justify-center">
+    <div className="flex flex-row bg-base-200 pt-6 gap-5 sticky top-0 z-10 items-center justify-center ">
       <div className="flex bg-base-100 shadow-br rounded-lg w-full items-center h-full px-4 gap-20">
         <h1 className="flex text-2xl font-bold text-primary">Dashboard</h1>
         <label className="w-full input text-base-content focus-within:outline-none focus-within:ring-0 input-sm ">

@@ -13,7 +13,7 @@ import SidebarButton from "./SidebarButton";
 import SidebarLogo from "./SidebarLogo";
 
 const Sidebar = () => {
-  const [isLarge, setIsLarge] = useState(true);
+  const [isLarge, setIsLarge] = useState(false);
   const session = useSession();
 
   useEffect(() => {
@@ -29,10 +29,6 @@ const Sidebar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (!session.data?.user) {
-    return null;
-  }
-
   return (
     <motion.div
       animate={{ width: isLarge ? "185px" : "60px" }}
@@ -47,13 +43,13 @@ const Sidebar = () => {
           <Divider className="w-full" />
         </div>
 
-        {session.data.user.type === UserType.Student
+        {session.data?.user.type === UserType.Student
           ? studentSidebar(isLarge)
-          : session.data.user.type === UserType.Admin
+          : session.data?.user.type === UserType.Admin
           ? adminSidebar(isLarge)
-          : session.data.user.type === UserType.Counselor
+          : session.data?.user.type === UserType.Counselor
           ? counselorSidebar(isLarge)
-          : null}
+          : studentSidebar(isLarge)}
 
         <div className="w-full px-3">
           <Divider className="w-full" />

@@ -1,4 +1,5 @@
 "use client";
+import { formatDatetime } from "@/lib/utils";
 import { HiDotsHorizontal } from "react-icons/hi";
 import ImageGrid from "./ImageGrid";
 import { PostComment, PostProps } from "./PostActions";
@@ -36,7 +37,7 @@ const PostPopup = ({
         <div>
           {/* Date */}
           <div className="flex justify-between items-end text-sm text-base-content/60">
-            <span>{date}</span>
+            <span>{formatDatetime(date)}</span>
             <HiDotsHorizontal className="text-2xl" />
           </div>
 

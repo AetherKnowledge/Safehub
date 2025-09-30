@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { AiFillHome } from "react-icons/ai";
 import { FaCalendar, FaRobot, FaUsers } from "react-icons/fa";
-import { IoIosSettings } from "react-icons/io";
+import { IoIosCall, IoIosSettings } from "react-icons/io";
 import { IoChatboxEllipses } from "react-icons/io5";
 import Divider from "../Divider";
 import CollapseButton from "./CollapseButton";
@@ -100,6 +100,9 @@ const studentSidebar = (isLarge: boolean) => {
         isLarge={isLarge}
       >
         Chats
+      </SidebarButton>
+      <SidebarButton href="/user/hotline" icon={IoIosCall} isLarge={isLarge}>
+        Hotline
       </SidebarButton>
     </>
   );

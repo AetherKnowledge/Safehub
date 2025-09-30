@@ -35,7 +35,7 @@ export default function RootLayout({
             <SocketProvider>
               <CallPopupProvider>
                 <NotificationProvider>
-                  <main>{children}</main>
+                  <main className="text-base-content">{children}</main>
                 </NotificationProvider>
               </CallPopupProvider>
             </SocketProvider>

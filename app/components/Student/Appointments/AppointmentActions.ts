@@ -5,7 +5,7 @@ import { NewAppointmentData, newAppointmentSchema } from "@/lib/schemas";
 import { authenticateUser } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { NextResponse } from "next/server";
-import { AppointmentData } from "./AppointmentTable/AppointmentTable";
+import { AppointmentData } from "./AppointmentTable/AppointmentsTable";
 
 export async function getAppointments(): Promise<AppointmentData[]> {
   const session = await auth();

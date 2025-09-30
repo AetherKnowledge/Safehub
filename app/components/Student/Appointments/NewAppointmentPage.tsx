@@ -9,7 +9,7 @@ import { CounselorData } from "../Counselors/CounselorsActions";
 import { createNewAppointment } from "./AppointmentActions";
 import ConcernPicker from "./Booking/ConcernPicker";
 import CounselorPicker from "./Booking/CounselorPicker";
-import DatePicker from "./Booking/DatePicker";
+import DatePicker from "./Booking/DatePickerOld";
 import TimePicker from "./Booking/TimePicker";
 
 const BookAppointment = () => {

@@ -131,3 +131,42 @@ export function formatDatetime(date: Date | string): string {
 
   return formatter.format(date).replace(",", "");
 }
+
+export function formatDateDisplay(
+  date: Date | string,
+  hasYear: boolean = true
+): string {
+  // const date = new Date(datetimeStr + " UTC");
+  date = new Date(date);
+
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: hasYear ? "numeric" : undefined,
+  });
+
+  return formatter.format(date);
+}
+
+export function formatDate(date: Date | string): string {
+  date = new Date(date);
+  const formattedDate = [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+  return formattedDate;
+}
+
+export function formatTime(date: Date | string): string {
+  // const date = new Date(datetimeStr + " UTC");
+  date = new Date(date);
+
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return formatter.format(date);
+}

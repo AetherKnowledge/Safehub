@@ -3,6 +3,8 @@ import { useSession } from "next-auth/react";
 import { env } from "next-runtime-env";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+// TODO: Stop from disconnecting when moving out of the page, and instead only disconnect when logging out
+
 interface UseWebSocketOptions {
   reconnect?: boolean;
   reconnectIntervalMs?: number;

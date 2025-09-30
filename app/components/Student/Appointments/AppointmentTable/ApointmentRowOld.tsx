@@ -3,7 +3,7 @@ import { AppointmentStatus, UserType } from "@/app/generated/prisma";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { GoDotFill } from "react-icons/go";
-import { AppointmentData } from "./AppointmentTable";
+import { AppointmentData } from "./UpcomingAppointmentsTable";
 
 interface Props {
   appointment: AppointmentData;

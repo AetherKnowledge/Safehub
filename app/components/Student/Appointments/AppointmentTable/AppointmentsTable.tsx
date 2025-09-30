@@ -34,7 +34,7 @@ const AppointmentsTable = async () => {
   const appointments = await getAppointments();
 
   return (
-    <div className="group h-122 scrollbar-gutter:stable overflow-y-auto w-full">
+    <div className="group h-[39vh] xl:h-[60.2vh] scrollbar-gutter:stable overflow-y-auto w-full">
       <table className="w-full">
         <thead>
           <tr className="flex flex-row border border-transparent border-b-base-content/30 p-2 mb-2 items-center gap-4 w-full font-semibold text-sm">

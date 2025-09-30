@@ -15,7 +15,7 @@ type Props = {
 
 const AppointmentPage = ({ date }: Props) => {
   return (
-    <div className="flex flex-col gap-5 p-5 pt-0">
+    <div className="flex flex-col gap-5">
       <div className="flex flex-col xl:flex-row gap-3">
         <div className="flex flex-col w-full bg-base-100 shadow-br rounded p-3 gap-1">
           <h2 className="font-bold">Upcoming Appointments</h2>

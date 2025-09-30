@@ -95,18 +95,38 @@ export async function createNewAppointment(
     throw new Error("Invalid appointment data");
   }
 
+  const counselor = await getCounselorBasedOnSchedule(appointmentData.schedule);
+
+  if (!counselor) {
+    throw new Error("No counselor available at the selected time");
+  }
+
   const appointment = await prisma.appointment.create({
     data: {
-      counselorId: appointmentData.counselorId,
+      counselorId: counselor.counselorId,
       studentId: session.user.id,
+
+      focus: appointmentData.focus,
+      hadCounselingBefore: appointmentData.hadCounselingBefore,
+      sessionPreference: appointmentData.sessionPreference,
+      urgencyLevel: appointmentData.urgencyLevel,
       schedule: appointmentData.schedule,
-      concerns: appointmentData.concerns.join(","),
+      notes: appointmentData.notes,
     },
   });
 
   if (!appointment) {
     throw new Error("Failed to create appointment");
   }
+}
+
+async function getCounselorBasedOnSchedule(schedule: Date) {
+  // TODO: Implement logic to find an available counselor based on the schedule
+  // Find a counselor who is available at the given schedule
+  // for now just get the first counselor
+  const counselor = await prisma.counselor.findFirst({});
+
+  return counselor;
 }
 
 export async function cancelAppointment(appointmentId: string) {

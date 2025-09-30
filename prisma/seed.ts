@@ -19,6 +19,77 @@ async function main() {
   const counselorHashedPassword = await hash("test", 10);
   const counselorUUID = "52866741-dc71-4ced-b5ad-993419a730bc";
 
+  // ================================
+  // Storage Bucket Setup
+  // ================================
+  await client.query(`DELETE FROM storage.objects WHERE bucket_id = 'posts';`);
+  await client.query(`DELETE FROM storage.buckets WHERE id = 'posts';`);
+  await client.query(`
+    INSERT INTO storage.buckets (id, name, public)
+    VALUES ('posts', 'posts', true)
+    ON CONFLICT (id) DO NOTHING;
+  `);
+
+  // Drop policies if they exist first
+  await client.query(
+    `DROP POLICY IF EXISTS "Authenticated users can read posts bucket" ON storage.objects;`
+  );
+  await client.query(
+    `DROP POLICY IF EXISTS "Only Admins can insert into post bucket" ON storage.objects;`
+  );
+  await client.query(
+    `DROP POLICY IF EXISTS "Only Admins can update post objects" ON storage.objects;`
+  );
+  await client.query(
+    `DROP POLICY IF EXISTS "Only Admins can delete post objects" ON storage.objects;`
+  );
+
+  // Recreate policies
+  await client.query(`
+    CREATE POLICY "Authenticated users can read posts bucket"
+    ON storage.objects FOR SELECT
+    USING (
+      bucket_id = 'posts'
+      AND auth.role() = 'authenticated'
+    );
+  `);
+
+  await client.query(`
+    CREATE POLICY "Only Admins can insert into post bucket"
+    ON storage.objects FOR INSERT
+    WITH CHECK (
+      bucket_id = 'posts'
+      AND public.role() = 'Admin'
+    );
+  `);
+
+  await client.query(`
+    CREATE POLICY "Only Admins can update post objects"
+    ON storage.objects FOR UPDATE
+    USING (
+      bucket_id = 'posts'
+      AND public.role() = 'Admin'
+    )
+    WITH CHECK (
+      bucket_id = 'posts'
+      AND public.role() = 'Admin'
+    );
+  `);
+
+  await client.query(`
+    CREATE POLICY "Only Admins can delete post objects"
+    ON storage.objects FOR DELETE
+    USING (
+      bucket_id = 'posts'
+      AND public.role() = 'Admin'
+    );
+  `);
+  console.log("✅ Supabase storage bucket + policies seeded");
+
+  // ================================
+  // Admin + Counselor Seeding
+  // ================================
+
   // Enable pgcrypto extension for gen_random_uuid()
   await client.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
 

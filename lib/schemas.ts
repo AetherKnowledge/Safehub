@@ -1,4 +1,8 @@
-import { CallStatus, UserType } from "@/app/generated/prisma";
+import {
+  CallStatus,
+  SessionPreference,
+  UserType,
+} from "@/app/generated/prisma";
 import { z } from "zod";
 
 export const IMAGE_SCHEMA = z
@@ -28,9 +32,14 @@ export const commentSchema = z.object({
 export type CommentData = z.infer<typeof commentSchema>;
 
 export const newAppointmentSchema = z.object({
-  counselorId: z.string(),
+  // counselorId: z.string(),
+
+  focus: z.string(),
+  hadCounselingBefore: z.boolean(),
+  sessionPreference: z.enum(SessionPreference),
+  urgencyLevel: z.number().min(1).max(5),
   schedule: z.date(),
-  concerns: z.array(z.string()),
+  notes: z.string().max(500).optional(),
 });
 export type NewAppointmentData = z.infer<typeof newAppointmentSchema>;
 

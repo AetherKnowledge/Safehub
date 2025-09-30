@@ -50,6 +50,12 @@ enum UserStatus {
   Offline
 }
 
+enum SessionPreference {
+  InPerson
+  Online
+  Either
+}
+
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String?
@@ -243,9 +249,14 @@ model Appointment {
   studentId   String            @db.Uuid
   counselorId String            @db.Uuid
   status      AppointmentStatus @default(Pending)
-  schedule    DateTime
   createdAt   DateTime          @default(now())
-  concerns    String?
+
+  focus               String
+  hadCounselingBefore Boolean
+  sessionPreference   SessionPreference
+  urgencyLevel        Int
+  schedule            DateTime
+  notes               String?
 
   student   Student   @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
   counselor Counselor @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)

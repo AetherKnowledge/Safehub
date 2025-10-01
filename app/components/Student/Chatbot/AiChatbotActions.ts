@@ -4,6 +4,7 @@ import { chathistory } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { authenticateUser } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
+import jwt from "jsonwebtoken";
 
 export async function sendMessage(message: string): Promise<any> {
   const session = await auth();
@@ -15,11 +16,21 @@ export async function sendMessage(message: string): Promise<any> {
     throw new Error("Invalid request");
   }
 
+  const token = jwt.sign(
+    {
+      userId: session.user.id,
+      email: session.user.email,
+    },
+    process.env.N8N_SECRET!,
+    { expiresIn: "1h" }
+  );
+
   const n8nWebhookUrl = process.env.N8N_URL!;
   const response = await fetch(n8nWebhookUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       userId: session.user.id,

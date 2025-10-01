@@ -33,7 +33,6 @@ export async function sendMessage(message: string): Promise<any> {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      userId: session.user.id,
       message,
     }),
   });

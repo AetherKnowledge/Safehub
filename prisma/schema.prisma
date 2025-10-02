@@ -66,6 +66,15 @@ model User {
   accounts      Account[]
   sessions      Session[]
 
+  firstName     String?
+  lastName      String?
+  department    String?
+  program       String?
+  year          Int?
+  section       String?
+  recoveryEmail String?
+  phoneNumber   String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

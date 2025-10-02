@@ -1,6 +1,5 @@
 import { UserType } from "@/app/generated/prisma";
 import { prisma } from "@/prisma/client";
-import { Session } from "next-auth";
 import Image from "next/image";
 import { ReactNode } from "react";
 
@@ -56,28 +55,6 @@ export const removeManyChatsWithOthers = async (
       },
     });
   });
-};
-
-export const authenticateUser = async (
-  session: Session,
-  userType?: UserType
-): Promise<boolean> => {
-  if (!session || !session.user?.email) {
-    return false;
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true, type: true },
-  });
-
-  if (!user) {
-    return false;
-  }
-
-  if (userType && user.type !== userType.toString()) return false;
-
-  return true;
 };
 
 export function imageGenerator(

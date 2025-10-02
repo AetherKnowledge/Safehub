@@ -2,13 +2,13 @@
 
 import { chathistory } from "@/app/generated/prisma";
 import { auth } from "@/auth";
-import { authenticateUser } from "@/lib/utils";
+
 import { prisma } from "@/prisma/client";
 import jwt from "jsonwebtoken";
 
 export async function sendMessage(message: string): Promise<any> {
   const session = await auth();
-  if (!session || !authenticateUser(session)) {
+  if (!session) {
     throw new Error("Unauthorized");
   }
 
@@ -46,7 +46,7 @@ export async function sendMessage(message: string): Promise<any> {
 export async function getHistory(): Promise<chathistory[]> {
   const session = await auth();
 
-  if (!session || !authenticateUser(session)) {
+  if (!session) {
     throw new Error("Unauthorized");
   }
 

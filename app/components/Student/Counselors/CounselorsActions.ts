@@ -3,7 +3,7 @@
 import { Days, UserStatus, UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
-import { authenticateUser } from "@/lib/utils";
+
 import { prisma } from "@/prisma/client";
 
 export type CounselorData = {
@@ -27,7 +27,7 @@ export type CounselorData = {
 export async function getCounselors() {
   const session = await auth();
 
-  if (!session || !authenticateUser(session, UserType.Student)) {
+  if (!session || !(session.user.type === UserType.Student)) {
     throw new Error("Unauthorized");
   }
 

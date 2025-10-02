@@ -4,7 +4,7 @@ import { UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { CommentData, commentSchema, newPostSchema } from "@/lib/schemas";
 import { Buckets, getBucket } from "@/lib/supabase/client";
-import { authenticateUser } from "@/lib/utils";
+
 import { prisma } from "@/prisma/client";
 import StorageFileApi from "@supabase/storage-js/dist/module/packages/StorageFileApi";
 import { fileTypeFromBuffer } from "file-type";
@@ -41,7 +41,7 @@ export type PostComment = {
 
 export async function getPosts(): Promise<PostProps[]> {
   const session = await auth();
-  if (!session || !authenticateUser(session)) {
+  if (!session) {
     throw new Error("Unauthorized");
   }
 
@@ -118,7 +118,7 @@ export async function createPost(formData: FormData): Promise<void> {
 
   if (
     !session ||
-    !authenticateUser(session, UserType.Admin) ||
+    !(session.user.type === UserType.Admin) ||
     !session.user?.id
   ) {
     throw new Error("Unauthorized");
@@ -232,41 +232,9 @@ export async function createFile(
   return url.data.publicUrl;
 }
 
-// export async function getPostImage(
-//   postId: string,
-//   imageId: string
-// ): Promise<string> {
-//   const session = await auth();
-//   if (!session || !authenticateUser(session)) {
-//     throw new Error("Unauthorized");
-//   }
-
-//   if (!postId || typeof postId !== "string" || postId.trim() === "") {
-//     throw new Error("Invalid Post ID");
-//   }
-
-//   if (!imageId || typeof imageId !== "string" || imageId.trim() === "") {
-//     throw new Error("Invalid Image ID");
-//   }
-
-//   const post = await prisma.post.findUnique({
-//     where: { id: parseInt(postId) },
-//     select: {
-//       images: true,
-//     },
-//   });
-
-//   if (!post) throw new Error("Post not found");
-
-//   const imageUrl = post.images.find((img) => img.includes(imageId));
-//   if (!imageUrl) throw new Error("Image not found in post");
-
-//   return imageUrl;
-// }
-
 export async function likePost(postId: string, like: boolean) {
   const session = await auth();
-  if (!session || !authenticateUser(session) || !session.user?.id) {
+  if (!session || !session.user?.id) {
     throw new Error("Unauthorized");
   }
 
@@ -308,7 +276,7 @@ export async function likePost(postId: string, like: boolean) {
 
 export async function dislikePost(postId: string, dislike: boolean) {
   const session = await auth();
-  if (!session || !authenticateUser(session) || !session.user?.id) {
+  if (!session || !session.user?.id) {
     throw new Error("Unauthorized");
   }
 
@@ -350,7 +318,7 @@ export async function dislikePost(postId: string, dislike: boolean) {
 
 export async function addComment(data: CommentData): Promise<void> {
   const session = await auth();
-  if (!session || !authenticateUser(session) || !session.user?.id) {
+  if (!session || !session.user?.id) {
     throw new Error("Unauthorized");
   }
 

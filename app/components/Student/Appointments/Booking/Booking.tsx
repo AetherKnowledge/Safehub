@@ -1,9 +1,11 @@
 "use client";
+import ErrorScreen from "@/app/components/ErrorScreen";
+import LoadingScreen from "@/app/components/LoadingScreen";
+import SuccessScreen from "@/app/components/SuccessScreen";
 import { SessionPreference } from "@/app/generated/prisma";
 import { NewAppointmentData } from "@/lib/schemas";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createNewAppointment } from "../AppointmentActions";
 import DatePickerSelector from "./DatePickerSelector";
 
@@ -56,10 +58,12 @@ const Booking = () => {
       {showErrorScreen && (
         <ErrorScreen
           message={errorMessage}
-          setShowErrorScreen={setShowErrorScreen}
+          onClose={() => setShowErrorScreen(false)}
         />
       )}
-      {showSuccessScreen && <SuccessScreen router={router} />}
+      {showSuccessScreen && (
+        <SuccessScreen onClose={() => router.push("/user/appointments")} />
+      )}
       <div className="flex items-center justify-center">
         <div className="flex flex-col bg-base-100 shadow-br rounded max-w-2xl  items-center justify-center max-h-[85vh] overflow-y-auto p-5">
           <div className="flex flex-col gap-10 h-full">
@@ -223,75 +227,5 @@ const Booking = () => {
     </>
   );
 };
-
-const LoadingScreen = () => (
-  <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-50 backdrop-blur-sm z-50">
-    <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-      <div className="flex flex-col items-center justify-center h-full space-y-4">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
-        <p className="text-base-content">Loading...</p>
-      </div>
-    </div>
-  </div>
-);
-
-const SuccessScreen = ({ router }: { router: AppRouterInstance }) => {
-  const [countdown, setCountdown] = useState(5);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          router.push("/user/appointments");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [router]);
-
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-50 backdrop-blur-sm z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-        <div className="flex flex-col items-center justify-center h-full space-y-4">
-          <p className="text-base-content text-2xl">Success</p>
-          <p className="text-base-content text-sm">
-            Redirecting in {countdown} seconds...
-          </p>
-          <button
-            className="btn btn-primary"
-            onClick={() => router.push("/user/appointments")}
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ErrorScreen = ({
-  message,
-  setShowErrorScreen,
-}: {
-  message: string;
-  setShowErrorScreen: (show: boolean) => void;
-}) => (
-  <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-50 backdrop-blur-sm z-50">
-    <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-      <div className="flex flex-col items-center justify-center h-full space-y-4">
-        <p className="text-error">Error: {message}</p>
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowErrorScreen(false)}
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-);
 
 export default Booking;

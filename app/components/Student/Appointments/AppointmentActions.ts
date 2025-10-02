@@ -2,7 +2,7 @@
 import { UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { NewAppointmentData, newAppointmentSchema } from "@/lib/schemas";
-import { authenticateUser } from "@/lib/utils";
+
 import { prisma } from "@/prisma/client";
 import { NextResponse } from "next/server";
 import { AppointmentData } from "./AppointmentTable/AppointmentsTable";
@@ -10,7 +10,7 @@ import { AppointmentData } from "./AppointmentTable/AppointmentsTable";
 export async function getAppointments(): Promise<AppointmentData[]> {
   const session = await auth();
 
-  if (!session || !authenticateUser(session, UserType.Student)) {
+  if (!session || !(session.user.type === UserType.Student)) {
     throw new Error("Unauthorized");
   }
 
@@ -84,7 +84,7 @@ export async function createNewAppointment(
 
   if (
     !session ||
-    !authenticateUser(session, UserType.Student) ||
+    !(session.user.type === UserType.Student) ||
     !session.user?.id
   ) {
     throw new Error("Unauthorized");

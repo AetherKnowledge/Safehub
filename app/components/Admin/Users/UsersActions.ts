@@ -4,7 +4,7 @@ import { UserStatus, UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
 import { UpdateUserTypeData, updateUserSchema } from "@/lib/schemas";
-import { authenticateUser, createManyChatsWithOthers } from "@/lib/utils";
+import { createManyChatsWithOthers } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 
 export type UserWithStatus = {
@@ -21,7 +21,7 @@ export type UserWithStatus = {
 export async function getUsers() {
   const session = await auth();
 
-  if (!session || !(await authenticateUser(session, UserType.Admin))) {
+  if (!session || !(session.user.type === UserType.Admin)) {
     throw new Error("Unauthorized");
   }
 
@@ -55,7 +55,7 @@ export async function getUsers() {
 export async function updateUserType(data: UpdateUserTypeData) {
   const session = await auth();
 
-  if (!session || !(await authenticateUser(session, UserType.Admin))) {
+  if (!session || !(session.user.type === UserType.Admin)) {
     throw new Error("Unauthorized");
   }
 

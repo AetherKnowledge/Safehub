@@ -158,6 +158,40 @@ export function formatDate(date: Date | string): string {
   return formattedDate;
 }
 
+export function convertLocalToUTC(
+  date: Date | string,
+  withTime?: boolean
+): Date {
+  date = new Date(date);
+  const utcDate = new Date(
+    Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      withTime ? date.getHours() : 0,
+      withTime ? date.getMinutes() : 0,
+      withTime ? date.getSeconds() : 0
+    )
+  );
+  return utcDate;
+}
+
+export function convertUTCToLocal(
+  date: Date | string,
+  withTime?: boolean
+): Date {
+  date = new Date(date);
+  const localDate = new Date(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+    withTime ? date.getUTCHours() : 0,
+    withTime ? date.getUTCMinutes() : 0,
+    withTime ? date.getUTCSeconds() : 0
+  );
+  return localDate;
+}
+
 export function formatTime(date: Date | string): string {
   // const date = new Date(datetimeStr + " UTC");
   date = new Date(date);

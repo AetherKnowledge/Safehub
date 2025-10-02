@@ -81,6 +81,8 @@ async function DatePickerWithAppointments({ date }: { date?: string }) {
       <DatePicker
         value={date ? new Date(date) : undefined}
         highlightedDates={highlightedDates}
+        pushToRouter={true}
+        local={true}
       />
     </>
   );

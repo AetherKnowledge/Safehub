@@ -7,6 +7,8 @@ import DatePicker from "./DatePicker";
 interface DatePickerSelectorProps {
   value?: Date;
   highlightedDates?: Date[];
+
+  /** Returns utc date not local date */
   onChange?: (date: Date) => void;
 }
 

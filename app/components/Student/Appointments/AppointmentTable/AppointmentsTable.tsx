@@ -1,5 +1,5 @@
 import { AppointmentStatus } from "@/app/generated/prisma";
-import { formatDateDisplay, formatTime, imageGenerator } from "@/lib/utils";
+import { formatDateDisplay, imageGenerator } from "@/lib/utils";
 import {
   FaRegCalendar,
   FaRegQuestionCircle,
@@ -93,10 +93,20 @@ function AppointmentRow({ appointment }: { appointment: AppointmentData }) {
         </p>
       </td>
       <td className="flex flex-col items-center justify-center w-full">
-        <p className="text-sm">{formatTime(appointment.schedule)}</p>
+        <p className="text-sm">
+          {appointment.status === AppointmentStatus.Approved ||
+          appointment.status === AppointmentStatus.Completed
+            ? formatDateDisplay(appointment.schedule, false)
+            : "N/A"}
+        </p>
       </td>
       <td className="flex flex-col items-center justify-center w-full">
-        <p className="text-sm">MR 143</p>
+        <p className="text-sm">
+          {appointment.status === AppointmentStatus.Approved ||
+          appointment.status === AppointmentStatus.Completed
+            ? "MR 143"
+            : "N/A"}
+        </p>
       </td>
       <td className="flex flex-col items-center justify-center w-full">
         <StatusBadge status={appointment.status} />

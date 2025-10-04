@@ -24,7 +24,8 @@ export async function getAppointments(): Promise<AppointmentData[]> {
     },
     select: {
       id: true,
-      schedule: true,
+      startTime: true,
+      endTime: true,
       status: true,
       student: {
         select: {
@@ -57,7 +58,8 @@ export async function getAppointments(): Promise<AppointmentData[]> {
     (appointment) =>
       ({
         id: appointment.id.toString(),
-        schedule: appointment.schedule,
+        startTime: appointment.startTime,
+        endTime: appointment.endTime,
         status: appointment.status,
         student: {
           studentId: appointment.student.studentId,
@@ -95,7 +97,9 @@ export async function createNewAppointment(
     throw new Error("Invalid appointment data");
   }
 
-  const counselor = await getCounselorBasedOnSchedule(appointmentData.schedule);
+  const counselor = await getCounselorBasedOnSchedule(
+    appointmentData.startTime
+  );
 
   if (!counselor) {
     throw new Error("No counselor available at the selected time");
@@ -105,12 +109,11 @@ export async function createNewAppointment(
     data: {
       counselorId: counselor.counselorId,
       studentId: session.user.id,
-
       focus: appointmentData.focus,
       hadCounselingBefore: appointmentData.hadCounselingBefore,
       sessionPreference: appointmentData.sessionPreference,
       urgencyLevel: appointmentData.urgencyLevel,
-      schedule: appointmentData.schedule,
+      startTime: appointmentData.startTime,
       notes: appointmentData.notes,
     },
   });

@@ -264,8 +264,10 @@ model Appointment {
   hadCounselingBefore Boolean
   sessionPreference   SessionPreference
   urgencyLevel        Int
-  schedule            DateTime
+  startTime           DateTime
+  endTime             DateTime?
   notes               String?
+  room                String?
 
   student   Student   @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
   counselor Counselor @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)

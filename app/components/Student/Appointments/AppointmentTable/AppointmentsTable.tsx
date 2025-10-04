@@ -12,7 +12,8 @@ import CancelButton from "./CancelButton";
 
 export type AppointmentData = {
   id: string;
-  schedule: Date;
+  startTime: Date;
+  endTime: Date;
   status: AppointmentStatus;
   student: {
     studentId: string;
@@ -89,14 +90,14 @@ function AppointmentRow({ appointment }: { appointment: AppointmentData }) {
       </td>
       <td className="flex flex-col items-center justify-center w-full">
         <p className="text-sm">
-          {formatDateDisplay(appointment.schedule, false)}
+          {formatDateDisplay(appointment.startTime, false)}
         </p>
       </td>
       <td className="flex flex-col items-center justify-center w-full">
         <p className="text-sm">
           {appointment.status === AppointmentStatus.Approved ||
           appointment.status === AppointmentStatus.Completed
-            ? formatDateDisplay(appointment.schedule, false)
+            ? formatDateDisplay(appointment.startTime, false)
             : "N/A"}
         </p>
       </td>

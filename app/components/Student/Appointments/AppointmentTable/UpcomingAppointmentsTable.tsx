@@ -47,13 +47,13 @@ function UpcomingAppointmentRow({
       <td className="flex flex-col w-full">
         <p className="text-[10px]">Date:</p>
         <p className="font-semibold text-xs">
-          {formatDateDisplay(appointment.schedule, false)}
+          {formatDateDisplay(appointment.startTime, false)}
         </p>
       </td>
       <td className="flex flex-col w-full">
         <p className="text-[10px]">Time:</p>
         <p className="font-semibold text-xs">
-          {formatTime(appointment.schedule)}
+          {formatTime(appointment.startTime)}
         </p>
       </td>
       <td className="flex flex-col w-full">

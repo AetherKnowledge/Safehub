@@ -35,7 +35,7 @@ const Booking = () => {
       hadCounselingBefore: q2,
       sessionPreference: q3,
       urgencyLevel: q4,
-      schedule: q5,
+      startTime: q5,
       notes: q6,
     };
 

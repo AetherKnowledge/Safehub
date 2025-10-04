@@ -1,3 +1,4 @@
+import AppointmentsPage from "@/app/components/Counselors/AppointmentsPage";
 import StudentAppointmentPage from "@/app/components/Student/Appointments/AppointmentPage";
 import { UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
@@ -9,14 +10,16 @@ type Props = {
 
 const NewAppointmentsPage = async ({ searchParams }: Props) => {
   const session = await auth();
-  if (!session || session.user.type !== UserType.Student)
-    return redirect("/user/dashboard");
+  if (!session) return redirect("/user/dashboard");
 
   const dateParam = (await searchParams).date;
   const today = new Date().toISOString().split("T")[0];
   const date = dateParam && isValidDate(dateParam) ? dateParam : today;
 
-  return <StudentAppointmentPage date={date} />;
+  if (session.user.type === UserType.Student)
+    return <StudentAppointmentPage date={date} />;
+  else if (session.user.type === UserType.Counselor)
+    return <AppointmentsPage />;
 };
 
 function isValidDate(dateString: string): boolean {

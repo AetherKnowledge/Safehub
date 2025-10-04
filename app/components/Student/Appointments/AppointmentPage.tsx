@@ -67,11 +67,11 @@ const AppointmentPage = ({ date }: Props) => {
 async function DatePickerWithAppointments({ date }: { date?: string }) {
   const appointments = await getAppointments();
   const highlightedDates = appointments.map(
-    (appointment) => new Date(appointment.schedule)
+    (appointment) => new Date(appointment.startTime)
   );
   const filteredAppointments = date
     ? appointments.filter(
-        (appointment) => formatDate(appointment.schedule) === date
+        (appointment) => formatDate(appointment.startTime) === date
       )
     : appointments;
 

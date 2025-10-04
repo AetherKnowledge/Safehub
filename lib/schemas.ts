@@ -38,7 +38,8 @@ export const newAppointmentSchema = z.object({
   hadCounselingBefore: z.boolean(),
   sessionPreference: z.enum(SessionPreference),
   urgencyLevel: z.number().min(1).max(5),
-  schedule: z.date(),
+  startTime: z.date(),
+  endTime: z.date().optional(),
   notes: z.string().max(500).optional(),
 });
 export type NewAppointmentData = z.infer<typeof newAppointmentSchema>;

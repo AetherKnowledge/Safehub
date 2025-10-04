@@ -1,4 +1,6 @@
 import Sidebar from "@/app/components/Sidebar";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import UserNavbar from "../components/Navbar/UserNavbar";
 
 interface Props {
@@ -6,6 +8,12 @@ interface Props {
 }
 
 const Layout = async ({ children }: Props) => {
+  // move this to middleware later
+  const session = await auth();
+  if (!session) {
+    redirect("/api/auth/signin");
+  }
+
   return (
     <div className="flex bg-base-200 min-h-screen p-6 pt-0 gap-6">
       {/* Resizable Floating Sidebar */}

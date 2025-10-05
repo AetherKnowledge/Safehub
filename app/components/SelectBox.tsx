@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { IoMdArrowDropdown } from "react-icons/io";
 
 interface SelectBoxProps {
@@ -61,7 +61,7 @@ export default function SelectBox({
 
   function handleSelect(item: string) {
     setSelected(item);
-    onSelect && onSelect(item);
+    onSelect?.(item);
     if (queryKey) handleSearchChange(queryKey, item);
     setOpen(false);
   }

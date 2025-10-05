@@ -103,7 +103,7 @@ const PostComments = ({
               try {
                 await addComment({ postId: id, content: value } as CommentData);
               } catch (error) {
-                console.log(prevComments);
+                console.log(error);
                 setComments(prevComments);
               }
               inputRef.current.value = "";

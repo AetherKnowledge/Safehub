@@ -6,7 +6,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/prisma/client";
 import jwt from "jsonwebtoken";
 
-export async function sendMessage(message: string): Promise<any> {
+export async function sendMessage(message: string) {
   const session = await auth();
   if (!session) {
     throw new Error("Unauthorized");

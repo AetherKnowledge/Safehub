@@ -51,7 +51,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
     const formData = new FormData(event.target as HTMLFormElement);
 
     try {
-      const result = await changeUserInfo(formData);
+      await changeUserInfo(formData);
       setShowSuccessScreen(true);
     } catch (error) {
       setErrorMessage((error as Error).message);

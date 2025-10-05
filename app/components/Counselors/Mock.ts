@@ -1,9 +1,15 @@
-import { AppointmentStatus } from "@/app/generated/prisma";
+import { AppointmentStatus, SessionPreference } from "@/app/generated/prisma";
+import { auth } from "@/auth";
 import { AppointmentData } from "../Appointments/AppointmentsActions";
 
 export async function getMockCounselorAppointments(
   date: Date
 ): Promise<AppointmentData[]> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
   console.log("Fetching mock appointments for date:", date);
 
   const today = new Date();
@@ -23,7 +29,7 @@ export async function getMockCounselorAppointments(
       createdAt: new Date(),
       focus: "Academic Counseling",
       hadCounselingBefore: true,
-      sessionPreference: "InPerson" as any,
+      sessionPreference: SessionPreference.InPerson,
       urgencyLevel: 3,
       startTime: new Date(
         today.getFullYear(),
@@ -51,6 +57,15 @@ export async function getMockCounselorAppointments(
           section: "A",
           program: "BSIT",
           year: 3,
+          image: null,
+        },
+      },
+      counselor: {
+        user: {
+          id: "mock-counselor-1",
+          name: "Dr. Smith",
+          email: "dr.smith@example.com",
+          image: null,
         },
       },
     },
@@ -62,7 +77,7 @@ export async function getMockCounselorAppointments(
       createdAt: new Date(),
       focus: "Career Guidance",
       hadCounselingBefore: false,
-      sessionPreference: "Online" as any,
+      sessionPreference: SessionPreference.Online,
       urgencyLevel: 2,
       startTime: new Date(
         today.getFullYear(),
@@ -90,6 +105,15 @@ export async function getMockCounselorAppointments(
           section: "B",
           program: "BSCS",
           year: 2,
+          image: null,
+        },
+      },
+      counselor: {
+        user: {
+          id: "mock-counselor-1",
+          name: "Dr. Smith",
+          email: "dr.smith@example.com",
+          image: null,
         },
       },
     },
@@ -101,7 +125,7 @@ export async function getMockCounselorAppointments(
       createdAt: new Date(),
       focus: "Personal Counseling",
       hadCounselingBefore: true,
-      sessionPreference: "InPerson" as any,
+      sessionPreference: SessionPreference.InPerson,
       urgencyLevel: 4,
       startTime: new Date(
         tomorrow.getFullYear(),
@@ -129,6 +153,15 @@ export async function getMockCounselorAppointments(
           section: "A",
           program: "BSA",
           year: 4,
+          image: null,
+        },
+      },
+      counselor: {
+        user: {
+          id: "mock-counselor-1",
+          name: "Dr. Smith",
+          email: "dr.smith@example.com",
+          image: null,
         },
       },
     },
@@ -140,7 +173,7 @@ export async function getMockCounselorAppointments(
       createdAt: new Date(),
       focus: "Study Skills",
       hadCounselingBefore: false,
-      sessionPreference: "Either" as any,
+      sessionPreference: SessionPreference.Either,
       urgencyLevel: 1,
       startTime: new Date(
         dayAfterTomorrow.getFullYear(),
@@ -168,6 +201,15 @@ export async function getMockCounselorAppointments(
           section: "A",
           program: "BSBA",
           year: 1,
+          image: null,
+        },
+      },
+      counselor: {
+        user: {
+          id: "mock-counselor-1",
+          name: "Dr. Smith",
+          email: "dr.smith@example.com",
+          image: null,
         },
       },
     },
@@ -179,7 +221,7 @@ export async function getMockCounselorAppointments(
       createdAt: new Date(),
       focus: "Stress Management",
       hadCounselingBefore: true,
-      sessionPreference: "Online" as any,
+      sessionPreference: SessionPreference.Online,
       urgencyLevel: 5,
       startTime: new Date(
         nextWeek.getFullYear(),
@@ -207,6 +249,16 @@ export async function getMockCounselorAppointments(
           section: "B",
           program: "BSCpE",
           year: 3,
+          image: null,
+        },
+      },
+
+      counselor: {
+        user: {
+          id: "mock-counselor-1",
+          name: "Dr. Smith",
+          email: "dr.smith@example.com",
+          image: null,
         },
       },
     },
@@ -218,7 +270,7 @@ export async function getMockCounselorAppointments(
       createdAt: new Date(),
       focus: "Academic Planning",
       hadCounselingBefore: true,
-      sessionPreference: "InPerson" as any,
+      sessionPreference: SessionPreference.InPerson,
       urgencyLevel: 2,
       startTime: new Date(
         today.getFullYear(),
@@ -246,6 +298,15 @@ export async function getMockCounselorAppointments(
           section: "B",
           program: "BSIE",
           year: 2,
+          image: null,
+        },
+      },
+      counselor: {
+        user: {
+          id: "mock-counselor-1",
+          name: "Dr. Smith",
+          email: "dr.smith@example.com",
+          image: null,
         },
       },
     },

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Create student record
-    const student = await prisma.student.create({
+    await prisma.student.create({
       data: {
         studentId: newUser.id,
       },

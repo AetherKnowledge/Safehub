@@ -60,6 +60,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       session.user.id = user?.id || "";
       session.user.type = user?.type;
+      session.user.darkMode = user?.darkMode || false;
 
       if (signingSecret) {
         const payload = {

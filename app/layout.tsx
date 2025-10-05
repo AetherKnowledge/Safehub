@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import NotificationProvider from "@/lib/NotificationProvider";
 import type { Metadata } from "next";
 import { PublicEnvScript } from "next-runtime-env";
@@ -19,13 +20,16 @@ export const metadata: Metadata = {
   description: "A safe space for your conversations",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+  const darkMode = session?.user?.darkMode ?? false;
+
   return (
-    <html lang="en">
+    <html lang="en" data-theme={darkMode ? "lcup-dark" : "light"}>
       <head>
         <PublicEnvScript />
       </head>

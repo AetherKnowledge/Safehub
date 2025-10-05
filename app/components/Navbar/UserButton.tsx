@@ -2,6 +2,7 @@ import { auth, signIn, signOut } from "@/auth";
 import { Session } from "next-auth";
 import Image from "next/image";
 import { FaChevronDown } from "react-icons/fa6";
+import DarkModeToggle from "../DarkModeToggle/DarkModeToggle";
 
 const UserButton = async () => {
   const session = await auth();
@@ -69,14 +70,7 @@ const AuthenticatedUserButton = (session: Session) => {
 
         <ul className="absolute right-0 mt-2 w-52 menu dropdown-content bg-base-100 text-base-content rounded-md z-10 p-2 shadow-br">
           <li>
-            <label>
-              <input
-                type="checkbox"
-                value="lcup-dark"
-                className="toggle theme-controller"
-              />
-              Dark Mode
-            </label>
+            <DarkModeToggle />
           </li>
           <li>
             <form

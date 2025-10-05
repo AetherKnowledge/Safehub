@@ -7,12 +7,14 @@ declare module "next-auth" {
     user: {
       id?: string;
       type?: UserType;
+      darkMode?: boolean;
     } & DefaultSession["user"];
   }
 
   interface User extends DefaultUser {
     id?: string;
     type?: UserType;
+    darkMode?: boolean;
   }
 }
 
@@ -20,6 +22,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id?: string;
     type?: UserType;
+    darkMode?: boolean;
   }
 }
 

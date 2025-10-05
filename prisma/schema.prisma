@@ -75,6 +75,8 @@ model User {
   recoveryEmail String?
   phoneNumber   String?
 
+  darkMode Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

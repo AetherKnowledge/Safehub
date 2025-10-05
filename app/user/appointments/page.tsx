@@ -1,25 +1,34 @@
-import AppointmentsPage from "@/app/components/Counselors/AppointmentsPage";
+import AppointmentsPage, {
+  ViewMode,
+} from "@/app/components/Counselors/AppointmentsPage";
 import StudentAppointmentPage from "@/app/components/Student/Appointments/AppointmentPage";
 import { UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
 type Props = {
-  searchParams: Promise<{ date?: string }>;
+  searchParams: Promise<{ date?: string; view?: string; showAll?: string }>;
 };
 
 const NewAppointmentsPage = async ({ searchParams }: Props) => {
   const session = await auth();
   if (!session) return redirect("/user/dashboard");
 
-  const dateParam = (await searchParams).date;
-  const today = new Date().toISOString().split("T")[0];
+  const params = await searchParams;
+
+  const dateParam = params.date;
+  const today = new Date().toLocaleDateString();
   const date = dateParam && isValidDate(dateParam) ? dateParam : today;
+
+  const viewParam = params.view;
+  const view = viewParam === ViewMode.LIST ? ViewMode.LIST : ViewMode.CALENDAR;
+
+  const showAll = params.showAll === "true";
 
   if (session.user.type === UserType.Student)
     return <StudentAppointmentPage date={date} />;
   else if (session.user.type === UserType.Counselor)
-    return <AppointmentsPage />;
+    return <AppointmentsPage date={date} viewMode={view} showAll={showAll} />;
 };
 
 function isValidDate(dateString: string): boolean {

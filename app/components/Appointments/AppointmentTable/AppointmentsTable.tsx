@@ -1,4 +1,4 @@
-import { AppointmentStatus } from "@/app/generated/prisma";
+import { AppointmentStatus, UserType } from "@/app/generated/prisma";
 import { formatDateDisplay, imageGenerator } from "@/lib/utils";
 import {
   FaRegCalendar,
@@ -7,33 +7,16 @@ import {
 } from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
 import { MdMeetingRoom } from "react-icons/md";
-import { getAppointments } from "../AppointmentActions";
+import { AppointmentData } from "../AppointmentsActions";
 import CancelButton from "./CancelButton";
 
-export type AppointmentData = {
-  id: string;
-  startTime: Date;
-  endTime: Date;
-  status: AppointmentStatus;
-  student: {
-    studentId: string;
-    user: {
-      name: string;
-      image?: string | null;
-    };
-  };
-  counselor: {
-    counselorId: string;
-    user: {
-      name: string;
-      image?: string | null;
-    };
-  };
-};
-
-const AppointmentsTable = async () => {
-  const appointments = await getAppointments();
-
+const AppointmentsTable = async ({
+  userType,
+  appointments,
+}: {
+  userType: UserType;
+  appointments: AppointmentData[];
+}) => {
   return (
     <div className="group h-[39vh] xl:h-[60.2vh] scrollbar-gutter:stable overflow-y-auto w-full">
       <table className="w-full">
@@ -41,7 +24,7 @@ const AppointmentsTable = async () => {
           <tr className="flex flex-row border border-transparent border-b-base-content/30 p-2 mb-2 items-center gap-4 w-full font-semibold text-sm">
             <th className="flex flex-row items-center justify-center gap-2 w-full">
               <FaRegUserCircle />
-              <p>Counselor</p>
+              <p>{userType === UserType.Student ? "Counselor" : "Student"}</p>
             </th>
             <th className="w-full flex flex-row items-center justify-center gap-2">
               <FaRegCalendar />
@@ -67,7 +50,11 @@ const AppointmentsTable = async () => {
         </thead>
         <tbody>
           {appointments.map((appointment) => (
-            <AppointmentRow key={appointment.id} appointment={appointment} />
+            <AppointmentRow
+              key={appointment.id}
+              appointment={appointment}
+              userType={userType}
+            />
           ))}
         </tbody>
       </table>
@@ -75,18 +62,17 @@ const AppointmentsTable = async () => {
   );
 };
 
-function AppointmentRow({ appointment }: { appointment: AppointmentData }) {
+function AppointmentRow({
+  appointment,
+  userType,
+}: {
+  appointment: AppointmentData;
+  userType: UserType;
+}) {
   return (
     <tr className="flex flex-row border border-transparent border-b-base-content/30 p-2 mb-2 items-center gap-4 w-full text-center">
-      <td className="flex flex-row w-full items-center justify-center gap-2">
-        {imageGenerator(
-          appointment.counselor.user.name,
-          10,
-          appointment.counselor.user.image || undefined
-        )}
-        <p className="font-semibold text-sm">
-          {appointment.counselor.user.name}
-        </p>
+      <td className="flex flex-wrap w-full items-center justify-center gap-2">
+        <UserColumn userType={userType} appointment={appointment} />
       </td>
       <td className="flex flex-col items-center justify-center w-full">
         <p className="text-sm">
@@ -116,6 +102,41 @@ function AppointmentRow({ appointment }: { appointment: AppointmentData }) {
         <ActionButton appointment={appointment} />
       </td>
     </tr>
+  );
+}
+
+function UserColumn({
+  userType,
+  appointment,
+}: {
+  userType: UserType;
+  appointment: AppointmentData;
+}) {
+  return (
+    <>
+      {imageGenerator(
+        userType === UserType.Student
+          ? appointment.counselor.user.name ??
+              appointment.counselor.user.email.split("@")[0] ??
+              "Counselor"
+          : appointment.student.user.name ??
+              appointment.student.user.email.split("@")[0] ??
+              "Student",
+        10,
+        userType === UserType.Student
+          ? appointment.counselor.user.image || undefined
+          : appointment.student.user.image || undefined
+      )}
+      <p className="font-semibold text-sm">
+        {userType === UserType.Student
+          ? appointment.counselor.user.name ??
+            appointment.counselor.user.email.split("@")[0] ??
+            "Counselor"
+          : appointment.student.user.name ??
+            appointment.student.user.email.split("@")[0] ??
+            "Student"}
+      </p>
+    </>
   );
 }
 

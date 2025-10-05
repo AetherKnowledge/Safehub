@@ -1,19 +1,22 @@
+import { UserType } from "@/app/generated/prisma";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { Suspense } from "react";
 import { FaCalendar } from "react-icons/fa6";
-import { getAppointments } from "./AppointmentActions";
-import AppointmentsTable from "./AppointmentTable/AppointmentsTable";
-import UpcomingAppointmentsTable from "./AppointmentTable/UpcomingAppointmentsTable";
-import DatePicker from "./Booking/DatePicker";
-import Contact from "./Images/Contact";
-import Meeting from "./Images/Meeting";
+import { getAppointments } from "../../Appointments/AppointmentsActions";
+import AppointmentsTable from "../../Appointments/AppointmentTable/AppointmentsTable";
+import UpcomingAppointmentsTable from "../../Appointments/AppointmentTable/UpcomingAppointmentsTable";
+import DatePicker from "../../Appointments/Booking/DatePicker";
+import Contact from "../../Appointments/Images/Contact";
+import Meeting from "../../Appointments/Images/Meeting";
 
 type Props = {
   date?: string;
 };
 
-const AppointmentPage = ({ date }: Props) => {
+const AppointmentPage = async ({ date }: Props) => {
+  const appointments = await getAppointments();
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col xl:flex-row gap-3">
@@ -57,7 +60,10 @@ const AppointmentPage = ({ date }: Props) => {
       <div className="flex flex-col bg-base-100 rounded p-3 shadow-br gap-1">
         <h2 className="font-bold">Booking History</h2>
         <Suspense>
-          <AppointmentsTable />
+          <AppointmentsTable
+            userType={UserType.Student}
+            appointments={appointments}
+          />
         </Suspense>
       </div>
     </div>

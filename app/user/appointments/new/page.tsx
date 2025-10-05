@@ -1,4 +1,4 @@
-import Booking from "@/app/components/Student/Appointments/Booking/Booking";
+import Booking from "@/app/components/Appointments/Booking/Booking";
 import { UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";

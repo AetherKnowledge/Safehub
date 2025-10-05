@@ -3,7 +3,7 @@
 import DefaultLoading from "@/app/components/DefaultLoading";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { cancelAppointment } from "../AppointmentActions";
+import { cancelAppointment } from "../AppointmentsActions";
 
 interface CancelButtonProps {
   appointmentId: string;

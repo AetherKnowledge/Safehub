@@ -1,5 +1,5 @@
 import { formatDateDisplay, formatTime, imageGenerator } from "@/lib/utils";
-import { AppointmentData } from "./AppointmentsTable";
+import { AppointmentData } from "../AppointmentsActions";
 
 interface UpcomingAppointmentsTableProps {
   appointments: AppointmentData[];
@@ -33,7 +33,9 @@ function UpcomingAppointmentRow({
     <tr className="flex flex-row border border-base-content/10 rounded p-2 mb-2 items-center gap-4 w-full">
       <td>
         {imageGenerator(
-          appointment.counselor.user.name,
+          appointment.counselor.user.name ??
+            appointment.counselor.user.email.split("@")[0] ??
+            "Counselor",
           10,
           appointment.counselor.user.image || undefined
         )}

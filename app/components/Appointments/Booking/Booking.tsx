@@ -6,8 +6,8 @@ import { SessionPreference } from "@/app/generated/prisma";
 import { NewAppointmentData } from "@/lib/schemas";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createNewAppointment } from "../AppointmentActions";
 import DatePickerSelector from "./DatePickerSelector";
+import { createNewAppointment } from "../AppointmentsActions";
 
 const Booking = () => {
   const router = useRouter();

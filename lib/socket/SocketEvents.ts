@@ -1,6 +1,6 @@
 import { CallStatus, User } from "@/app/generated/prisma";
 import { types } from "mediasoup";
-import { TransportOptions } from "mediasoup-client/lib/Transport";
+import { TransportOptions } from "mediasoup-client/types";
 
 export type SocketUser = Pick<User, "id" | "name" | "image" | "type" | "email">;
 

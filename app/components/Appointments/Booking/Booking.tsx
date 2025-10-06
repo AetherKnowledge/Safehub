@@ -6,8 +6,8 @@ import { SessionPreference } from "@/app/generated/prisma";
 import { NewAppointmentData } from "@/lib/schemas";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import DatePickerSelector from "./DatePickerSelector";
 import { createNewAppointment } from "../AppointmentsActions";
+import DatePickerSelector from "./DatePickerSelector";
 
 const Booking = () => {
   const router = useRouter();
@@ -73,7 +73,7 @@ const Booking = () => {
                 on?
               </p>
               <textarea
-                className="textarea textarea-ghost border border-base-content/10 focus:outline-base-content/20 focus:ring-0 w-full h-16 bg-white"
+                className="textarea textarea-ghost border border-base-content/10 focus:outline-base-content/20 focus:ring-0 w-full h-16 bg-base-200"
                 placeholder="type your response here..."
                 value={q1}
                 onChange={(e) => setQ1(e.target.value)}
@@ -89,7 +89,7 @@ const Booking = () => {
                   <input
                     type="radio"
                     name="q2"
-                    className="checkbox rounded bg-white"
+                    className="checkbox rounded bg-base-200"
                     onChange={() => setQ2(true)}
                   />
                   <p className="text-base-content">Yes</p>
@@ -98,7 +98,7 @@ const Booking = () => {
                   <input
                     type="radio"
                     name="q2"
-                    className="checkbox rounded bg-white"
+                    className="checkbox rounded bg-base-200"
                     onChange={() => setQ2(false)}
                   />
                   <p className="text-base-content">No</p>
@@ -114,7 +114,7 @@ const Booking = () => {
                   <input
                     type="radio"
                     name="q3"
-                    className="checkbox rounded bg-white"
+                    className="checkbox rounded bg-base-200"
                     onChange={() => setQ3(SessionPreference.InPerson)}
                   />
                   <p className="text-base-content">In-person</p>
@@ -123,7 +123,7 @@ const Booking = () => {
                   <input
                     type="radio"
                     name="q3"
-                    className="checkbox rounded bg-white"
+                    className="checkbox rounded bg-base-200"
                     onChange={() => setQ3(SessionPreference.Online)}
                   />
                   <p className="text-base-content">Online</p>
@@ -132,7 +132,7 @@ const Booking = () => {
                   <input
                     type="radio"
                     name="q3"
-                    className="checkbox rounded bg-white"
+                    className="checkbox rounded bg-base-200"
                     onChange={() => setQ3(SessionPreference.Either)}
                   />
                   <p className="text-base-content">Either</p>
@@ -149,7 +149,7 @@ const Booking = () => {
                   <input
                     type="radio"
                     name="q4"
-                    className="checkbox rounded bg-white"
+                    className="checkbox rounded bg-base-200"
                     onChange={() => setQ4(1)}
                   />
                   <p className="text-base-content">1</p>
@@ -158,7 +158,7 @@ const Booking = () => {
                   <input
                     type="radio"
                     name="q4"
-                    className="checkbox rounded bg-white"
+                    className="checkbox rounded bg-base-200"
                     onChange={() => setQ4(2)}
                   />
                   <p className="text-base-content">2</p>
@@ -167,7 +167,7 @@ const Booking = () => {
                   <input
                     type="radio"
                     name="q4"
-                    className="checkbox rounded bg-white"
+                    className="checkbox rounded bg-base-200"
                     onChange={() => setQ4(3)}
                   />
                   <p className="text-base-content">3</p>
@@ -176,7 +176,7 @@ const Booking = () => {
                   <input
                     type="radio"
                     name="q4"
-                    className="checkbox rounded bg-white"
+                    className="checkbox rounded bg-base-200"
                     onChange={() => setQ4(4)}
                   />
                   <p className="text-base-content">4</p>
@@ -185,7 +185,7 @@ const Booking = () => {
                   <input
                     type="radio"
                     name="q4"
-                    className="checkbox rounded bg-white"
+                    className="checkbox rounded bg-base-200"
                     onChange={() => setQ4(5)}
                   />
                   <p className="text-base-content">5</p>
@@ -201,7 +201,7 @@ const Booking = () => {
                 6. Is there anything important I should know before our session?
               </p>
               <textarea
-                className="textarea textarea-ghost border border-base-content/10 focus:outline-base-content/20 focus:ring-0 w-full h-16 bg-white"
+                className="textarea textarea-ghost border border-base-content/10 focus:outline-base-content/20 focus:ring-0 w-full h-16 bg-base-200"
                 placeholder="type your response here..."
                 value={q6}
                 onChange={(e) => setQ6(e.target.value)}

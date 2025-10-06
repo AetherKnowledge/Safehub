@@ -1,6 +1,7 @@
-import { auth, signIn, signOut } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { Session } from "next-auth";
 import Image from "next/image";
+import Link from "next/link";
 import { FaChevronDown } from "react-icons/fa6";
 import DarkModeToggle from "../DarkModeToggle/DarkModeToggle";
 
@@ -70,17 +71,10 @@ const AuthenticatedUserButton = (session: Session) => {
 
         <ul className="absolute right-0 mt-2 w-52 menu dropdown-content bg-base-100 text-base-content rounded-md z-10 p-2 shadow-br">
           <li>
-            <DarkModeToggle />
+            <DarkModeToggle defaultChecked={session.user?.darkMode || false} />
           </li>
           <li>
-            <form
-              action={async () => {
-                "use server";
-                await signOut();
-              }}
-            >
-              <button type="submit">Sign Out</button>
-            </form>
+            <Link href="/api/auth/signout">Sign Out</Link>
           </li>
         </ul>
       </div>

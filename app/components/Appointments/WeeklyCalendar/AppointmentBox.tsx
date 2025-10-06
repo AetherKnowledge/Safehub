@@ -10,6 +10,7 @@ import AppointmentPopup, { AppointmentPopupAction } from "./AppointmentPopup";
 import {
   getAppointmentHeight,
   getAppointmentTopPosition,
+  getBgStatusColor,
   getBorderStatusColor,
   getStatusTextColor,
 } from "./WeeklyCalendarUtils";
@@ -57,7 +58,9 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
     <>
       <div
         key={`appointment-${appointment.id}`}
-        className={`absolute left-1 right-1 rounded p-2 cursor-pointer bg-base-100 bg-opacity-10 border-l-4 shadow-br hover:shadow-md transition-shadow ${getBorderStatusColor(
+        className={`absolute left-1 right-1 rounded p-2 cursor-pointer ${getBgStatusColor(
+          appointment.status
+        )} bg-opacity-10 border-l-4 shadow-br hover:shadow-md transition-shadow ${getBorderStatusColor(
           appointment.status
         )}`}
         style={{
@@ -73,10 +76,10 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
         >
           {appointment.status}
         </div>
-        <div className="text-xs text-gray-800 truncate">
+        <div className="text-xs truncate">
           {appointment.student.user.name || appointment.student.user.email}
         </div>
-        <div className="text-[10px] text-gray-800 truncate pb-">
+        <div className="text-[10px] truncate pb-">
           {formatTime(appointment.startTime)} -{" "}
           {formatTime(appointment.endTime!)}
         </div>

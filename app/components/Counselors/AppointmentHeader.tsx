@@ -1,6 +1,6 @@
 "use client";
 import { formatDate } from "@/lib/utils";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaAngleLeft, FaRegCalendar } from "react-icons/fa";
 import { FaAngleRight } from "react-icons/fa6";
@@ -12,6 +12,7 @@ import { ViewMode } from "./AppointmentsPage";
 const AppointmentHeader: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathName = usePathname();
   const [todayAppointmentsCount, setTodayAppointmentsCount] = useState(0);
 
   useEffect(() => {
@@ -58,7 +59,7 @@ const AppointmentHeader: React.FC = () => {
   const updateSearchParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
-    router.push(`?${params.toString()}`);
+    router.push(`${pathName}?${params.toString()}`);
   };
 
   const getDateRangeString = () => {
@@ -76,7 +77,7 @@ const AppointmentHeader: React.FC = () => {
     <div className="flex items-center justify-between p-6">
       <div className="flex items-center gap-4">
         <div className="p-1 bg-base-200 rounded-lg">
-          <div className="flex bg-white rounded-lg">
+          <div className="flex bg-base-100 rounded-lg">
             <button
               className={`flex flex-row px-4 py-2 text-base-content rounded-l-lg gap-1 items-center transition-colors duration-200 ${
                 viewMode === ViewMode.LIST

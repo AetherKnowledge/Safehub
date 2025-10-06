@@ -25,7 +25,7 @@ const LoginButton = async () => {
             className="flex items-center justify-center btn btn-primary gap-3 min-w-50 mx-auto lg:mx-0 py-[clamp(1.25rem,2vw,2.5rem)]"
             type="submit"
           >
-            <div className="bg-white rounded-full w-[clamp(1.25rem,2vw,2.5rem)] h-[clamp(1.25rem,2vw,2.5rem)] flex items-center justify-center">
+            <div className="bg-base-100 rounded-full w-[clamp(1.25rem,2vw,2.5rem)] h-[clamp(1.25rem,2vw,2.5rem)] flex items-center justify-center">
               <FcGoogle className="w-[clamp(1.25rem,2vw,2.5rem)] h-[clamp(1.25rem,2vw,2.5rem)]" />
             </div>
             <p className="text-step-1 font-medium">Register Now</p>

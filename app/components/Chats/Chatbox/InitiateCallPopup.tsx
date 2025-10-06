@@ -26,7 +26,7 @@ const InitiateCallPopup = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-10 backdrop-blur-sm z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+      <div className="bg-base-100 p-6 rounded-lg shadow-lg text-center">
         <h3 className="text-xl font-bold mb-4">
           {status === CallStatus.No_Answer
             ? "No Answer"

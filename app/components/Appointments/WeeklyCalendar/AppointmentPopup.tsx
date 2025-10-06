@@ -23,7 +23,7 @@ const AppointmentPopup = ({ appointment, onAction }: AppointmentPopupProps) => {
   return (
     <div className="fixed inset-0 bg-transparent bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity">
       <div
-        className={`bg-base-100 rounded-lg p-6 max-w-md w-full mx-4 border-l-4 ${getBorderStatusColor(
+        className={`bg-base-100 rounded-lg p-6 max-w-md w-full mx-4 border-l-6 ${getBorderStatusColor(
           appointment.status
         )}`}
       >

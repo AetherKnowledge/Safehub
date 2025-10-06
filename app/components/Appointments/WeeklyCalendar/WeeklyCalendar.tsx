@@ -20,13 +20,19 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
               <div
                 key={day}
                 className={`flex-1 p-3 text-center border-l border-base-content/30 ${
-                  isToday ? "bg-green-50" : ""
+                  isToday ? "bg-primary" : ""
                 }`}
               >
-                <div className="font-medium text-sm">{day}</div>
+                <div
+                  className={`font-medium text-sm ${
+                    isToday ? "text-primary-content" : ""
+                  }`}
+                >
+                  {day}
+                </div>
                 <div
                   className={`text-lg font-bold ${
-                    isToday ? "text-green-600" : ""
+                    isToday ? "text-primary-content" : ""
                   }`}
                 >
                   {date.getDate()}
@@ -73,7 +79,7 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
               <div
                 key={dayIndex}
                 className={`flex-1 relative border-l border-base-content/30 ${
-                  isToday ? "bg-green-50" : ""
+                  isToday ? "bg-primary/20" : ""
                 }`}
                 style={{ height: `${TIME_SLOTS.length * 120}px` }}
               >

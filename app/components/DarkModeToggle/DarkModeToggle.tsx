@@ -2,7 +2,7 @@
 
 import { changeDarkMode } from "./DarkModeActions";
 
-const DarkModeToggle = () => {
+const DarkModeToggle = ({ defaultChecked }: { defaultChecked: boolean }) => {
   const handleToggle = async (enabled: boolean) => {
     try {
       const newTheme = enabled ? "lcup-dark" : "lcup-light";
@@ -20,6 +20,7 @@ const DarkModeToggle = () => {
       <input
         type="checkbox"
         onChange={(e) => handleToggle(e.target.checked)}
+        defaultChecked={defaultChecked}
         value="lcup-dark"
         className="toggle theme-controller"
       />

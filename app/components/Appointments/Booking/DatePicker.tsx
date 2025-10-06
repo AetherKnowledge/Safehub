@@ -67,16 +67,13 @@ export default function DatePicker({
 
   const isHighlighted = (day: number) => {
     if (!highlightedDates) return false;
-    const dateToCheck = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth(),
-      day
-    )
-      .toISOString()
-      .split("T")[0]; // normalize to YYYY-MM-DD
 
     return highlightedDates.some(
-      (d) => d.toISOString().split("T")[0] === dateToCheck
+      (date) =>
+        date &&
+        date.getDate() === day &&
+        date.getMonth() === currentMonth.getMonth() &&
+        date.getFullYear() === currentMonth.getFullYear()
     );
   };
 

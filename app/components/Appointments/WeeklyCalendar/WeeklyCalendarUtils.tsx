@@ -18,15 +18,15 @@ export const TIME_SLOTS = [
 export const getBgStatusColor = (status: AppointmentStatus) => {
   switch (status) {
     case "Approved":
-      return "bg-info";
+      return "bg-info/20";
     case "Pending":
-      return "bg-warning";
+      return "bg-warning/20";
     case "Completed":
-      return "bg-success";
+      return "bg-success/20";
     case "Rejected":
-      return "bg-error";
+      return "bg-error/20";
     default:
-      return "bg-base-content";
+      return "bg-base-content/20";
   }
 };
 

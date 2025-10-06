@@ -29,7 +29,7 @@ const DatePickerSelector = ({
   }
 
   return (
-    <div className="relative inline-block w-100 border border-base-content/20 bg-white rounded">
+    <div className="relative inline-block w-100 border border-base-content/20 bg-base-200 rounded">
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row items-center px-3 py-2 gap-2 text-left text-base-content/40">
           <FaCalendar />

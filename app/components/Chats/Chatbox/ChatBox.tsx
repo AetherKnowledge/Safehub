@@ -32,7 +32,7 @@ export function ChatBox({ chat }: { chat: ChatData }) {
       <ChatHeader chat={chat} />
       {/* Scrollable chat history */}
       <div
-        className="flex-1 flex flex-col gap-2 overflow-y-auto"
+        className="group flex-1 flex flex-col gap-2 overflow-y-auto scrollbar-gutter:stable"
         ref={chatContainerRef}
       >
         <ChatHistory
@@ -110,7 +110,7 @@ export function AiChatBox({ chat }: { chat: ChatData }) {
       <ChatHeader chat={chat} />
       {/* Scrollable chat history */}
       <div
-        className="flex-1 flex flex-col gap-2 overflow-y-auto"
+        className="group flex-1 flex flex-col gap-2 overflow-y-auto scrollbar-gutter:stable"
         ref={chatContainerRef}
       >
         <ChatHistory
@@ -146,7 +146,9 @@ function ChatHistory({
 
   if (!messages || messages.length === 0) {
     return (
-      <p className="text-center text-gray-500">No chat history available.</p>
+      <p className="text-center text-gray-500 mt-4">
+        No chat history available.
+      </p>
     );
   }
 

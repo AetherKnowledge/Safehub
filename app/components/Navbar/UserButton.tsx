@@ -40,7 +40,7 @@ const SignInButton = () => {
     <form
       action={async () => {
         "use server";
-        await signIn();
+        await signIn(undefined, { redirectTo: "/user/dashboard" });
       }}
     >
       <button
@@ -54,10 +54,10 @@ const SignInButton = () => {
 };
 
 const AuthenticatedUserButton = (session: Session) => {
-  function getLastName() {
+  function getFirstName() {
     const name = session?.user?.name?.split(" ");
     if (!name) return "User";
-    return name.length > 1 ? name[name.length - 1] : "";
+    return name.length > 1 ? name[0] : "";
   }
 
   return (
@@ -82,7 +82,7 @@ const AuthenticatedUserButton = (session: Session) => {
             <div className="flex flex-col text-base-content">
               <p className="text-sm">Hello,</p>
               <p className="font-semibold text-sm whitespace-nowrap">
-                {getLastName() || session.user?.email?.split("@")[0] || "User"}
+                {getFirstName() || session.user?.email?.split("@")[0] || "User"}
               </p>
             </div>
             <div className="rounded-md p-1 hover:brightness-90 hover:bg-base-200 active:brightness-75 transition object-cover duration-150 ease-in-out hover:scale-105 cursor-pointer">

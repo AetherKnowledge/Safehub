@@ -15,6 +15,25 @@ const AppointmentHeader: React.FC = () => {
   const pathName = usePathname();
   const [todayAppointmentsCount, setTodayAppointmentsCount] = useState(0);
 
+  // Search params are also stored here for immediate UI updates
+  const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.CALENDAR);
+  const [date, setDate] = useState<Date>(new Date());
+  const [showAll, setShowAll] = useState<boolean>(false);
+
+  // Sync state with URL parameters
+  useEffect(() => {
+    const currentViewMode =
+      (searchParams.get("view") as ViewMode) || ViewMode.CALENDAR;
+    const currentDate = searchParams.get("date")
+      ? new Date(searchParams.get("date") as string)
+      : new Date();
+    const currentShowAll = searchParams.get("showAll") === "true";
+
+    setViewMode(currentViewMode);
+    setDate(currentDate);
+    setShowAll(currentShowAll);
+  }, [searchParams]);
+
   useEffect(() => {
     const fetchTodayAppointmentsCount = async () => {
       const count = await getTodayAppointmentsCount(new Date());
@@ -23,19 +42,6 @@ const AppointmentHeader: React.FC = () => {
 
     fetchTodayAppointmentsCount();
   }, []);
-
-  // Search params are also stored here for immediate UI updates
-  const [viewMode, setViewMode] = useState<ViewMode>(
-    (searchParams.get("view") as ViewMode) || ViewMode.CALENDAR
-  );
-  const [date, setDate] = useState<Date>(
-    searchParams.get("date")
-      ? new Date(searchParams.get("date") as string)
-      : new Date()
-  );
-  const [showAll, setShowAll] = useState<boolean>(
-    searchParams.get("showAll") === "true"
-  );
   const weekDates = getWeekDates(date);
 
   const changeShowAll = (show: boolean) => {

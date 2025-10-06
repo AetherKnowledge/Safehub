@@ -81,10 +81,11 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
               weekDates[0],
               weekDates[weekDates.length - 1]
             )}
-            children={(appointments) => (
+          >
+            {(appointments) => (
               <DayContainer weekDates={weekDates} appointments={appointments} />
             )}
-          />
+          </Await>
         </Suspense>
       </div>
     </div>

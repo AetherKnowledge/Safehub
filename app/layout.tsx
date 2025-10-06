@@ -8,6 +8,9 @@ import SocketProvider from "../lib/socket/SocketProvider";
 import CallPopupProvider from "./components/Chats/Chatbox/CallPopupProvider";
 import "./globals.css";
 
+// change await auth() to <Await resolve={await auth()}>
+// then use it in a child component
+
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],

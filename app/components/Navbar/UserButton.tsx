@@ -2,32 +2,54 @@ import { auth, signIn } from "@/auth";
 import { Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import { FaChevronDown } from "react-icons/fa6";
+import { Await } from "react-router";
 import DarkModeToggle from "../DarkModeToggle/DarkModeToggle";
 
 const UserButton = async () => {
-  const session = await auth();
-
   return (
     <div className="flex items-center gap-2 hover:cursor-pointer">
-      {session ? (
-        AuthenticatedUserButton(session)
-      ) : (
-        <form
-          action={async () => {
-            "use server";
-            await signIn();
-          }}
-        >
-          <button
-            className="btn btn-primary w-25 font-semibold duration-150 ease-in-out hover:scale-105"
-            type="submit"
-          >
-            Sign in
-          </button>
-        </form>
-      )}
+      <Suspense fallback={<LoadingUserButton />}>
+        <Await resolve={await auth()}>
+          {(session) =>
+            session ? AuthenticatedUserButton(session) : <SignInButton />
+          }
+        </Await>
+      </Suspense>
     </div>
+  );
+};
+
+const LoadingUserButton = () => {
+  return (
+    <div className="flex items-center gap-2 hover:cursor-pointer bg-base-100 shadow-br rounded-lg p-2">
+      <div className="animate-pulse flex items-center gap-2">
+        <div className="w-10 h-10 rounded-full bg-gray-500"></div>
+        <div className="flex flex-col">
+          <div className="h-4 w-24 bg-gray-500 rounded"></div>
+          <div className="h-4 w-16 bg-gray-500 rounded"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SignInButton = () => {
+  return (
+    <form
+      action={async () => {
+        "use server";
+        await signIn();
+      }}
+    >
+      <button
+        className="btn btn-primary w-25 font-semibold duration-150 ease-in-out hover:scale-105"
+        type="submit"
+      >
+        Sign in
+      </button>
+    </form>
   );
 };
 
@@ -41,7 +63,7 @@ const AuthenticatedUserButton = (session: Session) => {
   return (
     <div className="flex flex-row bg-base-100 shadow-br rounded-lg items-center justify-center gap-y-2">
       <div className="relative dropdown" role="button" tabIndex={0}>
-        <div className="flex flex-row gap-2 items-center justify-center px-2 min-w-max py-2">
+        <div className="flex flex-row gap-2 items-center justify-center p-2 min-w-max">
           {session.user?.image ? (
             <Image
               className="w-10 h-10 rounded-full "

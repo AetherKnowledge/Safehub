@@ -1,32 +1,37 @@
-"use client";
-import ChatBox from "./Chatbox/ChatBox";
-import ChatHeader from "./Chatbox/ChatHeader";
+import { ChatData } from "@/@types/network";
+import { getChatBotChat } from "./AiChatBotActions";
+import ChatBox, { AiChatBox } from "./Chatbox/ChatBox";
 import ChatSidebar from "./Chatbox/ChatSidebar";
+import { getChats } from "./ChatsActions";
 
 type ChatsPageProps = {
   chatId?: string;
 };
 
-const ChatsPage = ({ chatId }: ChatsPageProps) => {
+const ChatsPage = async ({ chatId }: ChatsPageProps) => {
+  // So SafeHub AI is always first
+  const chats: ChatData[] = [await getChatBotChat()];
+  chats.push(...(await getChats()));
+
+  const chatForSelectedId = chats.find((chat) => chat.id === chatId);
+
   return (
-    <div className="flex flex-col h-[82vh] ">
-      <ChatHeader chatId={chatId} />
-      <div className="divider mt-[-8] mb-[-2] pl-3 pr-3" />
-      <div className="flex flex-row h-full ">
-        {chatId ? (
-          <>
-            <div className="w-[20vw]">
-              <ChatSidebar chatId={chatId} />
-            </div>
-            <div className="divider divider-horizontal mx-[-6]" />
-            <div className="flex flex-col h-full w-full">
-              <ChatBox chatId={chatId} />
-            </div>
-          </>
-        ) : (
-          <ChatSidebar />
-        )}
-      </div>
+    <div className="flex flex-row h-[87.5vh] gap-3">
+      <ChatSidebar chatId={chatId} chats={chats} />
+
+      {chatForSelectedId && chatForSelectedId.id === "chatbot" ? (
+        <AiChatBox chat={chatForSelectedId} />
+      ) : (
+        chatForSelectedId && <ChatBox chat={chatForSelectedId} />
+      )}
+    </div>
+  );
+};
+
+export const ChatPageSkeleton = () => {
+  return (
+    <div className="flex flex-row h-[87vh] gap-5">
+      <ChatSidebar chats={[]} loading={true} />
     </div>
   );
 };

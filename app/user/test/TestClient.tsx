@@ -1,6 +1,8 @@
 "use client";
 
-import ChatSidebar, { Chat } from "@/app/components/Chats/Chatbox/ChatSidebar";
+import ChatSidebarOld, {
+  Chat,
+} from "@/app/components/Chats/Chatbox/ChatSidebarOld";
 import { getChats } from "@/app/components/Chats/ChatsActions";
 import { UserStatus } from "@/app/generated/prisma";
 import { imageGenerator } from "@/lib/utils";
@@ -34,7 +36,7 @@ const TestClient = () => {
 
   console.log(chats);
   console.log("bruh");
-  return <ChatSidebar />;
+  return <ChatSidebarOld />;
 };
 
 export default TestClient;

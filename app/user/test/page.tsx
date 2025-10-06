@@ -1,4 +1,4 @@
-import { Chat } from "@/app/components/Chats/Chatbox/ChatSidebar";
+import { Chat } from "@/app/components/Chats/Chatbox/ChatSidebarOld";
 import { getChats } from "@/app/components/Chats/ChatsActions";
 import { UserStatus } from "@/app/generated/prisma";
 import { imageGenerator } from "@/lib/utils";

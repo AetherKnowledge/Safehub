@@ -1,12 +1,13 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { IoIosSend } from "react-icons/io";
 
 interface Props {
   onSend?: (content: string) => void;
+  asyncOnsend?: (content: string) => Promise<void>;
 }
 
-const ChatboxInput = ({ onSend }: Props) => {
+const ChatBoxInput = ({ onSend, asyncOnsend }: Props) => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -15,38 +16,39 @@ const ChatboxInput = ({ onSend }: Props) => {
     if (!message.trim()) return;
 
     setLoading(true);
-    onSend?.(message);
     setMessage("");
+
+    onSend?.(message);
+    if (asyncOnsend) {
+      await asyncOnsend(message);
+    }
 
     setLoading(false);
   };
 
   return (
-    <div className="border-t border-base-300 p-4 rounded-b-2xl text-base-content bg-base-100">
-      <form onSubmit={handleSubmit} className="flex items-center gap-2 ">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          className="input input-bordered flex-1 focus:outline-none focus:ring-0"
-        />
-        <div className="flex items-center justify-center w-20">
-          {loading ? (
-            <div className="loading loading-spinner loading-md"></div>
-          ) : (
-            <button
+    <form onSubmit={handleSubmit} className="flex items-center gap-2 ">
+      <input
+        type="text"
+        placeholder="Type a message..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        className="input rounded-2xl bg-base-200 border-none flex-1 outline-none ring-0 focus:outline-none focus:ring-0"
+      />
+      <div className="flex items-center justify-center w-8">
+        {loading ? (
+          <div className="loading loading-spinner text-primary loading-md"></div>
+        ) : (
+          <button type="submit" disabled={!message.trim()}>
+            <IoIosSend
               type="submit"
-              className="btn btn-primary"
-              disabled={!message.trim()}
-            >
-              Send
-            </button>
-          )}
-        </div>
-      </form>
-    </div>
+              className="text-3xl text-primary cursor-pointer hover:text-secondary transition-colors"
+            />
+          </button>
+        )}
+      </div>
+    </form>
   );
 };
 
-export default ChatboxInput;
+export default ChatBoxInput;

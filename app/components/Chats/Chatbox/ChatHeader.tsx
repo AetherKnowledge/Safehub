@@ -1,28 +1,47 @@
 "use client";
+import { ChatData } from "@/@types/network";
+import { UserStatus } from "@/app/generated/prisma";
+import { imageGenerator } from "@/lib/utils";
 import { IoIosCall } from "react-icons/io";
 import { useCallPopup } from "./CallPopupProvider";
 
 type ChatHeaderProps = {
-  chatId?: string;
+  chat: ChatData;
 };
 
-const ChatHeader = ({ chatId }: ChatHeaderProps) => {
+const ChatHeader = ({ chat }: ChatHeaderProps) => {
   const { initiateCall } = useCallPopup();
 
   const handleInitiateCall = () => {
-    if (!chatId) return;
+    if (!chat.id) return;
 
-    initiateCall(chatId);
+    initiateCall(chat.id);
   };
 
   return (
-    <div className="p-4 border-b-1 border-none rounded-t-2xl text-base-content bg-base-100">
-      <div className="flex flex-row justify-between">
-        <h2 className="text-3xl font-bold text-primary">Chats</h2>
-        {chatId && (
+    <div className="border-b-1 border-base-content/20 rounded-t-2xl pb-2">
+      <div className="flex flex-row justify-between items-center">
+        <div className="flex flex-row gap-2 items-center">
+          <div
+            className={`flex flex-col border-2 border-transparent rounded-full ${
+              chat.status === UserStatus.Online ? "border-primary" : ""
+            }`}
+          >
+            {imageGenerator(chat.name, 10, chat.src)}
+          </div>
+          <div className="flex flex-col justify-center max-w-59 overflow-hidden flex-1 min-w-0">
+            <h2 className="font-semibold text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+              {chat.name}
+            </h2>
+            <p className="text-xs text-base-content/60 overflow-hidden text-ellipsis whitespace-nowrap">
+              {`${chat.status === UserStatus.Online ? "Online" : "Offline"}`}
+            </p>
+          </div>
+        </div>
+        {chat && (
           <div className="flex flex-row gap-5">
             <IoIosCall
-              className="text-2xl text-primary cursor-pointer hover:text-secondary transition-colors mt-2"
+              className="text-2xl text-primary cursor-pointer hover:text-secondary transition-colors"
               onClick={handleInitiateCall}
             />
           </div>

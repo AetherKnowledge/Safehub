@@ -1,4 +1,4 @@
-import { formatDatetime } from "@/lib/utils";
+import { formatDateDisplay, formatTime } from "@/lib/utils";
 import Image from "next/image";
 import { ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
@@ -34,7 +34,9 @@ const MessageBubble = ({
       <div className="chat-header text-base-content text-xs/normal flex items-center ml-1 mr-1">
         {!self && name}
         <time className="text-xs opacity-50 ml-2 mr-2">
-          {formatDatetime(createdAt)}
+          {createdAt.toLocaleString() === new Date().toLocaleString()
+            ? formatDateDisplay(createdAt, false)
+            : formatTime(createdAt)}
         </time>
         {self && name}
       </div>

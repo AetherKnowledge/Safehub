@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { AiFillHome } from "react-icons/ai";
-import { FaCalendar, FaRobot, FaUsers } from "react-icons/fa";
+import { FaCalendar, FaUsers } from "react-icons/fa";
 import { IoIosCall, IoIosSettings } from "react-icons/io";
 import { IoChatboxEllipses } from "react-icons/io5";
 import Divider from "../Divider";
@@ -90,9 +90,6 @@ const studentSidebar = (isLarge: boolean) => {
         isLarge={isLarge}
       >
         Appointments
-      </SidebarButton>
-      <SidebarButton href="/user/chatbot" icon={FaRobot} isLarge={isLarge}>
-        Chatbot
       </SidebarButton>
       <SidebarButton
         href="/user/chats"

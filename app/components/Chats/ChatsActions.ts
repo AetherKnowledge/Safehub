@@ -1,6 +1,6 @@
 "use server";
 
-import { ParsedChat } from "@/@types/network";
+import { ChatData } from "@/@types/network";
 import { UserStatus } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
@@ -11,7 +11,9 @@ import { prisma } from "@/prisma/client";
 
 // TODO: Make it so chat name is dependent on the other user's name if it is direct
 
-export async function getChats(): Promise<ParsedChat[]> {
+// only returns latest message for each chat
+// useMessaging will fetch all messages for the selected chat
+export async function getChats(): Promise<ChatData[]> {
   console.log("Fetching chats...");
   const session = await auth();
 
@@ -82,9 +84,16 @@ export async function getChats(): Promise<ParsedChat[]> {
           ? UserStatus.Online
           : UserStatus.Offline,
         latestMessageAt: chat.lastMessageAt,
-      } as ParsedChat;
+        latestMessage: chat.messages[0]?.content,
+        isLatestMessageFromSelf:
+          chat.messages[0] && member
+            ? chat.messages[0].createdAt <= chat.lastMessageAt!
+            : false,
+      } as ChatData;
     })
   );
+
+  console.log("Fetched chats:", parsedChats);
 
   return parsedChats;
 }

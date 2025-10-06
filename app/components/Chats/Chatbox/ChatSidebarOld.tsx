@@ -24,7 +24,7 @@ type ChatSidebarProps = {
 
 // TODO: Change to notification provider
 
-const ChatSidebar = ({ chatId }: ChatSidebarProps) => {
+const ChatSidebarOld = ({ chatId }: ChatSidebarProps) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const onRecieveData = useSocket().onRecieveData;
 
@@ -111,4 +111,4 @@ const ChatSidebar = ({ chatId }: ChatSidebarProps) => {
     </div>
   );
 };
-export default ChatSidebar;
+export default ChatSidebarOld;

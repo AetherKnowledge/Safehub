@@ -15,12 +15,12 @@ const Layout = async ({ children }: Props) => {
   }
 
   return (
-    <div className="flex bg-base-200 min-h-screen p-6 pt-0 gap-6">
+    <div className="flex bg-base-200 min-h-screen p-6 pt-0 gap-4">
       {/* Resizable Floating Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex flex-col flex-1 gap-6">
+      <div className="flex flex-col flex-1 gap-4">
         <UserNavbar />
         {children}
       </div>

@@ -1,12 +1,17 @@
-import ChatsPage from "@/app/components/Chats/ChatsPage";
+import ChatsPage, { ChatPageSkeleton } from "@/app/components/Chats/ChatsPage";
+import { Suspense } from "react";
 
-const page = () => {
+const page = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ chatId: string }>;
+}) => {
+  const { chatId } = await searchParams;
+
   return (
-    <div className="flex-1">
-      <div className="bg-base-100 shadow-br rounded-xl">
-        <ChatsPage />
-      </div>
-    </div>
+    <Suspense fallback={<ChatPageSkeleton />}>
+      <ChatsPage chatId={chatId} />
+    </Suspense>
   );
 };
 

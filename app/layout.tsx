@@ -5,7 +5,7 @@ import { PublicEnvScript } from "next-runtime-env";
 import { Inter, Manrope } from "next/font/google";
 import AuthProvider from "../lib/auth/AuthProvider";
 import SocketProvider from "../lib/socket/SocketProvider";
-import CallPopupProvider from "./components/Chats/Chatbox/CallPopupProvider";
+import CallPopupProvider from "./components/Chats/ChatBox/CallPopupProvider";
 import "./globals.css";
 
 // change await auth() to <Await resolve={await auth()}>

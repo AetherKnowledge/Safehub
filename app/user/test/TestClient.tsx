@@ -1,15 +1,14 @@
 "use client";
 
-import ChatSidebarOld, {
-  Chat,
-} from "@/app/components/Chats/Chatbox/ChatSidebarOld";
+import { ChatData } from "@/@types/network";
+import ChatSidebar from "@/app/components/Chats/ChatBox/ChatSidebar";
 import { getChats } from "@/app/components/Chats/ChatsActions";
 import { UserStatus } from "@/app/generated/prisma";
 import { imageGenerator } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 const TestClient = () => {
-  const [chats, setChats] = useState<Chat[]>([]);
+  const [chats, setChats] = useState<ChatData[]>([]);
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -25,7 +24,7 @@ const TestClient = () => {
               src: imageGenerator(chat.name, 10, chat.src),
               status: chat.status || UserStatus.Offline,
               latestMessage: chat.latestMessage,
-            }) as Chat
+            }) as ChatData
         )
       );
       setChats(parsedData);
@@ -36,7 +35,7 @@ const TestClient = () => {
 
   console.log(chats);
   console.log("bruh");
-  return <ChatSidebarOld />;
+  return <ChatSidebar chats={chats} />;
 };
 
 export default TestClient;

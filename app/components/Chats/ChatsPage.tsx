@@ -1,7 +1,7 @@
 import { ChatData } from "@/@types/network";
 import { getChatBotChat } from "./AiChatBotActions";
-import ChatBox, { AiChatBox } from "./Chatbox/ChatBox";
-import ChatSidebar from "./Chatbox/ChatSidebar";
+import ChatBox, { AiChatBox } from "./ChatBox/ChatBox";
+import ChatSidebar from "./ChatBox/ChatSidebar";
 import { getChats } from "./ChatsActions";
 
 type ChatsPageProps = {

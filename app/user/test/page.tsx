@@ -1,4 +1,4 @@
-import { Chat } from "@/app/components/Chats/Chatbox/ChatSidebarOld";
+import { ChatData } from "@/@types/network";
 import { getChats } from "@/app/components/Chats/ChatsActions";
 import { UserStatus } from "@/app/generated/prisma";
 import { imageGenerator } from "@/lib/utils";
@@ -16,7 +16,7 @@ const Test = async () => {
           src: imageGenerator(chat.name, 10, chat.src),
           status: chat.status || UserStatus.Offline,
           latestMessage: chat.latestMessage,
-        }) as Chat
+        }) as ChatData
     )
   );
 

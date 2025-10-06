@@ -2,7 +2,7 @@ import { CommentData } from "@/lib/schemas";
 import { imageGenerator } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
-import MessageBubble from "../Chats/Chatbox/MessageBubble";
+import MessageBubble from "../Chats/ChatBox/MessageBubble";
 import { addComment, PostComment } from "./PostActions";
 
 type PostCommentsProps = {

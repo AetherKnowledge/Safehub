@@ -1,5 +1,7 @@
-import { Fragment } from "react";
-import DailyAppointments from "./DailyAppointments";
+import { Fragment, Suspense } from "react";
+import { Await } from "react-router";
+import { getAppointmentsForDateRange } from "../AppointmentsActions";
+import DayContainer, { DayContainerLoading } from "./DayContainer";
 import { DAYS, TIME_SLOTS, getWeekDates } from "./WeeklyCalendarUtils";
 
 const WeeklyCalendar = ({ date }: { date: Date }) => {
@@ -70,36 +72,20 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
           ))}
         </div>
 
-        {/* Days container */}
-        <div className="flex-1 flex ">
-          {weekDates.map((date, dayIndex) => {
-            const isToday = date.toDateString() === new Date().toDateString();
-
-            return (
-              <div
-                key={dayIndex}
-                className={`flex-1 relative border-l border-base-content/30 ${
-                  isToday ? "bg-primary/20" : ""
-                }`}
-                style={{ height: `${TIME_SLOTS.length * 120}px` }}
-              >
-                {/* Hour lines */}
-                {TIME_SLOTS.map((_, timeIndex) => (
-                  <div
-                    key={timeIndex}
-                    className="absolute w-full text-center"
-                    style={{ top: `${timeIndex * 120}px`, height: "120px" }}
-                  >
-                    {/* Half-hour line */}
-                    <div className="absolute w-full" style={{ top: "60px" }} />
-                  </div>
-                ))}
-
-                <DailyAppointments date={date} key={dayIndex} />
-              </div>
-            );
-          })}
-        </div>
+        <Suspense
+          key={weekDates.map((date) => date.toDateString()).join(",")}
+          fallback={<DayContainerLoading weekDates={weekDates} />}
+        >
+          <Await
+            resolve={getAppointmentsForDateRange(
+              weekDates[0],
+              weekDates[weekDates.length - 1]
+            )}
+            children={(appointments) => (
+              <DayContainer weekDates={weekDates} appointments={appointments} />
+            )}
+          />
+        </Suspense>
       </div>
     </div>
   );

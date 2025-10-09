@@ -7,7 +7,7 @@ import AuthProvider from "../lib/auth/AuthProvider";
 import SocketProvider from "../lib/socket/SocketProvider";
 import ChatBotProvider from "./components/ChatBot/ChatBotProvider";
 import CallPopupProvider from "./components/Chats/ChatBox/CallPopupProvider";
-// @ts-ignore: allow side-effect CSS import without module declarations
+// @ts-expect-error: allow side-effect CSS import without module declarations
 import "./globals.css";
 
 // change await auth() to <Await resolve={await auth()}>

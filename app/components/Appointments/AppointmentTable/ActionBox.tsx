@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
 import DefaultLoading from "../../DefaultLoading";
-import { AppointmentData } from "./AppointmentsActions";
+import { AppointmentData } from "../AppointmentActions";
+import Feedback from "../Feedback";
 import { Actions } from "./AppointmentsTable";
 import ApproveButton from "./ApproveButton";
 import CancelButton from "./CancelButton";
 import EditButton from "./EditButton";
-import Feedback from "./Feedback";
 
 type ActionBoxProps = {
   actions: Actions[];

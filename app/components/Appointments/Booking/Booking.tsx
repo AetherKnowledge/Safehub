@@ -4,10 +4,7 @@ import { NewAppointmentData } from "@/lib/schemas";
 import Link from "next/link";
 import { useState } from "react";
 import { usePopup } from "../../Popup/PopupProvider";
-import {
-  createNewAppointment,
-  updateAppointment,
-} from "../AppointmentTable/AppointmentsActions";
+import { createNewAppointment, updateAppointment } from "../AppointmentActions";
 import DatePickerSelector from "./DatePickerSelector";
 
 const Booking = ({ appointment }: { appointment?: Appointment }) => {

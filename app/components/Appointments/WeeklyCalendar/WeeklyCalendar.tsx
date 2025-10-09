@@ -1,6 +1,6 @@
 import { Fragment, Suspense } from "react";
 import { Await } from "react-router";
-import { getAppointmentsForDateRange } from "../AppointmentTable/AppointmentsActions";
+import { getAppointmentsForDateRange } from "../AppointmentActions";
 import DayContainer, { DayContainerLoading } from "./DayContainer";
 import { DAYS, TIME_SLOTS, getWeekDates } from "./WeeklyCalendarUtils";
 

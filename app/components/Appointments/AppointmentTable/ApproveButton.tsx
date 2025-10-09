@@ -3,8 +3,8 @@
 import { AppointmentStatus } from "@/app/generated/prisma";
 import { useRouter } from "next/navigation";
 import { FaCheckCircle } from "react-icons/fa";
-import { updateAppointmentStatus } from "./AppointmentsActions";
 import { usePopup } from "../../Popup/PopupProvider";
+import { updateAppointmentStatus } from "../AppointmentActions";
 
 interface ApproveButton {
   appointmentId: string;

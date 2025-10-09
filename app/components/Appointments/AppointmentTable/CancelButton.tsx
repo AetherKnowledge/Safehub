@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { MdCancel } from "react-icons/md";
 import { usePopup } from "../../Popup/PopupProvider";
-import { updateAppointmentStatus } from "./AppointmentsActions";
+import { updateAppointmentStatus } from "../AppointmentActions";
 
 interface CancelButtonProps {
   appointmentId: string;

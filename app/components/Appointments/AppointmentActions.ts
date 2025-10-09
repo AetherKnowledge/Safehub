@@ -2,6 +2,7 @@
 import {
   Appointment,
   AppointmentStatus,
+  Feedback,
   User,
   UserType,
 } from "@/app/generated/prisma";
@@ -19,9 +20,10 @@ export type AppointmentData = Appointment & {
   counselor: {
     user: Pick<User, "id" | "name" | "email" | "image">;
   };
+  feedback: Feedback | null;
 };
 
-export async function getAppointments() {
+export async function getAppointments(): Promise<AppointmentData[]> {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
@@ -63,6 +65,7 @@ export async function getAppointments() {
           },
         },
       },
+      feedback: true,
     },
   });
 
@@ -111,6 +114,7 @@ export async function getAppointmentById(
             },
           },
         },
+        feedback: true,
       },
     })
     .catch(() => {
@@ -194,6 +198,11 @@ export async function updateAppointment(
     throw new Error("Appointment not found");
   }
 
+  const validation = newAppointmentSchema.safeParse(appointmentData);
+  if (!validation.success) {
+    throw new Error("Invalid appointment data");
+  }
+
   // Update the appointment status
   const updatedAppointment = await prisma.appointment.update({
     where: { id: appointmentId },
@@ -226,6 +235,7 @@ export async function updateAppointment(
           },
         },
       },
+      feedback: true,
     },
   });
 
@@ -326,6 +336,7 @@ export async function getAppointmentsForDateRange(
           },
         },
       },
+      feedback: true,
     },
     orderBy: {
       startTime: "asc",
@@ -393,6 +404,7 @@ export async function getAppointmentsForDate(
           },
         },
       },
+      feedback: true,
     },
     orderBy: {
       startTime: "asc",

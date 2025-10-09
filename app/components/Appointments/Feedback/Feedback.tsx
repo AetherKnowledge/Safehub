@@ -1,27 +1,57 @@
 "use client";
 
+import { NewFeedbackData } from "@/lib/schemas";
 import { useState } from "react";
 import { FaRegStar, FaStar } from "react-icons/fa6";
 import { MdMessage } from "react-icons/md";
 import ModalBase from "../../Popup/ModalBase";
-import { AppointmentData } from "./AppointmentsActions";
+import { usePopup } from "../../Popup/PopupProvider";
+import { AppointmentData } from "../AppointmentActions";
+import { upsertFeedback } from "./FeedbackActions";
 
 const Feedback = ({ appointment }: { appointment: AppointmentData }) => {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [rating, setRating] = useState<number>(0);
-  const [feedback, setFeedback] = useState<string>("");
-  const [anonymous, setAnonymous] = useState<boolean>(true);
+  const [rating, setRating] = useState<number>(
+    appointment.feedback?.rating || 0
+  );
+  const [content, setContent] = useState<string>(
+    appointment.feedback?.content || ""
+  );
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(
+    appointment.feedback?.isAnonymous || true
+  );
+  const statusPopup = usePopup();
 
   const handleSubmit = async () => {
-    // Placeholder: wire this up to your API or actions
-    console.log("Submitting feedback", {
+    const feedbackData: NewFeedbackData = {
+      appointmentId: appointment.id,
       rating,
-      feedback,
-      anonymous,
-      appointment,
-    });
-    // Close modal after submit
-    setShowFeedbackModal(false);
+      content,
+      isAnonymous,
+    };
+
+    await upsertFeedback(appointment.id, feedbackData)
+      .then(() => {
+        setShowFeedbackModal(false);
+        statusPopup.showSuccess(
+          `Feedback ${
+            appointment.feedback ? "updated" : "submitted"
+          } successfully.`
+        );
+      })
+      .catch((error) => {
+        console.error(
+          `Error ${
+            appointment.feedback ? "updating" : "submitting"
+          } feedback: ${error}`
+        );
+        setShowFeedbackModal(false);
+        statusPopup.showError(
+          `Failed to ${
+            appointment.feedback ? "update" : "submit"
+          } feedback. Please try again. ${error.message}`
+        );
+      });
   };
 
   return (
@@ -61,8 +91,8 @@ const Feedback = ({ appointment }: { appointment: AppointmentData }) => {
             </p>
 
             <textarea
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
               placeholder="Add your feedback"
               className="textarea w-full h-28 p-3 border border-gray-300 rounded mb-4 resize-none outline-none ring-0 focus:ring-1 focus:outline-0"
             />
@@ -71,8 +101,8 @@ const Feedback = ({ appointment }: { appointment: AppointmentData }) => {
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={anonymous}
-                  onChange={(e) => setAnonymous(e.target.checked)}
+                  checked={isAnonymous}
+                  onChange={(e) => setIsAnonymous(e.target.checked)}
                   className="toggle toggle-sm toggle-primary"
                 />
                 <span className="ml-2">Anonymous</span>
@@ -90,7 +120,7 @@ const Feedback = ({ appointment }: { appointment: AppointmentData }) => {
                   className="btn btn-primary text-white"
                   onClick={() => handleSubmit()}
                 >
-                  Submit
+                  {appointment.feedback ? "Update" : "Submit"}
                 </button>
               </div>
             </div>

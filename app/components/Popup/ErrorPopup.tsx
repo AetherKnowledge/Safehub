@@ -15,7 +15,7 @@ const ErrorPopup = ({
   redirectTo,
 }: ErrorScreenProps) => (
   <ModalBase>
-    <div className="bg-base-100 p-6 rounded-lg shadow-lg text-center">
+    <div className="bg-base-100 p-6 rounded-lg shadow-lg text-center z-100">
       <div className="flex flex-col items-center justify-center h-full space-y-4">
         <p className="text-error">Error: {message}</p>
         {redirectTo ? (

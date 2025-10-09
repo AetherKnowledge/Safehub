@@ -2,10 +2,11 @@
 import { AppointmentStatus } from "@/app/generated/prisma";
 import { formatTime } from "@/lib/utils";
 import { useState } from "react";
+import { usePopup } from "../../Popup/PopupProvider";
 import {
   AppointmentData,
   updateAppointmentStatus,
-} from "../AppointmentTable/AppointmentsActions";
+} from "../AppointmentActions";
 import AppointmentPopup, { AppointmentPopupAction } from "./AppointmentPopup";
 import {
   getAppointmentHeight,
@@ -25,6 +26,7 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
   const appointmentDate = new Date(appointment.startTime);
   const topPosition = getAppointmentTopPosition(appointmentDate);
   const height = getAppointmentHeight(appointment);
+  const popup = usePopup();
 
   // Handle appointment action (Mark as done, Cancel)
   const handleAppointmentAction = async (
@@ -42,7 +44,9 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
       await updateAppointmentStatus(
         appointment.id,
         newStatus as AppointmentStatus
-      );
+      ).catch(() => {
+        popup.showError("Failed to update appointment status.");
+      });
 
       // Update local state
       onUpdate?.({ ...appointment, status: newStatus });

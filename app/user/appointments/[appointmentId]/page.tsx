@@ -1,5 +1,5 @@
-import { getAppointmentById } from "@/app/components/Appointments/AppointmentTable/AppointmentsActions";
-import Booking from "@/app/components/Appointments/Booking/Booking";
+import { getAppointmentById } from "@/app/components/Appointments/AppointmentActions";
+import Booking from "@/app/components/Appointments/Booking";
 import ErrorPopup from "@/app/components/Popup/ErrorPopup";
 
 const page = async ({

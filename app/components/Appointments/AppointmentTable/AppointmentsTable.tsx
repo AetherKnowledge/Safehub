@@ -7,8 +7,8 @@ import {
 } from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
 import { MdMeetingRoom } from "react-icons/md";
+import { AppointmentData } from "../AppointmentActions";
 import ActionBox from "./ActionBox";
-import { AppointmentData } from "./AppointmentsActions";
 
 const AppointmentsTable = async ({
   userType,

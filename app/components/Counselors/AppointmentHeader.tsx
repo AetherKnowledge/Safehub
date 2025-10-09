@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 import { FaAngleLeft, FaRegCalendar } from "react-icons/fa";
 import { FaAngleRight } from "react-icons/fa6";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { getTodayAppointmentsCount } from "../Appointments/AppointmentTable/AppointmentsActions";
+import { getTodayAppointmentsCount } from "../Appointments/AppointmentActions";
 import { getWeekDates } from "../Appointments/WeeklyCalendar/WeeklyCalendarUtils";
+import { usePopup } from "../Popup/PopupProvider";
 import { ViewMode } from "./AppointmentsPage";
 
 const AppointmentHeader: React.FC = () => {
@@ -14,6 +15,7 @@ const AppointmentHeader: React.FC = () => {
   const searchParams = useSearchParams();
   const pathName = usePathname();
   const [todayAppointmentsCount, setTodayAppointmentsCount] = useState(0);
+  const popup = usePopup();
 
   // Search params are also stored here for immediate UI updates
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.CALENDAR);
@@ -36,8 +38,13 @@ const AppointmentHeader: React.FC = () => {
 
   useEffect(() => {
     const fetchTodayAppointmentsCount = async () => {
-      const count = await getTodayAppointmentsCount(new Date());
-      setTodayAppointmentsCount(count);
+      await getTodayAppointmentsCount(new Date())
+        .then((count) => {
+          setTodayAppointmentsCount(count);
+        })
+        .catch((err) => {
+          popup.showError("Failed to load today's appointments count.", err);
+        });
     };
 
     fetchTodayAppointmentsCount();

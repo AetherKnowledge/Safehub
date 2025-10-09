@@ -1,5 +1,6 @@
 "use client";
-import { AppointmentData } from "../AppointmentTable/AppointmentsActions";
+import ModalBase from "../../Popup/ModalBase";
+import { AppointmentData } from "../AppointmentActions";
 import {
   getBorderStatusColor,
   getStatusTextColor,
@@ -21,7 +22,7 @@ type AppointmentPopupProps = {
 
 const AppointmentPopup = ({ appointment, onAction }: AppointmentPopupProps) => {
   return (
-    <div className="fixed inset-0 bg-transparent bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity">
+    <ModalBase>
       <div
         className={`bg-base-100 rounded-lg p-6 max-w-md w-full mx-4 border-l-6 ${getBorderStatusColor(
           appointment.status
@@ -95,7 +96,7 @@ const AppointmentPopup = ({ appointment, onAction }: AppointmentPopupProps) => {
           </button>
         </div>
       </div>
-    </div>
+    </ModalBase>
   );
 };
 

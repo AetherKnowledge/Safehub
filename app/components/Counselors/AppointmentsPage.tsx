@@ -2,8 +2,8 @@ import { UserType } from "@/app/generated/prisma";
 import {
   getAppointments,
   getAppointmentsForDateRange,
-} from "../Appointments/AppointmentTable/AppointmentsActions";
-import AppointmentsTable from "../Appointments/AppointmentTable/AppointmentsTable";
+} from "../Appointments/AppointmentActions";
+import AppointmentsTable from "../Appointments/AppointmentTable";
 import WeeklyCalendar from "../Appointments/WeeklyCalendar";
 import { getWeekDates } from "../Appointments/WeeklyCalendar/WeeklyCalendarUtils";
 import AppointmentHeader from "./AppointmentHeader";

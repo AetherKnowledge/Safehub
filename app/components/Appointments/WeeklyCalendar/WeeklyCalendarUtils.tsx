@@ -1,5 +1,5 @@
 import { AppointmentStatus } from "@/app/generated/prisma";
-import { AppointmentData } from "../AppointmentTable/AppointmentsActions";
+import { AppointmentData } from "../AppointmentActions";
 
 // Time slots from 8:00 AM to 12:00 PM (24-hour format)
 export const TIME_SLOTS = [

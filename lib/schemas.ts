@@ -44,6 +44,14 @@ export const newAppointmentSchema = z.object({
 });
 export type NewAppointmentData = z.infer<typeof newAppointmentSchema>;
 
+export const newFeedbackSchema = z.object({
+  appointmentId: z.string(),
+  rating: z.number().min(1).max(5),
+  content: z.string().max(500).optional(),
+  isAnonymous: z.boolean().optional(),
+});
+export type NewFeedbackData = z.infer<typeof newFeedbackSchema>;
+
 export const messageSchema = z.object({
   chatId: z.string().min(1, "Chat ID is required"),
   content: z.string().trim().min(1).max(1000), // Increased for encrypted content

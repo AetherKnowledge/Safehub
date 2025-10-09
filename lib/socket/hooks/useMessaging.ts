@@ -6,13 +6,7 @@ import { SocketEventType, SocketMessage } from "../SocketEvents";
 import { useSocket } from "../SocketProvider";
 
 export function useMessaging(chatId: string, fetchMessages = true): Messaging {
-  // Don't use socket for chatbot
-  // as it uses a different mechanism
-  // for sending and receiving messages
-  // this is here because chatbox calls two hooks conditionally
-  // which changes the order of hooks called
-  // which is against the rules of hooks
-  const socket = chatId === "chatbot" ? null : useSocket().socket;
+  const socket = useSocket().socket;
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const onRecieveData = useSocket().onRecieveData;
@@ -26,7 +20,8 @@ export function useMessaging(chatId: string, fetchMessages = true): Messaging {
   );
 
   useEffect(() => {
-    if (!fetchMessages) {
+    console.log("Loading messages for chat:", chatId);
+    if (!fetchMessages || chatId === "chatbot") {
       setLoading(false);
       return;
     }
@@ -38,7 +33,7 @@ export function useMessaging(chatId: string, fetchMessages = true): Messaging {
     };
 
     loadData();
-  }, []);
+  }, [chatId]);
 
   useEffect(() => {
     const unsubscribe = onRecieveData((event) => {
@@ -53,6 +48,7 @@ export function useMessaging(chatId: string, fetchMessages = true): Messaging {
 
   const sendMessage = useCallback(
     async (content: string) => {
+      if (chatId === "chatbot") return;
       if (!socket || socket.readyState !== WebSocket.OPEN) {
         console.warn("Socket not open. Cannot send message.");
         return;
@@ -88,7 +84,12 @@ export function useMessaging(chatId: string, fetchMessages = true): Messaging {
   }, [socket, chatId]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      console.warn("Socket not initialized.");
+      return;
+    }
+    if (chatId === "chatbot") return;
+
     joinChat();
 
     return () => {

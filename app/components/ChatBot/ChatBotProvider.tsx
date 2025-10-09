@@ -1,10 +1,7 @@
 "use client";
 import { Message, Messaging } from "@/@types/network";
 import { ChatBotChat } from "@/app/components/ChatBot/ChatBot";
-import {
-  getChatBotHistory,
-  sendMessageToChatBot,
-} from "@/app/components/ChatBot/ChatBotActions";
+import { getChatBotHistory } from "@/app/components/ChatBot/ChatBotActions";
 import { useSession } from "next-auth/react";
 import {
   createContext,
@@ -57,8 +54,8 @@ const ChatBotProvider = ({ children }: { children: ReactNode }) => {
       } as Message,
     ]);
 
-    const reply = await sendMessageToChatBot(content);
-    setMessages((prevMessages) => [...prevMessages, reply]);
+    // const reply = await sendMessageToChatBot(content);
+    // setMessages((prevMessages) => [...prevMessages, reply]);
   };
 
   const chatBotContextValue: Messaging = { messages, sendMessage, loading };

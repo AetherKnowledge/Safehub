@@ -11,8 +11,10 @@ import MessageBubble from "./MessageBubble";
 export function ChatBox({ chat }: { chat: ChatData }) {
   const session = useSession();
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const messaging =
-    chat.id === "chatbot" ? useChatBot() : useMessaging(chat.id);
+
+  const chatBot = useChatBot();
+  const userChats = useMessaging(chat.id);
+  const messaging = chat.id === "chatbot" ? chatBot : userChats;
 
   useEffect(() => {
     setTimeout(scrollToBottom, 50);

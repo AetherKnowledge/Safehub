@@ -34,6 +34,7 @@ export function useWebSocket(
 
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectAttempts = useRef(0);
+  const initConnectTimeout = useRef<NodeJS.Timeout | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -112,17 +113,37 @@ export function useWebSocket(
   useEffect(() => {
     if (status === "authenticated" && !socketRef.current) {
       // wait a tick to avoid blocking render
-      setTimeout(() => {
-        connect();
+      initConnectTimeout.current = setTimeout(() => {
+        // double-check current state before connecting
+        if (status === "authenticated" && !socketRef.current) {
+          connect();
+        }
+        initConnectTimeout.current = null;
       }, 50);
     } else if (status === "unauthenticated") {
       disconnect();
     }
 
+    // clear only the scheduled initial connect when deps change
     return () => {
-      disconnect();
+      if (initConnectTimeout.current) {
+        clearTimeout(initConnectTimeout.current);
+        initConnectTimeout.current = null;
+      }
     };
   }, [status, connect, disconnect]);
+
+  // Ensure we disconnect when the component unmounts.
+  useEffect(() => {
+    return () => {
+      // clear any pending initial connect and disconnect socket
+      if (initConnectTimeout.current) {
+        clearTimeout(initConnectTimeout.current);
+        initConnectTimeout.current = null;
+      }
+      disconnect();
+    };
+  }, [disconnect]);
 
   return {
     socket: socketRef.current,

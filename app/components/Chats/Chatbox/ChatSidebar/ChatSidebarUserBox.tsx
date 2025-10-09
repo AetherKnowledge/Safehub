@@ -19,8 +19,10 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathName = usePathname();
-  const messaging =
-    chat.id === "chatbot" ? useChatBot() : useMessaging(chat.id, false);
+  const chatBot = useChatBot();
+  const userChats = useMessaging(chat.id, false);
+
+  const messaging = chat.id === "chatbot" ? chatBot : userChats;
 
   useEffect(() => {
     console.log(latestMessage);

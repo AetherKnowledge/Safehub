@@ -40,10 +40,12 @@ const ChatHeader = ({ chat }: ChatHeaderProps) => {
         </div>
         {chat && (
           <div className="flex flex-row gap-5">
-            <IoIosCall
-              className="text-2xl text-primary cursor-pointer hover:text-secondary transition-colors"
-              onClick={handleInitiateCall}
-            />
+            {chat.id !== "chatbot" && (
+              <IoIosCall
+                className="text-2xl text-primary cursor-pointer hover:text-secondary transition-colors"
+                onClick={handleInitiateCall}
+              />
+            )}
           </div>
         )}
       </div>

@@ -1,9 +1,9 @@
 "use client";
+import { Message } from "@/@types/network";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import { useSocket } from "./socket/SocketProvider";
-import { Message } from "./socket/hooks/useMessaging";
 
 interface Props {
   children: React.ReactNode;

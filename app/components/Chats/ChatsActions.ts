@@ -1,10 +1,9 @@
 "use server";
 
-import { ChatData } from "@/@types/network";
+import { ChatData, Message } from "@/@types/network";
 import { UserStatus } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
-import { Message } from "@/lib/socket/hooks/useMessaging";
 import { Recipient } from "@/lib/socket/SocketEvents";
 
 import { prisma } from "@/prisma/client";
@@ -53,6 +52,7 @@ export async function getChats(): Promise<ChatData[]> {
         },
         take: 1,
         select: {
+          userId: true,
           content: true,
           createdAt: true,
         },
@@ -83,12 +83,13 @@ export async function getChats(): Promise<ChatData[]> {
         status: (await isUserOnline(member?.id || ""))
           ? UserStatus.Online
           : UserStatus.Offline,
-        latestMessageAt: chat.lastMessageAt,
-        latestMessage: chat.messages[0]?.content,
-        isLatestMessageFromSelf:
-          chat.messages[0] && member
-            ? chat.messages[0].createdAt <= chat.lastMessageAt!
-            : false,
+        latestMessage: chat.messages[0]
+          ? ({
+              ...chat.messages[0],
+              name: member?.name || member?.email || "Unknown",
+              src: member?.image || undefined,
+            } as Message)
+          : undefined,
       } as ChatData;
     })
   );

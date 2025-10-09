@@ -1,19 +1,34 @@
 "use client";
 import { ChatData } from "@/@types/network";
+import { useChatBot } from "@/app/components/ChatBot/ChatBotProvider";
 import { UserStatus } from "@/app/generated/prisma";
+import { useMessaging } from "@/lib/socket/hooks/useMessaging";
 import { imageGenerator } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-// Make this latest message update in real-time with web sockets
 type Props = {
   chat: ChatData;
   selected: boolean;
 };
 
-const SidebarUserBox = ({ chat, selected }: Props) => {
+const ChatSidebarUserBox = ({ chat, selected }: Props) => {
+  const session = useSession();
+  const [latestMessage, setLatestMessage] = useState(chat.latestMessage);
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathName = usePathname();
+  const messaging =
+    chat.id === "chatbot" ? useChatBot() : useMessaging(chat.id, false);
+
+  useEffect(() => {
+    console.log(latestMessage);
+    if (messaging.messages.length > 0) {
+      setLatestMessage(messaging.messages[messaging.messages.length - 1]);
+      console.log(messaging.messages[messaging.messages.length - 1]);
+    }
+  }, [messaging.messages]);
 
   const updateSearchParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -23,7 +38,7 @@ const SidebarUserBox = ({ chat, selected }: Props) => {
 
   const getRelativeTime = (date: Date): string => {
     const now = new Date();
-    const diffInMs = now.getTime() - date.getTime();
+    const diffInMs = now.getTime() - new Date(date).getTime();
     const diffInSeconds = Math.floor(diffInMs / 1000);
     const diffInMinutes = Math.floor(diffInSeconds / 60);
     const diffInHours = Math.floor(diffInMinutes / 60);
@@ -32,6 +47,7 @@ const SidebarUserBox = ({ chat, selected }: Props) => {
     const diffInMonths = Math.floor(diffInDays / 30);
     const diffInYears = Math.floor(diffInDays / 365);
 
+    if (diffInSeconds <= 0) return "now";
     if (diffInSeconds < 60) return `${diffInSeconds}s`;
     if (diffInMinutes < 60) return `${diffInMinutes}m`;
     if (diffInHours < 24) return `${diffInHours}h`;
@@ -40,10 +56,6 @@ const SidebarUserBox = ({ chat, selected }: Props) => {
     if (diffInMonths < 12) return `${diffInMonths}mo`;
     return `${diffInYears}yr`;
   };
-
-  const latestMessageDateText = chat.latestMessageAt
-    ? getRelativeTime(chat.latestMessageAt)
-    : "";
 
   return (
     <div
@@ -64,13 +76,13 @@ const SidebarUserBox = ({ chat, selected }: Props) => {
           {chat.name}
         </h2>
         <p className="text-xs text-base-content/60 overflow-hidden text-ellipsis whitespace-nowrap">
-          {chat.isLatestMessageFromSelf ? "You: " : ""}
-          {chat.latestMessage || "No messages yet"}
+          {latestMessage?.userId === session.data?.user.id ? "You: " : ""}
+          {latestMessage?.content || "No messages yet"}
         </p>
       </div>
       <div className="flex flex-col justify-end items-end">
         <p className="text-xs text-base-content/60">
-          {chat.latestMessage ? latestMessageDateText : ""}
+          {latestMessage ? getRelativeTime(latestMessage.createdAt) : ""}
         </p>
       </div>
     </div>
@@ -100,4 +112,4 @@ export const SidebarUserBoxSkeleton = () => {
   );
 };
 
-export default SidebarUserBox;
+export default ChatSidebarUserBox;

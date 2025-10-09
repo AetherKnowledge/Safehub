@@ -34,15 +34,15 @@ interface Props {
 }
 
 const CallPopup = ({ children }: Props) => {
-  const [
-    calling,
+  const {
+    currentCall,
     initiateCall,
     answerCall,
     rejectCall,
     leaveCall,
     localStream,
     peers,
-  ] = useCalling();
+  } = useCalling();
 
   const callPopupContextValue: CallPopupContextType = {
     setVideoPopup: (value: boolean) => {
@@ -80,30 +80,30 @@ const CallPopup = ({ children }: Props) => {
   const [initiatingCall, setInitiatingCall] = useState(false);
 
   useEffect(() => {
-    if (calling && calling.callerId !== session.data?.user.id) {
-      console.log("Incoming call:", calling);
+    if (currentCall && currentCall.callerId !== session.data?.user.id) {
+      console.log("Incoming call:", currentCall);
       setRingingPopup(true); // Show the popup when there is an incoming call
     } else if (
-      calling &&
-      calling.callerId === session.data?.user.id &&
-      (calling.status === CallStatus.Pending ||
-        calling.status === CallStatus.No_Answer)
+      currentCall &&
+      currentCall.callerId === session.data?.user.id &&
+      (currentCall.status === CallStatus.Pending ||
+        currentCall.status === CallStatus.No_Answer)
     ) {
-      console.log("Outgoing call initiated:", calling);
+      console.log("Outgoing call initiated:", currentCall);
       setInitiatingCall(true);
     } else if (
-      calling &&
-      calling.callerId === session.data?.user.id &&
-      calling.status === CallStatus.Accepted
+      currentCall &&
+      currentCall.callerId === session.data?.user.id &&
+      currentCall.status === CallStatus.Accepted
     ) {
-      console.log("Outgoing call accepted:", calling);
+      console.log("Outgoing call accepted:", currentCall);
       setVideoPopup(true);
     } else {
       setInitiatingCall(false);
       setRingingPopup(false); // Hide the popup when there is no call
       setVideoPopup(false); // Hide the video popup when there is no call
     }
-  }, [calling, calling?.status]);
+  }, [currentCall, currentCall?.status]);
 
   function resetPopups() {
     setInitiatingCall(false);
@@ -112,7 +112,7 @@ const CallPopup = ({ children }: Props) => {
   }
 
   const handleAnswerCall = () => {
-    if (!calling) return;
+    if (!currentCall) return;
 
     answerCall();
     resetPopups();
@@ -120,14 +120,14 @@ const CallPopup = ({ children }: Props) => {
   };
 
   const handleRejectCall = () => {
-    if (!calling) return;
+    if (!currentCall) return;
 
     rejectCall();
     resetPopups();
   };
 
   const handleLeaveCall = () => {
-    if (!calling) return;
+    if (!currentCall) return;
 
     leaveCall();
     resetPopups();
@@ -143,18 +143,18 @@ const CallPopup = ({ children }: Props) => {
     <>
       {ringingPopup && (
         <RingingPopup
-          callerName={calling?.callerName || "Unknown Caller"}
-          callerImage={calling?.callerImage}
+          callerName={currentCall?.callerName || "Unknown Caller"}
+          callerImage={currentCall?.callerImage}
           onAnswer={handleAnswerCall}
           onReject={handleRejectCall}
         />
       )}
       {initiatingCall && (
         <InitiateCallPopup
-          recipients={calling?.recipients || []}
-          chatName={calling?.chatName}
+          recipients={currentCall?.recipients || []}
+          chatName={currentCall?.chatName}
           onCancel={handleLeaveCall}
-          status={calling?.status || CallStatus.Pending}
+          status={currentCall?.status || CallStatus.Pending}
         />
       )}
       {videoPopup && (

@@ -1,6 +1,6 @@
+import { Message } from "@/@types/network";
 import { messageSchema } from "@/lib/schemas";
 import ClientSocketServer from "@/lib/socket/ClientSocketServer";
-import { Message } from "@/lib/socket/hooks/useMessaging";
 import {
   SocketAnswerCall,
   SocketCallEnded,

@@ -28,7 +28,9 @@ export function useCalling() {
   const socket = useSocket().socket;
   const onRecieveData = useSocket().onRecieveData;
   const onRecieveError = useSocket().onRecieveError;
-  const [calling, setCalling] = useState<SocketInitiateCall | null>(null);
+  const [currentCall, setCurrentCall] = useState<SocketInitiateCall | null>(
+    null
+  );
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [callMembers, setCallMembers] = useState<string[]>([]);
   const [peers, setPeers] = useState<PeerData[]>([]);
@@ -40,7 +42,7 @@ export function useCalling() {
         return;
       }
 
-      if (!calling) {
+      if (!currentCall) {
         console.warn("No active call to create peer for member:", member);
         return;
       }
@@ -82,8 +84,8 @@ export function useCalling() {
           payload: {
             from: session.data?.user.id,
             to: member,
-            callId: calling.callId,
-            chatId: calling.chatId,
+            callId: currentCall.callId,
+            chatId: currentCall.chatId,
             sdpData: JSON.stringify(signalData),
           } as SocketSdp,
         } as SocketEvent;
@@ -148,7 +150,7 @@ export function useCalling() {
 
       return peer;
     },
-    [calling, setPeers]
+    [currentCall, setPeers]
   );
 
   const getMediaStream = useCallback(async () => {
@@ -199,19 +201,19 @@ export function useCalling() {
       );
 
       // Set the calling state to the received call data
-      setCalling(data);
+      setCurrentCall(data);
     }
 
     function answeredCallHandler(data: SocketAnswerCall) {
       console.log("Call answered:", data);
-      if (data.chatId === calling?.chatId) {
+      if (data.chatId === currentCall?.chatId) {
         // Handle the call answered event, e.g., show a notification or update state
         console.log(
-          `Call answered in chat ${calling?.chatId} by ${data.userName}`
+          `Call answered in chat ${currentCall?.chatId} by ${data.userName}`
         );
       }
 
-      if (!calling) {
+      if (!currentCall) {
         console.warn("No call to answer.");
         return;
       }
@@ -220,7 +222,9 @@ export function useCalling() {
       // calling.status = CallStatus.Accepted;
       // Update the call status to accepted
 
-      setCalling((prev) => (prev ? { ...prev, status: data.answer } : prev));
+      setCurrentCall((prev) =>
+        prev ? { ...prev, status: data.answer } : prev
+      );
       setCallMembers((prev) => {
         const updatedMembers = [...prev];
         if (!updatedMembers.includes(data.userId)) {
@@ -232,25 +236,27 @@ export function useCalling() {
 
     function recieveCallLeftHandler(data: SocketLeaveCall) {
       console.log("Call left:", data);
-      if (data.chatId === calling?.chatId) {
+      if (data.chatId === currentCall?.chatId) {
         // Handle the call left event, e.g., show a notification or update state
-        console.log(`Call left in chat ${calling?.chatId} by ${data.userName}`);
+        console.log(
+          `Call left in chat ${currentCall?.chatId} by ${data.userName}`
+        );
       }
     }
 
     function recieveCallEnded(data: SocketCallEnded) {
-      if (!calling) {
+      if (!currentCall) {
         console.warn("No active call to handle call ended event.");
         return;
       }
 
       console.log("Call ended:", data);
-      if (data.chatId === calling?.chatId) {
+      if (data.chatId === currentCall?.chatId) {
         // Handle the call ended event, e.g., show a notification or update state
-        console.log(`Call ended in chat ${calling?.chatId}`);
+        console.log(`Call ended in chat ${currentCall?.chatId}`);
       }
 
-      setCalling(null); // Clear the calling state
+      setCurrentCall(null); // Clear the calling state
       setLocalStream(null); // Clear the local stream
     }
 
@@ -300,7 +306,7 @@ export function useCalling() {
             }
           }
 
-          if (!calling) {
+          if (!currentCall) {
             console.warn("No call to handle SDP offer.");
             return;
           }
@@ -352,7 +358,7 @@ export function useCalling() {
   useEffect(() => {
     const unsubscribe = onRecieveError((error) => {
       if (error.errorType === SocketErrorCallType.NO_ANSWER) {
-        setCalling((prev) =>
+        setCurrentCall((prev) =>
           prev ? { ...prev, status: CallStatus.No_Answer } : prev
         );
       }
@@ -396,10 +402,10 @@ export function useCalling() {
       };
 
       socket.send(JSON.stringify(message));
-      setCalling(callData);
+      setCurrentCall(callData);
       setCallMembers([session.data?.user.id]);
     },
-    [socket, session, calling]
+    [socket, session, currentCall]
   );
 
   const answerCall = useCallback(async () => {
@@ -408,7 +414,7 @@ export function useCalling() {
       return;
     }
 
-    if (!calling) {
+    if (!currentCall) {
       console.warn("No call to answer.");
       return;
     }
@@ -429,8 +435,8 @@ export function useCalling() {
     }
 
     const answerData = {
-      callId: calling?.callId,
-      chatId: calling?.chatId,
+      callId: currentCall?.callId,
+      chatId: currentCall?.chatId,
       answer: CallStatus.Accepted,
     } as SocketAnswerCall;
 
@@ -440,8 +446,8 @@ export function useCalling() {
     };
 
     const updatedMembers = [...callMembers];
-    if (!updatedMembers.includes(calling.callerId)) {
-      updatedMembers.push(calling.callerId);
+    if (!updatedMembers.includes(currentCall.callerId)) {
+      updatedMembers.push(currentCall.callerId);
     }
     if (!updatedMembers.includes(session.data?.user.id)) {
       updatedMembers.push(session.data?.user.id);
@@ -458,7 +464,7 @@ export function useCalling() {
     }
 
     socket.send(JSON.stringify(message));
-  }, [socket, calling, peers, callMembers]);
+  }, [socket, currentCall, peers, callMembers]);
 
   const rejectCall = useCallback(() => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -466,14 +472,14 @@ export function useCalling() {
       return;
     }
 
-    if (!calling) {
+    if (!currentCall) {
       console.warn("No call to reject.");
       return;
     }
 
     const answerData = {
-      callId: calling?.callId,
-      chatId: calling?.chatId,
+      callId: currentCall?.callId,
+      chatId: currentCall?.chatId,
       answer: CallStatus.Rejected,
     } as SocketAnswerCall;
 
@@ -483,7 +489,7 @@ export function useCalling() {
     };
 
     socket.send(JSON.stringify(message));
-  }, [socket, calling]);
+  }, [socket, currentCall]);
 
   const leaveCall = useCallback(() => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -491,14 +497,14 @@ export function useCalling() {
       return;
     }
 
-    if (!calling) {
+    if (!currentCall) {
       console.warn("No call to leave.");
       return;
     }
 
     const leaveData = {
-      callId: calling?.callId,
-      chatId: calling?.chatId,
+      callId: currentCall?.callId,
+      chatId: currentCall?.chatId,
     };
 
     const message = {
@@ -511,7 +517,7 @@ export function useCalling() {
     setPeers([]);
 
     // Existing cleanup logic
-    setCalling(null);
+    setCurrentCall(null);
     if (localStream) {
       localStream.getTracks().forEach((track) => track.stop());
       setLocalStream(null);
@@ -519,17 +525,17 @@ export function useCalling() {
 
     // Send the leave call message to the server
     socket.send(JSON.stringify(message));
-    setCalling(null); // Clear the calling state
+    setCurrentCall(null); // Clear the calling state
     setLocalStream(null); // Clear the local stream
-  }, [socket, calling, localStream, peers]);
+  }, [socket, currentCall, localStream, peers]);
 
-  return [
-    calling,
+  return {
+    currentCall,
     initiateCall,
     answerCall,
     rejectCall,
     leaveCall,
     localStream,
     peers,
-  ] as const;
+  } as const;
 }

@@ -3,8 +3,10 @@ import { ChatData } from "@/@types/network";
 import { UserType } from "@/app/generated/prisma";
 import { useEffect, useState } from "react";
 import ChatSidebarHeader from "./ChatSidebarHeader";
+import ChatSidebarUserBox, {
+  SidebarUserBoxSkeleton,
+} from "./ChatSidebarUserBox";
 import FilterButton from "./FilterButton";
-import SidebarUserBox, { SidebarUserBoxSkeleton } from "./SidebarUserBox";
 
 export enum ChatFilter {
   All = "all",
@@ -73,7 +75,7 @@ const ChatSidebar = ({
               <SidebarUserBoxSkeleton key={index} />
             ))
           : filteredChats.map((chat) => (
-              <SidebarUserBox
+              <ChatSidebarUserBox
                 key={chat.id}
                 chat={chat}
                 selected={chatId === chat.id}

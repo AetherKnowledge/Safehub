@@ -1,6 +1,6 @@
 import { ChatData } from "@/@types/network";
-import { getChatBotChat } from "./AiChatBotActions";
-import ChatBox, { AiChatBox } from "./ChatBox/ChatBox";
+import { getChatBotChat } from "../ChatBot/ChatBotActions";
+import ChatBox from "./ChatBox/ChatBox";
 import ChatSidebar from "./ChatBox/ChatSidebar";
 import { getChats } from "./ChatsActions";
 
@@ -19,11 +19,17 @@ const ChatsPage = async ({ chatId }: ChatsPageProps) => {
     <div className="flex flex-row h-[87.5vh] gap-3">
       <ChatSidebar chatId={chatId} chats={chats} />
 
-      {chatForSelectedId && chatForSelectedId.id === "chatbot" ? (
-        <AiChatBox chat={chatForSelectedId} />
-      ) : (
-        chatForSelectedId && <ChatBox chat={chatForSelectedId} />
-      )}
+      {/* This is here because hooks need to be called in the same order
+          because chatbot uses different hooks compared to normal chats.
+          Navigating between normal chats will not remount the component, but
+          navigating to chatbot from another chat will.
+      */}
+      {chatForSelectedId &&
+        (chatForSelectedId.id === "chatbot" ? (
+          <ChatBox key={chatId} chat={chatForSelectedId} />
+        ) : (
+          <ChatBox chat={chatForSelectedId} />
+        ))}
     </div>
   );
 };

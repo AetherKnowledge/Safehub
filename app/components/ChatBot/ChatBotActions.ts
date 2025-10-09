@@ -1,24 +1,16 @@
 "use server";
 
-import { ChatData } from "@/@types/network";
-import { chathistory, ChatType, UserStatus } from "@/app/generated/prisma";
+import { ChatData, Message } from "@/@types/network";
+import { chathistory } from "@/app/generated/prisma";
 import { auth } from "@/auth";
-import { Message } from "@/lib/socket/hooks/useMessaging";
+import { Session } from "next-auth";
 
 import { prisma } from "@/prisma/client";
 import jwt from "jsonwebtoken";
+import { ChatBotChat } from "./ChatBot";
 
 export type ChatBotResponse = {
   output: string;
-};
-
-const ChatBotChat: ChatData = {
-  id: "chatbot",
-  name: "SafeHub AI",
-  email: "support@safehub-lcup.uk",
-  type: ChatType.DIRECT,
-  status: UserStatus.Online,
-  src: "/images/safehub-ai.svg",
 };
 
 type ChatBotMessage = {
@@ -92,9 +84,8 @@ export async function getChatBotChat(): Promise<ChatData> {
   return {
     ...ChatBotChat,
     latestMessage: chatHistory
-      ? (chatHistory.message as ChatBotMessage).content
+      ? convertChatBotMessageToChatMessage(session, chatHistory)
       : undefined,
-    latestMessageAt: chatHistory?.createdAt || undefined,
   };
 }
 
@@ -114,26 +105,35 @@ export async function getChatBotHistory(): Promise<Message[]> {
     },
   });
 
-  const convertedHistory: Message[] = chatHistory.map((msg) => ({
-    id: msg.id,
+  const convertedHistory: Message[] = chatHistory.map((msg) =>
+    convertChatBotMessageToChatMessage(session, msg)
+  );
+
+  return convertedHistory;
+}
+
+function convertChatBotMessageToChatMessage(
+  session: Session,
+  chatHistory: chathistory
+): Message {
+  return {
+    id: chatHistory.id,
     chatId: ChatBotChat.id,
     userId:
-      (msg.message as ChatBotMessage).type === "human"
+      (chatHistory.message as ChatBotMessage).type === "human"
         ? session.user.id || "user"
         : "chatbot",
-    content: (msg.message as ChatBotMessage).content,
-    createdAt: msg.createdAt,
-    updatedAt: msg.createdAt,
+    content: (chatHistory.message as ChatBotMessage).content,
+    createdAt: chatHistory.createdAt,
+    updatedAt: chatHistory.createdAt,
 
     name:
-      (msg.message as ChatBotMessage).type === "human"
+      (chatHistory.message as ChatBotMessage).type === "human"
         ? session.user.name || "You"
         : ChatBotChat.name,
     src:
-      (msg.message as ChatBotMessage).type === "human"
+      (chatHistory.message as ChatBotMessage).type === "human"
         ? session.user.image || undefined
         : ChatBotChat.src,
-  }));
-
-  return convertedHistory;
+  };
 }

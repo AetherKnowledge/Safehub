@@ -1,26 +1,35 @@
 "use client";
+import { Message, Messaging } from "@/@types/network";
 import { getChatById } from "@/app/components/Chats/ChatsActions";
-import { ChatMessage } from "@/app/generated/prisma";
 import { useCallback, useEffect, useState } from "react";
 import { SocketEventType, SocketMessage } from "../SocketEvents";
 import { useSocket } from "../SocketProvider";
 
-export interface Message extends ChatMessage {
-  name: string;
-  src?: string;
-}
-
-export function useMessaging(chatId: string) {
-  const socket = useSocket().socket;
+export function useMessaging(chatId: string, fetchMessages = true): Messaging {
+  // Don't use socket for chatbot
+  // as it uses a different mechanism
+  // for sending and receiving messages
+  // this is here because chatbox calls two hooks conditionally
+  // which changes the order of hooks called
+  // which is against the rules of hooks
+  const socket = chatId === "chatbot" ? null : useSocket().socket;
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const onRecieveData = useSocket().onRecieveData;
-  const onMessage = useCallback((event: Message) => {
-    console.log("Received socket message:", event);
-    setMessages((prev) => [...prev, event]);
-  }, []);
+  const onMessage = useCallback(
+    (event: Message) => {
+      console.log("Received socket message:", event);
+      if (event.chatId !== chatId) return;
+      setMessages((prev) => [...prev, event]);
+    },
+    [chatId]
+  );
 
   useEffect(() => {
+    if (!fetchMessages) {
+      setLoading(false);
+      return;
+    }
     const loadData = async () => {
       const serverMessages = (await getChatById(chatId)) as Message[];
 
@@ -43,17 +52,19 @@ export function useMessaging(chatId: string) {
   }, [onRecieveData]);
 
   const sendMessage = useCallback(
-    (content: SocketMessage) => {
+    async (content: string) => {
       if (!socket || socket.readyState !== WebSocket.OPEN) {
         console.warn("Socket not open. Cannot send message.");
         return;
       }
 
+      const message: SocketMessage = { content, chatId };
+
       socket.send(
-        JSON.stringify({ type: SocketEventType.MESSAGE, payload: content })
+        JSON.stringify({ type: SocketEventType.MESSAGE, payload: message })
       );
     },
-    [socket]
+    [socket, chatId]
   );
 
   const joinChat = useCallback(() => {
@@ -85,5 +96,5 @@ export function useMessaging(chatId: string) {
     };
   }, [socket, chatId]);
 
-  return [messages, onMessage, sendMessage, loading] as const;
+  return { messages, sendMessage, loading } as const;
 }

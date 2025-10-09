@@ -3,7 +3,7 @@ import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { Suspense } from "react";
 import { FaCalendar } from "react-icons/fa6";
-import { getAppointments } from "../../Appointments/AppointmentsActions";
+import { getAppointments } from "../../Appointments/AppointmentTable/AppointmentsActions";
 import AppointmentsTable from "../../Appointments/AppointmentTable/AppointmentsTable";
 import UpcomingAppointmentsTable from "../../Appointments/AppointmentTable/UpcomingAppointmentsTable";
 import DatePicker from "../../Appointments/Booking/DatePicker";

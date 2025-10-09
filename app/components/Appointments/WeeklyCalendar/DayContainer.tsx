@@ -1,4 +1,4 @@
-import { AppointmentData } from "../AppointmentsActions";
+import { AppointmentData } from "../AppointmentTable/AppointmentsActions";
 import AppointmentBox from "./AppointmentBox";
 import { TIME_SLOTS } from "./WeeklyCalendarUtils";
 

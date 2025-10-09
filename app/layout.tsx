@@ -8,6 +8,7 @@ import SocketProvider from "../lib/socket/SocketProvider";
 import ChatBotProvider from "./components/ChatBot/ChatBotProvider";
 import CallPopupProvider from "./components/Chats/ChatBox/CallPopupProvider";
 import "./globals.css";
+import PopupProvider from "./components/Popup/PopupProvider";
 
 // change await auth() to <Await resolve={await auth()}>
 // then use it in a child component
@@ -39,17 +40,19 @@ export default async function RootLayout({
       </head>
       <body className={`${inter.variable} antialiased`}>
         <div className="flex flex-col min-h-screen">
-          <AuthProvider>
-            <SocketProvider>
-              <CallPopupProvider>
-                <NotificationProvider>
-                  <ChatBotProvider>
-                    <main className="text-base-content">{children}</main>
-                  </ChatBotProvider>
-                </NotificationProvider>
-              </CallPopupProvider>
-            </SocketProvider>
-          </AuthProvider>
+          <PopupProvider>
+            <AuthProvider>
+              <SocketProvider>
+                <CallPopupProvider>
+                  <NotificationProvider>
+                    <ChatBotProvider>
+                      <main className="text-base-content">{children}</main>
+                    </ChatBotProvider>
+                  </NotificationProvider>
+                </CallPopupProvider>
+              </SocketProvider>
+            </AuthProvider>
+          </PopupProvider>
         </div>
       </body>
     </html>

@@ -1,5 +1,5 @@
 import { AppointmentStatus, UserType } from "@/app/generated/prisma";
-import { formatDateDisplay, imageGenerator } from "@/lib/utils";
+import { formatDateDisplay, formatTime, imageGenerator } from "@/lib/utils";
 import {
   FaRegCalendar,
   FaRegQuestionCircle,
@@ -7,8 +7,8 @@ import {
 } from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
 import { MdMeetingRoom } from "react-icons/md";
-import { AppointmentData } from "../AppointmentsActions";
-import CancelButton from "./CancelButton";
+import ActionBox from "./ActionBox";
+import { AppointmentData } from "./AppointmentsActions";
 
 const AppointmentsTable = async ({
   userType,
@@ -80,12 +80,7 @@ function AppointmentRow({
         </p>
       </td>
       <td className="flex flex-col items-center justify-center w-full">
-        <p className="text-sm">
-          {appointment.status === AppointmentStatus.Approved ||
-          appointment.status === AppointmentStatus.Completed
-            ? formatDateDisplay(appointment.startTime, false)
-            : "N/A"}
-        </p>
+        <p className="text-sm">{formatTime(appointment.startTime)}</p>
       </td>
       <td className="flex flex-col items-center justify-center w-full">
         <p className="text-sm">
@@ -98,8 +93,12 @@ function AppointmentRow({
       <td className="flex flex-col items-center justify-center w-full">
         <StatusBadge status={appointment.status} />
       </td>
-      <td className="flex flex-col items-center justify-center w-full">
-        <ActionButton appointment={appointment} />
+      <td className="flex flex-wrap items-center justify-center w-full gap-2">
+        {userType === UserType.Student ? (
+          <StudentActionButton appointment={appointment} />
+        ) : (
+          <CounselorActionButton appointment={appointment} />
+        )}
       </td>
     </tr>
   );
@@ -155,16 +154,59 @@ function StatusBadge({ status }: { status: AppointmentStatus }) {
   }
 }
 
-function ActionButton({ appointment }: { appointment: AppointmentData }) {
+export enum Actions {
+  APPROVE = "approve",
+  CANCEL = "cancel",
+  EDIT = "edit",
+  FEEDBACK = "feedback",
+}
+
+function StudentActionButton({
+  appointment,
+}: {
+  appointment: AppointmentData;
+}) {
   switch (appointment.status) {
     case AppointmentStatus.Rejected:
       return null;
     case AppointmentStatus.Pending:
-      return <CancelButton appointmentId={appointment.id} />;
+      <ActionBox
+        actions={[Actions.EDIT, Actions.CANCEL]}
+        appointment={appointment}
+      />;
     case AppointmentStatus.Approved:
-      return <CancelButton appointmentId={appointment.id} />;
+      return (
+        <ActionBox
+          actions={[Actions.EDIT, Actions.CANCEL]}
+          appointment={appointment}
+        />
+      );
     case AppointmentStatus.Completed:
-      return <button className="btn btn-info">Feedback</button>;
+      return (
+        <ActionBox actions={[Actions.FEEDBACK]} appointment={appointment} />
+      );
+    default:
+      return null;
+  }
+}
+
+function CounselorActionButton({
+  appointment,
+}: {
+  appointment: AppointmentData;
+}) {
+  switch (appointment.status) {
+    case AppointmentStatus.Rejected:
+      return null;
+    case AppointmentStatus.Pending:
+      return (
+        <ActionBox
+          actions={[Actions.APPROVE, Actions.EDIT, Actions.CANCEL]}
+          appointment={appointment}
+        />
+      );
+    case AppointmentStatus.Approved:
+      return <ActionBox actions={[Actions.EDIT]} appointment={appointment} />;
     default:
       return null;
   }

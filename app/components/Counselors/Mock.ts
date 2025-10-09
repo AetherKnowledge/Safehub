@@ -1,6 +1,6 @@
 import { AppointmentStatus, SessionPreference } from "@/app/generated/prisma";
 import { auth } from "@/auth";
-import { AppointmentData } from "../Appointments/AppointmentsActions";
+import { AppointmentData } from "../Appointments/AppointmentTable/AppointmentsActions";
 
 export async function getMockCounselorAppointments(
   date: Date

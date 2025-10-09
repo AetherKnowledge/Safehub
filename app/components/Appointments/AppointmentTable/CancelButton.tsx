@@ -1,42 +1,42 @@
 "use client";
 
-import DefaultLoading from "@/app/components/DefaultLoading";
+import { AppointmentStatus } from "@/app/generated/prisma";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { cancelAppointment } from "../AppointmentsActions";
+import { MdCancel } from "react-icons/md";
+import { usePopup } from "../../Popup/PopupProvider";
+import { updateAppointmentStatus } from "./AppointmentsActions";
 
 interface CancelButtonProps {
   appointmentId: string;
+  setLoading: (loading: boolean) => void;
 }
 
-const CancelButton = ({ appointmentId }: CancelButtonProps) => {
+const CancelButton = ({ appointmentId, setLoading }: CancelButtonProps) => {
+  const session = useSession();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const popup = usePopup();
 
   const handleCancel = async (appointmentId: string) => {
-    try {
-      setLoading(true);
-      await cancelAppointment(appointmentId);
-      router.refresh();
-    } catch (error) {
-      console.error("Error canceling appointment:", error);
-      return;
-    }
+    await updateAppointmentStatus(appointmentId, AppointmentStatus.Rejected)
+      .then(() => {
+        setLoading(false);
+        router.refresh();
+      })
+      .catch((error) => {
+        setLoading(false);
+        popup.showError(error.message || "Failed to cancel appointment");
+      });
   };
 
   return (
-    <>
-      {loading ? (
-        <DefaultLoading />
-      ) : (
-        <button
-          className="btn btn-error"
-          onClick={() => handleCancel(appointmentId)}
-        >
-          Cancel
-        </button>
-      )}
-    </>
+    <button
+      className="flex flex-row btn btn-error gap-1 justify-center items-center btn-sm h-8"
+      onClick={() => handleCancel(appointmentId)}
+    >
+      <MdCancel className="w-3 h-3" />
+      {session.data?.user.type === "Student" ? "Cancel" : "Reject"}
+    </button>
   );
 };
 

@@ -1,5 +1,5 @@
 import { formatDateDisplay, formatTime, imageGenerator } from "@/lib/utils";
-import { AppointmentData } from "../AppointmentsActions";
+import { AppointmentData } from "./AppointmentsActions";
 
 interface UpcomingAppointmentsTableProps {
   appointments: AppointmentData[];

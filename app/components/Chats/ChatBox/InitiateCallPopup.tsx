@@ -1,6 +1,7 @@
 import { CallStatus } from "@/app/generated/prisma";
 import { Recipient } from "@/lib/socket/SocketEvents";
 import Image from "next/image";
+import ModalBase from "../../Popup/ModalBase";
 
 type InitiateCallPopupProps = {
   recipients: Recipient[];
@@ -25,7 +26,7 @@ const InitiateCallPopup = ({
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-10 backdrop-blur-sm z-50">
+    <ModalBase>
       <div className="bg-base-100 p-6 rounded-lg shadow-lg text-center">
         <h3 className="text-xl font-bold mb-4">
           {status === CallStatus.No_Answer
@@ -61,7 +62,7 @@ const InitiateCallPopup = ({
           </button>
         </div>
       </div>
-    </div>
+    </ModalBase>
   );
 };
 

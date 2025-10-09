@@ -7,6 +7,7 @@ import {
   FaVideo,
   FaVideoSlash,
 } from "react-icons/fa";
+import ModalBase from "../Popup/ModalBase";
 
 interface Props {
   stream: MediaStream | null;
@@ -46,7 +47,7 @@ const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
   }, [stream]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-50 backdrop-blur-sm z-50">
+    <ModalBase>
       <div className="bg-base-100 p-6 rounded-lg shadow-lg text-center">
         <h3 className="text-xl font-bold mb-4">Video Call</h3>
         <div className="relative w-[800px] h-[400px] rounded-lg border-2 border-gray-300">
@@ -123,7 +124,7 @@ const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
           </div>
         </div>
       </div>
-    </div>
+    </ModalBase>
   );
 };
 

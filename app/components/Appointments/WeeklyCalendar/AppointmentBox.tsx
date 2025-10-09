@@ -5,7 +5,7 @@ import { useState } from "react";
 import {
   AppointmentData,
   updateAppointmentStatus,
-} from "../AppointmentsActions";
+} from "../AppointmentTable/AppointmentsActions";
 import AppointmentPopup, { AppointmentPopupAction } from "./AppointmentPopup";
 import {
   getAppointmentHeight,

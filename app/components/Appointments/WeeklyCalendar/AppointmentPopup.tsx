@@ -1,5 +1,5 @@
 "use client";
-import { AppointmentData } from "../AppointmentsActions";
+import { AppointmentData } from "../AppointmentTable/AppointmentsActions";
 import {
   getBorderStatusColor,
   getStatusTextColor,

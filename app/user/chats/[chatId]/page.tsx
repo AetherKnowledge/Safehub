@@ -1,10 +1,12 @@
 import ChatsPage, { ChatPageSkeleton } from "@/app/components/Chats/ChatsPage";
 import { Suspense } from "react";
 
-const page = async () => {
+const page = async ({ params }: { params: Promise<{ chatId: string }> }) => {
+  const { chatId } = await params;
+
   return (
     <Suspense fallback={<ChatPageSkeleton />}>
-      <ChatsPage />
+      <ChatsPage chatId={chatId} />
     </Suspense>
   );
 };

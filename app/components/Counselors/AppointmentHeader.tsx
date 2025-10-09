@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { FaAngleLeft, FaRegCalendar } from "react-icons/fa";
 import { FaAngleRight } from "react-icons/fa6";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { getTodayAppointmentsCount } from "../Appointments/AppointmentsActions";
+import { getTodayAppointmentsCount } from "../Appointments/AppointmentTable/AppointmentsActions";
 import { getWeekDates } from "../Appointments/WeeklyCalendar/WeeklyCalendarUtils";
 import { ViewMode } from "./AppointmentsPage";
 

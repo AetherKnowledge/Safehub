@@ -5,7 +5,7 @@ import { UserStatus } from "@/app/generated/prisma";
 import { useMessaging } from "@/lib/socket/hooks/useMessaging";
 import { imageGenerator } from "@/lib/utils";
 import { useSession } from "next-auth/react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type Props = {
@@ -16,9 +16,6 @@ type Props = {
 const ChatSidebarUserBox = ({ chat, selected }: Props) => {
   const session = useSession();
   const [latestMessage, setLatestMessage] = useState(chat.latestMessage);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathName = usePathname();
   const chatBot = useChatBot();
   const userChats = useMessaging(chat.id, false);
 
@@ -31,12 +28,6 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
       console.log(messaging.messages[messaging.messages.length - 1]);
     }
   }, [messaging.messages]);
-
-  const updateSearchParam = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(key, value);
-    router.push(`${pathName}?${params.toString()}`);
-  };
 
   const getRelativeTime = (date: Date): string => {
     const now = new Date();
@@ -60,11 +51,11 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
   };
 
   return (
-    <div
+    <Link
+      href={`/user/chats/${chat.id}`}
       className={`flex flex-row border-b-1 rounded rounded-b-none border-base-content/20 p-2 gap-2 ${
         selected ? "bg-base-300" : "hover:bg-base-200 cursor-pointer"
       } transition-opacity`}
-      onClick={() => updateSearchParam("chatId", chat.id)}
     >
       <div
         className={`border-2 border-transparent rounded-full ${
@@ -87,7 +78,7 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
           {latestMessage ? getRelativeTime(latestMessage.createdAt) : ""}
         </p>
       </div>
-    </div>
+    </Link>
   );
 };
 

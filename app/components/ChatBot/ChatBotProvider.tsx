@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -31,35 +32,41 @@ const ChatBotProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const loadData = async () => {
+      if (!session) return;
+
       setLoading(true);
       const history = await getChatBotHistory();
       setMessages(history);
       setLoading(false);
     };
     loadData();
-  }, []);
+  }, [session]);
 
-  const sendMessage = async (content: string) => {
-    console.log(session);
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        id: Date.now().toString(),
-        chatId: ChatBotChat.id,
-        content,
-        userId: session.data?.user.id || "",
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!session) return;
 
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: Date.now().toString(),
+          chatId: ChatBotChat.id,
+          content,
+          userId: session.data?.user.id || "",
 
-        name: session.data?.user.name || "You",
-        src: session.data?.user.image || undefined,
-      } as Message,
-    ]);
+          createdAt: new Date(),
+          updatedAt: new Date(),
 
-    const reply = await sendMessageToChatBot(content);
-    setMessages((prevMessages) => [...prevMessages, reply]);
-  };
+          name: session.data?.user.name || "You",
+          src: session.data?.user.image || undefined,
+        } as Message,
+      ]);
+
+      const reply = await sendMessageToChatBot(content);
+      setMessages((prevMessages) => [...prevMessages, reply]);
+    },
+    [session]
+  );
 
   const chatBotContextValue: Messaging = { messages, sendMessage, loading };
   return (

@@ -64,8 +64,8 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
 
   return (
     <div className="flex items-center justify-center">
-      <div className="flex flex-col bg-base-100 shadow-br rounded max-w-2xl  items-center justify-center max-h-[85vh] overflow-y-auto p-5">
-        <div className="flex flex-col gap-10 h-full">
+      <div className="flex flex-col bg-base-100 shadow-br rounded max-w-2xl  items-center justify-center max-h-[80vh] p-5">
+        <div className="flex flex-col gap-10 h-full overflow-y-auto">
           <div className="flex flex-col gap-2">
             <p className="font-semibold text-lg">
               1. What brings you in today, and what would you like to focus on?

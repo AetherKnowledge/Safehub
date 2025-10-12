@@ -31,7 +31,7 @@ const AppointmentsPage = async ({
       );
 
   return (
-    <div className="bg-base-100 shadow-br rounded-lg">
+    <div className="flex flex-col bg-base-100 shadow-br rounded-lg gap-3 flex-1 min-h-0">
       <AppointmentHeader />
       {viewMode === ViewMode.CALENDAR && (
         <WeeklyCalendar date={new Date(date)} />

@@ -10,6 +10,8 @@ interface DatePickerSelectorProps {
 
   /** Returns utc date not local date */
   onChange?: (date: Date) => void;
+
+  canPickPast?: boolean;
 }
 
 const DatePickerSelector = ({
@@ -17,7 +19,6 @@ const DatePickerSelector = ({
   highlightedDates,
   onChange,
 }: DatePickerSelectorProps) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(value || null);
 
   function selectDate(date: Date) {
@@ -25,37 +26,40 @@ const DatePickerSelector = ({
       onChange(date);
     }
     setSelectedDate(date);
-    setIsOpen(false);
   }
 
   return (
-    <div className="relative inline-block w-100 border border-base-content/20 bg-base-200 rounded">
-      <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-row items-center px-3 py-2 gap-2 text-left text-base-content/40">
+    <div
+      className="relative dropdown h-12 min-h-[48px] min-w-70 border border-base-content/20 bg-base-200 rounded"
+      role="button"
+      tabIndex={0}
+    >
+      <div className="flex flex-row justify-between items-center h-full">
+        <div
+          className={`flex flex-row items-center px-3 py-2 gap-2 text-left ${
+            selectedDate ? "text-base-content" : "text-base-content/40"
+          }`}
+        >
           <FaCalendar />
           <p>
             {selectedDate ? formatDateDisplay(selectedDate) : "Select date"}
           </p>
         </div>
-        <button
-          className="flex flex-row items-center justify-between px-3 py-2 w-25 text-left border border-transparent border-l-base-content/20 text-base-content/40"
-          onClick={() => setIsOpen(!isOpen)}
-        >
+        <button className="flex flex-row items-center justify-between px-3 py-2 h-full w-25 text-left border border-transparent border-l-base-content/20 text-base-content">
           <p className="pl-1">Select</p>
           <FaAngleDown />
         </button>
       </div>
-      {isOpen && (
-        <div className="absolute mt-2 z-10">
-          <DatePicker
-            value={selectedDate || value}
-            highlightedDates={highlightedDates}
-            onChange={(date) => {
-              selectDate(date);
-            }}
-          />
-        </div>
-      )}
+      <div className="dropdown-content absolute mt-2 z-10">
+        <DatePicker
+          value={selectedDate || value}
+          highlightedDates={highlightedDates}
+          onChange={(date) => {
+            selectDate(date);
+          }}
+          canPickPast={false}
+        />
+      </div>
     </div>
   );
 };

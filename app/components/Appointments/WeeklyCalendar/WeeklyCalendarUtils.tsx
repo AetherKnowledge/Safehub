@@ -1,18 +1,38 @@
 import { AppointmentStatus } from "@/app/generated/prisma";
 import { AppointmentData } from "../AppointmentActions";
 
-// Time slots from 8:00 AM to 12:00 PM (24-hour format)
-export const TIME_SLOTS = [
-  "8:00 A.M.",
-  "8:30 A.M.",
-  "9:00 A.M.",
-  "9:30 A.M.",
-  "10:00 A.M.",
-  "10:30 A.M.",
-  "11:00 A.M.",
-  "11:30 A.M.",
-  "12:00 N.N.",
-];
+// Calendar configuration: 8:00 AM to 8:00 PM
+export const START_HOUR = 8; // 8 AM
+export const END_HOUR = 20; // 8 PM (24-hour format)
+export const TOTAL_MINUTES = (END_HOUR - START_HOUR) * 60; // 720 minutes
+
+// Generate 30-minute time slots from 8:00 AM to 8:00 PM (inclusive)
+export const TIME_SLOTS = (() => {
+  const labels: string[] = [];
+  for (let m = 0; m <= TOTAL_MINUTES; m += 30) {
+    const totalMinutes = START_HOUR * 60 + m;
+    const hours24 = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    let period = "A.M.";
+    let hour12 = hours24;
+    if (hours24 === 0) {
+      hour12 = 12;
+      period = "A.M.";
+    } else if (hours24 === 12) {
+      hour12 = 12;
+      period = minutes === 0 ? "N.N." : "P.M."; // 12:00 N.N. special label
+    } else if (hours24 > 12) {
+      hour12 = hours24 - 12;
+      period = "P.M.";
+    }
+
+    const minuteStr = minutes.toString().padStart(2, "0");
+    const label = `${hour12}:${minuteStr} ${period}`;
+    labels.push(label);
+  }
+  return labels;
+})();
 
 // Status color mapping
 export const getBgStatusColor = (status: AppointmentStatus) => {
@@ -82,33 +102,25 @@ export const getWeekDates = (date: Date) => {
 
 // Calculate the top position of an appointment based on its time
 export const getAppointmentTopPosition = (appointmentTime: Date) => {
-  const hour = appointmentTime.getHours();
-  const minute = appointmentTime.getMinutes();
-
-  // Calendar starts at 8 AM, each hour slot is 120px (60px for the main slot + 60px for half-hour)
-  const baseHour = 8;
-  const hourSlotHeight = 120; // Total height for one hour (includes 30-min intervals)
-
-  if (hour < baseHour || hour > 12) {
-    return 0; // Outside our time range
-  }
-
-  const hoursFromStart = hour - baseHour;
-  const minuteOffset = (minute / 60) * hourSlotHeight;
-
-  return hoursFromStart * hourSlotHeight + minuteOffset;
+  // Returns percentage from top (0-100)
+  const hours = appointmentTime.getHours();
+  const minutes = appointmentTime.getMinutes();
+  const minutesFromStart = hours * 60 + minutes - START_HOUR * 60;
+  const clampedTotal = Math.min(Math.max(minutesFromStart, 0), TOTAL_MINUTES);
+  return (clampedTotal / TOTAL_MINUTES) * 100;
 };
 
 // Calculate the height of an appointment based on duration
 export const getAppointmentHeight = (appointment: AppointmentData) => {
+  // Returns percentage height of the day column (0-100)
+  const MIN_PERCENT = 4; // Ensure small appointments are clickable
   if (appointment.endTime) {
     const startTime = new Date(appointment.startTime);
     const endTime = new Date(appointment.endTime);
     const durationMinutes =
       (endTime.getTime() - startTime.getTime()) / (1000 * 60);
-    // Convert minutes to pixels (120px per hour)
-    return Math.max((durationMinutes / 60) * 120, 30); // Minimum 30px height
+    return Math.max((durationMinutes / TOTAL_MINUTES) * 100, MIN_PERCENT);
   }
   // Default to 45 minutes if endTime not specified
-  return 54; // 45 minutes = 54px (45/60 * 120px * 0.6 to not overlap)
+  return Math.max((45 / TOTAL_MINUTES) * 100, MIN_PERCENT);
 };

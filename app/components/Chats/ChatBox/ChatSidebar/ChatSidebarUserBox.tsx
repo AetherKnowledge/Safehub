@@ -1,9 +1,9 @@
 "use client";
 import { ChatData } from "@/@types/network";
 import { useChatBot } from "@/app/components/ChatBot/ChatBotProvider";
+import UserImage from "@/app/components/UserImage";
 import { UserStatus } from "@/app/generated/prisma";
 import { useMessaging } from "@/lib/socket/hooks/useMessaging";
-import { imageGenerator } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -57,13 +57,12 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
         selected ? "bg-base-300" : "hover:bg-base-200 cursor-pointer"
       } transition-opacity`}
     >
-      <div
-        className={`border-2 border-transparent rounded-full ${
-          chat.status === UserStatus.Online ? "border-primary" : ""
-        }`}
-      >
-        {imageGenerator(chat.name, 10, chat.src)}
-      </div>
+      <UserImage
+        name={chat.name}
+        width={10}
+        src={chat.src || undefined}
+        bordered={chat.status === UserStatus.Online}
+      />
       <div className="flex flex-col justify-center max-w-59 overflow-hidden flex-1 min-w-0">
         <h2 className="font-semibold text-sm overflow-hidden text-ellipsis whitespace-nowrap">
           {chat.name}

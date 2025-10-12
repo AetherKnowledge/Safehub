@@ -1,10 +1,10 @@
 "use client";
-import { imageGenerator } from "@/lib/utils";
 import Link from "next/link";
 import { FaEdit } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
 import Divider from "../Divider";
 import { usePopup } from "../Popup/PopupProvider";
+import UserImage from "../UserImage";
 import ComboBox from "./ComboBox";
 import InputBox from "./InputBox";
 import { changeUserInfo, SettingsUser } from "./SettingsActions";
@@ -59,16 +59,15 @@ const Settings = ({ user }: { user: SettingsUser }) => {
     >
       <div className="flex flex-col p-4 gap-2">
         <div className="flex flex-row items-center">
-          <div className="border-4 border-primary bg-primary rounded-full">
-            {imageGenerator(
-              user.name || user.email,
-              20,
-              user.image || undefined
-            )}
-          </div>
+          <UserImage
+            name={user.name || user.email.split("@")[0] || "User"}
+            width={16}
+            src={user.image || undefined}
+            bordered={true}
+          />
           <div className="flex flex-col ml-4 w-full">
             <span className="font-bold">{user.name}</span>
-            <span className="text-sm text-gray-500">{user.email}</span>
+            <span className="text-sm text-base-content/50">{user.email}</span>
           </div>
         </div>
 
@@ -133,7 +132,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
       <div className="flex flex-col p-4 gap-2">
         <div className="flex flex-col">
           <span className="font-bold text-xs">Account Recovery</span>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-base-content/50">
             Set your recovery email and phone number
           </span>
         </div>

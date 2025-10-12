@@ -1,14 +1,18 @@
 "use client";
 import { Appointment, SessionPreference } from "@/app/generated/prisma";
-import { NewAppointmentData } from "@/lib/schemas";
+import { NewAppointmentData, UpdateAppointmentData } from "@/lib/schemas";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { usePopup } from "../../Popup/PopupProvider";
 import { createNewAppointment, updateAppointment } from "../AppointmentActions";
 import DatePickerSelector from "./DatePickerSelector";
+import { getTimeFromDate, setTimeToDate, Time, TimePeriod } from "./TimePicker";
+import TimePickerSelector from "./TimePickerSelector";
 
 const Booking = ({ appointment }: { appointment?: Appointment }) => {
   const popup = usePopup();
+  const router = useRouter();
   const [q1, setQ1] = useState(appointment?.focus || "");
   const [q2, setQ2] = useState<boolean | null>(
     appointment?.hadCounselingBefore ?? null
@@ -37,13 +41,15 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
       notes: q6,
     };
 
+    console.log(formData);
     if (appointment) {
-      updateAppointment(appointment.id, formData)
+      updateAppointment(appointment.id, formData as UpdateAppointmentData)
         .then(() => {
           popup.showSuccess(
             "Appointment updated successfully!",
             "/user/appointments"
           );
+          router.refresh();
         })
         .catch((error) => {
           popup.showError(error.message || "An error occurred");
@@ -64,14 +70,14 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
 
   return (
     <div className="flex items-center justify-center">
-      <div className="flex flex-col bg-base-100 shadow-br rounded max-w-2xl  items-center justify-center max-h-[80vh] p-5">
+      <div className="flex flex-col bg-base-100 shadow-br rounded max-w-2xl  items-center justify-center h-[87.5vh] p-5">
         <div className="flex flex-col gap-10 h-full overflow-y-auto">
           <div className="flex flex-col gap-2">
             <p className="font-semibold text-lg">
               1. What brings you in today, and what would you like to focus on?
             </p>
             <textarea
-              className="textarea textarea-ghost border border-base-content/10 focus:outline-base-content/20 focus:ring-0 w-full h-16 bg-base-200"
+              className="textarea textarea-ghost border border-base-content/10 focus:outline-base-content/20 focus:ring-0 w-[98%] ml-1 h-16 bg-base-200"
               placeholder="type your response here..."
               value={q1}
               onChange={(e) => setQ1(e.target.value)}
@@ -202,17 +208,31 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
           </div>
           <div className="flex flex-col gap-2">
             <p className="font-semibold text-lg">5. Pick a schedule.</p>
-            <DatePickerSelector
-              value={q5 || undefined}
-              onChange={(date) => setQ5(date)}
-            />
+            <div className="flex flex-wrap gap-5 items-center text-center">
+              <DatePickerSelector
+                value={q5 || undefined}
+                onChange={(date) => setQ5(date)}
+                canPickPast={false}
+              />
+              <TimePickerSelector
+                value={q5 ? getTimeFromDate(q5) : undefined}
+                min={{ hour: 8, minute: 0, period: TimePeriod.AM }}
+                max={{ hour: 8, minute: 0, period: TimePeriod.PM }}
+                onChange={(time: Time) => {
+                  setQ5((prev) => {
+                    if (!prev) return prev;
+                    return setTimeToDate(new Date(prev), time);
+                  });
+                }}
+              />
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <p className="font-semibold text-lg">
               6. Is there anything important I should know before our session?
             </p>
             <textarea
-              className="textarea textarea-ghost border border-base-content/10 focus:outline-base-content/20 focus:ring-0 w-full h-16 bg-base-200"
+              className="textarea textarea-ghost border border-base-content/10 focus:outline-base-content/20 focus:ring-0 w-[98%] ml-1 h-16 bg-base-200"
               placeholder="type your response here..."
               value={q6}
               onChange={(e) => setQ6(e.target.value)}

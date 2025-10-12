@@ -1,8 +1,8 @@
 import { CommentData } from "@/lib/schemas";
-import { imageGenerator } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
 import MessageBubble from "../Chats/ChatBox/MessageBubble";
+import UserImage from "../UserImage";
 import { addComment, PostComment } from "./PostActions";
 
 type PostCommentsProps = {
@@ -64,7 +64,11 @@ const PostComments = ({
       <div className="divider my-[-4]" />
       <div className="flex items-center gap-2">
         <div className="avatar">
-          {imageGenerator(authorName, 10, authorImage || undefined)}
+          <UserImage
+            name={authorName}
+            width={10}
+            src={authorImage || undefined}
+          />
         </div>
         <input
           ref={inputRef}

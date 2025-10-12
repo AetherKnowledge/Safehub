@@ -27,6 +27,7 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
   const topPosition = getAppointmentTopPosition(appointmentDate);
   const height = getAppointmentHeight(appointment);
   const popup = usePopup();
+  const clippedHeight = Math.max(0, Math.min(height, 100 - topPosition));
 
   // Handle appointment action (Mark as done, Cancel)
   const handleAppointmentAction = async (
@@ -61,15 +62,14 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
   return (
     <>
       <div
-        key={`appointment-${appointment.id}`}
         className={`absolute left-1 right-1 rounded p-2 cursor-pointer ${getBgStatusColor(
           appointment.status
         )} bg-opacity-10 border-l-4 shadow-br hover:shadow-md transition-shadow ${getBorderStatusColor(
           appointment.status
         )}`}
         style={{
-          top: `${topPosition}px`,
-          height: `${height}px`,
+          top: `${topPosition}%`,
+          height: `${clippedHeight}%`,
         }}
         onClick={() => setShowPopup(true)}
       >

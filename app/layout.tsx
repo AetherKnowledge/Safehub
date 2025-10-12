@@ -7,8 +7,8 @@ import AuthProvider from "../lib/auth/AuthProvider";
 import SocketProvider from "../lib/socket/SocketProvider";
 import ChatBotProvider from "./components/ChatBot/ChatBotProvider";
 import CallPopupProvider from "./components/Chats/ChatBox/CallPopupProvider";
-import "./globals.css";
 import PopupProvider from "./components/Popup/PopupProvider";
+import "./globals.css";
 
 // change await auth() to <Await resolve={await auth()}>
 // then use it in a child component
@@ -25,6 +25,8 @@ export const metadata: Metadata = {
   description: "A safe space for your conversations",
 };
 
+// TODO: make all padding consistent
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -39,15 +41,13 @@ export default async function RootLayout({
         <PublicEnvScript />
       </head>
       <body className={`${inter.variable} antialiased`}>
-        <div className="flex flex-col min-h-screen">
+        <div className="h-screen text-base-content">
           <PopupProvider>
             <AuthProvider>
               <SocketProvider>
                 <CallPopupProvider>
                   <NotificationProvider>
-                    <ChatBotProvider>
-                      <main className="text-base-content">{children}</main>
-                    </ChatBotProvider>
+                    <ChatBotProvider>{children}</ChatBotProvider>
                   </NotificationProvider>
                 </CallPopupProvider>
               </SocketProvider>

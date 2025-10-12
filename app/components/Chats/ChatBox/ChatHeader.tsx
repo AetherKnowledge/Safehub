@@ -1,8 +1,8 @@
 "use client";
 import { ChatData } from "@/@types/network";
 import { UserStatus } from "@/app/generated/prisma";
-import { imageGenerator } from "@/lib/utils";
 import { IoIosCall } from "react-icons/io";
+import UserImage from "../../UserImage";
 import { useCallPopup } from "./CallPopupProvider";
 
 type ChatHeaderProps = {
@@ -27,7 +27,7 @@ const ChatHeader = ({ chat }: ChatHeaderProps) => {
               chat.status === UserStatus.Online ? "border-primary" : ""
             }`}
           >
-            {imageGenerator(chat.name, 10, chat.src)}
+            <UserImage name={chat.name} width={10} src={chat.src} />
           </div>
           <div className="flex flex-col justify-center max-w-59 overflow-hidden flex-1 min-w-0">
             <h2 className="font-semibold text-sm overflow-hidden text-ellipsis whitespace-nowrap">

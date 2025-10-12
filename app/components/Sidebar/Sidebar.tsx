@@ -32,8 +32,9 @@ const Sidebar = () => {
   return (
     <motion.div
       animate={{ width: isLarge ? "185px" : "60px" }}
+      initial={{ width: isLarge ? "185px" : "60px" }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="flex flex-col justify-between sticky top-6 h-[93vh] min-w-[60px] max-w-[185px] bg-base-100 shadow-br rounded-lg pt-1 z-10 overflow-hidden"
+      className="flex flex-col justify-between sticky pt-1 top-0 h-[calc(100vh-3rem)] min-w-[60px] max-w-[185px] bg-base-100 shadow-br rounded-lg z-10 overflow-x-hidden overflow-y-auto"
     >
       {/* Top Section */}
       <div className="flex flex-col items-center space-y-4">

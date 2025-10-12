@@ -1,6 +1,7 @@
 "use client";
 
 import { NewFeedbackData } from "@/lib/schemas";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegStar, FaStar } from "react-icons/fa6";
 import { MdMessage } from "react-icons/md";
@@ -21,6 +22,7 @@ const Feedback = ({ appointment }: { appointment: AppointmentData }) => {
     appointment.feedback?.isAnonymous || true
   );
   const statusPopup = usePopup();
+  const router = useRouter();
 
   const handleSubmit = async () => {
     const feedbackData: NewFeedbackData = {
@@ -38,6 +40,7 @@ const Feedback = ({ appointment }: { appointment: AppointmentData }) => {
             appointment.feedback ? "updated" : "submitted"
           } successfully.`
         );
+        router.refresh();
       })
       .catch((error) => {
         console.error(

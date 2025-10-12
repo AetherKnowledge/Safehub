@@ -27,7 +27,7 @@ const EventBox = ({
   return (
     <>
       <div
-        className={`card bg-base-100 max-w-2xl mx-auto ${
+        className={`card bg-base-100 min-w-[400px] w-full mx-auto ${
           expanded ? "max-h-[1000px]" : "max-h-[700px]"
         } overflow-hidden`}
       >

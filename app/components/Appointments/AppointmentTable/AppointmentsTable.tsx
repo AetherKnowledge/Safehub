@@ -1,5 +1,5 @@
 import { AppointmentStatus, UserType } from "@/app/generated/prisma";
-import { formatDateDisplay, formatTime, imageGenerator } from "@/lib/utils";
+import { formatDateDisplay, formatTime } from "@/lib/utils";
 import {
   FaRegCalendar,
   FaRegQuestionCircle,
@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
 import { MdMeetingRoom } from "react-icons/md";
+import UserImage from "../../UserImage";
 import { AppointmentData } from "../AppointmentActions";
 import ActionBox from "./ActionBox";
 
@@ -18,33 +19,45 @@ const AppointmentsTable = async ({
   appointments: AppointmentData[];
 }) => {
   return (
-    <div className="group h-[39vh] xl:h-[60.2vh] scrollbar-gutter:stable overflow-y-auto w-full">
+    <div className="w-full overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="flex flex-row border border-transparent border-b-base-content/30 p-2 mb-2 items-center gap-4 w-full font-semibold text-sm">
-            <th className="flex flex-row items-center justify-center gap-2 w-full">
-              <FaRegUserCircle />
-              <p>{userType === UserType.Student ? "Counselor" : "Student"}</p>
+          <tr className="border-b border-base-content/30 text-sm font-semibold">
+            <th className="px-3 py-2">
+              <div className="flex items-center justify-center gap-2">
+                <FaRegUserCircle />
+                <p>{userType === UserType.Student ? "Counselor" : "Student"}</p>
+              </div>
             </th>
-            <th className="w-full flex flex-row items-center justify-center gap-2">
-              <FaRegCalendar />
-              <p>Date</p>
+            <th className="px-3 py-2">
+              <div className="flex items-center justify-center gap-2">
+                <FaRegCalendar />
+                <p>Date</p>
+              </div>
             </th>
-            <th className="w-full flex flex-row items-center justify-center gap-2">
-              <IoMdTime />
-              <p>Time</p>
+            <th className="px-3 py-2">
+              <div className="flex items-center justify-center gap-2">
+                <IoMdTime />
+                <p>Time</p>
+              </div>
             </th>
-            <th className="w-full flex flex-row items-center justify-center gap-2">
-              <MdMeetingRoom />
-              <p>Room</p>
+            <th className="px-3 py-2">
+              <div className="flex items-center justify-center gap-2">
+                <MdMeetingRoom />
+                <p>Room</p>
+              </div>
             </th>
-            <th className="w-full flex flex-row items-center justify-center gap-2">
-              <FaRegQuestionCircle />
-              <p>Status</p>
+            <th className="px-3 py-2">
+              <div className="flex items-center justify-center gap-2">
+                <FaRegQuestionCircle />
+                <p>Status</p>
+              </div>
             </th>
-            <th className="w-full flex flex-row items-center justify-center gap-2">
-              <FaRegQuestionCircle />
-              <p>Action</p>
+            <th className="px-3 py-2">
+              <div className="flex items-center justify-center gap-2">
+                <FaRegQuestionCircle />
+                <p>Action</p>
+              </div>
             </th>
           </tr>
         </thead>
@@ -70,19 +83,23 @@ function AppointmentRow({
   userType: UserType;
 }) {
   return (
-    <tr className="flex flex-row border border-transparent border-b-base-content/30 p-2 mb-2 items-center gap-4 w-full text-center">
-      <td className="flex flex-wrap w-full items-center justify-center gap-2">
-        <UserColumn userType={userType} appointment={appointment} />
+    <tr className="border-b border-base-content/30 text-center">
+      <td className="px-3 py-4">
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <UserColumn userType={userType} appointment={appointment} />
+        </div>
       </td>
-      <td className="flex flex-col items-center justify-center w-full">
+      <td className="px-3 py-4">
         <p className="text-sm">
           {formatDateDisplay(appointment.startTime, false)}
         </p>
       </td>
-      <td className="flex flex-col items-center justify-center w-full">
-        <p className="text-sm">{formatTime(appointment.startTime)}</p>
+      <td className="px-3 py-4">
+        <p className="text-sm">{`${formatTime(appointment.startTime)} ${
+          appointment.endTime ? " - " + formatTime(appointment.endTime) : ""
+        }`}</p>
       </td>
-      <td className="flex flex-col items-center justify-center w-full">
+      <td className="px-3 py-4">
         <p className="text-sm">
           {appointment.status === AppointmentStatus.Approved ||
           appointment.status === AppointmentStatus.Completed
@@ -90,15 +107,17 @@ function AppointmentRow({
             : "N/A"}
         </p>
       </td>
-      <td className="flex flex-col items-center justify-center w-full">
+      <td className="px-3 py-4">
         <StatusBadge status={appointment.status} />
       </td>
-      <td className="flex flex-wrap items-center justify-center w-full gap-2">
-        {userType === UserType.Student ? (
-          <StudentActionButton appointment={appointment} />
-        ) : (
-          <CounselorActionButton appointment={appointment} />
-        )}
+      <td className="px-3 py-4">
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {userType === UserType.Student ? (
+            <StudentActionButton appointment={appointment} />
+          ) : (
+            <CounselorActionButton appointment={appointment} />
+          )}
+        </div>
       </td>
     </tr>
   );
@@ -113,19 +132,23 @@ function UserColumn({
 }) {
   return (
     <>
-      {imageGenerator(
-        userType === UserType.Student
-          ? appointment.counselor.user.name ??
+      <UserImage
+        name={
+          userType === UserType.Student
+            ? appointment.counselor.user.name ??
               appointment.counselor.user.email.split("@")[0] ??
               "Counselor"
-          : appointment.student.user.name ??
+            : appointment.student.user.name ??
               appointment.student.user.email.split("@")[0] ??
-              "Student",
-        10,
-        userType === UserType.Student
-          ? appointment.counselor.user.image || undefined
-          : appointment.student.user.image || undefined
-      )}
+              "Student"
+        }
+        width={10}
+        src={
+          userType === UserType.Student
+            ? appointment.counselor.user.image || undefined
+            : appointment.student.user.image || undefined
+        }
+      />
       <p className="font-semibold text-sm">
         {userType === UserType.Student
           ? appointment.counselor.user.name ??
@@ -170,20 +193,28 @@ function StudentActionButton({
     case AppointmentStatus.Rejected:
       return null;
     case AppointmentStatus.Pending:
-      <ActionBox
-        actions={[Actions.EDIT, Actions.CANCEL]}
-        appointment={appointment}
-      />;
+      return (
+        <ActionBox
+          actions={[Actions.EDIT, Actions.CANCEL]}
+          appointment={appointment}
+          userType={UserType.Student}
+        />
+      );
     case AppointmentStatus.Approved:
       return (
         <ActionBox
           actions={[Actions.EDIT, Actions.CANCEL]}
           appointment={appointment}
+          userType={UserType.Student}
         />
       );
     case AppointmentStatus.Completed:
       return (
-        <ActionBox actions={[Actions.FEEDBACK]} appointment={appointment} />
+        <ActionBox
+          actions={[Actions.FEEDBACK]}
+          appointment={appointment}
+          userType={UserType.Student}
+        />
       );
     default:
       return null;
@@ -203,10 +234,17 @@ function CounselorActionButton({
         <ActionBox
           actions={[Actions.APPROVE, Actions.EDIT, Actions.CANCEL]}
           appointment={appointment}
+          userType={UserType.Counselor}
         />
       );
     case AppointmentStatus.Approved:
-      return <ActionBox actions={[Actions.EDIT]} appointment={appointment} />;
+      return (
+        <ActionBox
+          actions={[Actions.EDIT]}
+          appointment={appointment}
+          userType={UserType.Counselor}
+        />
+      );
     default:
       return null;
   }

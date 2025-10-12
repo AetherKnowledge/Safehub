@@ -39,10 +39,20 @@ export const newAppointmentSchema = z.object({
   sessionPreference: z.enum(SessionPreference),
   urgencyLevel: z.number().min(1).max(5),
   startTime: z.date(),
-  endTime: z.date().optional(),
   notes: z.string().max(500).optional(),
 });
 export type NewAppointmentData = z.infer<typeof newAppointmentSchema>;
+
+export const updateAppointmentSchema = z.object({
+  focus: z.string().optional(),
+  hadCounselingBefore: z.boolean().optional(),
+  sessionPreference: z.enum(SessionPreference).optional(),
+  urgencyLevel: z.number().min(1).max(5).optional(),
+  startTime: z.date().optional(),
+  notes: z.string().max(500).optional(),
+  endTime: z.date().optional(),
+});
+export type UpdateAppointmentData = z.infer<typeof updateAppointmentSchema>;
 
 export const newFeedbackSchema = z.object({
   appointmentId: z.string(),

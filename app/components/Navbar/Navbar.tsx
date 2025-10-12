@@ -3,7 +3,7 @@ import UserButton from "./UserButton";
 
 const Navbar = () => {
   return (
-    <div className="navbar bg-base-100 p-5 fixed top-0 left-0 w-full z-1">
+    <div className="navbar bg-base-100 p-5 fixed top-0 left-0 w-full z-20 shadow-sm">
       <div className="navbar-start">
         <Image
           src="/images/safehub.svg"

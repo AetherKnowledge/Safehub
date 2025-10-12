@@ -7,7 +7,13 @@ import {
   UserType,
 } from "@/app/generated/prisma";
 import { auth } from "@/auth";
-import { NewAppointmentData, newAppointmentSchema } from "@/lib/schemas";
+import {
+  NewAppointmentData,
+  newAppointmentSchema,
+  UpdateAppointmentData,
+  updateAppointmentSchema,
+} from "@/lib/schemas";
+import { addMinutes } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 
 export type AppointmentData = Appointment & {
@@ -150,6 +156,10 @@ export async function createNewAppointment(
     throw new Error("No counselor available at the selected time");
   }
 
+  if (validation.data.startTime < new Date()) {
+    throw new Error("Cannot book appointment in the past");
+  }
+
   const appointment = await prisma.appointment.create({
     data: {
       counselorId: counselor.counselorId,
@@ -159,6 +169,7 @@ export async function createNewAppointment(
       sessionPreference: appointmentData.sessionPreference,
       urgencyLevel: appointmentData.urgencyLevel,
       startTime: appointmentData.startTime,
+      endTime: addMinutes(appointmentData.startTime, 60), // Default to 60 minutes if endTime not provided
       notes: appointmentData.notes,
     },
   });
@@ -179,7 +190,7 @@ async function getCounselorBasedOnSchedule(schedule: Date) {
 
 export async function updateAppointment(
   appointmentId: string,
-  appointmentData: NewAppointmentData
+  appointmentData: UpdateAppointmentData
 ): Promise<AppointmentData> {
   const session = await auth();
   if (!session?.user?.id) {
@@ -198,15 +209,27 @@ export async function updateAppointment(
     throw new Error("Appointment not found");
   }
 
-  const validation = newAppointmentSchema.safeParse(appointmentData);
+  const validation = updateAppointmentSchema.safeParse(appointmentData);
   if (!validation.success) {
     throw new Error("Invalid appointment data");
+  }
+
+  if (validation.data.startTime && validation.data.startTime < new Date()) {
+    throw new Error("Cannot book appointment in the past");
+  }
+
+  if (
+    validation.data.endTime &&
+    validation.data.startTime &&
+    validation.data.endTime <= validation.data.startTime
+  ) {
+    throw new Error("End time must be greater than start time");
   }
 
   // Update the appointment status
   const updatedAppointment = await prisma.appointment.update({
     where: { id: appointmentId },
-    data: appointmentData,
+    data: validation.data as UpdateAppointmentData,
     include: {
       student: {
         include: {

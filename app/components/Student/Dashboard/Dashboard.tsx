@@ -1,7 +1,5 @@
-import Divider from "../../Divider";
 import { getPosts, PostProps } from "../../Posts/PostActions";
-import EventBox from "../../Posts/PostBox";
-import Sorter from "./Sorter";
+import DashboardPosts from "./DashboardPosts";
 
 export enum SortBy {
   Date = "Date",
@@ -19,21 +17,8 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
   const posts = sort(await getPosts(), sortBy, order);
 
   return (
-    <div className="flex flex-col max-w-2xl gap-3">
-      <div className="flex flex-row justify-between items-center bg-base-100 shadow-br rounded-xl px-4">
-        <p className="text-base-content font-bold">Newsfeed</p>
-        <div className="flex flex-row gap-2 bg-base-200 px-2 py-1 rounded my-1 items-center">
-          <Sorter sortBy={sortBy} order={order} />
-        </div>
-      </div>
-      <div className="bg-base-100 shadow-br rounded-xl">
-        {posts.map((post) => (
-          <div key={post.id}>
-            <EventBox {...post} />
-            {post.id !== posts[posts.length - 1].id && <Divider />}
-          </div>
-        ))}
-      </div>
+    <div className="flex flex-col gap-3 flex-1 min-h-0">
+      <DashboardPosts posts={posts} sortBy={sortBy} order={order} />
     </div>
   );
 };

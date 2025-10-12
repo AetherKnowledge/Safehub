@@ -16,6 +16,8 @@ interface DatePickerProps {
 
   /** If true, the date picker will push local date to the router */
   local?: boolean;
+
+  canPickPast?: boolean;
 }
 
 const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
@@ -27,6 +29,7 @@ export default function DatePicker({
   highlightedDates,
   pushToRouter = false,
   local = false,
+  canPickPast = true,
 }: DatePickerProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(value || null);
   const router = useRouter();
@@ -75,6 +78,19 @@ export default function DatePicker({
         date.getMonth() === currentMonth.getMonth() &&
         date.getFullYear() === currentMonth.getFullYear()
     );
+  };
+
+  const isDisabled = (day: number) => {
+    if (canPickPast) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      day
+    );
+    return selectedDate < today;
   };
 
   return (
@@ -143,6 +159,7 @@ export default function DatePicker({
                   ? "underline decoration-primary underline-offset-2"
                   : ""
               }`}
+              disabled={isDisabled(day)}
               onClick={() => handleSelect(day)}
             >
               {day}

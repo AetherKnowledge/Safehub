@@ -1,11 +1,11 @@
 import { auth, signIn } from "@/auth";
 import { Session } from "next-auth";
-import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { FaChevronDown } from "react-icons/fa6";
 import { Await } from "react-router";
 import DarkModeToggle from "../DarkModeToggle/DarkModeToggle";
+import UserImage from "../UserImage";
 
 const UserButton = async () => {
   return (
@@ -64,19 +64,14 @@ const AuthenticatedUserButton = (session: Session) => {
     <div className="flex flex-row bg-base-100 shadow-br rounded-lg items-center justify-center gap-y-2">
       <div className="relative dropdown" role="button" tabIndex={0}>
         <div className="flex flex-row gap-2 items-center justify-center p-2 min-w-max">
-          {session.user?.image ? (
-            <Image
-              className="w-10 h-10 rounded-full "
-              src={session.user.image}
-              alt={session.user.name || "User Profile"}
-              width={40}
-              height={40}
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-500 text-white flex items-center justify-center font-bold select-none cursor-pointer">
-              {session.user?.email?.charAt(0).toUpperCase() || "?"}
-            </div>
-          )}
+          <UserImage
+            name={
+              session.user?.name || session.user?.email?.split("@")[0] || "User"
+            }
+            src={session.user?.image || undefined}
+            width={10}
+            bordered={false}
+          />
 
           <div className="flex flex-row gap-3 items-center justify-center">
             <div className="flex flex-col text-base-content">

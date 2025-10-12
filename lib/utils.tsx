@@ -1,7 +1,5 @@
 import { UserType } from "@/app/generated/prisma";
 import { prisma } from "@/prisma/client";
-import Image from "next/image";
-import { ReactNode } from "react";
 
 export const createManyChatsWithOthers = async (
   userType: UserType,
@@ -60,36 +58,8 @@ export const removeManyChatsWithOthers = async (
   });
 };
 
-export function imageGenerator(
-  name: string,
-  width: number,
-  src?: string
-): ReactNode {
-  return (
-    <>
-      {src ? (
-        <div className={`w-${width}`}>
-          <Image
-            src={src}
-            alt={name ?? "counselor Avatar"}
-            className={`w-${width} h-${width} rounded-full`}
-            width={width * 2}
-            height={width * 2}
-          />
-        </div>
-      ) : (
-        <div className={`w-${width}`}>
-          <div
-            role="button"
-            tabIndex={0}
-            className={`w-${width} h-${width} rounded-full bg-gray-500 text-white flex items-center justify-center font-bold hover:brightness-90 active:brightness-75 transition duration-150 select-none cursor-pointer`}
-          >
-            {name.charAt(0).toUpperCase()}
-          </div>
-        </div>
-      )}
-    </>
-  );
+export function addMinutes(date: Date, minutes: number): Date {
+  return new Date(date.getTime() + minutes * 60000);
 }
 
 export function formatDatetime(date: Date | string): string {

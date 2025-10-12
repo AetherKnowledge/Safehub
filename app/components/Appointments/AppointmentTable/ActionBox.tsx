@@ -1,4 +1,5 @@
 "use client";
+import { UserType } from "@/app/generated/prisma";
 import { useState } from "react";
 import DefaultLoading from "../../DefaultLoading";
 import { AppointmentData } from "../AppointmentActions";
@@ -11,9 +12,10 @@ import EditButton from "./EditButton";
 type ActionBoxProps = {
   actions: Actions[];
   appointment: AppointmentData;
+  userType: UserType;
 };
 
-const ActionBox = ({ actions, appointment }: ActionBoxProps) => {
+const ActionBox = ({ actions, appointment, userType }: ActionBoxProps) => {
   const [loading, setLoading] = useState(false);
 
   return (
@@ -23,7 +25,7 @@ const ActionBox = ({ actions, appointment }: ActionBoxProps) => {
       ) : (
         <>
           {actions.includes(Actions.EDIT) && (
-            <EditButton appointmentId={appointment.id} />
+            <EditButton appointment={appointment} userType={userType} />
           )}
           {actions.includes(Actions.FEEDBACK) && (
             <Feedback appointment={appointment} />

@@ -16,7 +16,7 @@ const ChatsPage = async ({ chatId }: ChatsPageProps) => {
   const chatForSelectedId = chats.find((chat) => chat.id === chatId);
 
   return (
-    <div className="flex flex-row h-[87.5vh] gap-3">
+    <div className="flex flex-row h-full gap-3">
       <ChatSidebar chatId={chatId} chats={chats} />
 
       {chatForSelectedId && <ChatBox chat={chatForSelectedId} />}

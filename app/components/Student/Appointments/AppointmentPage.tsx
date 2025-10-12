@@ -18,7 +18,7 @@ const AppointmentPage = async ({ date }: Props) => {
   const appointments = await getAppointments();
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-3 flex-1 min-h-0">
       <div className="flex flex-col xl:flex-row gap-3">
         <div className="flex flex-col w-full bg-base-100 shadow-br rounded p-3 gap-1">
           <h2 className="font-bold">Upcoming Appointments</h2>
@@ -57,7 +57,7 @@ const AppointmentPage = async ({ date }: Props) => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col bg-base-100 rounded p-3 shadow-br gap-1">
+      <div className="flex flex-col bg-base-100 rounded p-3 shadow-br gap-1 flex-1 min-h-0">
         <h2 className="font-bold">Booking History</h2>
         <Suspense>
           <AppointmentsTable

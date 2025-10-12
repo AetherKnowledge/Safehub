@@ -1,4 +1,4 @@
-import { Fragment, Suspense } from "react";
+import { Suspense } from "react";
 import { Await } from "react-router";
 import { getAppointmentsForDateRange } from "../AppointmentActions";
 import DayContainer, { DayContainerLoading } from "./DayContainer";
@@ -8,9 +8,9 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
   const weekDates = getWeekDates(date);
 
   return (
-    <div className="bg-base-100 shadow-br rounded-lg">
+    <div className="bg-base-100 h-full rounded-lg flex flex-col">
       {/* Calendar Grid */}
-      <div className="flex border border-base-content/30 bg-base-100 overflow-hidden">
+      <div className="flex border border-base-content/30 bg-base-100">
         <div className="w-25 flex-shrink-0 p-3"></div>{" "}
         {/* Empty cell for time column - matches body */}
         <div className="flex-1 flex">
@@ -46,47 +46,64 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
       </div>
 
       {/* Calendar Body */}
-      <div className="flex border border-t-0 border-base-content/30 rounded-b-lg">
-        {/* Time column */}
-        <div className="w-25 flex-shrink-0">
-          {TIME_SLOTS.map((timeSlot, timeIndex) => (
-            <Fragment key={timeSlot}>
-              {timeIndex % 2 === 0 && (
-                <div
-                  key={timeSlot}
-                  className={`flex flex-col text-xs text-gray-600 text-center ${
-                    timeIndex < TIME_SLOTS.length - 1
-                      ? "border-b h-[240px]"
-                      : "h-[120px]"
-                  } border-base-content/30 justify-center`}
-                >
-                  <p className="h-[113px]">{timeSlot}</p>
-                  <p className="h-[127px] text-[10px] text-base-content/50">
-                    {timeIndex < TIME_SLOTS.length - 1
-                      ? TIME_SLOTS[timeIndex + 1]
-                      : ""}
-                  </p>
-                </div>
-              )}
-            </Fragment>
-          ))}
-        </div>
+      <div className="flex border border-t-0 border-base-content/30 rounded-b-lg h-full">
+        <div className="flex w-full relative min-h-[500px]">
+          {/* Time column */}
+          <div className="w-25 flex-shrink-0 relative h-full">
+            {/* Horizontal grid lines in the time column for perfect alignment */}
 
-        <Suspense
-          key={weekDates.map((date) => date.toDateString()).join(",")}
-          fallback={<DayContainerLoading weekDates={weekDates} />}
-        >
-          <Await
-            resolve={getAppointmentsForDateRange(
-              weekDates[0],
-              weekDates[weekDates.length - 1]
-            )}
+            {/* Render a label for every time slot (hour + half-hour) aligned to grid */}
+            {TIME_SLOTS.map((timeSlot, timeIndex) => {
+              const topPercent = (timeIndex / (TIME_SLOTS.length - 1)) * 100;
+              const isHalfHour = timeIndex % 2 === 1;
+              const isFirst = timeIndex === 0;
+              const isLast = timeIndex === TIME_SLOTS.length - 1;
+
+              if (isLast) return null; // Skip last label to avoid overflow
+              return (
+                <div
+                  key={`${timeSlot}-${timeIndex}`}
+                  className={`flex flex-row items-center justify-center absolute left-0 right-0 text-center ${
+                    isHalfHour
+                      ? "text-[10px] text-base-content/50"
+                      : "text-xs text-gray-600"
+                  }`}
+                  style={{
+                    top: `${topPercent}%`,
+                    transform: isFirst ? "translateY(0%)" : "translateY(-50%)",
+                  }}
+                >
+                  {timeSlot}
+                  {/* Short right-edge tick line for hour marks only */}
+                  {!isHalfHour && !isFirst && !isLast && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 h-px w-[5px] bg-base-content/40"
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <Suspense
+            key={weekDates.map((date) => date.toDateString()).join(",")}
+            fallback={<DayContainerLoading weekDates={weekDates} />}
           >
-            {(appointments) => (
-              <DayContainer weekDates={weekDates} appointments={appointments} />
-            )}
-          </Await>
-        </Suspense>
+            <Await
+              resolve={getAppointmentsForDateRange(
+                weekDates[0],
+                weekDates[weekDates.length - 1]
+              )}
+            >
+              {(appointments) => (
+                <DayContainer
+                  weekDates={weekDates}
+                  appointments={appointments}
+                />
+              )}
+            </Await>
+          </Suspense>
+        </div>
       </div>
     </div>
   );

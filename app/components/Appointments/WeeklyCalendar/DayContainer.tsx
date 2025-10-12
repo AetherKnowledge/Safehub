@@ -10,7 +10,7 @@ const DayContainer = async ({
   appointments: AppointmentData[];
 }) => {
   return (
-    <div className="flex-1 flex">
+    <div className="flex-1 flex h-full">
       {weekDates.map((date, dayIndex) => {
         const appointmentsForDay = appointments.filter((appointment) => {
           const appointmentDate = new Date(appointment.startTime);
@@ -21,22 +21,27 @@ const DayContainer = async ({
         return (
           <div
             key={dayIndex}
-            className={`flex-1 relative border-l border-base-content/30 ${
+            className={`flex-1 relative h-full border-l border-base-content/30 ${
               isToday ? "bg-primary/20" : ""
             }`}
-            style={{ height: `${TIME_SLOTS.length * 120}px` }}
           >
-            {/* Hour lines */}
-            {TIME_SLOTS.map((_, timeIndex) => (
-              <div
-                key={timeIndex}
-                className="absolute w-full text-center"
-                style={{ top: `${timeIndex * 120}px`, height: "120px" }}
-              >
-                {/* Half-hour line */}
-                <div className="absolute w-full" style={{ top: "60px" }} />
-              </div>
-            ))}
+            {/* Hour and half-hour grid lines using percentages */}
+            {TIME_SLOTS.map((_, timeIndex) => {
+              const topPercent = (timeIndex / (TIME_SLOTS.length - 1)) * 100;
+              const isFirst = timeIndex === 0;
+              const isHalfHour = timeIndex % 2 === 1;
+              return (
+                <div
+                  key={timeIndex}
+                  className={`absolute left-0 right-0 border-transparent ${
+                    isHalfHour
+                      ? "border-base-content/10" // lighter for half-hour
+                      : "border-base-content/20" // slightly darker for full hour
+                  }`}
+                  style={{ top: `${topPercent}%` }}
+                />
+              );
+            })}
 
             {appointmentsForDay.map((appointment, index) => {
               return <AppointmentBox key={index} appointment={appointment} />;
@@ -50,29 +55,34 @@ const DayContainer = async ({
 
 export const DayContainerLoading = ({ weekDates }: { weekDates: Date[] }) => {
   return (
-    <div className="flex-1 flex">
+    <div className="flex-1 flex h-full">
       {weekDates.map((date, dayIndex) => {
         const isToday = date.toDateString() === new Date().toDateString();
 
         return (
           <div
             key={dayIndex}
-            className={`flex-1 relative border-l border-base-content/30 ${
+            className={`flex-1 relative h-full border-l border-base-content/30 ${
               isToday ? "bg-primary/20" : ""
             }`}
-            style={{ height: `${TIME_SLOTS.length * 120}px` }}
           >
-            {/* Hour lines */}
-            {TIME_SLOTS.map((_, timeIndex) => (
-              <div
-                key={timeIndex}
-                className="absolute w-full text-center"
-                style={{ top: `${timeIndex * 120}px`, height: "120px" }}
-              >
-                {/* Half-hour line */}
-                <div className="absolute w-full" style={{ top: "60px" }} />
-              </div>
-            ))}
+            {/* Hour and half-hour grid lines using percentages */}
+            {TIME_SLOTS.map((_, timeIndex) => {
+              const topPercent = (timeIndex / (TIME_SLOTS.length - 1)) * 100;
+              const isFirst = timeIndex === 0;
+              const isHalfHour = timeIndex % 2 === 1;
+              return (
+                <div
+                  key={timeIndex}
+                  className={`absolute left-0 right-0 border-transparent ${
+                    isHalfHour
+                      ? "border-base-content/10" // lighter for half-hour
+                      : "border-base-content/20" // slightly darker for full hour
+                  }`}
+                  style={{ top: `${topPercent}%` }}
+                />
+              );
+            })}
 
             <AppointmentBoxLoading />
           </div>

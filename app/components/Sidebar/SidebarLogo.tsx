@@ -17,6 +17,7 @@ const SidebarLogo = ({ isLarge }: SidebarLogoProps) => {
       >
         <motion.g
           animate={{ x: isLarge ? 0 : 31.5 }} // shift left when collapsed
+          initial={{ x: isLarge ? 0 : 31.5 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
         >
           {/* Heart - always visible */}

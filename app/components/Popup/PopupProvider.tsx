@@ -1,8 +1,9 @@
 "use client";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import ErrorPopup from "./ErrorPopup";
 import LoadingPopup from "./LoadingPopup";
 import SuccessPopup from "./SuccessPopup";
+import YesNoPopup from "./YesNoPopup";
 
 interface PopupProviderContextType {
   showLoading: (message?: string) => void;
@@ -16,6 +17,11 @@ interface PopupProviderContextType {
     redirectTo?: string,
     onClose?: () => void
   ) => void;
+  showYesNo: (
+    message: string,
+    onYesCallback?: () => void,
+    onNoCallback?: () => void
+  ) => Promise<boolean>;
   hidePopup: () => void;
 }
 
@@ -28,6 +34,7 @@ enum PopupType {
   LOADING,
   SUCCESS,
   ERROR,
+  YESNO,
 }
 
 export function usePopup() {
@@ -43,6 +50,11 @@ const PopupProvider = ({ children }: { children: React.ReactNode }) => {
   const [message, setMessage] = useState<string | null>(null);
   const [redirectTo, setRedirectTo] = useState<string | null>(null);
   const [onClose, setOnClose] = useState<(() => void) | null>(null);
+
+  const [onYes, setOnYes] = useState<(() => void) | null>(null);
+  const [onNo, setOnNo] = useState<(() => void) | null>(null);
+  // Keep a resolver for pending Yes/No prompts so callers can await the result
+  const pendingResolveRef = useRef<((result: boolean) => void) | null>(null);
 
   const popupContextValue: PopupProviderContextType = {
     showLoading: (msg?: string) => {
@@ -64,11 +76,52 @@ const PopupProvider = ({ children }: { children: React.ReactNode }) => {
 
       setPopupType(PopupType.ERROR);
     },
+    showYesNo: (
+      msg: string,
+      onYesCallback?: () => void,
+      onNoCallback?: () => void
+    ) => {
+      setMessage(msg);
+      return new Promise<boolean>((resolve) => {
+        // store resolver for external dismissal (e.g., hidePopup)
+        pendingResolveRef.current = resolve;
+        // wire up click handlers
+        setOnYes(() => () => {
+          resolve(true);
+          if (onYesCallback) onYesCallback();
+          pendingResolveRef.current = null;
+          // cleanup
+          setPopupType(PopupType.NONE);
+          setMessage(null);
+          setOnYes(null);
+          setOnNo(null);
+        });
+        setOnNo(() => () => {
+          resolve(false);
+          if (onNoCallback) onNoCallback();
+          pendingResolveRef.current = null;
+
+          // cleanup
+          setPopupType(PopupType.NONE);
+          setMessage(null);
+          setOnYes(null);
+          setOnNo(null);
+        });
+        setPopupType(PopupType.YESNO);
+      });
+    },
     hidePopup: () => {
+      // If a Yes/No is pending and user programmatically hides the popup, resolve as false
+      if (popupType === PopupType.YESNO && pendingResolveRef.current) {
+        pendingResolveRef.current(false);
+        pendingResolveRef.current = null;
+      }
       setPopupType(PopupType.NONE);
       setMessage(null);
       setRedirectTo(null);
       setOnClose(null);
+      setOnYes(null);
+      setOnNo(null);
     },
   };
 
@@ -85,6 +138,13 @@ const PopupProvider = ({ children }: { children: React.ReactNode }) => {
             if (onClose) onClose();
           }}
           redirectTo={redirectTo || undefined}
+        />
+      )}
+      {popupType === PopupType.YESNO && (
+        <YesNoPopup
+          message={message || undefined}
+          onYes={onYes || undefined}
+          onNo={onNo || undefined}
         />
       )}
       {popupType === PopupType.ERROR && (

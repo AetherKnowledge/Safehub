@@ -265,6 +265,36 @@ export async function updateAppointment(
   return updatedAppointment;
 }
 
+export async function checkForConflictingDate(
+  startTime: Date,
+  endTime: Date,
+  appointmentId: string
+) {
+  const session = await auth();
+  if (!session?.user?.id || session.user.type !== UserType.Counselor) {
+    throw new Error("Unauthorized");
+  }
+
+  const conflictingAppointments = await prisma.appointment.findMany({
+    where: {
+      id: {
+        not: appointmentId,
+      },
+      startTime: {
+        lte: endTime,
+      },
+      endTime: {
+        gte: startTime,
+      },
+    },
+  });
+
+  if (conflictingAppointments.length > 0) {
+    return conflictingAppointments;
+  }
+  return null;
+}
+
 export async function updateAppointmentStatus(
   appointmentId: string,
   status: AppointmentStatus

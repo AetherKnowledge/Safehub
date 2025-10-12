@@ -6,7 +6,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ModalBase from "../../Popup/ModalBase";
 import { usePopup } from "../../Popup/PopupProvider";
-import { AppointmentData, updateAppointment } from "../AppointmentActions";
+import {
+  AppointmentData,
+  checkForConflictingDate,
+  updateAppointment,
+} from "../AppointmentActions";
 import DatePickerSelector from "../Booking/DatePickerSelector";
 import {
   getTimeFromDate,
@@ -32,7 +36,7 @@ const RescheduleBooking = ({
   const statusPopup = usePopup();
   const router = useRouter();
 
-  function confirmReschedule() {
+  async function confirmReschedule() {
     if (!startTime) return;
 
     onClose();
@@ -42,6 +46,22 @@ const RescheduleBooking = ({
       startTime,
       endTime: endTime || addMinutes(startTime, 60),
     };
+
+    const conflicts = await checkForConflictingDate(
+      startTime,
+      endTime || addMinutes(startTime, 60),
+      appointment.id
+    );
+
+    if (conflicts && conflicts.length > 0) {
+      const confirm = await statusPopup.showYesNo(
+        `The selected time conflicts with ${conflicts.length} existing appointment(s). Do you still want to proceed?`
+      );
+      if (!confirm) {
+        statusPopup.hidePopup();
+        return;
+      }
+    }
 
     updateAppointment(appointment.id, formData)
       .then(() => {

@@ -94,7 +94,7 @@ export const DayContainerLoading = ({ weekDates }: { weekDates: Date[] }) => {
 
 export const AppointmentBoxLoading = () => {
   return (
-    <div className="absolute top-2 left-2 text-xs text-gray-400">
+    <div className="absolute top-2 left-2 text-xs text-base-content/70">
       Loading...
     </div>
   );

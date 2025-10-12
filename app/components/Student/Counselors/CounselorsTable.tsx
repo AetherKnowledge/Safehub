@@ -51,7 +51,7 @@ const CounselorList = ({ name }: { name?: string }) => {
           <p className="text-base-content">Loading registered counselors...</p>
         </div>
       ) : counselors.length === 0 ? (
-        <p className="text-center text-gray-500">
+        <p className="text-center text-base-content/70">
           No registered counselors available.
         </p>
       ) : (

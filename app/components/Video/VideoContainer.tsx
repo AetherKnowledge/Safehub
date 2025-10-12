@@ -86,7 +86,7 @@ const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
               </div>
             ) : (
               <div className="flex items-center justify-center w-full h-full bg-gray-100 rounded-lg">
-                <p className="text-gray-500">
+                <p className="text-base-content/70">
                   Waiting for other participants...
                 </p>
               </div>

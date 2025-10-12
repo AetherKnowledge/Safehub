@@ -1,26 +1,47 @@
 "use client";
+import { AppointmentStatus, UserType } from "@/app/generated/prisma";
+import { useRouter } from "next/navigation";
+import { IoCaretBackCircle } from "react-icons/io5";
 import ModalBase from "../../Popup/ModalBase";
-import { AppointmentData } from "../AppointmentActions";
+import { usePopup } from "../../Popup/PopupProvider";
+import {
+  AppointmentData,
+  updateAppointmentStatus,
+} from "../AppointmentActions";
+import ApproveButton from "../AppointmentTable/ApproveButton";
+import CancelButton from "../AppointmentTable/CancelButton";
+import EditButton from "../AppointmentTable/EditButton";
+import MarkDoneButton from "../AppointmentTable/MarkDoneButton";
 import {
   getBorderStatusColor,
   getStatusTextColor,
 } from "./WeeklyCalendarUtils";
 
-export enum AppointmentPopupAction {
-  COMPLETE = "complete",
-  CANCEL = "cancel",
-  CLOSE = "close",
-}
-
 type AppointmentPopupProps = {
   appointment: AppointmentData;
-  onAction?: (
-    appointment: AppointmentData,
-    action: AppointmentPopupAction
-  ) => void;
+  onClose?: () => void;
 };
 
-const AppointmentPopup = ({ appointment, onAction }: AppointmentPopupProps) => {
+const AppointmentPopup = ({ appointment, onClose }: AppointmentPopupProps) => {
+  const router = useRouter();
+  const statusPopup = usePopup();
+
+  const handleUpdate = async (appointmentStatus: AppointmentStatus) => {
+    onClose?.();
+    statusPopup.showLoading("Updating appointment...");
+
+    await updateAppointmentStatus(appointment.id, appointmentStatus)
+      .then(() => {
+        statusPopup.showSuccess(
+          `Appointment ${appointmentStatus.toLowerCase()} successfully`
+        );
+        router.refresh();
+      })
+      .catch((error) => {
+        statusPopup.showError(error.message || "Failed to update appointment.");
+      });
+  };
+
   return (
     <ModalBase>
       <div
@@ -40,10 +61,10 @@ const AppointmentPopup = ({ appointment, onAction }: AppointmentPopupProps) => {
             <h3 className="text-lg font-bold mt-2">
               {appointment.student.user.name || appointment.student.user.email}
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-base-content/70">
               {appointment.focus} - {appointment.sessionPreference}
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-base-content/60">
               {new Date(appointment.startTime).toLocaleString()}
               {appointment.endTime && (
                 <span>
@@ -63,35 +84,40 @@ const AppointmentPopup = ({ appointment, onAction }: AppointmentPopupProps) => {
         {appointment.notes && (
           <div className="mb-4">
             <h4 className="font-medium text-sm mb-1">Notes:</h4>
-            <p className="text-sm text-gray-600">{appointment.notes}</p>
+            <p className="text-sm text-base-content/70">{appointment.notes}</p>
           </div>
         )}
 
         <div className="flex gap-2">
-          {appointment.status === "Approved" && (
-            <button
-              onClick={() =>
-                onAction?.(appointment, AppointmentPopupAction.COMPLETE)
-              }
-              className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-            >
-              Mark as done
-            </button>
+          {(appointment.status === AppointmentStatus.Pending ||
+            appointment.status === AppointmentStatus.Approved) && (
+            <EditButton
+              appointment={appointment}
+              userType={UserType.Counselor}
+            />
+          )}
+          {appointment.status === AppointmentStatus.Pending && (
+            <ApproveButton
+              onClick={() => handleUpdate(AppointmentStatus.Approved)}
+            />
+          )}
+          {appointment.status === AppointmentStatus.Approved && (
+            <MarkDoneButton
+              onClick={() => handleUpdate(AppointmentStatus.Completed)}
+            />
+          )}
+          {(appointment.status === AppointmentStatus.Approved ||
+            appointment.status === AppointmentStatus.Pending) && (
+            <CancelButton
+              onClick={() => handleUpdate(AppointmentStatus.Rejected)}
+              appointmentStatus={appointment.status}
+            />
           )}
           <button
-            onClick={() =>
-              onAction?.(appointment, AppointmentPopupAction.CANCEL)
-            }
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400"
+            onClick={onClose}
+            className="flex flex-row btn btn-ghost gap-1 justify-center items-center btn-sm h-8 ml-auto"
           >
-            Cancel
-          </button>
-          <button
-            onClick={() =>
-              onAction?.(appointment, AppointmentPopupAction.CLOSE)
-            }
-            className="px-4 py-2 bg-gray-500 text-white rounded text-sm hover:bg-gray-600 ml-auto"
-          >
+            <IoCaretBackCircle className="w-3 h-3" />
             Close
           </button>
         </div>

@@ -71,7 +71,7 @@ function ChatHistory({
 
   if (!messages || messages.length === 0) {
     return (
-      <p className="text-center text-gray-500 mt-4">
+      <p className="text-center text-base-content/70 mt-4">
         No chat history available.
       </p>
     );

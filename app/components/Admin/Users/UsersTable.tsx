@@ -71,7 +71,7 @@ const UsersTable = ({ name }: { name?: string }) => {
           <p className="text-base-content">Loading registered users...</p>
         </div>
       ) : users.length === 0 ? (
-        <p className="text-center text-gray-500">
+        <p className="text-center text-base-content/70">
           No registered users available.
         </p>
       ) : (

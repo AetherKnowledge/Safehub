@@ -6,7 +6,6 @@ import {
   FaRegUserCircle,
 } from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
-import { MdMeetingRoom } from "react-icons/md";
 import UserImage from "../../UserImage";
 import { AppointmentData } from "../AppointmentActions";
 import ActionBox from "./ActionBox";
@@ -41,12 +40,12 @@ const AppointmentsTable = async ({
                 <p>Time</p>
               </div>
             </th>
-            <th className="px-3 py-2">
+            {/* <th className="px-3 py-2">
               <div className="flex items-center justify-center gap-2">
                 <MdMeetingRoom />
                 <p>Room</p>
               </div>
-            </th>
+            </th> */}
             <th className="px-3 py-2">
               <div className="flex items-center justify-center gap-2">
                 <FaRegQuestionCircle />
@@ -99,14 +98,14 @@ function AppointmentRow({
           appointment.endTime ? " - " + formatTime(appointment.endTime) : ""
         }`}</p>
       </td>
-      <td className="px-3 py-4">
+      {/* <td className="px-3 py-4">
         <p className="text-sm">
           {appointment.status === AppointmentStatus.Approved ||
           appointment.status === AppointmentStatus.Completed
             ? "MR 143"
             : "N/A"}
         </p>
-      </td>
+      </td> */}
       <td className="px-3 py-4">
         <StatusBadge status={appointment.status} />
       </td>
@@ -169,9 +168,9 @@ function StatusBadge({ status }: { status: AppointmentStatus }) {
     case AppointmentStatus.Pending:
       return <div className="badge badge-warning">Pending</div>;
     case AppointmentStatus.Approved:
-      return <div className="badge badge-success">Approved</div>;
+      return <div className="badge badge-info">Approved</div>;
     case AppointmentStatus.Completed:
-      return <div className="badge badge-info">Confirmed</div>;
+      return <div className="badge badge-success">Completed</div>;
     default:
       return null;
   }
@@ -182,6 +181,7 @@ export enum Actions {
   CANCEL = "cancel",
   EDIT = "edit",
   FEEDBACK = "feedback",
+  MARK_DONE = "mark_done",
 }
 
 function StudentActionButton({
@@ -227,8 +227,6 @@ function CounselorActionButton({
   appointment: AppointmentData;
 }) {
   switch (appointment.status) {
-    case AppointmentStatus.Rejected:
-      return null;
     case AppointmentStatus.Pending:
       return (
         <ActionBox
@@ -240,7 +238,7 @@ function CounselorActionButton({
     case AppointmentStatus.Approved:
       return (
         <ActionBox
-          actions={[Actions.EDIT]}
+          actions={[Actions.EDIT, Actions.CANCEL, Actions.MARK_DONE]}
           appointment={appointment}
           userType={UserType.Counselor}
         />

@@ -1,13 +1,8 @@
 "use client";
-import { AppointmentStatus } from "@/app/generated/prisma";
 import { formatTime } from "@/lib/utils";
 import { useState } from "react";
-import { usePopup } from "../../Popup/PopupProvider";
-import {
-  AppointmentData,
-  updateAppointmentStatus,
-} from "../AppointmentActions";
-import AppointmentPopup, { AppointmentPopupAction } from "./AppointmentPopup";
+import { AppointmentData } from "../AppointmentActions";
+import AppointmentPopup from "./AppointmentPopup";
 import {
   getAppointmentHeight,
   getAppointmentTopPosition,
@@ -26,37 +21,10 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
   const appointmentDate = new Date(appointment.startTime);
   const topPosition = getAppointmentTopPosition(appointmentDate);
   const height = getAppointmentHeight(appointment);
-  const popup = usePopup();
   const clippedHeight = Math.max(0, Math.min(height, 100 - topPosition));
 
-  // Handle appointment action (Mark as done, Cancel)
-  const handleAppointmentAction = async (
-    appointment: AppointmentData,
-    action: AppointmentPopupAction
-  ) => {
-    if (action === AppointmentPopupAction.CLOSE) {
-      setShowPopup(false);
-      return;
-    }
-
-    try {
-      const newStatus =
-        action === AppointmentPopupAction.COMPLETE ? "Completed" : "Rejected";
-      await updateAppointmentStatus(
-        appointment.id,
-        newStatus as AppointmentStatus
-      ).catch(() => {
-        popup.showError("Failed to update appointment status.");
-      });
-
-      // Update local state
-      onUpdate?.({ ...appointment, status: newStatus });
-
-      setShowPopup(false);
-    } catch (error) {
-      console.error("Error updating appointment:", error);
-      // You could show an error toast here
-    }
+  const handleClose = async () => {
+    setShowPopup(false);
   };
 
   return (
@@ -94,7 +62,7 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
         <AppointmentPopup
           key={`appointment-modal-${appointment.id}`}
           appointment={appointment}
-          onAction={handleAppointmentAction}
+          onClose={handleClose}
         />
       )}
     </>

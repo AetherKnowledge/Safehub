@@ -1,13 +1,19 @@
 "use client";
-import { UserType } from "@/app/generated/prisma";
+import { AppointmentStatus, UserType } from "@/app/generated/prisma";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import DefaultLoading from "../../DefaultLoading";
-import { AppointmentData } from "../AppointmentActions";
+import { usePopup } from "../../Popup/PopupProvider";
+import {
+  AppointmentData,
+  updateAppointmentStatus,
+} from "../AppointmentActions";
 import Feedback from "../Feedback";
 import { Actions } from "./AppointmentsTable";
 import ApproveButton from "./ApproveButton";
 import CancelButton from "./CancelButton";
 import EditButton from "./EditButton";
+import MarkDoneButton from "./MarkDoneButton";
 
 type ActionBoxProps = {
   actions: Actions[];
@@ -17,6 +23,26 @@ type ActionBoxProps = {
 
 const ActionBox = ({ actions, appointment, userType }: ActionBoxProps) => {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const statusPopup = usePopup();
+
+  const handleUpdate = async (appointmentStatus: AppointmentStatus) => {
+    setLoading(true);
+    statusPopup.showLoading("Updating appointment...");
+
+    await updateAppointmentStatus(appointment.id, appointmentStatus)
+      .then(() => {
+        setLoading?.(false);
+        statusPopup.showSuccess(
+          `Appointment ${appointmentStatus.toLowerCase()} successfully`
+        );
+        router.refresh();
+      })
+      .catch((error) => {
+        setLoading?.(false);
+        statusPopup.showError(error.message || "Failed to update appointment.");
+      });
+  };
 
   return (
     <>
@@ -32,15 +58,18 @@ const ActionBox = ({ actions, appointment, userType }: ActionBoxProps) => {
           )}
           {actions.includes(Actions.APPROVE) && (
             <ApproveButton
-              appointmentId={appointment.id}
-              setLoading={setLoading}
+              onClick={() => handleUpdate(AppointmentStatus.Approved)}
             />
           )}
-
+          {actions.includes(Actions.MARK_DONE) && (
+            <MarkDoneButton
+              onClick={() => handleUpdate(AppointmentStatus.Completed)}
+            />
+          )}
           {actions.includes(Actions.CANCEL) && (
             <CancelButton
-              appointmentId={appointment.id}
-              setLoading={setLoading}
+              appointmentStatus={appointment.status}
+              onClick={() => handleUpdate(AppointmentStatus.Rejected)}
             />
           )}
         </>

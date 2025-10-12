@@ -66,7 +66,7 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
                   className={`flex flex-row items-center justify-center absolute left-0 right-0 text-center ${
                     isHalfHour
                       ? "text-[10px] text-base-content/50"
-                      : "text-xs text-gray-600"
+                      : "text-xs text-base-content/70"
                   }`}
                   style={{
                     top: `${topPercent}%`,

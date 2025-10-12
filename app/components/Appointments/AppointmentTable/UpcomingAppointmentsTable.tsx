@@ -1,6 +1,6 @@
 import { formatDateDisplay, formatTime } from "@/lib/utils";
-import { AppointmentData } from "../AppointmentActions";
 import UserImage from "../../UserImage";
+import { AppointmentData } from "../AppointmentActions";
 
 interface UpcomingAppointmentsTableProps {
   appointments: AppointmentData[];
@@ -61,10 +61,10 @@ function UpcomingAppointmentRow({
           {formatTime(appointment.startTime)}
         </p>
       </td>
-      <td className="flex flex-col w-full">
+      {/* <td className="flex flex-col w-full">
         <p className="text-[10px]">Room:</p>
         <p className="font-semibold text-xs">MR 143</p>
-      </td>
+      </td> */}
     </tr>
   );
 }

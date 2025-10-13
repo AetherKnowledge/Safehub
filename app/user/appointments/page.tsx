@@ -1,8 +1,8 @@
+import { UserType } from "@/app/generated/prisma";
 import AppointmentsPage, {
   ViewMode,
-} from "@/app/components/Counselors/AppointmentsPage";
-import StudentAppointmentPage from "@/app/components/Student/Appointments/AppointmentPage";
-import { UserType } from "@/app/generated/prisma";
+} from "@/app/pages/Appointment/Counselor/AppointmentsPage";
+import StudentAppointmentPage from "@/app/pages/Appointment/Student";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 

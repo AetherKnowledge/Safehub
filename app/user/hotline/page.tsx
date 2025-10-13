@@ -1,4 +1,4 @@
-import HotlinePage from "@/app/components/Student/Hotline/HotlinePage";
+import HotlinePage from "@/app/pages/Hotline/Student";
 
 const page = () => {
   return <HotlinePage />;

@@ -1,7 +1,5 @@
-import StudentDashboard, {
-  Order,
-  SortBy,
-} from "@/app/components/Student/Dashboard/Dashboard";
+import StudentDashboard from "@/app/pages/Dashboard/Student";
+import { Order, SortBy } from "@/app/pages/Dashboard/Student/Dashboard";
 import { auth } from "@/auth";
 
 type Props = { searchParams: Promise<{ sortBy?: SortBy; order?: Order }> };

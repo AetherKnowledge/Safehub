@@ -1,6 +1,6 @@
 "use client";
 import { Message, Messaging } from "@/@types/network";
-import { getChatById } from "@/app/components/Chats/ChatsActions";
+import { getChatById } from "@/app/pages/Chats/ChatsActions";
 import { useCallback, useEffect, useState } from "react";
 import { SocketEventType, SocketMessage } from "../SocketEvents";
 import { useSocket } from "../SocketProvider";

@@ -1,5 +1,5 @@
-import CounselorList from "@/app/components/Student/Counselors/CounselorList";
 import { UserType } from "@/app/generated/prisma";
+import CounselorList from "@/app/pages/CounselorList/CounselorList";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 

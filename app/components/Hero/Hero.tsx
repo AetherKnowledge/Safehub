@@ -1,5 +1,5 @@
 import Image from "next/image";
-import SafehubIcon from "../Icons/SafehubIcon";
+import SafehubIcon from "../Images/SafehubIcon";
 import LoginButton from "./LoginButton";
 
 const Hero = () => {

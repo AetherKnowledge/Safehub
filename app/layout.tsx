@@ -6,9 +6,9 @@ import { Inter, Manrope } from "next/font/google";
 import AuthProvider from "../lib/auth/AuthProvider";
 import SocketProvider from "../lib/socket/SocketProvider";
 import ChatBotProvider from "./components/ChatBot/ChatBotProvider";
-import CallPopupProvider from "./components/Chats/ChatBox/CallPopupProvider";
 import PopupProvider from "./components/Popup/PopupProvider";
 import "./globals.css";
+import CallPopupProvider from "./pages/Chats/ChatBox/CallPopupProvider";
 
 // change await auth() to <Await resolve={await auth()}>
 // then use it in a child component

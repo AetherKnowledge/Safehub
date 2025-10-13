@@ -1,4 +1,4 @@
-import { getAppointmentsForDate } from "@/app/components/Appointments/AppointmentActions";
+import { getAppointmentsForDate } from "@/app/pages/Appointment/AppointmentActions";
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 

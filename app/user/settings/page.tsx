@@ -1,5 +1,5 @@
-import Settings from "@/app/components/Settings/Settings";
-import { getUser } from "@/app/components/Settings/SettingsActions";
+import Settings from "@/app/pages/Settings";
+import { getUser } from "@/app/pages/Settings/SettingsActions";
 
 const page = async () => {
   const user = await getUser();

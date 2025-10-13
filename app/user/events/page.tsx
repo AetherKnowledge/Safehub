@@ -1,10 +1,10 @@
-import EventsPage from "@/app/components/Posts/PostsPage";
+import PostPage from "@/app/pages/Post";
 
 const page = () => {
   return (
     <div className="flex-1">
       <div className="bg-base-100 shadow-br rounded-xl">
-        <EventsPage />
+        <PostPage />
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ const AppointmentPage = async ({ date }: Props) => {
   return (
     <div className="flex flex-col gap-3 flex-1 min-h-0">
       <div className="flex flex-col xl:flex-row gap-3">
-        <div className="flex flex-col w-full bg-base-100 shadow-br rounded p-3 gap-1">
+        <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1">
           <h2 className="font-bold">Upcoming Appointments</h2>
           <div className="flex flex-row gap-5 w-full">
             <Suspense>
@@ -28,7 +28,7 @@ const AppointmentPage = async ({ date }: Props) => {
             </Suspense>
           </div>
         </div>
-        <div className="flex flex-col bg-base-100 rounded p-3 shadow-br gap-1 w-full">
+        <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 w-full">
           <h2 className="font-bold">Book an Appointment</h2>
           <div className="flex flex-row gap-10 px-5 items-center justify-between w-full">
             <div className="flex flex-col gap-5 items-center justify-center pt-5">

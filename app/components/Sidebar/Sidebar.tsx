@@ -7,6 +7,7 @@ import { AiFillHome } from "react-icons/ai";
 import { FaCalendar, FaUsers } from "react-icons/fa";
 import { IoIosCall, IoIosSettings } from "react-icons/io";
 import { IoChatboxEllipses } from "react-icons/io5";
+import { MdFeedback } from "react-icons/md";
 import Divider from "../Divider";
 import CollapseButton from "./CollapseButton";
 import SidebarButton from "./SidebarButton";
@@ -125,6 +126,9 @@ const counselorSidebar = (isLarge: boolean) => {
         isLarge={isLarge}
       >
         Chats
+      </SidebarButton>
+      <SidebarButton href="/user/feedback" icon={MdFeedback} isLarge={isLarge}>
+        Feedback
       </SidebarButton>
     </>
   );

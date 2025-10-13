@@ -1,6 +1,6 @@
 "use server";
 
-import { Feedback, UserType } from "@/app/generated/prisma";
+import { Appointment, Feedback, User, UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { NewFeedbackData } from "@/lib/schemas";
 import { prisma } from "@/prisma/client";
@@ -24,6 +24,60 @@ export async function getFeedback(
   });
 
   return feedback;
+}
+
+export type FeedbackWithStudentDetails = Feedback & {
+  appointment: Pick<Appointment, "id"> & {
+    student?:
+      | { user: Pick<User, "id" | "name" | "image" | "email"> }
+      | undefined;
+  };
+};
+
+export async function getAllFeedbackForCounselor(): Promise<
+  FeedbackWithStudentDetails[]
+> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.type !== UserType.Counselor) {
+    throw new Error("Unauthorized");
+  }
+
+  const feedback = await prisma.feedback.findMany({
+    where: {
+      counselorId: session.user.id,
+    },
+    include: {
+      appointment: {
+        select: {
+          id: true,
+          student: {
+            select: {
+              user: {
+                select: { id: true, name: true, image: true, email: true },
+              },
+            },
+          },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  // if feedback isAnonymous, remove student info from the nested appointment
+  const filteredFeedback = feedback.map((fb) => {
+    if (!fb.isAnonymous) return fb;
+    const { appointment, ...rest } = fb;
+    if (!appointment) return fb;
+    return {
+      ...rest,
+      appointment: {
+        ...appointment,
+        student: undefined,
+      },
+    };
+  });
+
+  return filteredFeedback;
 }
 
 export async function upsertFeedback(

@@ -13,7 +13,7 @@ import ApproveButton from "./ApproveButton";
 import CancelButton from "./CancelButton";
 import EditButton from "./EditButton";
 import MarkDoneButton from "./MarkDoneButton";
-import Feedback from "@/app/components/Feedback";
+import FeedbackButton from "./FeedbackButton";
 
 type ActionBoxProps = {
   actions: Actions[];
@@ -54,7 +54,7 @@ const ActionBox = ({ actions, appointment, userType }: ActionBoxProps) => {
             <EditButton appointment={appointment} userType={userType} />
           )}
           {actions.includes(Actions.FEEDBACK) && (
-            <Feedback appointment={appointment} />
+            <FeedbackButton appointment={appointment} />
           )}
           {actions.includes(Actions.APPROVE) && (
             <ApproveButton

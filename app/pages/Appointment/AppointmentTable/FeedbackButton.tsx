@@ -1,16 +1,16 @@
 "use client";
 
+import ModalBase from "@/app/components/Popup/ModalBase";
+import { usePopup } from "@/app/components/Popup/PopupProvider";
+import { AppointmentData } from "@/app/pages/Appointment/AppointmentActions";
 import { NewFeedbackData } from "@/lib/schemas";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegStar, FaStar } from "react-icons/fa6";
 import { MdMessage } from "react-icons/md";
-import { upsertFeedback } from "./FeedbackActions";
-import { AppointmentData } from "@/app/pages/Appointment/AppointmentActions";
-import ModalBase from "../Popup/ModalBase";
-import { usePopup } from "../Popup/PopupProvider";
+import { upsertFeedback } from "../../Feedback/FeedbackActions";
 
-const Feedback = ({ appointment }: { appointment: AppointmentData }) => {
+const FeedbackButton = ({ appointment }: { appointment: AppointmentData }) => {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [rating, setRating] = useState<number>(
     appointment.feedback?.rating || 0
@@ -134,4 +134,4 @@ const Feedback = ({ appointment }: { appointment: AppointmentData }) => {
   );
 };
 
-export default Feedback;
+export default FeedbackButton;

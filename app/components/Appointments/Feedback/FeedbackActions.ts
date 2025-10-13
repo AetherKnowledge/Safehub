@@ -61,6 +61,8 @@ export async function upsertFeedback(
     },
     create: {
       ...feedbackData,
+      studentId: appointment.studentId,
+      counselorId: appointment.counselorId,
     },
   });
 

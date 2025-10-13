@@ -1,33 +1,31 @@
 "use server";
 
-import { Days, UserStatus, UserType } from "@/app/generated/prisma";
+import {
+  AvailableSlot,
+  Counselor,
+  User,
+  UserStatus,
+  UserType,
+} from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
 
 import { prisma } from "@/prisma/client";
 
-export type CounselorData = {
-  name: string | null;
-  type: UserType;
-  Counselor: {
-    AvailableSlots: {
-      counselorId: string;
-      id: string;
-      day: Days;
-      startTime: string;
-      endTime: string;
-    }[];
-  } | null;
-  id: string;
-  email: string;
-  image: string | null;
-  status: UserStatus;
+export type CounselorData = Pick<
+  User,
+  "id" | "name" | "email" | "image" | "status"
+> & {
+  Counselor: Counselor & {
+    availableSlots: AvailableSlot[];
+  };
+  rating: number;
 };
 
 export async function getCounselors() {
   const session = await auth();
 
-  if (!session || !(session.user.type === UserType.Student)) {
+  if (!session) {
     throw new Error("Unauthorized");
   }
 
@@ -41,25 +39,39 @@ export async function getCounselors() {
     select: {
       id: true,
       name: true,
-      type: true,
       image: true,
       email: true,
+      status: true,
       Counselor: {
-        select: {
-          AvailableSlots: true,
+        include: {
+          availableSlots: true,
+          feedbacks: { select: { rating: true } },
         },
       },
-      status: true,
     },
   });
 
   const counselorsWithStatus = await Promise.all(
     counselors.map(async (counselor) =>
       (await isUserOnline(counselor.id))
-        ? { ...counselor, status: UserStatus.Online }
-        : { ...counselor, status: UserStatus.Offline }
+        ? {
+            ...counselor,
+            status: UserStatus.Online,
+            rating: calculateStarRating(counselor.Counselor!.feedbacks),
+          }
+        : {
+            ...counselor,
+            status: UserStatus.Offline,
+            rating: calculateStarRating(counselor.Counselor!.feedbacks),
+          }
     )
   );
 
   return counselorsWithStatus as CounselorData[];
+}
+
+function calculateStarRating(feedbacks: { rating: number }[]) {
+  if (feedbacks.length === 0) return 0;
+  const total = feedbacks.reduce((acc, feedback) => acc + feedback.rating, 0);
+  return Math.round((total / feedbacks.length) * 100) / 100; // Round to 2 decimal place
 }

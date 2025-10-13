@@ -8,17 +8,15 @@ const CounselorsPage = async () => {
   if (!session) return;
 
   return (
-    <div className="flex-1">
-      <div className="bg-base-100 shadow-br rounded-xl">
-        {session.user.type === UserType.Student ? (
-          <CounselorList />
-        ) : session.user.type === UserType.Counselor ? (
-          <div>Not built</div>
-        ) : (
-          redirect("/user/dashboard")
-        )}
-      </div>
-    </div>
+    <>
+      {session.user.type === UserType.Student ? (
+        <CounselorList />
+      ) : session.user.type === UserType.Counselor ? (
+        <div>Not built</div>
+      ) : (
+        redirect("/user/dashboard")
+      )}
+    </>
   );
 };
 

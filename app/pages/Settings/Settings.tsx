@@ -2,9 +2,9 @@
 import Link from "next/link";
 import { FaEdit } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
-import ComboBox from "../../components/ComboBox";
 import Divider from "../../components/Divider";
-import InputBox from "../../components/InputBox";
+import ComboBox from "../../components/Input/ComboBox";
+import InputBox from "../../components/Input/InputBox";
 import { usePopup } from "../../components/Popup/PopupProvider";
 import UserImage from "../../components/UserImage";
 import { changeUserInfo, SettingsUser } from "./SettingsActions";

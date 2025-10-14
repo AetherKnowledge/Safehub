@@ -30,6 +30,16 @@ async function main() {
     ON CONFLICT (id) DO NOTHING;
   `);
 
+  await client.query(
+    `DELETE FROM storage.objects WHERE bucket_id = 'hotline';`
+  );
+  await client.query(`DELETE FROM storage.buckets WHERE id = 'hotline';`);
+  await client.query(`
+    INSERT INTO storage.buckets (id, name, public)
+    VALUES ('hotline', 'hotline', true)
+    ON CONFLICT (id) DO NOTHING;
+  `);
+
   // Drop policies if they exist first
   await client.query(
     `DROP POLICY IF EXISTS "Authenticated users can read posts bucket" ON storage.objects;`
@@ -42,6 +52,19 @@ async function main() {
   );
   await client.query(
     `DROP POLICY IF EXISTS "Only Admins can delete post objects" ON storage.objects;`
+  );
+
+  await client.query(
+    `DROP POLICY IF EXISTS "Authenticated users can read hotline bucket" ON storage.objects;`
+  );
+  await client.query(
+    `DROP POLICY IF EXISTS "Only Admins can insert into hotline bucket" ON storage.objects;`
+  );
+  await client.query(
+    `DROP POLICY IF EXISTS "Only Admins can update hotline objects" ON storage.objects;`
+  );
+  await client.query(
+    `DROP POLICY IF EXISTS "Only Admins can delete hotline objects" ON storage.objects;`
   );
 
   // Recreate policies
@@ -84,6 +107,48 @@ async function main() {
       AND public.role() = 'Admin'
     );
   `);
+
+  // Hotline bucket policies
+  await client.query(`
+    CREATE POLICY "Authenticated users can read hotline bucket"
+    ON storage.objects FOR SELECT
+    USING (
+      bucket_id = 'hotline'
+      AND auth.role() = 'authenticated'
+    );
+  `);
+
+  await client.query(`
+    CREATE POLICY "Only Admins can insert into hotline bucket"
+    ON storage.objects FOR INSERT
+    WITH CHECK (
+      bucket_id = 'hotline'
+      AND public.role() = 'Admin'
+    );
+  `);
+
+  await client.query(`
+    CREATE POLICY "Only Admins can update hotline objects"
+    ON storage.objects FOR UPDATE
+    USING (
+      bucket_id = 'hotline'
+      AND public.role() = 'Admin'
+    )
+    WITH CHECK (
+      bucket_id = 'hotline'
+      AND public.role() = 'Admin'
+    );
+  `);
+
+  await client.query(`
+    CREATE POLICY "Only Admins can delete hotline objects"
+    ON storage.objects FOR DELETE
+    USING (
+      bucket_id = 'hotline'
+      AND public.role() = 'Admin'
+    );
+  `);
+
   console.log("✅ Supabase storage bucket + policies seeded");
 
   // ================================

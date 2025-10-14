@@ -33,6 +33,7 @@ export function createClient(supabaseAccessToken: string) {
 export enum Buckets {
   Capstone = "capstone",
   Posts = "posts",
+  Hotline = "hotline",
 }
 
 export function getBucket(bucketName: Buckets, supabaseAccessToken: string) {

@@ -43,7 +43,7 @@ const CounselorList = ({ name }: { name?: string }) => {
   }
 
   return (
-    <div className="flex w-full h-full overflow-x-auto p-5 items-start justify-start">
+    <div className="flex w-full h-full overflow-x-auto items-start justify-start">
       {loading ? (
         <div className="flex flex-col items-center justify-center space-y-4 w-full h-full">
           <div className="loading loading-spinner loading-lg text-primary"></div>
@@ -80,7 +80,7 @@ const CounselorList = ({ name }: { name?: string }) => {
                   className="origin-top"
                 >
                   <td>
-                    <div className="flex flex-row items-center justify-center gap-4">
+                    <div className="flex items-center gap-4">
                       <UserImage
                         src={counselor.image}
                         name={counselor.name ?? "User"}

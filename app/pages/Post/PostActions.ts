@@ -4,10 +4,9 @@ import { UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { CommentData, commentSchema, newPostSchema } from "@/lib/schemas";
 import { Buckets, getBucket } from "@/lib/supabase/client";
+import { createFile } from "@/lib/utils";
 
 import { prisma } from "@/prisma/client";
-import StorageFileApi from "@supabase/storage-js/dist/module/packages/StorageFileApi";
-import { fileTypeFromBuffer } from "file-type";
 import path from "path";
 
 export type PostProps = {
@@ -163,7 +162,10 @@ export async function createPost(formData: FormData): Promise<void> {
           )
             return;
 
-          const url = await createFile(file, postId, bucket, session.user.id);
+          const filename = crypto.randomUUID();
+          const pathSafe = path.posix.join(session.user.id, postId);
+
+          const url = await createFile(file, bucket, filename, pathSafe);
           imageUrls.push(url);
         })
       );
@@ -182,54 +184,6 @@ export async function createPost(formData: FormData): Promise<void> {
       images: imageUrls,
     },
   });
-}
-
-export async function createFile(
-  file: File,
-  postId: string,
-  bucket: StorageFileApi,
-  userId: string
-): Promise<string> {
-  if (!file || !(file instanceof File) || file.size === 0) {
-    throw new Error("No file uploaded");
-  }
-
-  // Check MIME type and extension
-  const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error("Only image files are allowed");
-  }
-  if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)) {
-    throw new Error("File extension not allowed");
-  }
-
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  // Validate actual file type using magic bytes
-  const type = await fileTypeFromBuffer(buffer);
-  if (!type || !type.mime.startsWith("image/")) {
-    throw new Error("Uploaded file is not a valid image");
-  }
-
-  const ext = type?.ext || "bin";
-  const filename = crypto.randomUUID();
-  const pathSafe = path.posix.join(userId, `${postId}`, `${filename}.${ext}`);
-
-  const { error } = await bucket.upload(pathSafe, buffer, {
-    contentType: type.mime,
-    upsert: false,
-  });
-
-  if (error) {
-    console.error("Error uploading file:", error);
-    throw new Error("Failed to upload file");
-  }
-
-  const url = bucket.getPublicUrl(pathSafe);
-  console.log("Uploaded file URL:", url);
-
-  return url.data.publicUrl;
 }
 
 export async function likePost(postId: string, like: boolean) {

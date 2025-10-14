@@ -1,5 +1,63 @@
 import { UserType } from "@/app/generated/prisma";
 import { prisma } from "@/prisma/client";
+import StorageFileApi from "@supabase/storage-js/dist/module/packages/StorageFileApi";
+import { fileTypeFromBuffer } from "file-type";
+import path from "path";
+
+export async function createFile(
+  file: File,
+  bucket: StorageFileApi,
+  filename: string,
+  folderPath?: string,
+  upsert = false
+): Promise<string> {
+  if (!file || !(file instanceof File) || file.size === 0) {
+    throw new Error("No file uploaded");
+  }
+
+  // Check MIME type and extension
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "image/svg+xml",
+  ];
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error("Only image files are allowed");
+  }
+  if (!/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.name)) {
+    throw new Error("File extension not allowed");
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  // Validate actual file type using magic bytes
+  const type = await fileTypeFromBuffer(buffer);
+  if (!type || !type.mime.startsWith("image/")) {
+    throw new Error("Uploaded file is not a valid image");
+  }
+
+  const ext = type?.ext || "bin";
+  const pathSafe = path.posix.join(folderPath || "", `${filename}.${ext}`);
+
+  const { error } = await bucket.upload(pathSafe, buffer, {
+    contentType: type.mime,
+    upsert,
+  });
+
+  if (error) {
+    console.error("Error uploading file:", error);
+    throw new Error("Failed to upload file");
+  }
+
+  const url = bucket.getPublicUrl(pathSafe);
+  console.log("Uploaded file URL:", url);
+
+  return url.data.publicUrl;
+}
 
 export const createManyChatsWithOthers = async (
   userType: UserType,

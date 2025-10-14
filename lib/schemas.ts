@@ -9,7 +9,14 @@ export const IMAGE_SCHEMA = z
   .instanceof(File)
   .refine(
     (file) =>
-      ["image/png", "image/jpeg", "image/jpg", "image/gif"].includes(file.type),
+      [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/gif",
+        "image/webp",
+        "image/svg+xml",
+      ].includes(file.type),
     { message: "Invalid image file type" }
   );
 
@@ -42,6 +49,19 @@ export const newAppointmentSchema = z.object({
   notes: z.string().max(500).optional(),
 });
 export type NewAppointmentData = z.infer<typeof newAppointmentSchema>;
+
+export const upsertHotlineSchema = z.object({
+  id: z.string().min(1, "ID is required").optional(),
+  name: z.string().min(1, "Name is required").max(100, "Name is too long"),
+  phone: z
+    .string()
+    .min(10, "Phone number must be at least 10 digits")
+    .max(15, "Phone number must be at most 15 digits"),
+  description: z.string().max(500, "Description is too long").optional(),
+  website: z.url("Invalid URL").optional().or(z.literal("")),
+  image: IMAGE_SCHEMA.optional().or(z.string().optional()),
+});
+export type HotlineData = z.infer<typeof upsertHotlineSchema>;
 
 export const updateAppointmentSchema = z.object({
   focus: z.string().optional(),

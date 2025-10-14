@@ -32,7 +32,7 @@ const FeedbackPage = async () => {
           <RatingSummary feedbacks={feedbacks} />
         </div>
       </div>
-      <div className="flex flex-wrap bg-base-100 rounded p-3 shadow-br gap-3 flex-1 min-h-0 overflow-y-auto">
+      <div className="flex flex-wrap bg-base-100 rounded justify-center p-3 shadow-br gap-3 flex-1 min-h-0 overflow-y-auto">
         {feedbacks.map((feedback) => (
           <UserFeedback key={feedback.id} feedback={feedback} />
         ))}

@@ -1,39 +1,70 @@
+"use client";
+
+import { Hotline, UserType } from "@/app/generated/prisma";
 import Image from "next/image";
+import { MdImageNotSupported } from "react-icons/md";
 import NumberButton from "./NumberButton";
 
-export interface HotlineCardProps {
-  name: string;
-  description: string;
-  contactNumber: string;
-  imageSrc: string;
-  websiteUrl: string;
-}
-
 const HotlineCard = ({
-  name,
-  description,
-  contactNumber,
-  imageSrc,
-  websiteUrl,
-}: HotlineCardProps) => {
+  hotline,
+  userType,
+  onEdit,
+  onDelete,
+}: {
+  hotline: Hotline;
+  userType: UserType;
+  onEdit?: (hotline: Hotline) => void;
+  onDelete?: (hotline: Hotline) => void;
+}) => {
   return (
-    <div className="card rounded-lg bg-base-100 w-96 shadow-br">
+    <div className="card rounded-lg bg-base-100 w-96 h-120 shadow-lg">
       <figure className="pt-5">
-        <Image width={150} height={150} src={imageSrc} alt={name} />
+        {hotline.image ? (
+          <Image
+            width={150}
+            height={150}
+            src={hotline.image}
+            alt={hotline.name}
+          />
+        ) : (
+          <MdImageNotSupported className="text-gray-300" size={150} />
+        )}
       </figure>
       <div className="card-body items-center text-center">
-        <h2 className="card-title text-primary text-2xl">{name}</h2>
-        <p>{description}</p>
-        <NumberButton contactNumber={contactNumber} />
-        <div className="card-actions justify-center w-full">
+        <h2 className="card-title text-primary text-2xl">{hotline.name}</h2>
+        <div className="flex items-center justify-center overflow-y-auto h-32">
+          <p className="text-center">{hotline.description}</p>
+        </div>
+        <NumberButton contactNumber={hotline.phone} />
+        <div
+          className={`card-actions w-full ${
+            userType === UserType.Admin ? "justify-between" : "justify-center"
+          }`}
+        >
           <a
-            href={websiteUrl}
+            href={hotline.website || "/user/hotline"}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-primary"
           >
             Visit Website
           </a>
+          {userType === UserType.Admin && (
+            <div className="flex gap-2">
+              <button
+                className="btn btn-outline btn-primary"
+                onClick={() => onEdit?.(hotline)}
+              >
+                Edit
+              </button>
+              <button
+                className="btn btn-outline btn-error"
+                onClick={() => onDelete?.(hotline)}
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -130,6 +130,9 @@ const counselorSidebar = (isLarge: boolean) => {
       <SidebarButton href="/user/feedback" icon={MdFeedback} isLarge={isLarge}>
         Feedback
       </SidebarButton>
+      <SidebarButton href="/user/hotline" icon={IoIosCall} isLarge={isLarge}>
+        Hotline
+      </SidebarButton>
     </>
   );
 };
@@ -158,6 +161,9 @@ const adminSidebar = (isLarge: boolean) => {
       </SidebarButton>
       <SidebarButton href="/user/events" icon={FaCalendar} isLarge={isLarge}>
         Events
+      </SidebarButton>
+      <SidebarButton href="/user/hotline" icon={IoIosCall} isLarge={isLarge}>
+        Hotline
       </SidebarButton>
     </>
   );

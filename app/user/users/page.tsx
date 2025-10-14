@@ -10,13 +10,7 @@ const UsersPage = async () => {
     redirect("/user/dashboard");
   }
 
-  return (
-    <div className="flex-1">
-      <div className="bg-base-100 shadow-br rounded-xl">
-        <AdminUsersPage />
-      </div>
-    </div>
-  );
+  return <AdminUsersPage />;
 };
 
 export default UsersPage;

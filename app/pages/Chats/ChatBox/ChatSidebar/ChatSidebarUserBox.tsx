@@ -8,6 +8,11 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+// TODO: find another way to get latest message without using useMessaging
+// it loads all messages which is not efficient
+// maybe create a new hook that only fetches the latest message
+// or use a global state management solution to store the latest message
+
 type Props = {
   chat: ChatData;
   selected: boolean;

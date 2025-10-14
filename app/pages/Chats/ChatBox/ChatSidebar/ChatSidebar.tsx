@@ -44,7 +44,7 @@ const ChatSidebar = ({
   }, [filter, searchText, chats]);
 
   return (
-    <div className="flex flex-col bg-base-100 shadow-br rounded-xl p-4 gap-2">
+    <div className="flex flex-col bg-base-100 shadow-br rounded-xl overflow-y-auto p-4 gap-2">
       <ChatSidebarHeader onChangeSearch={setSearchText} />
       <div className="flex flex-row items-center gap-3">
         <FilterButton

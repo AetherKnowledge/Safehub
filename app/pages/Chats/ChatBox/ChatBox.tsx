@@ -31,7 +31,7 @@ export function ChatBox({ chat }: { chat: ChatData }) {
   };
 
   return (
-    <div className="flex flex-col rounded-lg w-full h-full bg-base-100 shadow-br p-4">
+    <div className="flex flex-col rounded-lg w-full h-full bg-base-100 overflow-y-auto shadow-br p-4">
       <ChatHeader chat={chat} />
       {/* Scrollable chat history */}
       <div

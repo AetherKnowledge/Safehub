@@ -22,7 +22,7 @@ const HotlinePage = ({
   }, [hotlines, name]);
 
   return (
-    <div className="flex flex-col flex-1 bg-base-100 p-5 gap-5 rounded-xl overflow-y-auto">
+    <div className="flex flex-col flex-1 bg-base-100 p-5 gap-5 rounded-xl overflow-y-auto shadow-br">
       <div className="flex flex-row items-center justify-center gap-3">
         <label className="input w-full outline-none ring-0 focus-within:outline-none focus-within:ring-0">
           <IoIosSearch className="text-xl text-base-content" />

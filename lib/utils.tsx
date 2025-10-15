@@ -59,6 +59,13 @@ export async function createFile(
   return url.data.publicUrl;
 }
 
+export async function deleteFolder(folderPath: string, bucket: StorageFileApi) {
+  const items = await bucket.list(folderPath);
+  await bucket.remove(
+    items.data?.map((item) => folderPath + "/" + item.name) || []
+  );
+}
+
 export const createManyChatsWithOthers = async (
   userType: UserType,
   userId: string

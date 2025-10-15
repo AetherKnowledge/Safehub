@@ -3,7 +3,7 @@ import { UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { upsertHotlineSchema } from "@/lib/schemas";
 import { Buckets, getBucket } from "@/lib/supabase/client";
-import { createFile } from "@/lib/utils";
+import { createFile, deleteFolder } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 
 export async function getAllHotline() {
@@ -56,15 +56,14 @@ export async function upsertHotline(formData: FormData) {
   if (image && typeof image === "string" && image.length > 0) {
     url = image;
   } else if (image && image instanceof File && image.size > 0) {
-    await createFile(image, bucket, hotline.id, undefined, true)
+    await createFile(image, bucket, hotline.id, hotline.id, true)
       .then((uploadedUrl) => {
         url = uploadedUrl;
       })
       .catch(async (error) => {
-        console.error("Error uploading image:", error);
         justCreated &&
           (await prisma.hotline.delete({ where: { id: hotline.id } }));
-        throw new Error("Failed to upload image");
+        throw new Error("Failed to upload image " + error?.message || "");
       });
   }
 
@@ -73,5 +72,23 @@ export async function upsertHotline(formData: FormData) {
       where: { id: hotline.id },
       data: { image: url },
     });
+  }
+}
+
+export async function deleteHotline(id: string) {
+  const session = await auth();
+  if (!session || session.user.type !== UserType.Admin) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    const deletedHotline = await prisma.hotline.delete({ where: { id } });
+    const bucket = await getBucket(
+      Buckets.Hotline,
+      session?.supabaseAccessToken || ""
+    );
+    await deleteFolder(deletedHotline.id, bucket);
+  } catch (error) {
+    throw new Error("Failed to delete hotline. " + (error as Error).message);
   }
 }

@@ -1,21 +1,50 @@
 "use client";
 
+import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { Hotline, UserType } from "@/app/generated/prisma";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { MdImageNotSupported } from "react-icons/md";
 import NumberButton from "./NumberButton";
+import { deleteHotline } from "./HotlineActions";
 
 const HotlineCard = ({
   hotline,
   userType,
   onEdit,
-  onDelete,
 }: {
   hotline: Hotline;
   userType: UserType;
   onEdit?: (hotline: Hotline) => void;
-  onDelete?: (hotline: Hotline) => void;
 }) => {
+  const statusPopup = usePopup();
+  const router = useRouter();
+
+  async function handleDelete() {
+    const confirmed = await statusPopup
+      .showYesNo(`Are you sure you want to delete ${hotline.name}?`)
+      .catch((error) => {
+        statusPopup.showError(
+          "An error occurred. Please try again." + (error?.message || "")
+        );
+        return false;
+      });
+
+    if (!confirmed) return;
+
+    statusPopup.showLoading("Deleting hotline...");
+    await deleteHotline(hotline.id)
+      .then(() => {
+        statusPopup.showSuccess("Hotline deleted!");
+        router.refresh();
+      })
+      .catch((error) => {
+        statusPopup.showError(
+          "An error occurred. Please try again." + (error?.message || "")
+        );
+      });
+  }
+
   return (
     <div className="card rounded-lg bg-base-100 w-96 h-120 shadow-lg">
       <figure className="pt-5">
@@ -59,7 +88,7 @@ const HotlineCard = ({
               </button>
               <button
                 className="btn btn-outline btn-error"
-                onClick={() => onDelete?.(hotline)}
+                onClick={handleDelete}
               >
                 Delete
               </button>

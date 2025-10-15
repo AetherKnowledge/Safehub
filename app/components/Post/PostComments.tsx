@@ -1,29 +1,22 @@
 import { CommentData } from "@/lib/schemas";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import MessageBubble from "../../pages/Chats/ChatBox/MessageBubble";
-import { addComment, PostComment } from "../../pages/Post/PostActions";
+import {
+  addComment,
+  PostComment,
+  PostData,
+} from "../../pages/Post/PostActions";
+import Divider from "../Divider";
+import { usePopup } from "../Popup/PopupProvider";
 import UserImage from "../UserImage";
 
-type PostCommentsProps = {
-  id: string;
-  authorName: string;
-  authorImage?: string;
-  comments: PostComment[];
-  setComments: React.Dispatch<React.SetStateAction<PostComment[]>>;
-};
-
-const PostComments = ({
-  id,
-  authorName,
-  authorImage,
-  comments,
-  setComments,
-}: PostCommentsProps) => {
+const PostComments = ({ post }: { post: PostData }) => {
   const session = useSession();
-
+  const [comments, setComments] = useState<PostComment[]>(post.comments || []);
   const inputRef = useRef<HTMLInputElement>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
+  const statusPopup = usePopup();
 
   const scrollToBottom = () => {
     const container = messageContainerRef.current;
@@ -39,11 +32,40 @@ const PostComments = ({
     scrollToBottom();
   }, [comments]);
 
+  async function onCommentAdded(text: string) {
+    const prevComments = [...comments];
+
+    setComments([
+      ...comments,
+      {
+        id:
+          comments.length > 0
+            ? (parseInt(comments[comments.length - 1].id) + 1).toString()
+            : "1",
+        user: {
+          name: session.data?.user.name || session.data?.user.email || "You",
+          image: session.data?.user.image || undefined,
+        },
+        content: text,
+        createdAt: new Date(),
+      },
+    ]);
+
+    await addComment({
+      postId: post.id,
+      content: text,
+    } as CommentData).catch((error) => {
+      statusPopup.showError("Failed to add comment" + (error?.message || ""));
+      setComments(prevComments);
+    });
+  }
+
   return (
-    <>
+    <div className="flex flex-col h-full">
       {/* Comments */}
+      <Divider />
       <div
-        className="flex-1 min-h-0 max-h-[40vh] overflow-y-auto px-5 flex flex-col "
+        className="flex-1 min-h-0 max-h-[30vh] overflow-y-auto px-5 flex flex-col "
         ref={messageContainerRef}
       >
         <div className="flex flex-col h-full">
@@ -59,15 +81,16 @@ const PostComments = ({
           ))}
         </div>
       </div>
+      <Divider />
 
       {/* COMMENT INPUT */}
-      <div className="divider my-[-4]" />
-      <div className="flex items-center gap-2">
+
+      <div className="flex items-center gap-2 mt-2">
         <div className="avatar">
           <UserImage
-            name={authorName}
+            name={post.author.name}
             width={10}
-            src={authorImage || undefined}
+            src={post.author.image || undefined}
           />
         </div>
         <input
@@ -82,40 +105,13 @@ const PostComments = ({
               inputRef.current.value.trim()
             ) {
               const value = inputRef.current.value.trim();
-              const prevComments = [...comments];
-
-              setComments([
-                ...comments,
-                {
-                  id:
-                    comments.length > 0
-                      ? (
-                          parseInt(comments[comments.length - 1].id) + 1
-                        ).toString()
-                      : "1",
-                  user: {
-                    name:
-                      session.data?.user.name ||
-                      session.data?.user.email ||
-                      "You",
-                    image: session.data?.user.image || undefined,
-                  },
-                  content: value,
-                  createdAt: new Date().toISOString(),
-                },
-              ]);
-              try {
-                await addComment({ postId: id, content: value } as CommentData);
-              } catch (error) {
-                console.log(error);
-                setComments(prevComments);
-              }
+              onCommentAdded(value);
               inputRef.current.value = "";
             }
           }}
         />
       </div>
-    </>
+    </div>
   );
 };
 

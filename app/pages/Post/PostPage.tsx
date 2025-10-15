@@ -1,31 +1,25 @@
-import EventBox from "../../components/Post/PostBox";
-import PostCreateBox from "../../components/Post/PostCreateBox";
+import { auth } from "@/auth";
+import { sortPosts } from "@/lib/utils";
+import { Order, SortBy } from "../Dashboard/Student/Dashboard";
+import DashboardPosts from "../Dashboard/Student/DashboardPosts";
 import { getPosts } from "./PostActions";
 
-const PostPage = async () => {
-  const posts = await getPosts();
-  console.log("Posts:", posts);
+const PostPage = async ({
+  searchParams: { sortBy, order },
+}: {
+  searchParams: { sortBy?: SortBy; order?: Order };
+}) => {
+  const posts = sortPosts(await getPosts(), sortBy, order);
+  const session = await auth();
 
   return (
-    <div>
-      <div className="flex flex-col h-[82vh] ">
-        <div className="p-4 border-b-1 border-none rounded-t-2xl text-base-content bg-base-100">
-          <h2 className="text-3xl font-bold text-primary">Events</h2>
-        </div>
-        <PostCreateBox />
-        <div className="divider mt-[-8] pl-3 pr-3" />
-
-        <div className="divider mt-[-8] pl-3 pr-3" />
-        <div className="overflow-y-auto h-full">
-          {posts.map((post) => (
-            <div key={post.id}>
-              <EventBox {...post} />
-              <div className="divider mt-[-8] pl-3 pr-3" />
-              <p>test</p>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="flex flex-col gap-3 flex-1 min-h-0">
+      <DashboardPosts
+        posts={posts}
+        sortBy={sortBy}
+        order={order}
+        userType={session?.user?.type}
+      />
     </div>
   );
 };

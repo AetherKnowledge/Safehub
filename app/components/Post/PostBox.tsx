@@ -1,115 +1,107 @@
 "use client";
 import { formatDatetime } from "@/lib/utils";
 import { useState } from "react";
-import { PostProps } from "../../pages/Post/PostActions";
+import { PostData } from "../../pages/Post/PostActions";
+import ModalBase from "../Popup/ModalBase";
 import ImageGrid from "./ImageGrid";
-import PostPopup from "./PostPopup"; // Add this import
+import PostComments from "./PostComments";
 import PostStats from "./PostStats";
 
-const EventBox = ({
-  id,
-  date,
-  title,
-  content,
-  images,
-  authorName,
-  authorImage,
-  likesStats,
-  dislikesStats,
-  comments = [],
-}: PostProps) => {
+const PostBox = ({
+  post,
+  showPopup,
+  setShowPopup,
+  isPopup = false,
+}: {
+  post: PostData;
+  showPopup: boolean;
+  setShowPopup: (value: boolean) => void;
+  isPopup?: boolean;
+}) => {
   const [expanded, setExpanded] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-
   const toggleExpand = () => setExpanded(!expanded);
-  const [optimisticComments, setOptimisticComments] = useState(comments);
+
+  const maxHeight = isPopup ? "80vh" : expanded ? "1000px" : "700px";
+
+  return (
+    <div
+      className={`card bg-base-100 min-w-[400px] w-full mx-auto ${maxHeight} overflow-hidden`}
+    >
+      {/* IMAGE GRID */}
+      <div className="px-4">
+        <ImageGrid images={post.images} />
+      </div>
+
+      <div className="card-body flex flex-col p-4 pt-0 px-6">
+        {/* STATS */}
+        <div className="pt-2">
+          <PostStats
+            post={post}
+            showPopup={showPopup}
+            setShowPopup={setShowPopup}
+          />
+        </div>
+
+        <div className="flex flex-row justify-between items-center">
+          {/* Title */}
+          <h2 className="text-base-content font-bold leading-tight br text-2xl">
+            {post.title}
+          </h2>
+
+          {/* Date */}
+          <div className="flex justify-between items-end text-xs text-base-content">
+            <span>{formatDatetime(post.createdAt)}</span>
+          </div>
+        </div>
+
+        {/* Text */}
+        <p className="text-sm text-base-content max-h-[10vh] overflow-y-auto">
+          {expanded ? (
+            <>{post.content} </>
+          ) : (
+            <>
+              {post.content.length > 200
+                ? post.content.slice(0, 200) + "..."
+                : post.content}
+            </>
+          )}
+          {post.content.length > 200 && (
+            <button
+              onClick={toggleExpand}
+              className="text-sm text-base-content/50 font-semibold ml-1 hover:underline"
+            >
+              {expanded ? "See less" : "See more..."}
+            </button>
+          )}
+        </p>
+
+        {/* Comments */}
+        {isPopup && <PostComments post={post} />}
+      </div>
+    </div>
+  );
+};
+
+export const PostBoxHandler = ({ post }: { post: PostData }) => {
+  const [showPopup, setShowPopup] = useState(false);
 
   return (
     <>
-      <div
-        className={`card bg-base-100 min-w-[400px] w-full mx-auto ${
-          expanded ? "max-h-[1000px]" : "max-h-[700px]"
-        } overflow-hidden`}
-      >
-        {/* IMAGE GRID */}
-        <div className="px-4">
-          <ImageGrid images={images} />
-        </div>
-
-        <div className="card-body flex flex-col p-4 pt-0 px-6">
-          {/* STATS */}
-          <div className="pt-2">
-            <PostStats
-              id={id}
-              likesStats={likesStats}
-              dislikesStats={dislikesStats}
-              comments={optimisticComments}
-              showPopup={showPopup}
-              setShowPopup={setShowPopup}
-            />
-          </div>
-
-          <div className="flex flex-row justify-between items-center">
-            {/* Title */}
-            <h2 className="text-base-content font-bold leading-tight br text-2xl">
-              {title}
-            </h2>
-
-            {/* Date */}
-            <div className="flex justify-between items-end text-xs text-base-content">
-              <span>{formatDatetime(date)}</span>
-            </div>
-          </div>
-
-          {/* Text */}
-          <p className="text-sm text-base-content">
-            {expanded ? (
-              <>{content} </>
-            ) : (
-              <>
-                {content.length > 200 ? content.slice(0, 200) + "..." : content}
-              </>
-            )}
-            {content.length > 200 && (
-              <button
-                onClick={toggleExpand}
-                className="text-sm text-base-content/50 font-semibold ml-1 hover:underline"
-              >
-                {expanded ? "See less" : "See more..."}
-              </button>
-            )}
-          </p>
-        </div>
-      </div>
+      <PostBox post={post} showPopup={showPopup} setShowPopup={setShowPopup} />
       {showPopup && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-          onClick={() => setShowPopup(false)} // Close on overlay click
-        >
-          <div
-            className="relative"
-            onClick={(e) => e.stopPropagation()} // Prevent close when clicking inside modal
-          >
-            <PostPopup
-              id={id}
-              date={date}
-              title={title}
-              content={content}
-              images={images}
-              authorName={authorName}
-              authorImage={authorImage}
-              likesStats={likesStats}
-              dislikesStats={dislikesStats}
-              comments={optimisticComments}
-              setComments={setOptimisticComments}
+        <ModalBase className="px-20" onClick={() => setShowPopup(false)}>
+          <div className="relative w-full" onClick={(e) => e.stopPropagation()}>
+            <PostBox
+              post={post}
               showPopup={showPopup}
               setShowPopup={setShowPopup}
+              isPopup
             />
           </div>
-        </div>
+        </ModalBase>
       )}
     </>
   );
 };
 
-export default EventBox;
+export default PostBoxHandler;

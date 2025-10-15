@@ -22,7 +22,10 @@ export const IMAGE_SCHEMA = z
 
 export const newPostSchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title is too long"),
-  content: z.string().max(500, "Content is too long").optional(),
+  content: z
+    .string()
+    .max(500, "Content is too long")
+    .min(1, "Content is required"),
   images: z.array(IMAGE_SCHEMA).max(5).optional(),
 });
 
@@ -38,6 +41,17 @@ export const commentSchema = z.object({
 });
 export type CommentData = z.infer<typeof commentSchema>;
 
+export const uploadPostSchema = z.object({
+  id: z.string().min(1).optional(),
+  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
+  content: z
+    .string()
+    .min(1, "Content is required")
+    .max(500, "Content is too long"),
+  images: z.array(IMAGE_SCHEMA.or(z.string())).optional(),
+});
+export type UploadPostData = z.infer<typeof uploadPostSchema>;
+
 export const newAppointmentSchema = z.object({
   // counselorId: z.string(),
 
@@ -50,7 +64,7 @@ export const newAppointmentSchema = z.object({
 });
 export type NewAppointmentData = z.infer<typeof newAppointmentSchema>;
 
-export const upsertHotlineSchema = z.object({
+export const uploadHotlineSchema = z.object({
   id: z.string().min(1, "ID is required").optional(),
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
   phone: z
@@ -61,7 +75,7 @@ export const upsertHotlineSchema = z.object({
   website: z.url("Invalid URL").optional().or(z.literal("")),
   image: IMAGE_SCHEMA.optional().or(z.string().optional()),
 });
-export type HotlineData = z.infer<typeof upsertHotlineSchema>;
+export type UploadHotlineData = z.infer<typeof uploadHotlineSchema>;
 
 export const updateAppointmentSchema = z.object({
   focus: z.string().optional(),

@@ -5,8 +5,8 @@ import { Hotline, UserType } from "@/app/generated/prisma";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { MdImageNotSupported } from "react-icons/md";
-import NumberButton from "./NumberButton";
 import { deleteHotline } from "./HotlineActions";
+import NumberButton from "./NumberButton";
 
 const HotlineCard = ({
   hotline,
@@ -21,14 +21,9 @@ const HotlineCard = ({
   const router = useRouter();
 
   async function handleDelete() {
-    const confirmed = await statusPopup
-      .showYesNo(`Are you sure you want to delete ${hotline.name}?`)
-      .catch((error) => {
-        statusPopup.showError(
-          "An error occurred. Please try again." + (error?.message || "")
-        );
-        return false;
-      });
+    const confirmed = await statusPopup.showYesNo(
+      `Are you sure you want to delete ${hotline.name}?`
+    );
 
     if (!confirmed) return;
 

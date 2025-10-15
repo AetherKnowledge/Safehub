@@ -1,70 +1,7 @@
 import { UserType } from "@/app/generated/prisma";
+import { Order, SortBy } from "@/app/pages/Dashboard/Student/Dashboard";
+import { PostData } from "@/app/pages/Post/PostActions";
 import { prisma } from "@/prisma/client";
-import StorageFileApi from "@supabase/storage-js/dist/module/packages/StorageFileApi";
-import { fileTypeFromBuffer } from "file-type";
-import path from "path";
-
-export async function createFile(
-  file: File,
-  bucket: StorageFileApi,
-  filename: string,
-  folderPath?: string,
-  upsert = false
-): Promise<string> {
-  if (!file || !(file instanceof File) || file.size === 0) {
-    throw new Error("No file uploaded");
-  }
-
-  // Check MIME type and extension
-  const allowedTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/gif",
-    "image/webp",
-    "image/svg+xml",
-  ];
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error("Only image files are allowed");
-  }
-  if (!/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.name)) {
-    throw new Error("File extension not allowed");
-  }
-
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  // Validate actual file type using magic bytes
-  const type = await fileTypeFromBuffer(buffer);
-  if (!type || !type.mime.startsWith("image/")) {
-    throw new Error("Uploaded file is not a valid image");
-  }
-
-  const ext = type?.ext || "bin";
-  const pathSafe = path.posix.join(folderPath || "", `${filename}.${ext}`);
-
-  const { error } = await bucket.upload(pathSafe, buffer, {
-    contentType: type.mime,
-    upsert,
-  });
-
-  if (error) {
-    console.error("Error uploading file:", error);
-    throw new Error("Failed to upload file");
-  }
-
-  const url = bucket.getPublicUrl(pathSafe);
-  console.log("Uploaded file URL:", url);
-
-  return url.data.publicUrl;
-}
-
-export async function deleteFolder(folderPath: string, bucket: StorageFileApi) {
-  const items = await bucket.list(folderPath);
-  await bucket.remove(
-    items.data?.map((item) => folderPath + "/" + item.name) || []
-  );
-}
 
 export const createManyChatsWithOthers = async (
   userType: UserType,
@@ -218,4 +155,39 @@ export function formatTime(date: Date | string): string {
   });
 
   return formatter.format(date);
+}
+
+export function sortPosts(
+  posts: PostData[],
+  sortBy = SortBy.Date,
+  order = Order.Desc
+) {
+  if (!posts) return [];
+  if (!sortBy || !order) return posts;
+
+  const sortedPosts = [...posts];
+
+  if (sortBy === SortBy.Date) {
+    sortedPosts.sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return order === Order.Asc ? dateA - dateB : dateB - dateA;
+    });
+  } else if (sortBy === SortBy.Likes) {
+    sortedPosts.sort((a, b) => {
+      const likesA = a.likeStats.count;
+      const likesB = b.likeStats.count;
+      return order === Order.Asc ? likesA - likesB : likesB - likesA;
+    });
+  } else if (sortBy === SortBy.Comments) {
+    sortedPosts.sort((a, b) => {
+      const commentsA = a.comments.length;
+      const commentsB = b.comments.length;
+      return order === Order.Asc
+        ? commentsA - commentsB
+        : commentsB - commentsA;
+    });
+  }
+
+  return sortedPosts;
 }

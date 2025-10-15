@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa6";
 
 import { HiSortAscending, HiSortDescending } from "react-icons/hi";
-import { Order, SortBy } from "./Dashboard";
+import { Order, SortBy } from "../../pages/Dashboard/Student/Dashboard";
 
 type SorterProps = {
   sortBy?: SortBy;
@@ -26,41 +26,44 @@ const Sorter = ({ sortBy = SortBy.Date, order = Order.Desc }: SorterProps) => {
     router.push(`?${params.toString()}`);
   };
 
+  const size = "w-5 h-5";
+  const ascendingSize = "w-6 h-6";
+
   return (
-    <>
+    <div className="flex flex-row gap-2 bg-base-200 px-2 py-1 rounded my-1 items-center">
       <FaRegCalendar
-        className={`w-4 h-4 cursor-pointer ${
+        className={`${size} cursor-pointer ${
           sortBy === SortBy.Date ? "text-primary" : "text-base-content"
         }`}
         onClick={() => updateQuery(SortBy.Date, order)}
       />
       <FaRegHeart
-        className={`w-4 h-4 cursor-pointer ${
+        className={`${size} cursor-pointer ${
           sortBy === SortBy.Likes ? "text-primary" : "text-base-content"
         }`}
         onClick={() => updateQuery(SortBy.Likes, order)}
       />
-      <FaRegBookmark className={`w-4 h-4 cursor-pointer text-base-content`} />
+      <FaRegBookmark className={`${size} cursor-pointer text-base-content`} />
       <FaRegComment
-        className={`w-4 h-4 cursor-pointer ${
+        className={`${size} cursor-pointer ${
           sortBy === SortBy.Comments ? "text-primary" : "text-base-content"
         }`}
         onClick={() => updateQuery(SortBy.Comments, order)}
       />
 
       <HiSortAscending
-        className={`w-5 h-5 cursor-pointer ${
+        className={`${ascendingSize} cursor-pointer ${
           order === Order.Asc ? "text-primary" : "text-base-content"
         }`}
         onClick={() => updateQuery(sortBy, Order.Asc)}
       />
       <HiSortDescending
-        className={`w-5 h-5 cursor-pointer ${
+        className={`${ascendingSize} cursor-pointer ${
           order === Order.Desc ? "text-primary" : "text-base-content"
         }`}
         onClick={() => updateQuery(sortBy, Order.Desc)}
       />
-    </>
+    </div>
   );
 };
 

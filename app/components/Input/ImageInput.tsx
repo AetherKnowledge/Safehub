@@ -9,7 +9,7 @@ type ImageInputProps = {
   accept?: string; // e.g., "image/*"
   required?: boolean;
   className?: string;
-  onChange?: (files: File[]) => void;
+  onChange?: (items: Array<File | string>) => void;
   // Pre-existing images to show in the middle (can be File or URL)
   initial?: Array<File | string>;
 };
@@ -120,11 +120,14 @@ const ImageInput = ({
     });
   }, []);
 
-  // Notify parent when selected image files change
+  // Notify parent when previews change (reflecting current kept URLs and selected files)
   useEffect(() => {
     if (!onChange) return;
-    onChange(images);
-  }, [images, onChange]);
+    const items: Array<File | string> = previews.map((p) =>
+      p.from === "file" && p.file ? p.file : p.url
+    );
+    onChange(items);
+  }, [previews, onChange]);
 
   // Cleanup on unmount
   useEffect(() => {

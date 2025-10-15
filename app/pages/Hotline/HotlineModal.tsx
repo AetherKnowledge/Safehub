@@ -5,6 +5,7 @@ import TextArea from "@/app/components/Input/TextArea";
 import ModalBase from "@/app/components/Popup/ModalBase";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { Hotline } from "@/app/generated/prisma";
+import { UploadHotlineData } from "@/lib/schemas";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { FaPhone } from "react-icons/fa";
@@ -27,25 +28,29 @@ const HotlineModal = ({
     return hotline?.image ? [hotline.image] : [];
   }, [hotline?.image]);
 
-  const handleImageChange = useCallback((files: File[]) => {
-    setImage(files && files.length > 0 ? files[0] : null);
+  const handleImageChange = useCallback((items: Array<File | string>) => {
+    // Prefer the first File in the list if any; otherwise keep null.
+    const file = items.find((it): it is File => it instanceof File) || null;
+    setImage(file);
   }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    if (hotline) {
-      formData.set("id", hotline.id);
-    }
 
-    if (image && image.size > 0) formData.set("image", image);
-    else if (hotline?.image && !image) formData.set("image", hotline.image);
-    else formData.delete("image");
+    const uploadData: UploadHotlineData = {
+      id: hotline?.id,
+      name: formData.get("name") as string,
+      phone: formData.get("phone") as string,
+      description: formData.get("description") as string,
+      website: formData.get("website") as string,
+      image: image && image.size > 0 ? image : hotline?.image || undefined,
+    };
 
     statusPopup.showLoading(
       hotline ? "Saving hotline..." : "Creating hotline..."
     );
-    await upsertHotline(formData)
+    await upsertHotline(uploadData)
       .then(() => {
         statusPopup.showSuccess(
           hotline ? "Hotline updated!" : "Hotline created!"

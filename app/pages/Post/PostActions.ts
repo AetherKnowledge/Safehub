@@ -1,26 +1,33 @@
 "use server";
 
-import { UserType } from "@/app/generated/prisma";
+import { Post, UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
-import { CommentData, commentSchema, newPostSchema } from "@/lib/schemas";
+import {
+  CommentData,
+  commentSchema,
+  UploadPostData,
+  uploadPostSchema,
+} from "@/lib/schemas";
+import {
+  createFile,
+  createTemporaryFolder,
+  deleteFolder,
+} from "@/lib/supabase/bucketUtils";
 import { Buckets, getBucket } from "@/lib/supabase/client";
-import { createFile } from "@/lib/utils";
 
 import { prisma } from "@/prisma/client";
-import path from "path";
 
-export type PostProps = {
-  id: string;
-  date: Date;
-  title: string;
-  content: string;
-  images: string[];
-  authorName: string;
-  authorImage?: string;
-  likesStats: PostStat;
-  dislikesStats: PostStat;
+export type PostData = Pick<
+  Post,
+  "id" | "createdAt" | "title" | "content" | "images"
+> & {
+  author: {
+    name: string;
+    image?: string;
+  };
+  likeStats: PostStat;
+  dislikeStats: PostStat;
   comments: PostComment[];
-  isPopup?: boolean;
 };
 
 export type PostStat = {
@@ -30,7 +37,7 @@ export type PostStat = {
 
 export type PostComment = {
   id: string;
-  createdAt: string;
+  createdAt: Date;
   user: {
     name: string;
     image?: string;
@@ -38,7 +45,7 @@ export type PostComment = {
   content: string;
 };
 
-export async function getPosts(): Promise<PostProps[]> {
+export async function getPosts(): Promise<PostData[]> {
   const session = await auth();
   if (!session) {
     throw new Error("Unauthorized");
@@ -65,16 +72,13 @@ export async function getPosts(): Promise<PostProps[]> {
         },
       },
       comments: {
-        select: {
-          id: true,
-          createdAt: true,
+        include: {
           user: {
             select: {
               name: true,
               image: true,
             },
           },
-          content: true,
         },
       },
     },
@@ -82,108 +86,114 @@ export async function getPosts(): Promise<PostProps[]> {
 
   return posts.map((post) => ({
     id: post.id.toString(),
-    date: post.createdAt,
+    createdAt: post.createdAt,
     title: post.title,
-    content: post.content || "",
+    content: post.content,
     images: post.images || [],
-    authorName: post.author.name || "",
-    authorImage: post.author.image || undefined,
-    likesStats: {
+    author: {
+      name: post.author?.name || "Unknown",
+      image: post.author?.image || undefined,
+    },
+    likeStats: {
       count: post.likes.length || 0,
       selected: post.likes.some((like) => like.userId === userId),
     },
-    dislikesStats: {
+    dislikeStats: {
       count: post.dislikes.length || 0,
       selected: post.dislikes.some((dislike) => dislike.userId === userId),
     },
     comments: post.comments.map((comment) => ({
-      id: comment.id.toString(),
-      createdAt: comment.createdAt.toISOString() || new Date().toISOString(),
+      ...comment,
       user: {
-        name: comment.user.name || "",
+        name: comment.user.name || "Unknown",
         image: comment.user.image || undefined,
       },
-      content: comment.content || "",
     })),
   }));
 }
 
-export async function createPost(formData: FormData): Promise<void> {
+export async function upsertPost(data: UploadPostData) {
   const session = await auth();
-  const bucket = await getBucket(
-    Buckets.Posts,
-    session?.supabaseAccessToken || ""
-  );
-
-  if (
-    !session ||
-    !(session.user.type === UserType.Admin) ||
-    !session.user?.id
-  ) {
+  if (!session || !session.user.id || session.user.type !== UserType.Admin) {
     throw new Error("Unauthorized");
   }
 
-  if (!(formData instanceof FormData)) {
-    throw new Error("Invalid request");
-  }
-
-  const validation = newPostSchema.safeParse({
-    title: formData.get("title"),
-    content: formData.get("content"),
-    images: formData.getAll("images") as File[],
-  });
+  const validation = uploadPostSchema.safeParse(data);
 
   if (!validation.success) {
-    console.log("Validation errors:", validation.error);
-    throw new Error("Invalid request");
+    throw new Error("Invalid data", { cause: validation.error });
   }
 
-  const { title, content, images } = validation.data;
+  const { id, title, content, images } = validation.data;
+  let post = null;
+  let justCreated = false;
 
-  const post = await prisma.post.create({
-    data: {
-      title,
-      content,
-      authorId: session.user.id,
-    },
-  });
-
-  const postId = post.id;
-  const imageUrls: string[] = [];
-  try {
-    if (images && images.length > 0) {
-      await Promise.all(
-        images.map(async (file) => {
-          if (
-            !file ||
-            !(file instanceof File) ||
-            file.size === 0 ||
-            !session.user.id
-          )
-            return;
-
-          const filename = crypto.randomUUID();
-          const pathSafe = path.posix.join(session.user.id, postId);
-
-          const url = await createFile(file, bucket, filename, pathSafe);
-          imageUrls.push(url);
-        })
-      );
-    }
-  } catch (error) {
-    console.error("Error uploading images:", error);
-    await prisma.post.delete({
-      where: { id: postId },
+  if (!id) {
+    post = await prisma.post.create({
+      data: { title, content, authorId: session.user.id },
     });
-    return;
+    justCreated = true;
+  } else {
+    console.log("Updating hotline with id:", id);
+    post = await prisma.post.update({
+      where: { id },
+      data: { title, content, authorId: session.user.id },
+    });
+    justCreated = false;
   }
 
-  await prisma.post.update({
-    where: { id: postId },
-    data: {
-      images: imageUrls,
-    },
-  });
+  const bucket = getBucket(Buckets.Posts, session?.supabaseAccessToken || "");
+
+  // Move existing images to a temp folder
+  // This is to prevent losing images if upload fails
+  let ignoreFiles: (string | undefined)[] = [];
+  if (!justCreated) {
+    // Get list of files to ignore (those that are still present)
+    ignoreFiles = (post.images || []).map((url) => {
+      const part = url.split("/");
+      if (images && images.includes(url)) return part[part.length - 1]; // Keep existing image
+    });
+
+    await createTemporaryFolder(post.id, post.id + "_old", bucket, ignoreFiles);
+  }
+
+  const urls: string[] = [];
+
+  await Promise.all(
+    (images || []).map(async (image) => {
+      if (typeof image === "string") {
+        urls.push(image);
+      } else if (image instanceof File && image.size > 0) {
+        const filename = crypto.randomUUID();
+        await createFile(image, bucket, filename, post.id, true)
+          .then((uploadedUrl) => {
+            urls.push(uploadedUrl);
+          })
+          .catch(async (error) => {
+            justCreated &&
+              (await prisma.post.delete({ where: { id: post.id } }));
+
+            // Restore old images
+            await deleteFolder(post.id, bucket);
+            !justCreated &&
+              (await createTemporaryFolder(post.id + "_old", post.id, bucket));
+            throw new Error("Failed to upload image " + error?.message || "");
+          });
+      }
+    })
+  );
+
+  console.log("Uploaded image URLs:", urls);
+
+  if (urls.length > 0) {
+    await prisma.post.update({
+      where: { id: post.id },
+      data: { images: urls },
+    });
+  }
+
+  // Delete temp folder
+  !justCreated && (await deleteFolder(post.id + "_old", bucket));
 }
 
 export async function likePost(postId: string, like: boolean) {
@@ -226,6 +236,18 @@ export async function likePost(postId: string, like: boolean) {
       data: { postId: postId, userId: session.user.id },
     });
   }
+}
+
+export async function deletePost(postId: string) {
+  const session = await auth();
+  if (!session || !session.user?.id || session.user.type !== UserType.Admin) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.post.delete({ where: { id: postId } });
+
+  const bucket = getBucket(Buckets.Posts, session?.supabaseAccessToken || "");
+  await deleteFolder(postId, bucket);
 }
 
 export async function dislikePost(postId: string, dislike: boolean) {

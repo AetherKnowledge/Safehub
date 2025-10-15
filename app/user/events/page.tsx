@@ -1,13 +1,14 @@
-import PostPage from "@/app/pages/Post";
+import { Order, SortBy } from "@/app/pages/Dashboard/Student/Dashboard";
+import PostPage from "@/app/pages/Post/PostPage";
+import { auth } from "@/auth";
 
-const page = () => {
-  return (
-    <div className="flex-1">
-      <div className="bg-base-100 shadow-br rounded-xl">
-        <PostPage />
-      </div>
-    </div>
-  );
+type Props = { searchParams: Promise<{ sortBy?: SortBy; order?: Order }> };
+
+const page = async ({ searchParams }: Props) => {
+  const session = await auth();
+  if (!session) return;
+
+  return <PostPage searchParams={await searchParams} />;
 };
 
 export default page;

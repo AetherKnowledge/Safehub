@@ -1,4 +1,3 @@
-import React from "react";
 import { IconType } from "react-icons";
 import { PostStat } from "../../pages/Post/PostActions";
 
@@ -14,14 +13,14 @@ type ButtonProps = {
 
 function StatButton({
   onChange,
-  icon,
+  icon: Icon,
   value,
   label,
   color = "text-green-500",
   className,
 }: ButtonProps) {
   return (
-    <label className="swap">
+    <label className="swap btn btn-ghost btn-xs px-1 cursor-pointer">
       <input
         type="checkbox"
         checked={value.selected}
@@ -30,16 +29,12 @@ function StatButton({
         }}
       />
       <div className="swap-on flex flex-col items-center justify-between hover:cursor-pointer">
-        {React.createElement(icon, {
-          className: `text-xl ${color} ${className || ""}`,
-        })}
-        {/* <p>{`${value.count.toString()} ${label}`}</p> */}
+        {Icon && <Icon className={`text-xl ${color} ${className || ""}`} />}
       </div>
       <div className="swap-off flex flex-col items-center justify-between hover:cursor-pointer">
-        {React.createElement(icon, {
-          className: `text-xl text-base-content ${className || ""}`,
-        })}
-        {/* <p>{`${value.count.toString()} ${label}`}</p> */}
+        {Icon && (
+          <Icon className={`text-xl text-base-content ${className || ""}`} />
+        )}
       </div>
     </label>
   );

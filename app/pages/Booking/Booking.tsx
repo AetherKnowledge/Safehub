@@ -1,5 +1,10 @@
 "use client";
-import { Appointment, SessionPreference } from "@/app/generated/prisma";
+import {
+  Appointment,
+  AppointmentStatus,
+  SessionPreference,
+  UserType,
+} from "@/app/generated/prisma";
 import { NewAppointmentData, UpdateAppointmentData } from "@/lib/schemas";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,11 +22,14 @@ import {
   createNewAppointment,
   updateAppointment,
 } from "@/app/pages/Appointment/AppointmentActions";
+import { useSession } from "next-auth/react";
 import { usePopup } from "../../components/Popup/PopupProvider";
 
 const Booking = ({ appointment }: { appointment?: Appointment }) => {
-  const popup = usePopup();
+  const statusPopup = usePopup();
   const router = useRouter();
+  const session = useSession();
+
   const [q1, setQ1] = useState(appointment?.focus || "");
   const [q2, setQ2] = useState<boolean | null>(
     appointment?.hadCounselingBefore ?? null
@@ -33,13 +41,29 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
   const [q5, setQ5] = useState<Date | null>(appointment?.startTime || null);
   const [q6, setQ6] = useState(appointment?.notes || "");
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!q1 || q2 === null || !q3 || !q4 || !q5) {
       alert("Please fill out all required fields.");
       return;
     }
 
-    popup.showLoading("Submitting your appointment...");
+    const scheduleUpdated =
+      session.data?.user.type === UserType.Student &&
+      appointment &&
+      appointment.status !== AppointmentStatus.Pending &&
+      appointment.startTime.toISOString() !== q5?.toISOString();
+
+    const confirmation = scheduleUpdated
+      ? await statusPopup.showYesNo(
+          "Changing the appointment time will reset its status to 'Pending' and requires counselor re-approval. Do you want to proceed?"
+        )
+      : true;
+
+    if (!confirmation) {
+      return;
+    }
+
+    statusPopup.showLoading("Submitting your appointment...");
 
     const formData: NewAppointmentData = {
       focus: q1,
@@ -54,25 +78,25 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
     if (appointment) {
       updateAppointment(appointment.id, formData as UpdateAppointmentData)
         .then(() => {
-          popup.showSuccess(
+          statusPopup.showSuccess(
             "Appointment updated successfully!",
             "/user/appointments"
           );
           router.refresh();
         })
         .catch((error) => {
-          popup.showError(error.message || "An error occurred");
+          statusPopup.showError(error.message || "An error occurred");
         });
     } else {
       createNewAppointment(formData)
         .then(() => {
-          popup.showSuccess(
+          statusPopup.showSuccess(
             "Appointment created successfully!",
             "/user/appointments"
           );
         })
         .catch((error) => {
-          popup.showError(error.message || "An error occurred");
+          statusPopup.showError(error.message || "An error occurred");
         });
     }
   }

@@ -210,8 +210,13 @@ export async function updateAppointment(
   }
 
   const validation = updateAppointmentSchema.safeParse(appointmentData);
+
   if (!validation.success) {
     throw new Error("Invalid appointment data");
+  }
+
+  if (validation.data.endTime && session.user.type === UserType.Student) {
+    throw new Error("Students cannot update end time");
   }
 
   if (validation.data.startTime && validation.data.startTime < new Date()) {
@@ -224,6 +229,18 @@ export async function updateAppointment(
     validation.data.endTime <= validation.data.startTime
   ) {
     throw new Error("End time must be greater than start time");
+  }
+
+  // If a student changes the start time, set status to Pending and adjust end time
+  // to be 60 minutes after the new start time
+  let status: AppointmentStatus | undefined = undefined;
+  if (
+    session.user.type === UserType.Student &&
+    validation.data.startTime &&
+    validation.data.startTime !== appointment.startTime
+  ) {
+    status = AppointmentStatus.Pending;
+    validation.data.endTime = addMinutes(validation.data.startTime, 60);
   }
 
   // Update the appointment status

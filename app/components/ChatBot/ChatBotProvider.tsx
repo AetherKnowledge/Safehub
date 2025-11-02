@@ -3,6 +3,7 @@ import { Message, Messaging } from "@/@types/network";
 import { ChatBotChat } from "@/app/components/ChatBot/ChatBot";
 import { getChatBotHistory } from "@/app/components/ChatBot/ChatBotActions";
 import { useSession } from "next-auth/react";
+import { env } from "next-runtime-env";
 import {
   createContext,
   ReactNode,
@@ -122,7 +123,7 @@ export async function sendMessageToChatBot(
     throw new Error("Unauthorized");
   }
 
-  const n8nWebhookUrl = process.env.NEXT_PUBLIC_N8N_URL!;
+  const n8nWebhookUrl = env("NEXT_PUBLIC_N8N_URL")!;
   const response = await fetch(n8nWebhookUrl, {
     method: "POST",
     headers: {

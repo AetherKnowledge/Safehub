@@ -18,9 +18,13 @@ const ChatBoxInput = ({ onSend, asyncOnsend }: Props) => {
     setLoading(true);
     setMessage("");
 
-    onSend?.(message);
-    if (asyncOnsend) {
-      await asyncOnsend(message);
+    try {
+      onSend?.(message);
+      if (asyncOnsend) {
+        await asyncOnsend(message);
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
     }
 
     setLoading(false);

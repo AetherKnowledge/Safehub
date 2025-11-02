@@ -23,6 +23,7 @@ const MessageBubble = ({
   showStatus = true,
 }: Props) => {
   const defaultPosition = self ? "chat chat-end" : "chat chat-start";
+  const isLoading = !content || content.trim() === "";
 
   return (
     <div className={defaultPosition}>
@@ -41,7 +42,15 @@ const MessageBubble = ({
         {self && name}
       </div>
       <div className="chat-bubble prose max-w-[800px]">
-        <ReactMarkdown>{content}</ReactMarkdown>
+        {isLoading ? (
+          <span className="flex gap-1 items-center">
+            <span className="animate-bounce">●</span>
+            <span className="animate-bounce [animation-delay:0.15s]">●</span>
+            <span className="animate-bounce [animation-delay:0.3s]">●</span>
+          </span>
+        ) : (
+          <ReactMarkdown>{content}</ReactMarkdown>
+        )}
       </div>
       <div className="chat-footer opacity-50 text-base-content flex">
         {showStatus && <span>Delivered</span>}

@@ -20,6 +20,65 @@ async function main() {
   const counselorUUID = "52866741-dc71-4ced-b5ad-993419a730bc";
 
   // ================================
+  // Vector Storage Setup
+  // ================================
+
+  // Drop function first if it exists
+  await client.query(`
+    DROP FUNCTION IF EXISTS match_documents (
+      query_embedding vector(3072),
+      match_count int,
+      filter jsonb
+    );
+  `);
+
+  // Recreate function
+  await client.query(`
+    CREATE FUNCTION match_documents (
+      query_embedding vector(3072),
+      match_count int DEFAULT null,
+      filter jsonb DEFAULT '{}'
+    ) RETURNS TABLE (
+      id bigint,
+      content text,
+      metadata jsonb,
+      similarity float
+    )
+    LANGUAGE plpgsql
+    AS $$
+    #variable_conflict use_column
+    BEGIN
+      RETURN QUERY
+      SELECT
+        id,
+        content,
+        metadata,
+        1 - (documents.embedding <=> query_embedding) AS similarity
+      FROM documents
+      WHERE metadata @> filter
+      ORDER BY documents.embedding <=> query_embedding
+      LIMIT match_count;
+    END;
+    $$;
+  `);
+
+  // Grant permissions
+  await client.query(`
+    GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE documents TO service_role;
+  `);
+
+  await client.query(`
+    GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO service_role;
+  `);
+
+  await client.query(`
+    GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE "Hotline" TO service_role;
+  `);
+  await client.query(`
+    GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE "Post" TO service_role;
+  `);
+
+  // ================================
   // Storage Bucket Setup
   // ================================
   await client.query(`DELETE FROM storage.objects WHERE bucket_id = 'posts';`);

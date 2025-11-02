@@ -6,7 +6,6 @@ import { auth } from "@/auth";
 import { Session } from "next-auth";
 
 import { prisma } from "@/prisma/client";
-import jwt from "jsonwebtoken";
 import { ChatBotChat } from "./ChatBot";
 
 export type ChatBotResponse = {
@@ -17,53 +16,6 @@ type ChatBotMessage = {
   type: "human" | "ai";
   content: string;
 };
-
-export async function sendMessageToChatBot(message: string): Promise<Message> {
-  const session = await auth();
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
-
-  if (!message || typeof message !== "string") {
-    throw new Error("Invalid request");
-  }
-
-  const token = jwt.sign(
-    {
-      userId: session.user.id,
-      email: session.user.email,
-    },
-    process.env.N8N_SECRET!,
-    { expiresIn: "1h" }
-  );
-
-  const n8nWebhookUrl = process.env.N8N_URL!;
-  const response = await fetch(n8nWebhookUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      message,
-    }),
-  });
-
-  const data: ChatBotResponse = await response.json();
-  console.log("Response from n8n:", data);
-
-  return {
-    id: Date.now().toString(),
-    chatId: ChatBotChat.id,
-    userId: ChatBotChat.id,
-    content: data.output,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-
-    name: ChatBotChat.name,
-    src: ChatBotChat.src,
-  };
-}
 
 export async function getChatBotChat(): Promise<ChatData> {
   const session = await auth();

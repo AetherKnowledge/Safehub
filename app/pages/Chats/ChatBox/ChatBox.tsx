@@ -8,6 +8,9 @@ import ChatBoxInput from "./ChatBoxInput";
 import ChatHeader from "./ChatHeader";
 import ChatHistory from "./ChatHistory";
 
+// TODO: Move useMessaging logic to a higher-level component to avoid re-initialization on chat switch.
+// TODO: Change order of elements to have chat history first for better accessibility.
+
 export function ChatBox({ chat }: { chat: ChatData }) {
   const session = useSession();
   const chatContainerRef = useRef<HTMLDivElement>(null);

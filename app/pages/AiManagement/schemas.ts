@@ -73,3 +73,18 @@ export const updateToolSettingsSchema = z.object({
   enabled: z.boolean(),
 });
 export type UpdateToolSettingsData = z.infer<typeof updateToolSettingsSchema>;
+
+export const uploadMCPFileSchema = z.object({
+  name: z.string().min(1, "File name is required"),
+  file: z
+    .instanceof(File, { message: "Invalid file" })
+    .refine(
+      (file) =>
+        [
+          "application/pdf",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ].includes(file.type),
+      { message: "Unsupported file type" }
+    ),
+});
+export type UploadMCPFileData = z.infer<typeof uploadMCPFileSchema>;

@@ -89,7 +89,7 @@ export const PostBoxHandler = ({ post }: { post: PostData }) => {
     <>
       <PostBox post={post} showPopup={showPopup} setShowPopup={setShowPopup} />
       {showPopup && (
-        <ModalBase className="px-20" onClick={() => setShowPopup(false)}>
+        <ModalBase className="px-20" onClose={() => setShowPopup(false)}>
           <div className="relative w-full" onClick={(e) => e.stopPropagation()}>
             <PostBox
               post={post}

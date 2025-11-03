@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: "5mb",
+      bodySizeLimit: "25mb",
     },
   },
   allowedDevOrigins: ["*.jcserver.net"],

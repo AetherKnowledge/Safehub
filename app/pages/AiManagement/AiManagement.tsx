@@ -1,4 +1,4 @@
-import { getPresets, getSettings } from "./AiManagementActions";
+import { getMCPFiles, getPresets, getSettings } from "./AiManagementActions";
 import ChatbotSandbox from "./ChatbotSandbox";
 import ChatBotSettings from "./ChatBotSettings";
 import MCPSettings from "./MCPSettings";
@@ -6,6 +6,7 @@ import MCPSettings from "./MCPSettings";
 const AiManagement = async () => {
   const settings = await getSettings();
   const presets = (await getPresets()).sort((a, b) => a.id - b.id);
+  const mcpFiles = await getMCPFiles();
 
   return (
     <div className="flex-1 flex bg-base-100 min-h-0 rounded-xl shadow-br">
@@ -14,7 +15,7 @@ const AiManagement = async () => {
 
         <ChatbotSandbox />
 
-        <MCPSettings settings={settings} />
+        <MCPSettings settings={settings} mcpFiles={mcpFiles} />
       </div>
     </div>
   );

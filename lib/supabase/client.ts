@@ -34,6 +34,7 @@ export enum Buckets {
   Capstone = "capstone",
   Posts = "posts",
   Hotline = "hotline",
+  Documents = "documents",
 }
 
 export function getBucket(bucketName: Buckets, supabaseAccessToken: string) {

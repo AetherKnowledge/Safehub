@@ -5,11 +5,11 @@ import { createPortal } from "react-dom";
 const ModalBase = ({
   children,
   className,
-  onClick,
+  onClose,
 }: {
   children: React.ReactNode;
   className?: string;
-  onClick?: () => void;
+  onClose?: () => void;
 }) => {
   const [mounted, setMounted] = useState(false);
 
@@ -22,9 +22,13 @@ const ModalBase = ({
   return createPortal(
     <div
       className={`fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-50 backdrop-brightness-50 z-[9999] ${className}`}
-      onClick={onClick}
+      onClick={onClose}
     >
-      {children}
+      <div
+        onClick={(e) => e.stopPropagation()} // prevents closing when clicking inside
+      >
+        {children}
+      </div>
     </div>,
     document.body
   );

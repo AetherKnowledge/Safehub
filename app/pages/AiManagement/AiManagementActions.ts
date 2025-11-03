@@ -1,6 +1,13 @@
 "use server";
-import { AiPreset, AiSettings, UserType } from "@/app/generated/prisma";
+import {
+  AiPreset,
+  AiSettings,
+  MCPFile,
+  UserType,
+} from "@/app/generated/prisma";
 import { auth } from "@/auth";
+import { createFile, deleteFile } from "@/lib/supabase/bucketUtils";
+import { Buckets, getBucket } from "@/lib/supabase/client";
 import { prisma } from "@/prisma/client";
 import {
   UpdateToggleableAiSettingsData,
@@ -8,6 +15,8 @@ import {
   updateToolSettingsSchema,
   UploadAiPresetData,
   uploadAiPresetSchema,
+  UploadMCPFileData,
+  uploadMCPFileSchema,
 } from "./schemas";
 
 export type AiSettingsWithPreset = AiSettings & {
@@ -200,5 +209,88 @@ export async function updateToolSettings(data: unknown) {
   await prisma.aiSettings.update({
     where: { id: 1 },
     data: { tools: updatedTools },
+  });
+}
+
+export async function getMCPFiles(): Promise<Array<MCPFile>> {
+  const session = await auth();
+  if (
+    !session?.user ||
+    session.user.type !== UserType.Admin ||
+    !session.supabaseAccessToken
+  ) {
+    throw new Error("Unauthorized");
+  }
+
+  return await prisma.mCPFile.findMany();
+}
+
+export async function uploadFileToMCP(
+  data: UploadMCPFileData
+): Promise<MCPFile> {
+  const session = await auth();
+  if (
+    !session?.user ||
+    session.user.type !== UserType.Admin ||
+    !session.supabaseAccessToken
+  ) {
+    throw new Error("Unauthorized");
+  }
+
+  const validation = uploadMCPFileSchema.safeParse(data);
+  if (!validation.success) {
+    throw new Error("Invalid tool settings data");
+  }
+  const fileData = validation.data;
+  // Remove spaces from file name
+  fileData.name = fileData.name.replaceAll(" ", "");
+
+  const bucket = getBucket(Buckets.Documents, session?.supabaseAccessToken);
+  const url: string = await createFile(
+    fileData.file,
+    bucket,
+    Buckets.Documents,
+    fileData.name.split(".")[0],
+    "",
+    true,
+    false,
+    false
+  );
+
+  return await prisma.mCPFile.create({
+    data: {
+      name: fileData.name,
+      url,
+    },
+  });
+}
+
+export async function deleteFileFromMCP(fileId: string) {
+  const session = await auth();
+  if (
+    !session?.user ||
+    session.user.type !== UserType.Admin ||
+    !session.supabaseAccessToken
+  ) {
+    throw new Error("Unauthorized");
+  }
+
+  const fileData = await prisma.mCPFile.findFirst({
+    where: {
+      id: fileId,
+    },
+  });
+
+  if (!fileData) {
+    throw new Error("File not found");
+  }
+
+  const bucket = getBucket(Buckets.Documents, session?.supabaseAccessToken);
+  await deleteFile(fileData.name, bucket);
+
+  await prisma.mCPFile.delete({
+    where: {
+      id: fileId,
+    },
   });
 }

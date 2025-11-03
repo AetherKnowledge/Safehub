@@ -28,6 +28,7 @@
     "fast-sort": "^3.4.1",
     "file-type": "^21.0.0",
     "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.11.0",
     "mediasoup": "^3.19.3",
     "mediasoup-client": "^3.16.7",
     "motion": "^12.23.12",

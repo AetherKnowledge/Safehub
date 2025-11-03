@@ -383,3 +383,12 @@ model AiSettings {
 
   preset AiPreset @relation(fields: [presetId], references: [id], onDelete: Cascade)
 }
+
+model MCPFile {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  url       String
+  preview   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

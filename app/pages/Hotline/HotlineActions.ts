@@ -65,7 +65,15 @@ export async function upsertHotline(data: UploadHotlineData) {
   if (image && typeof image === "string" && image.length > 0) {
     url = image;
   } else if (image && image instanceof File && image.size > 0) {
-    await createFile(image, bucket, hotline.id, hotline.id, true)
+    await createFile(
+      image,
+      bucket,
+      Buckets.Hotline,
+      hotline.id,
+      hotline.id,
+      true,
+      false
+    )
       .then((uploadedUrl) => {
         url = uploadedUrl;
       })

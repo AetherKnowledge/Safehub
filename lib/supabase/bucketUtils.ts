@@ -1,41 +1,33 @@
 import StorageFileApi from "@supabase/storage-js/dist/module/packages/StorageFileApi";
-import { fileTypeFromBuffer } from "file-type";
+import { fileTypeFromBuffer, FileTypeResult } from "file-type";
+import { env } from "next-runtime-env";
 import path from "path";
+import { Buckets } from "./client";
 
 export async function createFile(
   file: File,
   bucket: StorageFileApi,
+  bucketName: Buckets,
   filename: string,
   folderPath?: string,
-  upsert = false
+  upsert = false,
+  imageOnly = false,
+  isPublic = true
 ): Promise<string> {
   if (!file || !(file instanceof File) || file.size === 0) {
     throw new Error("No file uploaded");
   }
 
-  // Check MIME type and extension
-  const allowedTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/gif",
-    "image/webp",
-    "image/svg+xml",
-  ];
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error("Only image files are allowed");
-  }
-  if (!/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.name)) {
-    throw new Error("File extension not allowed");
-  }
-
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  // Validate actual file type using magic bytes
   const type = await fileTypeFromBuffer(buffer);
-  if (!type || !type.mime.startsWith("image/")) {
-    throw new Error("Uploaded file is not a valid image");
+  if (!type) {
+    throw new Error("Invalid Type");
+  }
+
+  if (imageOnly && !isFileImage(file, type)) {
+    throw new Error("Only Image files are allowed");
   }
 
   const ext = type?.ext || "bin";
@@ -51,8 +43,40 @@ export async function createFile(
     throw new Error("Failed to upload file");
   }
 
-  const url = bucket.getPublicUrl(pathSafe);
-  return url.data.publicUrl;
+  const url = isPublic
+    ? bucket.getPublicUrl(pathSafe).data.publicUrl
+    : `${env(
+        "NEXT_PUBLIC_SUPABASE_URL"
+      )}/storage/v1/object/authenticated/${bucketName}/${pathSafe}`;
+  return url;
+}
+
+export function isFileImage(file: File, type: FileTypeResult): Boolean {
+  // Check MIME type and extension
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "image/svg+xml",
+  ];
+  if (!allowedTypes.includes(file.type)) {
+    return false;
+  }
+  if (!/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.name)) {
+    return false;
+  }
+
+  if (!type || !type.mime.startsWith("image/")) {
+    throw new Error("Uploaded file is not a valid image");
+  }
+
+  return true;
+}
+
+export async function deleteFile(filePath: string, bucket: StorageFileApi) {
+  await bucket.remove([filePath]);
 }
 
 export async function deleteFolder(folderPath: string, bucket: StorageFileApi) {

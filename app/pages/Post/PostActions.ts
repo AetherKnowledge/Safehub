@@ -165,7 +165,15 @@ export async function upsertPost(data: UploadPostData) {
         urls.push(image);
       } else if (image instanceof File && image.size > 0) {
         const filename = crypto.randomUUID();
-        await createFile(image, bucket, filename, post.id, true)
+        await createFile(
+          image,
+          bucket,
+          Buckets.Posts,
+          filename,
+          post.id,
+          true,
+          false
+        )
           .then((uploadedUrl) => {
             urls.push(uploadedUrl);
           })

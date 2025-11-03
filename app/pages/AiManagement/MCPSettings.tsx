@@ -2,10 +2,19 @@
 import Divider from "@/app/components/Divider";
 import Toggle from "@/app/components/Input/Toggle";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { AiSettings, Tools } from "@/app/generated/prisma";
+import { AiSettings, MCPFile, Tools } from "@/app/generated/prisma";
+import { useSession } from "next-auth/react";
 import { useMemo, useRef, useState } from "react";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaAngleDown } from "react-icons/fa6";
-import { toggleAiSetting, updateToolSettings } from "./AiManagementActions";
+import {
+  deleteFileFromMCP,
+  toggleAiSetting,
+  updateToolSettings,
+  uploadFileToMCP,
+} from "./AiManagementActions";
+import FileCard from "./FileCard";
+import { UploadMCPFileData } from "./schemas";
 
 type ToolToggle = {
   key: string;
@@ -13,39 +22,23 @@ type ToolToggle = {
   enabled: boolean;
 };
 
-type FileCard = {
-  id: string;
-  name: string;
-  preview?: string; // url
-  source?: string; // hostname or small subtitle
-};
-
-const MCPSettings = ({ settings }: { settings: AiSettings }) => {
+const MCPSettings = ({
+  settings,
+  mcpFiles,
+}: {
+  settings: AiSettings;
+  mcpFiles: MCPFile[];
+}) => {
+  const session = useSession();
   const statusPopup = usePopup();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   // Right panel tools/files
   const [mcpOn, setMcpOn] = useState(settings.isMCPOn);
   const [tools, setTools] = useState<ToolToggle[]>(getTools(settings));
 
-  const [cards, setCards] = useState<FileCard[]>([
-    {
-      id: crypto.randomUUID(),
-      name: "PubMed Central",
-      source: "harvey.com/pub...",
-    },
-    { id: crypto.randomUUID(), name: "Articles", source: "langworth.info/..." },
-    {
-      id: crypto.randomUUID(),
-      name: "Awareness importance",
-      source: "breitenberg.org/...",
-    },
-    {
-      id: crypto.randomUUID(),
-      name: "Calm Mind Blog",
-      source: "konopelski.com/...",
-    },
-  ]);
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [cards, setCards] = useState<MCPFile[]>(mcpFiles);
+  const [selectedCards, setSelectedCards] = useState<Set<MCPFile>>(new Set());
+
   const [perPage, setPerPage] = useState(4);
   const [page, setPage] = useState(1);
 
@@ -58,15 +51,54 @@ const MCPSettings = ({ settings }: { settings: AiSettings }) => {
     return cards.slice(start, start + perPage);
   }, [cards, page, perPage]);
 
-  function handleUpload(files: FileList | null) {
+  async function handleUpload(files: FileList | null) {
     if (!files || files.length === 0) return;
-    const newCards: FileCard[] = Array.from(files).map((f) => ({
-      id: crypto.randomUUID(),
-      name: f.name,
-      preview: URL.createObjectURL(f),
-      source: "uploaded",
-    }));
-    setCards((prev) => [...newCards, ...prev]);
+    statusPopup.showLoading("Uploading files...");
+    const toUpload: UploadMCPFileData[] = Array.from(files).map(
+      (file) =>
+        ({
+          name: file.name,
+          file,
+        }) as UploadMCPFileData
+    );
+
+    let mcpFiles: MCPFile[] = [];
+
+    try {
+      mcpFiles = await Promise.all(
+        toUpload.map(async (file) => await uploadFileToMCP(file))
+      );
+
+      statusPopup.showSuccess("Files uploaded successfully.");
+      setCards((prev) => [...mcpFiles, ...prev]);
+    } catch (e) {
+      const err = e as Error;
+      statusPopup.showError(err.message || "Failed to upload files.");
+    }
+  }
+
+  async function handleDelete(files: MCPFile[]) {
+    if (files.length === 0) return;
+    const confirmed = await statusPopup.showYesNo(
+      "Are you sure you want to delete the selected files?"
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    statusPopup.showLoading("Deleting files...");
+    try {
+      await Promise.all(
+        files.map(async (file) => await deleteFileFromMCP(file.id))
+      );
+
+      statusPopup.showSuccess("Files deleted successfully.");
+      setCards((prev) => prev.filter((card) => !files.includes(card)));
+      setSelectedCards(new Set());
+    } catch (e) {
+      const err = e as Error;
+      statusPopup.showError(err.message || "Failed to delete files.");
+    }
   }
 
   async function onToggleMcp(checked: boolean) {
@@ -90,6 +122,13 @@ const MCPSettings = ({ settings }: { settings: AiSettings }) => {
           t.key === toolKey ? { ...t, enabled: !enabled } : { ...t }
         )
       );
+    });
+  }
+
+  function handleDownload(files: MCPFile[]) {
+    files.map((card) => {
+      console.log("Download URL " + card.url);
+      downloadFile(card.url, card.name, session.data?.supabaseAccessToken!);
     });
   }
 
@@ -121,100 +160,105 @@ const MCPSettings = ({ settings }: { settings: AiSettings }) => {
       <div className="bg-white rounded-xl flex flex-col m-4 mt-0">
         <div className="flex items-center justify-between p-3">
           <h3 className="font-medium">Files</h3>
-          <button
-            className="btn btn-sm btn-primary"
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            Upload Files
-          </button>
+          <div className="flex flex-row gap-2">
+            <button
+              className="btn btn-sm btn-primary"
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Upload Files
+            </button>
+            <div className="dropdown dropdown-end">
+              <BsThreeDotsVertical
+                role="button"
+                tabIndex={0}
+                className="cursor-pointer btn btn-ghost btn-sm p-1"
+              />
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow"
+              >
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selectedCards.size > 0) {
+                        setSelectedCards(new Set());
+                      } else {
+                        setSelectedCards(new Set(cards));
+                      }
+                    }}
+                  >
+                    {selectedCards.size > 0 ? "Unselect All" : "Select All"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDelete(Array.from(selectedCards));
+                    }}
+                  >
+                    Delete Selected
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDownload(Array.from(selectedCards));
+                    }}
+                  >
+                    Download Selected
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
         <input
           ref={fileInputRef}
           type="file"
           className="hidden"
           multiple
+          accept=".pdf,.docx"
           onChange={(e) => handleUpload(e.target.files)}
         />
 
         <Divider />
 
-        <div className="grid grid-cols-2 gap-3 p-3">
-          {pagedCards.map((c) => (
-            <div key={c.id} className="card bg-base-100 shadow-sm">
-              <div className="card-body p-3 gap-2">
-                <div className="flex items-start justify-between gap-2">
-                  <label className="cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="checkbox checkbox-primary"
-                      checked={!!selected[c.id]}
-                      onChange={(e) =>
-                        setSelected((s) => ({
-                          ...s,
-                          [c.id]: e.target.checked,
-                        }))
-                      }
-                    />
-                  </label>
-                  <div className="dropdown dropdown-end">
-                    <div
-                      tabIndex={0}
-                      role="button"
-                      className="btn btn-ghost btn-xs"
-                    >
-                      ⋮
-                    </div>
-                    <ul
-                      tabIndex={0}
-                      className="dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow"
-                    >
-                      <li>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setSelected((s) => ({ ...s, [c.id]: !s[c.id] }))
-                          }
-                        >
-                          Select
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setCards((prev) =>
-                              prev.filter((x) => x.id !== c.id)
-                            )
-                          }
-                        >
-                          Delete
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="w-full h-24 rounded bg-base-300 overflow-hidden flex items-center justify-center">
-                  {c.preview ? (
-                    <img
-                      src={c.preview}
-                      alt={c.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-xs opacity-60">No preview</span>
-                  )}
-                </div>
-                <div className="text-sm font-medium truncate" title={c.name}>
-                  {c.name}
-                </div>
-                <div className="text-xs opacity-60 truncate" title={c.source}>
-                  {c.source}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {cards.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 p-3">
+            {pagedCards.map((card) => (
+              <FileCard
+                key={card.id}
+                file={card}
+                selected={selectedCards.has(card)}
+                onSelect={(file, selected) => {
+                  setSelectedCards((prev) => {
+                    const newSet = new Set(prev);
+                    if (selected) {
+                      newSet.add(file);
+                    } else {
+                      newSet.delete(file);
+                    }
+                    return newSet;
+                  });
+                }}
+                onDelete={(file) => {
+                  handleDelete([file]);
+                }}
+                onDownload={(file) => {
+                  handleDownload([file]);
+                }}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex w-full text-center items-center justify-center text-base-content/70 h-51">
+            No files uploaded.
+          </div>
+        )}
 
         <Divider />
 
@@ -282,6 +326,36 @@ function getTools(settings: AiSettings): ToolToggle[] {
       enabled: settings.tools.includes(tool),
     } as ToolToggle;
   });
+}
+
+async function downloadFile(
+  url: string,
+  filename: string,
+  sessionToken: string
+) {
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    });
+    if (!response.ok) throw new Error("Failed to fetch file.");
+
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (err) {
+    console.error("File download failed:", err);
+  }
 }
 
 export default MCPSettings;

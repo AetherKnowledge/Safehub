@@ -21,6 +21,7 @@ type InputBoxProps = {
     | "color";
   bgColor?: string;
   size?: "input-xs" | "input-sm" | "input-md" | "input-lg" | "input-xl";
+  required?: boolean;
   icon?: IconType;
 };
 
@@ -33,11 +34,14 @@ const InputBox = ({
   bgColor = "bg-base-200",
   size = "input-sm",
   icon: Icon,
+  required = false,
 }: InputBoxProps) => {
   return (
     <>
       <fieldset className="fieldset w-full">
-        <legend className="fieldset-legend pb-1 ml-1">{legend}:</legend>
+        <legend className="fieldset-legend pb-1 gap-1">
+          {legend} {required && <span className="text-error">*</span>}
+        </legend>
         <label
           className={`input validator-2 ${size} no-outline rounded text-base-content w-full ${bgColor}`}
         >
@@ -48,6 +52,7 @@ const InputBox = ({
             type={type}
             placeholder={placeholder}
             defaultValue={defaultValue}
+            required={required}
           />
         </label>
         <p className="validator-hint hidden ml-1 mt-[-5px]">

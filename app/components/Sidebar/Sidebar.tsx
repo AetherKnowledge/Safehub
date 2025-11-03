@@ -8,6 +8,7 @@ import { FaCalendar, FaUsers } from "react-icons/fa";
 import { IoIosCall, IoIosSettings } from "react-icons/io";
 import { IoChatboxEllipses } from "react-icons/io5";
 import { MdFeedback } from "react-icons/md";
+import { RiGeminiFill } from "react-icons/ri";
 import Divider from "../Divider";
 import CollapseButton from "./CollapseButton";
 import SidebarButton from "./SidebarButton";
@@ -164,6 +165,13 @@ const adminSidebar = (isLarge: boolean) => {
       </SidebarButton>
       <SidebarButton href="/user/hotline" icon={IoIosCall} isLarge={isLarge}>
         Hotline
+      </SidebarButton>
+      <SidebarButton
+        href="/user/ai-management"
+        icon={RiGeminiFill}
+        isLarge={isLarge}
+      >
+        AI Management
       </SidebarButton>
     </>
   );

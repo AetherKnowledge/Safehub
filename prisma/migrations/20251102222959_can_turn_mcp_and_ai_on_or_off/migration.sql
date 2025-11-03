@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "public"."AiSettings" ADD COLUMN     "isAiOn" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "isMCPOn" BOOLEAN NOT NULL DEFAULT true;

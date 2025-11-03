@@ -45,6 +45,13 @@ enum CallStatus {
   No_Answer
 }
 
+enum Tools {
+  WebSearch
+  GetPosts
+  GetHotlines
+  QueryVault
+}
+
 enum UserStatus {
   Online
   Offline
@@ -349,4 +356,30 @@ model VerificationToken {
   expires    DateTime
 
   @@id([identifier, token])
+}
+
+model AiPreset {
+  id        Int      @id @default(autoincrement())
+  name      String
+  prompt    String
+  tasks     String?
+  rules     String?
+  limits    String?
+  examples  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions AiSettings[]
+}
+
+model AiSettings {
+  id        Int      @id @default(1)
+  isAiOn    Boolean  @default(true)
+  isMCPOn   Boolean  @default(true)
+  presetId  Int
+  tools     Tools[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  preset AiPreset @relation(fields: [presetId], references: [id], onDelete: Cascade)
 }

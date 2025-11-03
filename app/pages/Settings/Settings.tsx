@@ -63,7 +63,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
             name={user.name || user.email.split("@")[0] || "User"}
             width={16}
             src={user.image || undefined}
-            bordered={true}
+            bordered
           />
           <div className="flex flex-col ml-4 w-full">
             <span className="font-bold">{user.name}</span>

@@ -29,9 +29,9 @@ const UserImage = ({
           <Image
             src={src}
             alt={name ?? "counselor Avatar"}
-            className={`${imageWidth} ${imageHeight} rounded-full`}
-            width={width * 2}
-            height={width * 2}
+            className={`rounded-full`}
+            width={width * 4}
+            height={width * 4}
           />
         </div>
       ) : (

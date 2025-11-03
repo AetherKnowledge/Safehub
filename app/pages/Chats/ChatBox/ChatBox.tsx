@@ -1,12 +1,12 @@
 "use client";
-import { ChatData, Message } from "@/@types/network";
+import { ChatData } from "@/@types/network";
 import { useMessaging } from "@/lib/socket/hooks/useMessaging";
 import { useSession } from "next-auth/react";
-import { ReactNode, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useChatBot } from "../../../components/ChatBot/ChatBotProvider";
 import ChatBoxInput from "./ChatBoxInput";
 import ChatHeader from "./ChatHeader";
-import MessageBubble from "./MessageBubble";
+import ChatHistory from "./ChatHistory";
 
 export function ChatBox({ chat }: { chat: ChatData }) {
   const session = useSession();
@@ -49,45 +49,6 @@ export function ChatBox({ chat }: { chat: ChatData }) {
       <ChatBoxInput asyncOnsend={messaging.sendMessage} />
     </div>
   );
-}
-
-function ChatHistory({
-  loading,
-  messages,
-  userId,
-}: {
-  loading: boolean;
-  messages: Message[] | null;
-  userId: string;
-}): ReactNode {
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full space-y-4">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
-        <p className="text-base-content">Loading chat...</p>
-      </div>
-    );
-  }
-
-  if (!messages || messages.length === 0) {
-    return (
-      <p className="text-center text-base-content/70 mt-4">
-        No chat history available.
-      </p>
-    );
-  }
-
-  return messages.map((chat) => (
-    <MessageBubble
-      key={chat.id}
-      name={chat.name}
-      image={chat.src}
-      imageSize={10}
-      content={chat.content}
-      createdAt={chat.createdAt}
-      self={userId === chat.userId}
-    />
-  ));
 }
 
 export default ChatBox;

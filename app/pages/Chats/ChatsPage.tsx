@@ -1,5 +1,6 @@
 import { ChatData } from "@/@types/network";
 import { getChatBotChat } from "../../components/ChatBot/ChatBotActions";
+import { getSettings } from "../AiManagement/AiManagementActions";
 import ChatBox from "./ChatBox/ChatBox";
 import ChatSidebar from "./ChatBox/ChatSidebar";
 import { getChats } from "./ChatsActions";
@@ -10,7 +11,10 @@ type ChatsPageProps = {
 
 const ChatsPage = async ({ chatId }: ChatsPageProps) => {
   // So SafeHub AI is always first
-  const chats: ChatData[] = [await getChatBotChat()];
+  const chats: ChatData[] = [];
+  if ((await getSettings()).isAiOn) {
+    chats.push(await getChatBotChat());
+  }
   chats.push(...(await getChats()));
 
   const chatForSelectedId = chats.find((chat) => chat.id === chatId);

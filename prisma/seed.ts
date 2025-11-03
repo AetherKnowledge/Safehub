@@ -56,13 +56,7 @@ async function main() {
   );
 
   const settingId = "1";
-  const tools = [
-    "WebSearch",
-    "Calculator",
-    "GetPosts",
-    "GetHotlines",
-    "QueryVault",
-  ];
+  const tools = ["WebSearch", "GetPosts", "GetHotlines", "QueryVault"];
 
   await client.query(
     `

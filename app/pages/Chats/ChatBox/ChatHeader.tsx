@@ -5,6 +5,8 @@ import { IoIosCall } from "react-icons/io";
 import UserImage from "../../../components/UserImage";
 import { useCallPopup } from "./CallPopupProvider";
 
+// TODO: Split video and audio call buttons
+
 type ChatHeaderProps = {
   chat: ChatData;
 };

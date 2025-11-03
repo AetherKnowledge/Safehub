@@ -9,10 +9,7 @@ export const createManyChatsWithOthers = async (
 ) => {
   const users = await prisma.user.findMany({
     where: {
-      type:
-        userType === UserType.Student
-          ? UserType.Counselor
-          : { not: UserType.Student },
+      type: userType,
       AND: [
         { id: { not: userId } }, // Exclude the current user
       ],

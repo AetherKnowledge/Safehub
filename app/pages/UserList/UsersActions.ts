@@ -125,7 +125,6 @@ export async function updateUserType(data: UpdateUserTypeData) {
 
     await createManyChatsWithOthers(UserType.Admin, updatedUser.id);
     await createManyChatsWithOthers(UserType.Counselor, updatedUser.id);
-
     await createManyChatsWithOthers(UserType.Student, updatedUser.id);
   } else if (updatedUser.type === UserType.Student) {
     await prisma.student.create({

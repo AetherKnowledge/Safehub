@@ -51,7 +51,7 @@ export async function createFile(
   return url;
 }
 
-export function isFileImage(file: File, type: FileTypeResult): Boolean {
+export function isFileImage(file: File, type: FileTypeResult): boolean {
   // Check MIME type and extension
   const allowedTypes = [
     "image/jpeg",

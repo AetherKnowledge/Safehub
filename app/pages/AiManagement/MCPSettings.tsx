@@ -94,15 +94,15 @@ const MCPSettings = ({ settings }: { settings: AiSettings }) => {
   }
 
   return (
-    <section className="bg-base-100 p-4 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <section className="flex-1 flex flex-col min-h-0">
+      <div className="flex items-center justify-between p-4">
         <h2 className="text-lg font-bold">MCP Server</h2>
         <Toggle isChecked={mcpOn} onToggle={onToggleMcp} />
       </div>
 
       <Divider />
 
-      <div>
+      <div className="m-4">
         <h3 className="font-semibold mb-2">Tools</h3>
         <ul className="p-2 pt-0 space-y-2">
           {tools.map((tool) => (
@@ -118,7 +118,7 @@ const MCPSettings = ({ settings }: { settings: AiSettings }) => {
         </ul>
       </div>
 
-      <div className="bg-white rounded-xl flex flex-col">
+      <div className="bg-white rounded-xl flex flex-col m-4 mt-0">
         <div className="flex items-center justify-between p-3">
           <h3 className="font-medium">Files</h3>
           <button

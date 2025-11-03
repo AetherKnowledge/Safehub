@@ -5,9 +5,10 @@ import { IoIosSend } from "react-icons/io";
 interface Props {
   onSend?: (content: string) => void;
   asyncOnsend?: (content: string) => Promise<void>;
+  className?: string;
 }
 
-const ChatBoxInput = ({ onSend, asyncOnsend }: Props) => {
+const ChatBoxInput = ({ onSend, asyncOnsend, className }: Props) => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +32,10 @@ const ChatBoxInput = ({ onSend, asyncOnsend }: Props) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2 mt-4">
+    <form
+      onSubmit={handleSubmit}
+      className={`flex items-center gap-2 mt-4 ${className}`}
+    >
       <input
         type="text"
         placeholder="Type a message..."

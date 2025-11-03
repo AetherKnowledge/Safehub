@@ -138,15 +138,15 @@ const ChatBotSettings = ({
   }
 
   return (
-    <section className="flex-1 p-4 flex flex-col gap-4 min-h-0">
-      <div className="flex items-center justify-between">
+    <section className="flex-1 flex flex-col min-h-0">
+      <div className="flex items-center justify-between p-4">
         <h2 className="text-lg font-bold">AI Chatbot</h2>
         <Toggle isChecked={aiOn} onToggle={onChangeAiToggle} />
       </div>
 
       <Divider />
 
-      <div>
+      <div className="p-4">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold">Presets</h3>
           <div className="flex gap-2">
@@ -186,7 +186,7 @@ const ChatBotSettings = ({
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col gap-2 min-h-0 mt-2">
+      <div className="flex-1 flex flex-col gap-2 min-h-0 p-4 pt-0">
         <h2 className="font-semibold">System Prompt</h2>
 
         <div className="flex flex-col overflow-y-auto p-6 pt-2 border border-base-300/50 rounded-xl gap-6">
@@ -235,13 +235,16 @@ const ChatBotSettings = ({
         </div>
       </div>
 
-      <LoadingButton
-        isLoading={saving}
-        onClick={handleSave}
-        Icon={<CiSaveDown2 className="h-5 w-5" />}
-        text="Save"
-        loadingText="Saving..."
-      />
+      <div className="flex p-4 w-full">
+        <LoadingButton
+          className="w-full"
+          isLoading={saving}
+          onClick={handleSave}
+          Icon={<CiSaveDown2 className="h-5 w-5" />}
+          text="Save"
+          loadingText="Saving..."
+        />
+      </div>
     </section>
   );
 };

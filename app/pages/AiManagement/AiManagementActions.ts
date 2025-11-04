@@ -34,7 +34,7 @@ export async function getPresets(): Promise<Array<AiPreset>> {
 
 export async function getSettings(): Promise<AiSettingsWithPreset> {
   const session = await auth();
-  if (!session?.user || session.user.type !== UserType.Admin) {
+  if (!session?.user) {
     throw new Error("Unauthorized");
   }
 

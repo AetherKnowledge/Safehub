@@ -194,7 +194,6 @@ const ChatBotSettings = ({
             name="prompt"
             legend="What am I?"
             placeholder="e.g., A helpful AI chatbot assistant"
-            bgColor="bg-white"
             value={whatAmI}
             onChange={(e) => setWhatAmI(e.target.value)}
             required
@@ -205,7 +204,6 @@ const ChatBotSettings = ({
             placeholder="e.g., To assist the students"
             value={tasks}
             onChange={(e) => setTasks(e.target.value)}
-            bgColor="bg-white"
           />
           <TextAreaMarkDown
             name="rules"
@@ -213,7 +211,6 @@ const ChatBotSettings = ({
             placeholder="e.g., All responses must be humane mentally & emotionally"
             value={rules}
             onChange={(e) => setRules(e.target.value)}
-            bgColor="bg-white"
           />
 
           <TextAreaMarkDown
@@ -222,7 +219,6 @@ const ChatBotSettings = ({
             placeholder="e.g., Cannot provide medical advice"
             value={limits}
             onChange={(e) => setLimits(e.target.value)}
-            bgColor="bg-white"
           />
           <TextAreaMarkDown
             name="examples"
@@ -230,7 +226,6 @@ const ChatBotSettings = ({
             placeholder="e.g., A user asking about their account balance"
             value={examples}
             onChange={(e) => setExamples(e.target.value)}
-            bgColor="bg-white"
           />
         </div>
       </div>

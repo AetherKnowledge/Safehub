@@ -181,6 +181,8 @@ model Call {
   createdAt DateTime   @default(now())
   callerId  String     @db.Uuid
 
+  turnCredentials Json?
+
   chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
   caller User @relation(fields: [callerId], references: [id], onDelete: Cascade)
 

@@ -8,6 +8,10 @@ import {
 import ClientSocketServer from "@/lib/socket/ClientSocketServer";
 import { prisma } from "@/prisma/client";
 import {
+  deleteTurnCredentials,
+  getTurnCredentials,
+} from "../hooks/turnServerActions";
+import {
   SocketAnswerCall,
   SocketCallEnded,
   SocketErrorCallType,
@@ -100,15 +104,29 @@ export async function receiveInitiateCall(
     callerImage: member?.user.image || client.socketUser.image || undefined,
   };
 
+  // TODO: Add creation of TURN server credentials here and include in initiateCallData
+  // logic create credentials -> add it to database -> clients will get the credentials by getting it from database
+  const turnCredentials = await getTurnCredentials(initiateCallData.callId);
+
   // Create call in database first before sending socket events to prevent answering call before creating call in database
-  await prisma.call.create({
-    data: {
-      id: initiateCallData.callId,
-      chatId,
-      status: CallStatus.Pending,
-      callerId,
-    },
-  });
+  await prisma.call
+    .create({
+      data: {
+        id: initiateCallData.callId,
+        chatId,
+        status: CallStatus.Pending,
+        callerId,
+        turnCredentials,
+      },
+    })
+    .catch((error) => {
+      console.error("Error creating call in database:", error);
+      sendErrorResponseToSelf(
+        client,
+        "Error creating call in database",
+        SocketErrorRequestType.INTERNAL_SERVER_ERROR
+      );
+    });
 
   await createCallMember(client, initiateCallData.callId, callerId);
 
@@ -479,6 +497,7 @@ export async function createCallMember(
 
 export async function deleteCall(client: ClientSocketServer, callId: string) {
   try {
+    await deleteTurnCredentials(callId);
     await prisma.call.delete({ where: { id: callId } });
     console.log(`Call with ID ${callId} deleted`);
   } catch (error) {

@@ -14,6 +14,7 @@ import {
   SocketSdp,
 } from "../SocketEvents";
 import { useSocket } from "../SocketProvider";
+import { getIceServers } from "./turnServerActions";
 
 export type PeerData = {
   peerConnection: Peer.Instance;
@@ -22,6 +23,8 @@ export type PeerData = {
 };
 
 // TODO: Fix bug reject call not closing call for caller
+
+// TODO: Add turn server with metered.ca
 
 export function useCalling() {
   const session = useSession();
@@ -36,7 +39,7 @@ export function useCalling() {
   const [peers, setPeers] = useState<PeerData[]>([]);
 
   const createPeer = useCallback(
-    (member: string, stream: MediaStream, initiator: boolean) => {
+    async (member: string, stream: MediaStream, initiator: boolean) => {
       if (!socket || socket.readyState !== WebSocket.OPEN) {
         console.warn("Socket not open. Cannot create peer for member.");
         return;
@@ -57,7 +60,9 @@ export function useCalling() {
         return null;
       }
 
-      const iceServers: RTCIceServer[] = [
+      const iceServers: RTCIceServer[] = (await getIceServers(
+        currentCall.callId
+      )) || [
         {
           urls: [
             "stun:stun.l.google.com:19302",
@@ -311,7 +316,7 @@ export function useCalling() {
             return;
           }
 
-          const peer = createPeer(data.from, stream, false);
+          const peer = await createPeer(data.from, stream, false);
           if (!peer) {
             console.warn(`Failed to create peer for member ${data.from}`);
             return;
@@ -390,7 +395,7 @@ export function useCalling() {
       const callData: SocketInitiateCall = {
         status: CallStatus.Pending,
         callId: crypto.randomUUID(),
-        callerId: session.data?.user.id, // Replace with actual user ID
+        callerId: session.data?.user.id,
         recipients,
         chatId,
         chatName,

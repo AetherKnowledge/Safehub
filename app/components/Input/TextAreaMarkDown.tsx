@@ -19,7 +19,7 @@ const TextAreaMarkdown = ({
   name,
   legend,
   placeholder,
-  bgColor = "bg-base-200",
+  bgColor = "bg-neutral",
   size = "sm",
   required = false,
   value,

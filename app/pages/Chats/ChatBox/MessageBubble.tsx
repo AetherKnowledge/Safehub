@@ -41,7 +41,11 @@ const MessageBubble = ({
         </time>
         {self && name}
       </div>
-      <div className="chat-bubble prose max-w-[800px]">
+      <div
+        className={`chat-bubble prose max-w-[800px] ${
+          self ? "bg-primary text-primary-content" : "bg-neutral"
+        }`}
+      >
         {isLoading ? (
           <span className="flex gap-1 items-center">
             <span className="animate-bounce">●</span>

@@ -162,7 +162,7 @@ const MCPSettings = ({
         </ul>
       </div>
 
-      <div className="bg-base-200 rounded-xl flex flex-col m-4 mt-0">
+      <div className="bg-neutral rounded-xl flex flex-col m-4 mt-0">
         <div className="flex items-center justify-between p-3">
           <h3 className="font-medium">Files</h3>
           <div className="flex flex-row gap-2">

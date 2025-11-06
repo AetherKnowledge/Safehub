@@ -8,6 +8,7 @@ import {
 } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import {
+  ErrorResponse,
   NewAppointmentData,
   newAppointmentSchema,
   UpdateAppointmentData,
@@ -133,49 +134,73 @@ export async function getAppointmentById(
 export async function createNewAppointment(
   appointmentData: NewAppointmentData
 ) {
-  const session = await auth();
+  try {
+    const session = await auth();
 
-  if (
-    !session ||
-    !(session.user.type === UserType.Student) ||
-    !session.user?.id
-  ) {
-    throw new Error("Unauthorized");
-  }
+    if (
+      !session ||
+      !(session.user.type === UserType.Student) ||
+      !session.user?.id
+    ) {
+      throw new Error("Unauthorized");
+    }
 
-  const validation = newAppointmentSchema.safeParse(appointmentData);
-  if (!validation.success) {
-    throw new Error("Invalid appointment data");
-  }
+    const validation = newAppointmentSchema.safeParse(appointmentData);
+    if (!validation.success) {
+      throw new Error("Invalid appointment data");
+    }
 
-  const counselor = await getCounselorBasedOnSchedule(
-    appointmentData.startTime
-  );
+    const counselor = await getCounselorBasedOnSchedule(
+      appointmentData.startTime
+    );
 
-  if (!counselor) {
-    throw new Error("No counselor available at the selected time");
-  }
+    const startOfDay = new Date(validation.data.startTime);
+    startOfDay.setHours(0, 0, 0, 0);
 
-  if (validation.data.startTime < new Date()) {
-    throw new Error("Cannot book appointment in the past");
-  }
+    const endOfDay = new Date(validation.data.startTime);
+    endOfDay.setHours(23, 59, 59, 999);
 
-  const appointment = await prisma.appointment.create({
-    data: {
-      counselorId: counselor.counselorId,
-      studentId: session.user.id,
-      focus: appointmentData.focus,
-      hadCounselingBefore: appointmentData.hadCounselingBefore,
-      sessionPreference: appointmentData.sessionPreference,
-      urgencyLevel: appointmentData.urgencyLevel,
-      startTime: appointmentData.startTime,
-      endTime: addMinutes(appointmentData.startTime, 60), // Default to 60 minutes if endTime not provided
-      notes: appointmentData.notes,
-    },
-  });
+    const hasAppointmentToday = await prisma.appointment.findFirst({
+      where: {
+        studentId: session.user.id,
+        status: AppointmentStatus.Pending || AppointmentStatus.Approved,
+        startTime: {
+          gte: startOfDay,
+          lt: endOfDay,
+        },
+      },
+    });
+    if (hasAppointmentToday) {
+      throw new Error("You can only book one appointment per day");
+    }
 
-  if (!appointment) {
-    throw new Error("Failed to create appointment");
+    if (!counselor) {
+      throw new Error("No counselor available at the selected time");
+    }
+
+    if (validation.data.startTime < new Date()) {
+      throw new Error("Cannot book appointment in the past");
+    }
+
+    const appointment = await prisma.appointment.create({
+      data: {
+        counselorId: counselor.counselorId,
+        studentId: session.user.id,
+        focus: appointmentData.focus,
+        hadCounselingBefore: appointmentData.hadCounselingBefore,
+        sessionPreference: appointmentData.sessionPreference,
+        urgencyLevel: appointmentData.urgencyLevel,
+        startTime: appointmentData.startTime,
+        endTime: addMinutes(appointmentData.startTime, 60), // Default to 60 minutes if endTime not provided
+        notes: appointmentData.notes,
+      },
+    });
+
+    if (!appointment) {
+      throw new Error("Failed to create appointment");
+    }
+  } catch (error) {
+    return { error: (error as Error).message } as ErrorResponse;
   }
 }
 

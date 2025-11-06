@@ -76,28 +76,25 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
 
     console.log(formData);
     if (appointment) {
-      updateAppointment(appointment.id, formData as UpdateAppointmentData)
-        .then(() => {
-          statusPopup.showSuccess(
-            "Appointment updated successfully!",
-            "/user/appointments"
-          );
-          router.refresh();
-        })
-        .catch((error) => {
-          statusPopup.showError(error.message || "An error occurred");
-        });
+      await updateAppointment(
+        appointment.id,
+        formData as UpdateAppointmentData
+      );
+      statusPopup.showSuccess(
+        "Appointment updated successfully!",
+        "/user/appointments"
+      );
     } else {
-      createNewAppointment(formData)
-        .then(() => {
-          statusPopup.showSuccess(
-            "Appointment created successfully!",
-            "/user/appointments"
-          );
-        })
-        .catch((error) => {
-          statusPopup.showError(error.message || "An error occurred");
-        });
+      const response = await createNewAppointment(formData);
+      if (response?.error) {
+        statusPopup.showError(response.error);
+        return;
+      }
+
+      statusPopup.showSuccess(
+        "Appointment created successfully!",
+        "/user/appointments"
+      );
     }
   }
 
@@ -277,7 +274,7 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
             className="btn btn-error w-40 self-end mt-5"
             href="/user/appointments"
           >
-            Back
+            Cancel
           </Link>
           <button
             className="btn btn-primary w-40 self-end mt-5"

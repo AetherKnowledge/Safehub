@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { FaAngleDown, FaClock } from "react-icons/fa6";
+import { FaClock } from "react-icons/fa6";
 import TimePicker, { padTime, Time, TimePeriod } from "./TimePicker";
 
 interface TimePickerSelectorProps {
@@ -27,7 +27,7 @@ const TimePickerSelector = ({
 
   return (
     <div
-      className="relative dropdown h-12 min-h-[48px] min-w-70 border border-base-content/20 bg-base-200 rounded"
+      className="relative dropdown h-12 min-h-[48px] min-w-70 border border-base-content/20 bg-base-200 rounded cursor-pointer"
       role="button"
       tabIndex={0}
     >
@@ -46,13 +46,13 @@ const TimePickerSelector = ({
               : "Select time"}
           </p>
         </div>
-        <button
+        {/* <button
           className="flex flex-row items-center justify-between px-3 py-2 h-full w-25 text-left border border-transparent border-l-base-content/20 text-base-content"
           onClick={() => setIsOpen(!isOpen)}
         >
           <p className="pl-1">Select</p>
           <FaAngleDown />
-        </button>
+        </button> */}
       </div>
       <ul className="dropdown-content menu absolute mt-2 z-10">
         <li>

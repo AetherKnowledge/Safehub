@@ -10,8 +10,8 @@ import {
 } from "../AppointmentActions";
 import ApproveButton from "../AppointmentTable/ApproveButton";
 import CancelButton from "../AppointmentTable/CancelButton";
-import EditButton from "../AppointmentTable/EditButton";
 import MarkDoneButton from "../AppointmentTable/MarkDoneButton";
+import RescheduleButton from "../AppointmentTable/RescheduleButton";
 import {
   getBorderStatusColor,
   getStatusTextColor,
@@ -91,7 +91,7 @@ const AppointmentPopup = ({ appointment, onClose }: AppointmentPopupProps) => {
         <div className="flex gap-2">
           {(appointment.status === AppointmentStatus.Pending ||
             appointment.status === AppointmentStatus.Approved) && (
-            <EditButton
+            <RescheduleButton
               appointment={appointment}
               userType={UserType.Counselor}
             />

@@ -164,7 +164,7 @@ function UserColumn({
 function StatusBadge({ status }: { status: AppointmentStatus }) {
   switch (status) {
     case AppointmentStatus.Rejected:
-      return <div className="badge badge-error">Cancelled</div>;
+      return <div className="badge badge-error">Rejected</div>;
     case AppointmentStatus.Pending:
       return <div className="badge badge-warning">Pending</div>;
     case AppointmentStatus.Approved:
@@ -179,7 +179,7 @@ function StatusBadge({ status }: { status: AppointmentStatus }) {
 export enum Actions {
   APPROVE = "approve",
   CANCEL = "cancel",
-  EDIT = "edit",
+  RESCHEDULE = "reschedule",
   FEEDBACK = "feedback",
   MARK_DONE = "mark_done",
 }
@@ -195,7 +195,7 @@ function StudentActionButton({
     case AppointmentStatus.Pending:
       return (
         <ActionBox
-          actions={[Actions.EDIT, Actions.CANCEL]}
+          actions={[Actions.RESCHEDULE, Actions.CANCEL]}
           appointment={appointment}
           userType={UserType.Student}
         />
@@ -203,7 +203,7 @@ function StudentActionButton({
     case AppointmentStatus.Approved:
       return (
         <ActionBox
-          actions={[Actions.EDIT, Actions.CANCEL]}
+          actions={[Actions.RESCHEDULE, Actions.CANCEL]}
           appointment={appointment}
           userType={UserType.Student}
         />
@@ -230,7 +230,7 @@ function CounselorActionButton({
     case AppointmentStatus.Pending:
       return (
         <ActionBox
-          actions={[Actions.APPROVE, Actions.EDIT, Actions.CANCEL]}
+          actions={[Actions.APPROVE, Actions.RESCHEDULE, Actions.CANCEL]}
           appointment={appointment}
           userType={UserType.Counselor}
         />
@@ -238,7 +238,7 @@ function CounselorActionButton({
     case AppointmentStatus.Approved:
       return (
         <ActionBox
-          actions={[Actions.EDIT, Actions.CANCEL, Actions.MARK_DONE]}
+          actions={[Actions.RESCHEDULE, Actions.CANCEL, Actions.MARK_DONE]}
           appointment={appointment}
           userType={UserType.Counselor}
         />

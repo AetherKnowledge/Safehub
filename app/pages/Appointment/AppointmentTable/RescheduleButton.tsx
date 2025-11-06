@@ -11,7 +11,7 @@ interface CancelButtonProps {
   userType: UserType;
 }
 
-const EditButton = ({ appointment, userType }: CancelButtonProps) => {
+const RescheduleButton = ({ appointment, userType }: CancelButtonProps) => {
   const router = useRouter();
   const [showReschedule, setShowReschedule] = useState(false);
 
@@ -30,7 +30,7 @@ const EditButton = ({ appointment, userType }: CancelButtonProps) => {
         onClick={handleEdit}
       >
         <MdEdit className="w-3 h-3" />
-        Edit
+        Reschedule
       </div>
       {showReschedule && (
         <RescheduleBooking
@@ -42,4 +42,4 @@ const EditButton = ({ appointment, userType }: CancelButtonProps) => {
   );
 };
 
-export default EditButton;
+export default RescheduleButton;

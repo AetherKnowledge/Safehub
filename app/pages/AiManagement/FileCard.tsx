@@ -1,4 +1,5 @@
 "use client";
+import NoImage from "@/app/components/Images/NoImage";
 import { MCPFile } from "@/app/generated/prisma";
 import { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -84,7 +85,7 @@ const FileCard = ({
               className="w-full h-full object-cover"
             />
           ) : (
-            <span className="text-xs opacity-60">No preview</span>
+            <NoImage className="rounded-sm" text="No Preview" />
           )}
         </div>
         <div className="text-sm font-medium truncate" title={file.name}>

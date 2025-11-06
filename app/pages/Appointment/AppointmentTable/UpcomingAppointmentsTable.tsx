@@ -10,18 +10,26 @@ const UpcomingAppointmentsTable = async ({
   appointments,
 }: UpcomingAppointmentsTableProps) => {
   return (
-    <div className="group max-h-57 scrollbar-gutter:stable overflow-y-auto w-full">
-      <table className="w-full">
-        <tbody>
-          {appointments.map((appointment) => (
-            <UpcomingAppointmentRow
-              key={appointment.id}
-              appointment={appointment}
-            />
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <>
+      {appointments.length > 0 ? (
+        <div className="group w-full max-h-57 scrollbar-gutter:stable overflow-y-auto">
+          <table className="w-full">
+            <tbody>
+              {appointments.map((appointment) => (
+                <UpcomingAppointmentRow
+                  key={appointment.id}
+                  appointment={appointment}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="grid w-full h-57 items-center text-center text-sm mt-4">
+          No upcoming appointments.
+        </div>
+      )}
+    </>
   );
 };
 

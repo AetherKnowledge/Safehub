@@ -15,7 +15,7 @@ import SidebarButton from "./SidebarButton";
 import SidebarLogo from "./SidebarLogo";
 
 const Sidebar = () => {
-  const [isLarge, setIsLarge] = useState(false);
+  const [isLarge, setIsLarge] = useState(true);
   const session = useSession();
 
   useEffect(() => {
@@ -33,10 +33,11 @@ const Sidebar = () => {
 
   return (
     <motion.div
-      animate={{ width: isLarge ? "185px" : "60px" }}
-      initial={{ width: isLarge ? "185px" : "60px" }}
+      animate={{ width: isLarge ? "200px" : "60px" }}
+      initial={{ width: isLarge ? "200px" : "60px" }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="flex flex-col justify-between sticky pt-1 top-0 h-[calc(100vh-3rem)] min-w-[60px] max-w-[185px] bg-base-100 shadow-br rounded-lg z-10 overflow-x-hidden overflow-y-auto"
+      className="flex flex-col justify-between sticky pt-1 top-0 h-[calc(100vh-3rem)] min-w-[60px] max-w-[200px] bg-base-100 shadow-br rounded-lg z-10 overflow-x-hidden overflow-y-auto"
+      style={{ minWidth: isLarge ? "200px" : "60px" }}
     >
       {/* Top Section */}
       <div className="flex flex-col items-center space-y-4">
@@ -143,13 +144,13 @@ const adminSidebar = (isLarge: boolean) => {
       <SidebarButton href="/user/dashboard" icon={AiFillHome} isLarge={isLarge}>
         Dashboard
       </SidebarButton>
-      <SidebarButton
+      {/* <SidebarButton
         href="/user/appointments"
         icon={FaCalendar}
         isLarge={isLarge}
       >
         Appointments
-      </SidebarButton>
+      </SidebarButton> */}
       <SidebarButton href="/user/users" icon={FaUsers} isLarge={isLarge}>
         Users
       </SidebarButton>

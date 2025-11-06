@@ -1,9 +1,10 @@
-import Image from "next/image";
+import NoImage from "../Images/NoImage";
+import ImageBox from "./ImageBox";
 
 const ImageGrid = ({ images }: { images: string[] }) => {
   return (
     <>
-      {images.length > 0 && (
+      {images.length > 0 ? (
         <div
           className={`grid gap-1 mt-4 ${
             images.length === 1 ? "" : "grid-cols-2"
@@ -22,12 +23,7 @@ const ImageGrid = ({ images }: { images: string[] }) => {
                     : "aspect-video"
                 }`}
               >
-                <Image
-                  src={img}
-                  alt={`Image ${i + 1}`}
-                  fill
-                  className="object-cover"
-                />
+                <ImageBox src={img} alt={`Image ${i + 1}`} />
                 {isThirdWithExtra && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center hover:bg-black/70 transition-all duration-300 cursor-pointer">
                     <span className="text-white text-lg font-semibold">
@@ -38,6 +34,10 @@ const ImageGrid = ({ images }: { images: string[] }) => {
               </div>
             );
           })}
+        </div>
+      ) : (
+        <div className="mt-4 h-100 w-full aspect-video">
+          <NoImage className="rounded-sm" text="No Images Available" />
         </div>
       )}
     </>

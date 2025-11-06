@@ -10,7 +10,7 @@ import { getTodayAppointmentsCount } from "../AppointmentActions";
 import { getWeekDates } from "../WeeklyCalendar/WeeklyCalendarUtils";
 import { ViewMode } from "./AppointmentsPage";
 
-const AppointmentHeader: React.FC = () => {
+const AppointmentHeader = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathName = usePathname();
@@ -18,18 +18,20 @@ const AppointmentHeader: React.FC = () => {
   const popup = usePopup();
 
   // Search params are also stored here for immediate UI updates
-  const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.CALENDAR);
+  const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.LIST);
   const [date, setDate] = useState<Date>(new Date());
-  const [showAll, setShowAll] = useState<boolean>(false);
+  const [showAll, setShowAll] = useState<boolean>(true);
 
   // Sync state with URL parameters
   useEffect(() => {
     const currentViewMode =
-      (searchParams.get("view") as ViewMode) || ViewMode.CALENDAR;
+      (searchParams.get("view") as ViewMode) || ViewMode.LIST;
     const currentDate = searchParams.get("date")
       ? new Date(searchParams.get("date") as string)
       : new Date();
-    const currentShowAll = searchParams.get("showAll") === "true";
+    const currentShowAll = searchParams.get("showAll")
+      ? searchParams.get("showAll") === "true"
+      : true;
 
     setViewMode(currentViewMode);
     setDate(currentDate);

@@ -21,9 +21,11 @@ const NewAppointmentsPage = async ({ searchParams }: Props) => {
   const date = dateParam && isValidDate(dateParam) ? dateParam : today;
 
   const viewParam = params.view;
-  const view = viewParam === ViewMode.LIST ? ViewMode.LIST : ViewMode.CALENDAR;
+  const view =
+    viewParam === ViewMode.CALENDAR ? ViewMode.CALENDAR : ViewMode.LIST;
 
-  const showAll = params.showAll === "true";
+  const showAll = params.showAll ? params.showAll === "true" : true;
+  console.log("Show All:", showAll);
 
   if (session.user.type === UserType.Student)
     return <StudentAppointmentPage date={date} />;

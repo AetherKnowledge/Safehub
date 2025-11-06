@@ -8,6 +8,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import process from "process";
+import { UserType } from "./app/generated/prisma";
 // import { v4 as uuid } from "uuid";
 
 // TODO: Change to database session strategy
@@ -95,7 +96,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           studentId: newUser.id,
         },
       });
-      createManyChatsWithOthers(newUser.type, newUser.id);
+      createManyChatsWithOthers(UserType.Counselor, newUser.id);
     },
   },
 });

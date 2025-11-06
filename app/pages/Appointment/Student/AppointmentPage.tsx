@@ -22,7 +22,7 @@ const AppointmentPage = async ({ date }: Props) => {
       <div className="flex flex-col xl:flex-row gap-3">
         <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1">
           <h2 className="font-bold">Upcoming Appointments</h2>
-          <div className="flex flex-row gap-5 w-full">
+          <div className="flex flex-row min-w-150 gap-5 w-full">
             <Suspense>
               <DatePickerWithAppointments date={date} />
             </Suspense>

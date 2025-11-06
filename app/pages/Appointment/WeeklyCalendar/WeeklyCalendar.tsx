@@ -1,6 +1,10 @@
+import { AppointmentStatus } from "@/app/generated/prisma";
 import { Suspense } from "react";
 import { Await } from "react-router";
-import { getAppointmentsForDateRange } from "../AppointmentActions";
+import {
+  AppointmentData,
+  getAppointmentsForDateRange,
+} from "../AppointmentActions";
 import DayContainer, { DayContainerLoading } from "./DayContainer";
 import { DAYS, TIME_SLOTS, getWeekDates } from "./WeeklyCalendarUtils";
 
@@ -98,7 +102,7 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
               {(appointments) => (
                 <DayContainer
                   weekDates={weekDates}
-                  appointments={appointments}
+                  appointments={filterAppointments(appointments)}
                 />
               )}
             </Await>
@@ -108,5 +112,18 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
     </div>
   );
 };
+
+function filterAppointments(appointments: AppointmentData[]) {
+  const filteredAppointments = appointments.filter((appointment) => {
+    if (
+      appointment.status === AppointmentStatus.Rejected ||
+      appointment.status === AppointmentStatus.Pending
+    ) {
+      return false;
+    }
+    return true;
+  });
+  return filteredAppointments;
+}
 
 export default WeeklyCalendar;

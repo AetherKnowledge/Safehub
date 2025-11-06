@@ -9,7 +9,7 @@ type ChatsPageProps = {
   chatId?: string;
 };
 
-const ChatsPage = async ({ chatId = "chatbot" }: ChatsPageProps) => {
+const ChatsPage = async ({ chatId }: ChatsPageProps) => {
   // So SafeHub AI is always first
   const chats: ChatData[] = [];
   if ((await getSettings()).isAiOn) {
@@ -21,7 +21,7 @@ const ChatsPage = async ({ chatId = "chatbot" }: ChatsPageProps) => {
 
   return (
     <div className="flex flex-row gap-3 flex-1 min-h-0">
-      <ChatSidebar chatId={chatId} chats={chats} />
+      <ChatSidebar chatId={chatId || chats[0]?.id} chats={chats} />
 
       {chatForSelectedId && <ChatBox chat={chatForSelectedId} />}
     </div>

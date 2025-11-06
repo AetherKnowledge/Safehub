@@ -1,3 +1,4 @@
+import { AppointmentStatus } from "@/app/generated/prisma";
 import { formatDateDisplay, formatTime } from "@/lib/utils";
 import UserImage from "../../../components/UserImage";
 import { AppointmentData } from "../AppointmentActions";
@@ -9,13 +10,16 @@ interface UpcomingAppointmentsTableProps {
 const UpcomingAppointmentsTable = async ({
   appointments,
 }: UpcomingAppointmentsTableProps) => {
+  const filteredAppointments = appointments.filter((appointment) => {
+    return appointment.status === AppointmentStatus.Pending;
+  });
   return (
     <>
-      {appointments.length > 0 ? (
+      {filteredAppointments.length > 0 ? (
         <div className="group w-full max-h-57 scrollbar-gutter:stable overflow-y-auto">
           <table className="w-full">
             <tbody>
-              {appointments.map((appointment) => (
+              {filteredAppointments.map((appointment) => (
                 <UpcomingAppointmentRow
                   key={appointment.id}
                   appointment={appointment}

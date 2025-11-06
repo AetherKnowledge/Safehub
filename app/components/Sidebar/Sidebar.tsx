@@ -15,29 +15,38 @@ import SidebarButton from "./SidebarButton";
 import SidebarLogo from "./SidebarLogo";
 
 const Sidebar = () => {
-  const [isLarge, setIsLarge] = useState(true);
   const session = useSession();
+  const [isLarge, setIsLarge] = useState(false);
+
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     if (window.innerWidth < 1024) {
+  //       setIsLarge(false); // only shrink, never grow back
+  //     }
+  //   };
+
+  //   handleResize(); // run on mount
+  //   window.addEventListener("resize", handleResize);
+
+  //   return () => window.removeEventListener("resize", handleResize);
+  // }, []);
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        setIsLarge(false); // only shrink, never grow back
-      }
-    };
-
-    handleResize(); // run on mount
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    if (session.status !== "loading") setIsLarge(true);
+  }, [session.status]);
 
   return (
     <motion.div
-      animate={{ width: isLarge ? "200px" : "60px" }}
-      initial={{ width: isLarge ? "200px" : "60px" }}
+      animate={{
+        minWidth: isLarge ? "200px" : "60px",
+        width: isLarge ? "200px" : "60px",
+      }}
+      initial={{
+        minWidth: isLarge ? "200px" : "60px",
+        width: isLarge ? "200px" : "60px",
+      }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="flex flex-col justify-between sticky pt-1 top-0 h-[calc(100vh-3rem)] min-w-[60px] max-w-[200px] bg-base-100 shadow-br rounded-lg z-10 overflow-x-hidden overflow-y-auto"
-      style={{ minWidth: isLarge ? "200px" : "60px" }}
     >
       {/* Top Section */}
       <div className="flex flex-col items-center space-y-4">

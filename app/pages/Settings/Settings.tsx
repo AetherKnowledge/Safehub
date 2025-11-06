@@ -1,8 +1,9 @@
 "use client";
+import { UserType } from "@/app/generated/prisma";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { FaEdit } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
-import Divider from "../../components/Divider";
 import ComboBox from "../../components/Input/ComboBox";
 import InputBox from "../../components/Input/InputBox";
 import { usePopup } from "../../components/Popup/PopupProvider";
@@ -36,6 +37,7 @@ enum Section {
 }
 
 const Settings = ({ user }: { user: SettingsUser }) => {
+  const session = useSession();
   const popup = usePopup();
 
   async function handleSubmit(event: React.FormEvent) {
@@ -85,71 +87,50 @@ const Settings = ({ user }: { user: SettingsUser }) => {
             placeholder="Last Name"
           />
         </div>
-        <div className="flex flex-row gap-5 w-full">
-          <ComboBox
-            name="department"
-            legend="Department"
-            defaultValue={"CITE"}
-            placeholder="Select Department"
-            options={Object.values(Department).map((value) => ({
-              label: value,
-              value,
-            }))}
-          />
-          <ComboBox
-            name="program"
-            legend="Program"
-            defaultValue={"BSIT"}
-            placeholder="Select Program"
-            options={Object.values(Program).map((value) => ({
-              label: value,
-              value,
-            }))}
-          />
-          <ComboBox
-            name="year"
-            legend="Year"
-            defaultValue={"First"}
-            placeholder="Select Year"
-            options={Object.values(Year).map((value, index) => ({
-              label: value,
-              value: (index + 1).toString(),
-            }))}
-          />
-          <ComboBox
-            name="section"
-            legend="Section"
-            defaultValue={"A"}
-            placeholder="Select Section"
-            options={Object.values(Section).map((value) => ({
-              label: value,
-              value,
-            }))}
-          />
-        </div>
-      </div>
-      <Divider />
-      <div className="flex flex-col p-4 gap-2">
-        <div className="flex flex-col">
-          <span className="font-bold text-xs">Account Recovery</span>
-          <span className="text-xs text-base-content/50">
-            Set your recovery email and phone number
-          </span>
-        </div>
-        <div className="flex flex-row gap-5 w-full">
-          <InputBox
-            defaultValue={user.recoveryEmail || ""}
-            name="recoveryEmail"
-            legend="Recovery Email"
-            placeholder="Recovery Email"
-          />
-          <InputBox
-            defaultValue={user.phoneNumber || ""}
-            name="phoneNumber"
-            legend="Phone Number"
-            placeholder="Phone Number"
-          />
-        </div>
+        {session.data?.user.type === UserType.Student && (
+          <div className="flex flex-row gap-5 w-full">
+            <ComboBox
+              name="department"
+              legend="Department"
+              defaultValue={"CITE"}
+              placeholder="Select Department"
+              options={Object.values(Department).map((value) => ({
+                label: value,
+                value,
+              }))}
+            />
+            <ComboBox
+              name="program"
+              legend="Program"
+              defaultValue={"BSIT"}
+              placeholder="Select Program"
+              options={Object.values(Program).map((value) => ({
+                label: value,
+                value,
+              }))}
+            />
+            <ComboBox
+              name="year"
+              legend="Year"
+              defaultValue={"First"}
+              placeholder="Select Year"
+              options={Object.values(Year).map((value, index) => ({
+                label: value,
+                value: (index + 1).toString(),
+              }))}
+            />
+            <ComboBox
+              name="section"
+              legend="Section"
+              defaultValue={"A"}
+              placeholder="Select Section"
+              options={Object.values(Section).map((value) => ({
+                label: value,
+                value,
+              }))}
+            />
+          </div>
+        )}
       </div>
       <div className="flex flex-row items-center justify-between p-4 pt-0">
         <Link

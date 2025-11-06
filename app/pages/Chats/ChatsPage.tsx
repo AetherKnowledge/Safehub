@@ -9,7 +9,7 @@ type ChatsPageProps = {
   chatId?: string;
 };
 
-const ChatsPage = async ({ chatId }: ChatsPageProps) => {
+const ChatsPage = async ({ chatId = "chatbot" }: ChatsPageProps) => {
   // So SafeHub AI is always first
   const chats: ChatData[] = [];
   if ((await getSettings()).isAiOn) {

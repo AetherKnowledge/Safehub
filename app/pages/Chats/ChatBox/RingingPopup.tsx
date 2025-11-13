@@ -34,7 +34,7 @@ const RingingPopup = ({
               {callerName.charAt(0).toUpperCase()}
             </div>
           )}
-          <p className="mb-4">{callerName}</p>
+          <p className="mb-4 text-base-content">{callerName}</p>
         </div>
         <div className="flex justify-center gap-4">
           <button

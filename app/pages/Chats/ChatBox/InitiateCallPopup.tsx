@@ -28,7 +28,7 @@ const InitiateCallPopup = ({
   return (
     <ModalBase>
       <div className="bg-base-100 p-6 rounded-lg shadow-lg text-center">
-        <h3 className="text-xl font-bold mb-4">
+        <h3 className="text-xl font-bold mb-4 text-base-content">
           {status === CallStatus.No_Answer
             ? "No Answer"
             : status === CallStatus.Rejected
@@ -49,7 +49,7 @@ const InitiateCallPopup = ({
               {recipients[0]?.name?.charAt(0).toUpperCase() || "?"}
             </div>
           )}
-          <p className="mb-4">{getChatName()}</p>
+          <p className="mb-4 text-base-content">{getChatName()}</p>
         </div>
         <div className="flex justify-center gap-4">
           <button

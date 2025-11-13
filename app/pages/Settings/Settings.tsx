@@ -176,7 +176,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
             <div className="flex flex-col mt-2">
               <span className="font-bold text-xs">Guardian Information</span>
               <span className="text-xs text-base-content/50">
-                Set your guardian's email and phone number
+                {"Set your guardian's email and phone number"}
               </span>
             </div>
 

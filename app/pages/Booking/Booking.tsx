@@ -152,12 +152,14 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
     const startSchedule = new Date(formData.get("schedule") as string);
     const timeString = formData.get("time") as string;
     const [timePart, period] = timeString.split(" ");
-    let [hours, minutes] = timePart.split(":").map(Number);
+    const [hoursInitial, minutes] = timePart.split(":").map(Number);
+    let hours = hoursInitial;
     if (period === "PM" && hours !== 12) {
       hours += 12;
     } else if (period === "AM" && hours === 12) {
       hours = 0;
     }
+
     startSchedule.setHours(hours, minutes, 0, 0);
 
     const parsedData: NewAppointmentData | UpdateAppointmentData = {

@@ -10,7 +10,6 @@ import {
 } from "@/app/components/Input/Date/utils";
 import ModalBase from "@/app/components/Popup/ModalBase";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { UpdateAppointmentData } from "@/lib/schemas";
 import { addMinutes } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,6 +18,7 @@ import {
   checkForConflictingDate,
   updateAppointment,
 } from "../AppointmentActions";
+import { UpdateAppointmentData } from "../schema";
 
 const RescheduleBooking = ({
   appointment,

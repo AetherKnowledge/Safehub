@@ -5,7 +5,7 @@ import Legend from "./Legend";
 
 export type RadioBoxProps = InputInterface & {
   // Define any additional props needed for RadioBox here
-  defaultValue?: Option;
+  defaultValue?: Option["value"];
   options: Option[];
   size?: "radio-xs" | "radio-sm" | "radio-md" | "radio-lg" | "radio-xl";
   onChange?: (value: Option) => void;
@@ -25,7 +25,7 @@ const RadioBox = ({
   onInvalid,
 }: RadioBoxProps) => {
   const [currentValue, setCurrentValue] = useState<Option | undefined>(
-    defaultValue
+    options.find((option) => option.value === defaultValue)
   );
   const [hasError, setHasError] = useState(false);
 
@@ -59,6 +59,7 @@ const RadioBox = ({
                 name={name}
                 value={option.value}
                 required={required}
+                defaultChecked={defaultValue === option.value}
                 onInvalid={(e) => {
                   setHasError(true);
                   if (onInvalid) onInvalid();

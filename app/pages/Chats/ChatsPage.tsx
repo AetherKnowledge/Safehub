@@ -30,7 +30,7 @@ const ChatsPage = async ({ chatId }: ChatsPageProps) => {
 
 export const ChatPageSkeleton = () => {
   return (
-    <div className="flex flex-row h-[87vh] gap-5">
+    <div className="flex flex-row h-full gap-5">
       <ChatSidebar chats={[]} loading={true} />
     </div>
   );

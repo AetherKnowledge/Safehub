@@ -27,6 +27,7 @@ const DatePickerSelector = ({
   bgColor = "bg-neutral",
   value,
   highlightedDates,
+
   onChange,
   cannotPickPast = false,
 }: DatePickerSelectorProps) => {

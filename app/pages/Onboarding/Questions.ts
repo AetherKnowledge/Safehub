@@ -317,7 +317,6 @@ export const guardianQuestions: QuestionBox[] = [
       legend: "What is your guardian's email address?",
       placeholder: "Email address",
       type: "email",
-      required: true,
     },
     version: "1",
   },

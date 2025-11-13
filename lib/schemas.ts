@@ -1,8 +1,4 @@
-import {
-  CallStatus,
-  SessionPreference,
-  UserType,
-} from "@/app/generated/prisma";
+import { CallStatus, UserType } from "@/app/generated/prisma";
 import { z } from "zod";
 
 export type ErrorResponse = {
@@ -56,18 +52,6 @@ export const uploadPostSchema = z.object({
 });
 export type UploadPostData = z.infer<typeof uploadPostSchema>;
 
-export const newAppointmentSchema = z.object({
-  // counselorId: z.string(),
-
-  focus: z.string(),
-  hadCounselingBefore: z.boolean(),
-  sessionPreference: z.enum(SessionPreference),
-  urgencyLevel: z.number().min(1).max(5),
-  startTime: z.date(),
-  notes: z.string().max(500).optional(),
-});
-export type NewAppointmentData = z.infer<typeof newAppointmentSchema>;
-
 export const uploadHotlineSchema = z.object({
   id: z.string().min(1, "ID is required").optional(),
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
@@ -80,17 +64,6 @@ export const uploadHotlineSchema = z.object({
   image: IMAGE_SCHEMA.optional().or(z.string().optional()),
 });
 export type UploadHotlineData = z.infer<typeof uploadHotlineSchema>;
-
-export const updateAppointmentSchema = z.object({
-  focus: z.string().optional(),
-  hadCounselingBefore: z.boolean().optional(),
-  sessionPreference: z.enum(SessionPreference).optional(),
-  urgencyLevel: z.number().min(1).max(5).optional(),
-  startTime: z.date().optional(),
-  notes: z.string().max(500).optional(),
-  endTime: z.date().optional(),
-});
-export type UpdateAppointmentData = z.infer<typeof updateAppointmentSchema>;
 
 export const newFeedbackSchema = z.object({
   appointmentId: z.string(),

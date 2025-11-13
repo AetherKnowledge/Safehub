@@ -19,6 +19,7 @@ interface DatePickerProps {
   local?: boolean;
 
   cannotPickPast?: boolean;
+  defaultValue?: Date;
 }
 
 const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];

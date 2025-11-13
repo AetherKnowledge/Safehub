@@ -92,6 +92,7 @@ model User {
   year                Int?
   section             String?
   phoneNumber         String?
+  recoveryEmail       String?
 
   guardianName       String?
   guardianFirstName  String?
@@ -301,6 +302,7 @@ model Appointment {
   endTime             DateTime?
   notes               String?
   room                String?
+  appointmentData     Json?
 
   student   Student   @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
   counselor Counselor @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)

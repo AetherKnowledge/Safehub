@@ -52,10 +52,12 @@ const FormsBuilder = ({
   questions,
   hasTermsAndConditions = false,
   onSubmit,
+  onBack,
 }: {
   header: FormsHeaderProps;
   questions: QuestionBox[];
   hasTermsAndConditions?: boolean;
+  onBack?: () => void;
   onSubmit?: (formData: FormData) => void;
 }) => {
   return (
@@ -63,7 +65,7 @@ const FormsBuilder = ({
       <FormsHeader {...header} />
       {questions.map((question, index) => {
         return (
-          <Fragment key={header.headerText + "-question-fragment-" + index}>
+          <Fragment key={header.title + "-question-fragment-" + index}>
             {question.questionType === QuestionType.LINKED_SELECTOR &&
             !(question.props as LinkedSelectorProps).horizontal ? (
               <QuestionBuilder question={question} />
@@ -81,7 +83,7 @@ const FormsBuilder = ({
         </QuestionBG>
       )}
 
-      <Submit />
+      <Submit onBack={onBack} />
     </FormBG>
   );
 };

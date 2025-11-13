@@ -7,15 +7,15 @@ import {
   UserType,
 } from "@/app/generated/prisma";
 import { auth } from "@/auth";
+import { ErrorResponse } from "@/lib/schemas";
+import { addMinutes } from "@/lib/utils";
+import { prisma } from "@/prisma/client";
 import {
-  ErrorResponse,
   NewAppointmentData,
   newAppointmentSchema,
   UpdateAppointmentData,
   updateAppointmentSchema,
-} from "@/lib/schemas";
-import { addMinutes } from "@/lib/utils";
-import { prisma } from "@/prisma/client";
+} from "./schema";
 
 export type AppointmentData = Appointment & {
   student: {
@@ -147,12 +147,12 @@ export async function createNewAppointment(
 
     const validation = newAppointmentSchema.safeParse(appointmentData);
     if (!validation.success) {
-      throw new Error("Invalid appointment data");
+      throw new Error(
+        "Invalid appointment data: " + JSON.stringify(validation.error)
+      );
     }
 
-    const counselor = await getCounselorBasedOnSchedule(
-      appointmentData.startTime
-    );
+    const counselor = await getCounselorBasedOnSchedule();
 
     const startOfDay = new Date(validation.data.startTime);
     startOfDay.setHours(0, 0, 0, 0);
@@ -186,13 +186,13 @@ export async function createNewAppointment(
       data: {
         counselorId: counselor.counselorId,
         studentId: session.user.id,
-        focus: appointmentData.focus,
-        hadCounselingBefore: appointmentData.hadCounselingBefore,
-        sessionPreference: appointmentData.sessionPreference,
-        urgencyLevel: appointmentData.urgencyLevel,
-        startTime: appointmentData.startTime,
-        endTime: addMinutes(appointmentData.startTime, 60), // Default to 60 minutes if endTime not provided
-        notes: appointmentData.notes,
+        focus: validation.data.focus,
+        hadCounselingBefore: validation.data.hadCounselingBefore,
+        sessionPreference: validation.data.sessionPreference,
+        urgencyLevel: validation.data.urgencyLevel,
+        startTime: validation.data.startTime,
+        endTime: addMinutes(validation.data.startTime, 60), // Default to 60 minutes if endTime not provided
+        notes: validation.data.notes,
       },
     });
 
@@ -204,7 +204,7 @@ export async function createNewAppointment(
   }
 }
 
-async function getCounselorBasedOnSchedule(schedule: Date) {
+async function getCounselorBasedOnSchedule() {
   // TODO: Implement logic to find an available counselor based on the schedule
   // Find a counselor who is available at the given schedule
   // for now just get the first counselor

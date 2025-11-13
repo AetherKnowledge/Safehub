@@ -40,7 +40,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col w-full h-full gap-3 bg-base-100 shadow-br rounded-xl"
+      className="flex flex-col w-full h-full gap-3 bg-base-100 shadow-br rounded-xl overflow-y-auto"
     >
       <div className="flex flex-col p-4 gap-0">
         <div className="flex flex-row items-center">

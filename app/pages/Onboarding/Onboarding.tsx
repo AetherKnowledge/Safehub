@@ -6,6 +6,7 @@ import {
   guardianQuestions,
   studentQuestions,
 } from "@/app/pages/Onboarding/Questions";
+import { redirect } from "next/navigation";
 import { completeOnboarding } from "./OnboardingActions";
 
 const Onboarding = () => {
@@ -23,6 +24,7 @@ const Onboarding = () => {
     }
 
     statusPopup.showSuccess("Onboarding completed successfully.");
+    redirect("user/dashboard");
   }
 
   const header: FormsHeaderProps = {
@@ -39,6 +41,7 @@ const Onboarding = () => {
       questions={question}
       hasTermsAndConditions
       onSubmit={onSubmit}
+      onBack={() => redirect("/")}
     />
   );
 };

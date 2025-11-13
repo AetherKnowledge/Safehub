@@ -12,7 +12,6 @@ const TermsAndConditions = () => {
         <input
           name="termsAndConditions"
           type="checkbox"
-          defaultChecked
           required
           className="checkbox checkbox-ghost checkbox-primary rounded"
         />

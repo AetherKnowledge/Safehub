@@ -17,7 +17,9 @@ const RingingPopup = ({
   return (
     <ModalBase>
       <div className="bg-base-100 p-6 rounded-lg shadow-lg text-center">
-        <h3 className="text-xl font-bold mb-4">Incoming Call</h3>
+        <h3 className="text-xl font-bold mb-4 text-base-content">
+          Incoming Call
+        </h3>
         <div className="flex flex-col items-center justify-center">
           {callerImage ? (
             <Image

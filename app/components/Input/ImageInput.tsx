@@ -1,28 +1,27 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import InputInterface from "./InputInterface";
 
-type ImageInputProps = {
-  name: string;
-  legend?: string;
+type ImageInputProps = InputInterface & {
   multiple?: boolean;
   accept?: string; // e.g., "image/*"
-  required?: boolean;
-  className?: string;
   onChange?: (items: Array<File | string>) => void;
   // Pre-existing images to show in the middle (can be File or URL)
-  initial?: Array<File | string>;
+  defaultValue?: Array<File | string>;
 };
 
 const ImageInput = ({
   name,
   legend = "Image",
+  className,
+  required = false,
+  number,
   multiple = false,
   accept = "image/*",
-  required,
   onChange,
-  className,
-  initial,
+
+  defaultValue,
 }: ImageInputProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [images, setImages] = useState<File[]>([]);
@@ -92,7 +91,7 @@ const ImageInput = ({
 
   // Initialize previews from `initial`
   useEffect(() => {
-    if (!initial) return;
+    if (!defaultValue) return;
     setPreviews((prev) => {
       // cleanup old ones
       prev.forEach((p) => p.revoke?.());
@@ -102,7 +101,7 @@ const ImageInput = ({
         from: "file" | "url";
         file?: File;
       }[] = [];
-      const list = multiple ? initial : initial.slice(0, 1);
+      const list = multiple ? defaultValue : defaultValue.slice(0, 1);
       for (const it of list) {
         if (typeof it === "string") {
           items.push({ url: it, from: "url" });
@@ -142,7 +141,8 @@ const ImageInput = ({
   return (
     <fieldset className={`fieldset w-full ${className || ""}`}>
       <legend className="fieldset-legend pb-1 ml-1">
-        {legend}:<span className={required ? "text-error" : "hidden"}>*</span>
+        {number ? number.toString() + ". " : ""} {legend}:
+        <span className={required ? "text-error" : "hidden"}>*</span>
       </legend>
 
       {/* Dropzone */}

@@ -1,6 +1,6 @@
-import DatePicker from "@/app/components/Date/DatePicker";
 import Contact from "@/app/components/Images/Contact";
 import Meeting from "@/app/components/Images/Meeting";
+import DatePicker from "@/app/components/Input/Date/DatePicker";
 import { UserType } from "@/app/generated/prisma";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";

@@ -1,148 +1,152 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
+import { FaChevronDown } from "react-icons/fa";
+import InputInterface, { Option } from "./InputInterface";
+import Legend from "./Legend";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { IoMdArrowDropdown } from "react-icons/io";
-
-interface SelectBoxProps {
-  items: string[];
+export type SelectBoxProps = InputInterface & {
+  defaultValue?: Option["value"];
+  options: Option[];
+  size?: "text-xs" | "text-sm" | "text-base" | "text-lg" | "text-xl";
+  hint?: string;
+  onChange?: (value: Option) => void;
   placeholder?: string;
-  queryKey?: string;
-  onSelect?: (value: string) => void;
-  className?: string;
-  defaultValue?: string;
   value?: string;
-  padding?: string;
-  borderColor?: string;
-  bgColor?: string;
-  textColor?: string;
-  colorMap?: Record<string, { bg: string; text: string }>;
-}
+};
 
-export default function SelectBox({
-  items,
-  placeholder = "Select an option",
-  onSelect,
-  className = "",
+const SelectBox = ({
+  name,
+  legend,
+  className,
+  required = false,
+  hint,
+  number,
   defaultValue,
-  queryKey,
-  padding = "pr-2 py-1",
-  borderColor = "border-base-300",
-  bgColor = "bg-base-100",
-  textColor = "text-base-content",
-  colorMap,
-}: SelectBoxProps) {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathName = usePathname();
-
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string | null>(defaultValue ?? null);
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const [dropdownStyles, setDropdownStyles] =
-    useState<React.CSSProperties | null>(null);
-
-  const selectedStyles =
-    selected && colorMap?.[selected]
-      ? `${colorMap[selected].bg} ${colorMap[selected].text}`
-      : `${bgColor ?? "bg-base-100"} ${textColor ?? "text-base-content"}`;
-
-  function handleSearchChange(queryKey: string, value: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value) {
-      params.set(queryKey, value);
-    } else {
-      params.delete(value);
-    }
-    router.push(`${pathName}?${params.toString()}`, { scroll: false });
+  options,
+  bgColor = "bg-neutral",
+  size = "text-xs",
+  onChange,
+  onInvalid,
+  placeholder = "Select an option",
+  value,
+}: SelectBoxProps) => {
+  const [selectedOption, setSelectedOption] = useState<Option | null>(
+    options.find((option) => option.value === defaultValue) || null
+  );
+  const [hasError, setHasError] = useState(false);
+  function handleSelect(item: Option | null) {
+    if (onChange && item) onChange(item);
+    setSelectedOption(item);
+    setHasError(false);
   }
+  const [width, setWidth] = useState(200);
+  const sizeRef = useRef<HTMLFieldSetElement | null>(null);
 
-  function handleSelect(item: string) {
-    setSelected(item);
-    onSelect?.(item);
-    if (queryKey) handleSearchChange(queryKey, item);
-    setOpen(false);
-  }
+  const popoverName = name + "-popover";
+  const anchorName = "--" + name + "-anchor";
 
-  // Calculate dropdown position when opened
-  useLayoutEffect(() => {
-    if (open && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setDropdownStyles({
-        position: "absolute",
-        top: rect.bottom + window.scrollY,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-        zIndex: 9999,
-      });
-    }
-  }, [open]);
-
-  // Close on outside click
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        triggerRef.current &&
-        !triggerRef.current.contains(event.target as Node)
-      ) {
-        setOpen(false);
-      }
-    }
+    handleSelect(
+      options.find((option) => option.value === (value || defaultValue)) || null
+    );
+  }, [value, options]);
 
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+  useEffect(() => {
+    const element = sizeRef.current;
+    if (!element) return;
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [open]);
+    // Create ResizeObserver to detect element size changes
+    const observer = new ResizeObserver(([entry]) => {
+      const { width } = entry.contentRect;
+      setWidth(width);
+    });
+
+    observer.observe(element);
+
+    // Cleanup
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
-      <div
-        ref={triggerRef}
-        className={`relative border rounded-xl shadow-sm ${className} ${selectedStyles} ${borderColor}`}
-      >
-        <div className={`flex justify-center items-center ${padding}`}>
-          <button onClick={() => setOpen((prev) => !prev)} className="w-full">
-            {selected && selected !== defaultValue ? selected : placeholder}
-          </button>
-          <IoMdArrowDropdown
-            className="text-xl cursor-pointer"
-            onClick={() => setOpen((prev) => !prev)}
+      <fieldset ref={sizeRef} className="fieldset w-full">
+        {legend && (
+          <Legend
+            legend={legend}
+            required={required}
+            number={number}
+            size={size}
           />
-        </div>
-      </div>
-
-      {typeof window !== "undefined" &&
-        createPortal(
-          <AnimatePresence>
-            {open && dropdownStyles && (
-              <motion.ul
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.2 }}
-                style={dropdownStyles}
-                className="bg-base-100 border border-base-300 rounded-xl shadow-md"
-              >
-                {items.map((item) => (
-                  <li
-                    key={item}
-                    onClick={() => handleSelect(item)}
-                    className="px-4 py-2 cursor-pointer hover:bg-base-200 text-base-content text-sm"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </motion.ul>
-            )}
-          </AnimatePresence>,
-          document.body
         )}
+        <button
+          type="button"
+          className={`flex pr-2 justify-between items-center ${bgColor} rounded-lg cursor-pointer border ${
+            hasError ? "border-error" : "border-base-300"
+          } ${className} ${size}`}
+          popoverTarget={popoverName}
+          style={{ anchorName } as React.CSSProperties}
+        >
+          {hint && (
+            <p className="border p-2 border-transparent border-r-base-300">
+              {hint}
+            </p>
+          )}
+
+          <input
+            name={name}
+            value={selectedOption?.value ?? ""}
+            type="text"
+            className="sr-only h-full static validator-2 outline-none ring-0 focus:outline-none focus:ring-0"
+            required={required}
+            onInvalid={(e) => {
+              setHasError(true);
+              if (onInvalid) onInvalid();
+            }}
+            onChange={() => {}}
+            style={{ caretColor: "transparent" }}
+          />
+
+          <p
+            className={`w-full p-2 text-left ${
+              selectedOption ? "" : "text-base-content/50"
+            }`}
+          >
+            {selectedOption?.label || placeholder}
+          </p>
+
+          <FaChevronDown className="cursor-pointer" />
+        </button>
+
+        <div className="flex flex-col">
+          <p
+            className={`text-xs text-error ml-1 mt-[-5px] ${
+              hasError ? "" : "hidden"
+            }`}
+          >
+            This field is required.
+          </p>
+        </div>
+      </fieldset>
+
+      <ul
+        className={`dropdown dropdown-end menu rounded-box ${bgColor} rounded-lg border-base-300 shadow-sm ${size}`}
+        popover="auto"
+        id={popoverName}
+        style={{ positionAnchor: anchorName, width } as React.CSSProperties}
+      >
+        {options.map((option) => (
+          <li key={option.value}>
+            <button
+              type="button"
+              className="w-full text-left p-2 hover:bg-base-200"
+              onClick={() => handleSelect(option)}
+            >
+              {option.label}
+            </button>
+          </li>
+        ))}
+      </ul>
     </>
   );
-}
+};
+export default SelectBox;

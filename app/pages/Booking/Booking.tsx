@@ -10,20 +10,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import DatePickerSelector from "@/app/components/Date/DatePickerSelector";
+import DatePickerSelector from "@/app/components/Input/Date/DatePickerSelector";
+
+import TimePickerSelector from "@/app/components/Input/Date/TimePickerSelector";
 import {
   getTimeFromDate,
   setTimeToDate,
   Time,
   TimePeriod,
-} from "@/app/components/Date/TimePicker";
-import TimePickerSelector from "@/app/components/Date/TimePickerSelector";
+} from "@/app/components/Input/Date/utils";
+import { usePopup } from "@/app/components/Popup/PopupProvider";
 import {
   createNewAppointment,
   updateAppointment,
 } from "@/app/pages/Appointment/AppointmentActions";
 import { useSession } from "next-auth/react";
-import { usePopup } from "../../components/Popup/PopupProvider";
 
 const Booking = ({ appointment }: { appointment?: Appointment }) => {
   const statusPopup = usePopup();
@@ -240,11 +241,13 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
             <p className="font-semibold text-lg">5. Pick a schedule.</p>
             <div className="flex flex-wrap gap-5 items-center text-center">
               <DatePickerSelector
+                name="date"
                 value={q5 || undefined}
                 onChange={(date) => setQ5(date)}
-                canPickPast={false}
+                cannotPickPast
               />
               <TimePickerSelector
+                name="time"
                 value={q5 ? getTimeFromDate(q5) : undefined}
                 min={{ hour: 8, minute: 0, period: TimePeriod.AM }}
                 max={{ hour: 8, minute: 0, period: TimePeriod.PM }}

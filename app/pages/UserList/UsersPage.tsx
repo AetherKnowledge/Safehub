@@ -1,5 +1,5 @@
 "use client";
-import SelectBox from "@/app/components/Input/SelectBox";
+import SelectBoxOld from "@/app/components/Input/SelectBoxOld";
 import { useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 import UsersTable from "./UsersTable";
@@ -21,14 +21,14 @@ const RegisteredUsersTable = () => {
             }}
           />
         </label>
-        <SelectBox
+        <SelectBoxOld
           items={["All", "Admin", "Counselor", "Student"]}
           placeholder="Role"
           queryKey="role"
           className="w-[12vw] min-w-30"
           defaultValue="All"
         />
-        <SelectBox
+        <SelectBoxOld
           items={["All", "Online", "Offline"]}
           placeholder="Status"
           queryKey="status"

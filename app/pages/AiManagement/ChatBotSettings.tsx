@@ -195,7 +195,7 @@ const ChatBotSettings = ({
             legend="What am I?"
             placeholder="e.g., A helpful AI chatbot assistant"
             value={whatAmI}
-            onChange={(e) => setWhatAmI(e.target.value)}
+            onChange={(text) => setWhatAmI(text)}
             required
           />
           <TextAreaMarkDown
@@ -203,14 +203,14 @@ const ChatBotSettings = ({
             legend="What’s my tasks?"
             placeholder="e.g., To assist the students"
             value={tasks}
-            onChange={(e) => setTasks(e.target.value)}
+            onChange={(text) => setTasks(text)}
           />
           <TextAreaMarkDown
             name="rules"
             legend="Rules"
             placeholder="e.g., All responses must be humane mentally & emotionally"
             value={rules}
-            onChange={(e) => setRules(e.target.value)}
+            onChange={(text) => setRules(text)}
           />
 
           <TextAreaMarkDown
@@ -218,14 +218,14 @@ const ChatBotSettings = ({
             legend="Limitations"
             placeholder="e.g., Cannot provide medical advice"
             value={limits}
-            onChange={(e) => setLimits(e.target.value)}
+            onChange={(text) => setLimits(text)}
           />
           <TextAreaMarkDown
             name="examples"
             legend="Examples"
             placeholder="e.g., A user asking about their account balance"
             value={examples}
-            onChange={(e) => setExamples(e.target.value)}
+            onChange={(text) => setExamples(text)}
           />
         </div>
       </div>

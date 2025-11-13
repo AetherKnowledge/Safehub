@@ -1,6 +1,6 @@
 "use client";
 
-import SelectBox from "@/app/components/Input/SelectBox";
+import SelectBoxOld from "@/app/components/Input/SelectBoxOld";
 import UserImage from "@/app/components/UserImage";
 import { UserType } from "@/app/generated/prisma";
 import { UpdateUserTypeData } from "@/lib/schemas";
@@ -108,7 +108,7 @@ const UsersTable = ({ name }: { name?: string }) => {
                   </td>
                   <td>
                     <div className="flex justify-center">
-                      <SelectBox
+                      <SelectBoxOld
                         items={Object.keys(UserType).sort()}
                         placeholder={user.type}
                         className="w-30 font-medium"

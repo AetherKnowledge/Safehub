@@ -1,3 +1,4 @@
+import { getUserName } from "@/lib/socket/hooks/CallActions";
 import { PeerData } from "@/lib/socket/hooks/useCalling";
 import React, { useCallback } from "react";
 import {
@@ -137,6 +138,16 @@ const PeerVideo = ({
   isMainView: boolean;
 }) => {
   const peerVideoRef = React.useRef<HTMLVideoElement | null>(null);
+  const [username, setUsername] = React.useState("Unknown User");
+
+  React.useEffect(() => {
+    const fetchUsername = async () => {
+      const name = await getUserName(peer.userId);
+      setUsername(name);
+    };
+
+    fetchUsername();
+  }, [peer.userId]);
 
   React.useEffect(() => {
     if (peerVideoRef.current && peer.stream) {
@@ -159,7 +170,7 @@ const PeerVideo = ({
       />
       {peer.userId && (
         <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
-          {peer.userId}
+          {username}
         </div>
       )}
     </div>

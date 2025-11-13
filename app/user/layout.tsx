@@ -2,6 +2,8 @@ import Sidebar from "@/app/components/Sidebar";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import UserNavbar from "../components/Navbar/UserNavbar";
+import { UserType } from "../generated/prisma";
+import { hasOnboarded } from "../pages/Onboarding/OnboardingActions";
 
 interface Props {
   children?: React.ReactNode;
@@ -12,6 +14,12 @@ const Layout = async ({ children }: Props) => {
   const session = await auth();
   if (!session) {
     redirect("/api/auth/signin");
+  }
+  if (
+    session.user?.type === UserType.Student &&
+    (await hasOnboarded()) === false
+  ) {
+    redirect("/onboarding");
   }
 
   return (

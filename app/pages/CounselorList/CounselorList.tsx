@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { IoIosSearch } from "react-icons/io";
-import SelectBox from "../../components/Input/SelectBox";
+import SelectBoxOld from "../../components/Input/SelectBoxOld";
 import CounselorsTable from "./CounselorsTable";
 
 const CounselorList = () => {
@@ -22,7 +22,7 @@ const CounselorList = () => {
             }}
           />
         </label>
-        <SelectBox
+        <SelectBoxOld
           items={["All", "Online", "Offline"]}
           placeholder="Status"
           queryKey="status"

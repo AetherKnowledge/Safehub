@@ -5,8 +5,8 @@ import { UploadPostData } from "@/lib/schemas";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import ImageInput from "../Input/ImageInput";
-import InputBox from "../Input/InputBox";
 import TextArea from "../Input/TextArea";
+import TextBox from "../Input/TextBox";
 import ModalBase from "../Popup/ModalBase";
 import { usePopup } from "../Popup/PopupProvider";
 
@@ -66,7 +66,7 @@ const PostModal = ({ post, onClose }: Props) => {
           {post ? "Edit Post" : "Add Post"}
         </h2>
         <div className="flex flex-col flex-1 bg-base-200 px-3 pb-2 w-full">
-          <InputBox
+          <TextBox
             legend="Title"
             name="title"
             placeholder="Title here..."
@@ -76,7 +76,7 @@ const PostModal = ({ post, onClose }: Props) => {
           <ImageInput
             legend="Images"
             name="images"
-            initial={initialImageList}
+            defaultValue={initialImageList}
             onChange={handleImageChange}
             multiple
           />

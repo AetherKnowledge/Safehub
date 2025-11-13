@@ -80,14 +80,27 @@ model User {
   accounts      Account[]
   sessions      Session[]
 
-  firstName     String?
-  lastName      String?
-  department    String?
-  program       String?
-  year          Int?
-  section       String?
-  recoveryEmail String?
-  phoneNumber   String?
+  completedOnboarding Boolean   @default(false)
+  firstName           String?
+  middleName          String?
+  lastName            String?
+  suffix              String?
+  birthDate           DateTime?
+  gender              String?
+  department          String?
+  program             String?
+  year                Int?
+  section             String?
+  phoneNumber         String?
+
+  guardianName       String?
+  guardianFirstName  String?
+  guardianMiddleName String?
+  guardianLastName   String?
+  guardianSuffix     String?
+  guardianContact    String?
+  guardianEmail      String?
+  relationToGuardian String?
 
   darkMode Boolean @default(false)
 

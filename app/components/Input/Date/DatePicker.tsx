@@ -3,6 +3,7 @@
 import { convertLocalToUTC, formatDate } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 
 interface DatePickerProps {
@@ -17,7 +18,7 @@ interface DatePickerProps {
   /** If true, the date picker will push local date to the router */
   local?: boolean;
 
-  canPickPast?: boolean;
+  cannotPickPast?: boolean;
 }
 
 const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
@@ -29,7 +30,7 @@ export default function DatePicker({
   highlightedDates,
   pushToRouter = false,
   local = false,
-  canPickPast = true,
+  cannotPickPast = false,
 }: DatePickerProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(value || null);
   const router = useRouter();
@@ -81,7 +82,7 @@ export default function DatePicker({
   };
 
   const isDisabled = (day: number) => {
-    if (canPickPast) return false;
+    if (!cannotPickPast) return false;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -95,7 +96,19 @@ export default function DatePicker({
 
   return (
     <div className="bg-base-100 border border-base-content/10 rounded p-3 w-80">
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex justify-between items-center mb-2 gap-2">
+        <FaAngleDoubleLeft
+          className="btn btn-ghost h-5 p-0 rounded cursor-pointer"
+          onClick={() =>
+            setCurrentMonth(
+              new Date(
+                currentMonth.getFullYear() - 1,
+                currentMonth.getMonth(),
+                1
+              )
+            )
+          }
+        />
         <FaAngleLeft
           className="btn btn-ghost h-5 p-0 rounded cursor-pointer"
           onClick={() =>
@@ -108,7 +121,7 @@ export default function DatePicker({
             )
           }
         />
-        <span className="font-semibold text-sm">
+        <span className="font-semibold text-sm w-full text-center">
           {currentMonth.toLocaleString("default", { month: "long" })}{" "}
           {currentMonth.getFullYear()}
         </span>
@@ -119,6 +132,18 @@ export default function DatePicker({
               new Date(
                 currentMonth.getFullYear(),
                 currentMonth.getMonth() + 1,
+                1
+              )
+            )
+          }
+        />
+        <FaAngleDoubleRight
+          className="btn btn-ghost h-5 p-0 rounded cursor-pointer"
+          onClick={() =>
+            setCurrentMonth(
+              new Date(
+                currentMonth.getFullYear() + 1,
+                currentMonth.getMonth(),
                 1
               )
             )
@@ -149,6 +174,7 @@ export default function DatePicker({
 
           return (
             <button
+              type="button"
               key={day}
               className={`btn btn-ghost h-7 p-2 border border-transparent cursor-pointer font-light text-[12px] rounded ${
                 isSelected

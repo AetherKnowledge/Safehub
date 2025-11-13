@@ -1,7 +1,7 @@
 "use client";
 import ImageInput from "@/app/components/Input/ImageInput";
-import InputBox from "@/app/components/Input/InputBox";
 import TextArea from "@/app/components/Input/TextArea";
+import TextBox from "@/app/components/Input/TextBox";
 import ModalBase from "@/app/components/Popup/ModalBase";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { Hotline } from "@/app/generated/prisma";
@@ -78,7 +78,7 @@ const HotlineModal = ({
           {hotline ? "Edit Hotline" : "Add Hotline"}
         </h2>
         <div className="flex flex-col flex-1 bg-base-200 px-3 pb-2 w-full">
-          <InputBox
+          <TextBox
             legend="Hotline Name"
             name="name"
             placeholder="Name"
@@ -86,7 +86,7 @@ const HotlineModal = ({
             bgColor="bg-base-100"
             icon={GrEmergency}
           />
-          <InputBox
+          <TextBox
             legend="Hotline Number"
             name="phone"
             type="tel"
@@ -95,7 +95,7 @@ const HotlineModal = ({
             bgColor="bg-base-100"
             icon={FaPhone}
           />
-          <InputBox
+          <TextBox
             legend="Website"
             name="website"
             placeholder="https://"
@@ -107,7 +107,7 @@ const HotlineModal = ({
           <ImageInput
             legend="Image"
             name="image"
-            initial={initialImageList}
+            defaultValue={initialImageList}
             onChange={handleImageChange}
           />
           <TextArea

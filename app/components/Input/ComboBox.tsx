@@ -1,6 +1,7 @@
-type ComboBoxProps = {
-  name: string;
-  legend?: string;
+import InputInterface from "./InputInterface";
+import Legend from "./Legend";
+
+type ComboBoxProps = InputInterface & {
   defaultValue?: string;
   placeholder?: string;
   options?: { label: string; value: string }[];
@@ -11,19 +12,30 @@ type ComboBoxProps = {
 const ComboBox = ({
   name,
   legend,
+  className,
+  required = false,
+  number,
   defaultValue,
   placeholder,
   options,
-  bgColor = "bg-base-200",
+  bgColor = "bg-neutral",
   size = "select-sm",
 }: ComboBoxProps) => {
   return (
     <fieldset className="fieldset w-full">
-      <legend className="fieldset-legend pb-1">{legend}</legend>
+      {legend && (
+        <Legend
+          legend={legend}
+          required={required}
+          number={number}
+          size={size}
+        />
+      )}
       <select
         name={name}
-        className={`select ${size} outline-none ring-0 focus:outline-none focus:ring-0 rounded ${bgColor}`}
+        className={`select ${size} outline-none ring-0 focus:outline-none focus:ring-0 rounded ${bgColor} ${className}`}
         defaultValue={defaultValue}
+        required={required}
       >
         <option disabled value="select">
           {placeholder}

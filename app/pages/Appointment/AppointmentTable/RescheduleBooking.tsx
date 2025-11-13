@@ -1,19 +1,19 @@
 "use client";
 
-import { UpdateAppointmentData } from "@/lib/schemas";
-import { addMinutes } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import DatePickerSelector from "../../../components/Date/DatePickerSelector";
+import DatePickerSelector from "@/app/components/Input/Date/DatePickerSelector";
+import TimePickerSelector from "@/app/components/Input/Date/TimePickerSelector";
 import {
   getTimeFromDate,
   setTimeToDate,
   Time,
   TimePeriod,
-} from "../../../components/Date/TimePicker";
-import TimePickerSelector from "../../../components/Date/TimePickerSelector";
-import ModalBase from "../../../components/Popup/ModalBase";
-import { usePopup } from "../../../components/Popup/PopupProvider";
+} from "@/app/components/Input/Date/utils";
+import ModalBase from "@/app/components/Popup/ModalBase";
+import { usePopup } from "@/app/components/Popup/PopupProvider";
+import { UpdateAppointmentData } from "@/lib/schemas";
+import { addMinutes } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   AppointmentData,
   checkForConflictingDate,
@@ -80,11 +80,13 @@ const RescheduleBooking = ({
           <p className="font-semibold text-2xl">Pick a new schedule</p>
           <div className="flex flex-col gap-5 items-center text-center">
             <DatePickerSelector
+              name="date"
               value={startTime || undefined}
               onChange={(date) => setStartTime(date)}
-              canPickPast={false}
+              cannotPickPast
             />
             <TimePickerSelector
+              name="start-time"
               value={startTime ? getTimeFromDate(startTime) : undefined}
               min={{ hour: 8, minute: 0, period: TimePeriod.AM }}
               max={{ hour: 7, minute: 0, period: TimePeriod.PM }}
@@ -96,6 +98,7 @@ const RescheduleBooking = ({
               }}
             />
             <TimePickerSelector
+              name="end-time"
               value={endTime ? getTimeFromDate(endTime) : undefined}
               min={
                 startTime

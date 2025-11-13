@@ -126,12 +126,12 @@ const Dashboard = () => {
       {/* Top Grid - Charts */}
       <div className="grid grid-cols-2 gap-4">
         {/* Mood Chart */}
-        <div className="bg-base-100 rounded-lg p-4 w-full">
+        <div className="bg-base-100 rounded-lg p-4 w-full flex flex-col">
           <h3 className="text-sm font-semibold mb-4">
             Total Mood of all students
           </h3>
-          <div className="h-64">
-            <canvas ref={moodChartRef}></canvas>
+          <div className="flex-1">
+            <canvas ref={moodChartRef} className="w-full h-full"></canvas>
           </div>
         </div>
         {/* Active Students */}

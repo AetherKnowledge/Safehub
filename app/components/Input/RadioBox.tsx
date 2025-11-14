@@ -23,6 +23,7 @@ const RadioBox = ({
   size = "radio-xs",
   onChange,
   onInvalid,
+  noFormOutput = false,
 }: RadioBoxProps) => {
   const [currentValue, setCurrentValue] = useState<Option | undefined>(
     options.find((option) => option.value === defaultValue)
@@ -56,7 +57,7 @@ const RadioBox = ({
               <input
                 type="radio"
                 className={`radio ${size}`}
-                name={name}
+                name={noFormOutput ? undefined : name}
                 value={option.value}
                 required={required}
                 defaultChecked={defaultValue === option.value}

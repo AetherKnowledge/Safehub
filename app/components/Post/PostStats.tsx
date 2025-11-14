@@ -11,6 +11,8 @@ import PostDropdown from "./PostDropdown";
 import StatButton from "./StatsButton";
 
 //TODO: Change like to heart
+// TODO: Readd count
+// TODO: Sync state from server
 
 type PostStatsProps = {
   post: PostData;

@@ -1,4 +1,5 @@
 "use server";
+import ActionResult from "@/app/components/ActionResult";
 import {
   Appointment,
   AppointmentStatus,
@@ -7,11 +8,9 @@ import {
   UserType,
 } from "@/app/generated/prisma";
 import { auth } from "@/auth";
-import { ErrorResponse } from "@/lib/schemas";
-import { addMinutes } from "@/lib/utils";
+import { addMinutes, prettifyZodErrorMessage } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import {
-  NewAppointmentData,
   newAppointmentSchema,
   UpdateAppointmentData,
   updateAppointmentSchema,
@@ -132,8 +131,11 @@ export async function getAppointmentById(
 }
 
 export async function createNewAppointment(
-  appointmentData: NewAppointmentData
-) {
+  formData: FormData
+): Promise<ActionResult<void>> {
+  const data = Object.fromEntries(formData.entries());
+  console.log("Form Data Submitted:", data);
+
   try {
     const session = await auth();
 
@@ -145,10 +147,10 @@ export async function createNewAppointment(
       throw new Error("Unauthorized");
     }
 
-    const validation = newAppointmentSchema.safeParse(appointmentData);
+    const validation = newAppointmentSchema.safeParse(data);
     if (!validation.success) {
       throw new Error(
-        "Invalid appointment data: " + JSON.stringify(validation.error)
+        "Invalid appointment data: " + prettifyZodErrorMessage(validation.error)
       );
     }
 
@@ -200,8 +202,10 @@ export async function createNewAppointment(
       throw new Error("Failed to create appointment");
     }
   } catch (error) {
-    return { error: (error as Error).message } as ErrorResponse;
+    return { success: false, message: (error as Error).message };
   }
+
+  return { success: true };
 }
 
 async function getCounselorBasedOnSchedule() {
@@ -215,96 +219,138 @@ async function getCounselorBasedOnSchedule() {
 
 export async function updateAppointment(
   appointmentId: string,
-  appointmentData: UpdateAppointmentData
-): Promise<AppointmentData> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
+  formData: FormData
+): Promise<ActionResult<AppointmentData>> {
+  const data = Object.fromEntries(formData.entries());
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error("Unauthorized");
+    }
 
-  // Verify the appointment belongs to this user
-  const appointment = await prisma.appointment.findFirst({
-    where:
-      session.user.type === UserType.Student
-        ? { studentId: session.user.id, id: appointmentId }
-        : { counselorId: session.user.id, id: appointmentId },
-  });
+    // Verify the appointment belongs to this user
+    const appointment = await prisma.appointment.findFirst({
+      where:
+        session.user.type === UserType.Student
+          ? { studentId: session.user.id, id: appointmentId }
+          : { counselorId: session.user.id, id: appointmentId },
+    });
 
-  if (!appointment) {
-    throw new Error("Appointment not found");
-  }
+    if (!appointment) {
+      throw new Error("Appointment not found");
+    }
 
-  const validation = updateAppointmentSchema.safeParse(appointmentData);
+    const validation = updateAppointmentSchema.safeParse(data);
 
-  if (!validation.success) {
-    throw new Error("Invalid appointment data");
-  }
+    if (!validation.success) {
+      throw new Error("Invalid appointment data");
+    }
 
-  if (validation.data.endTime && session.user.type === UserType.Student) {
-    throw new Error("Students cannot update end time");
-  }
+    if (validation.data.endTime && session.user.type === UserType.Student) {
+      throw new Error("Students cannot update end time");
+    }
 
-  if (validation.data.startTime && validation.data.startTime < new Date()) {
-    throw new Error("Cannot book appointment in the past");
-  }
+    if (validation.data.startTime && validation.data.startTime < new Date()) {
+      throw new Error("Cannot book appointment in the past");
+    }
 
-  if (
-    validation.data.endTime &&
-    validation.data.startTime &&
-    validation.data.endTime <= validation.data.startTime
-  ) {
-    throw new Error("End time must be greater than start time");
-  }
+    if (
+      validation.data.endTime &&
+      validation.data.startTime &&
+      validation.data.endTime <= validation.data.startTime
+    ) {
+      throw new Error("End time must be greater than start time");
+    }
 
-  // If a student changes the start time, set status to Pending and adjust end time
-  // to be 60 minutes after the new start time
-  let status: AppointmentStatus | undefined = undefined;
-  if (
-    session.user.type === UserType.Student &&
-    validation.data.startTime &&
-    validation.data.startTime !== appointment.startTime
-  ) {
-    status = AppointmentStatus.Pending;
-    validation.data.endTime = addMinutes(validation.data.startTime, 60);
-  }
+    // If a student changes the start time, set status to Pending and adjust end time
+    // to be 60 minutes after the new start time
+    let status: AppointmentStatus | undefined = undefined;
+    if (
+      session.user.type === UserType.Student &&
+      validation.data.startTime &&
+      validation.data.startTime !== appointment.startTime
+    ) {
+      status = AppointmentStatus.Pending;
+      validation.data.endTime = addMinutes(validation.data.startTime, 60);
+    }
 
-  // Update the appointment status
-  const updatedAppointment = await prisma.appointment.update({
-    where: { id: appointmentId },
-    data: validation.data as UpdateAppointmentData,
-    include: {
-      student: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              section: true,
-              program: true,
-              year: true,
-              image: true,
+    // Update the appointment status
+    const updatedAppointment = await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: validation.data as UpdateAppointmentData,
+      include: {
+        student: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                section: true,
+                program: true,
+                year: true,
+                image: true,
+              },
             },
           },
         },
-      },
-      counselor: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
+        counselor: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+              },
             },
           },
         },
+        feedback: true,
       },
-      feedback: true,
-    },
-  });
+    });
 
-  return updatedAppointment;
+    return { success: true, data: updatedAppointment };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+}
+
+export async function rescheduleAppointment(
+  appointmentId: string,
+  startTime: Date,
+  endTime: Date
+): Promise<ActionResult<void>> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id || session.user.type !== UserType.Counselor) {
+      throw new Error("Unauthorized");
+    }
+
+    const appointment = await prisma.appointment.findFirst({
+      where: { counselorId: session.user.id, id: appointmentId },
+    });
+
+    if (!appointment) {
+      throw new Error("Appointment not found");
+    }
+
+    if (startTime < new Date()) {
+      throw new Error("Cannot reschedule to a past time");
+    }
+
+    if (endTime <= startTime) {
+      throw new Error("End time must be after start time");
+    }
+
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { startTime, endTime },
+    });
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
 }
 
 export async function checkForConflictingDate(

@@ -7,6 +7,7 @@ type InputInterface = {
   bgColor?: string;
   onInvalid?: () => void;
   disabled?: boolean;
+  noFormOutput?: boolean;
 };
 
 export type Option = {

@@ -104,11 +104,8 @@ export async function receiveInitiateCall(
     callerImage: member?.user.image || client.socketUser.image || undefined,
   };
 
-  // TODO: Add creation of TURN server credentials here and include in initiateCallData
-  // logic create credentials -> add it to database -> clients will get the credentials by getting it from database
   const turnCredentials = await getTurnCredentials(initiateCallData.callId);
 
-  // Create call in database first before sending socket events to prevent answering call before creating call in database
   await prisma.call
     .create({
       data: {

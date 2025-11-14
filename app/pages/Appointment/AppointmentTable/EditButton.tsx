@@ -6,12 +6,12 @@ import { MdEdit } from "react-icons/md";
 import { AppointmentData } from "../AppointmentActions";
 import RescheduleBooking from "./RescheduleBooking";
 
-interface CancelButtonProps {
+interface EditButtonProps {
   appointment: AppointmentData;
   userType: UserType;
 }
 
-const RescheduleButton = ({ appointment, userType }: CancelButtonProps) => {
+const EditButton = ({ appointment, userType }: EditButtonProps) => {
   const router = useRouter();
   const [showReschedule, setShowReschedule] = useState(false);
 
@@ -30,7 +30,7 @@ const RescheduleButton = ({ appointment, userType }: CancelButtonProps) => {
         onClick={handleEdit}
       >
         <MdEdit className="w-3 h-3" />
-        Reschedule
+        {userType === UserType.Student ? "Edit" : "Reschedule"}
       </div>
       {showReschedule && (
         <RescheduleBooking
@@ -42,4 +42,4 @@ const RescheduleButton = ({ appointment, userType }: CancelButtonProps) => {
   );
 };
 
-export default RescheduleButton;
+export default EditButton;

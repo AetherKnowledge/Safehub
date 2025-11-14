@@ -25,6 +25,7 @@ const TextAreaMarkdown = ({
   value,
   onChange,
   onInvalid,
+  noFormOutput = false,
 }: TextAreaMarkdownProps) => {
   const [focused, setFocused] = useState(false);
   const [textAreaSize, setTextAreaSize] = useState(`textarea-${size}`);
@@ -52,7 +53,7 @@ const TextAreaMarkdown = ({
 
       {focused ? (
         <textarea
-          name={name}
+          name={noFormOutput ? undefined : name}
           placeholder={placeholder}
           className={`textarea ${textAreaSize} ${height} outline-none ring-0 focus:outline-none focus:ring-0 rounded text-base-content w-full ${bgColor} ${
             hasError ? "border-error" : "border-base-300"

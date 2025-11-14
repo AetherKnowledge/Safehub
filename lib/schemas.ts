@@ -1,10 +1,6 @@
 import { CallStatus, UserType } from "@/app/generated/prisma";
 import { z } from "zod";
 
-export type ErrorResponse = {
-  error: string;
-};
-
 export const IMAGE_SCHEMA = z
   .instanceof(File)
   .refine(

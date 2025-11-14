@@ -11,9 +11,9 @@ import {
 import { Actions } from "./AppointmentsTable";
 import ApproveButton from "./ApproveButton";
 import CancelButton from "./CancelButton";
+import EditButton from "./EditButton";
 import FeedbackButton from "./FeedbackButton";
 import MarkDoneButton from "./MarkDoneButton";
-import RescheduleButton from "./RescheduleButton";
 
 type ActionBoxProps = {
   actions: Actions[];
@@ -50,8 +50,8 @@ const ActionBox = ({ actions, appointment, userType }: ActionBoxProps) => {
         <DefaultLoading />
       ) : (
         <>
-          {actions.includes(Actions.RESCHEDULE) && (
-            <RescheduleButton appointment={appointment} userType={userType} />
+          {actions.includes(Actions.EDIT) && (
+            <EditButton appointment={appointment} userType={userType} />
           )}
           {actions.includes(Actions.FEEDBACK) && (
             <FeedbackButton appointment={appointment} />

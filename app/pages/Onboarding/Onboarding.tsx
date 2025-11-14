@@ -17,9 +17,7 @@ const Onboarding = () => {
     const result = await completeOnboarding(formData);
 
     if (!result.success) {
-      statusPopup.showError(
-        result.error.message || "An unknown error occurred."
-      );
+      statusPopup.showError(result.message || "An unknown error occurred.");
       return;
     }
 

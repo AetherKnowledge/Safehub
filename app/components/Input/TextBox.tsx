@@ -41,6 +41,7 @@ const TextBox = ({
   pattern,
   onChange,
   onInvalid,
+  noFormOutput,
 }: TextBoxProps) => {
   return (
     <>
@@ -63,7 +64,7 @@ const TextBox = ({
             pattern={
               type === "tel" ? "^(?:\\+?[1-9]\\d{6,14}|09\\d{9})$" : pattern
             }
-            name={name}
+            name={noFormOutput ? undefined : name}
             type={type}
             placeholder={placeholder}
             defaultValue={defaultValue}

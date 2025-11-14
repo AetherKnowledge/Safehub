@@ -8,17 +8,18 @@ import InputInterface from "../InputInterface";
 import Legend from "../Legend";
 import DatePicker from "./DatePicker";
 
-export type DatePickerSelectorProps = InputInterface & {
+export type DateSelectorProps = InputInterface & {
   value?: Date;
   highlightedDates?: Date[];
 
   /** Returns utc date not local date */
   onChange?: (date: Date) => void;
 
-  cannotPickPast?: boolean;
+  min?: Date | "now"; // inclusive lower bound
+  max?: Date; // inclusive upper bound
 };
 
-const DatePickerSelector = ({
+const DateSelector = ({
   name,
   legend,
   className,
@@ -29,9 +30,13 @@ const DatePickerSelector = ({
   highlightedDates,
 
   onChange,
-  cannotPickPast = false,
-}: DatePickerSelectorProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(value || null);
+  min,
+  max,
+  noFormOutput = false,
+}: DateSelectorProps) => {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(
+    value || min === "now" ? new Date() : min || null
+  );
   const [hasError, setHasError] = useState(false);
 
   const popoverName = name + "-popover";
@@ -65,7 +70,7 @@ const DatePickerSelector = ({
           </div>
 
           <input
-            name={name}
+            name={noFormOutput ? undefined : name}
             value={selectedDate?.toISOString().split("T")[0] ?? ""}
             type="date"
             className="sr-only h-full static validator-2 outline-none ring-0 focus:outline-none focus:ring-0"
@@ -113,11 +118,12 @@ const DatePickerSelector = ({
           onChange={(date) => {
             selectDate(date);
           }}
-          cannotPickPast={cannotPickPast}
+          min={min}
+          max={max}
         />
       </div>
     </>
   );
 };
 
-export default DatePickerSelector;
+export default DateSelector;

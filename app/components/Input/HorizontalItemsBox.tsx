@@ -42,14 +42,20 @@ const HorizontalItemsBox = ({
   );
 };
 
-function HorizontalItemBuilder({ item }: { item: HorizontalBoxItem }) {
+function HorizontalItemBuilder({
+  item,
+  noFormOutput,
+}: {
+  item: HorizontalBoxItem;
+  noFormOutput?: boolean;
+}) {
   switch (item.type) {
     case QuestionType.TEXT:
-      return <TextBox {...item.props} />;
+      return <TextBox {...item.props} noFormOutput={noFormOutput} />;
     case QuestionType.RADIO:
-      return <RadioBox {...item.props} />;
+      return <RadioBox {...item.props} noFormOutput={noFormOutput} />;
     case QuestionType.SELECT:
-      return <SelectBox {...item.props} />;
+      return <SelectBox {...item.props} noFormOutput={noFormOutput} />;
   }
 }
 

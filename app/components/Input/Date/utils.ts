@@ -27,3 +27,53 @@ export type Time = {
   minute: number;
   period: TimePeriod;
 };
+
+export function timeToMinutes(t: Time): number {
+  let hour24 = t.hour % 12;
+  if (t.period === TimePeriod.PM) hour24 += 12;
+  if (t.period === TimePeriod.AM && t.hour === 12) hour24 = 0;
+  return hour24 * 60 + t.minute;
+}
+
+export function addDays(date: Date | "now", days: number): Date {
+  const result = new Date(date === "now" ? new Date() : date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
+export function isDateTimeAfter(
+  fromDate: Date | "now",
+  fromTime: Time | "now",
+  compareTo: Date | "now"
+): boolean {
+  const combinedDateTime = setTimeToDate(
+    fromDate === "now" ? new Date() : fromDate,
+    fromTime === "now" ? getTimeFromDate(new Date()) : fromTime
+  );
+  return combinedDateTime > (compareTo === "now" ? new Date() : compareTo);
+}
+
+export function isDateToday(date: Date | "now"): boolean {
+  if (date === "now") return true;
+
+  const compareDate = date;
+  const today = new Date();
+  return (
+    compareDate.getDate() === today.getDate() &&
+    compareDate.getMonth() === today.getMonth() &&
+    compareDate.getFullYear() === today.getFullYear()
+  );
+}
+
+export function timeToString(time: Time): string {
+  return `${padTime(
+    time.hour + (time.period === TimePeriod.PM ? 12 : 0) - 1
+  )}:${padTime(time.minute)}`;
+}
+
+export function dateToString(date: Date): string {
+  const year = date.getFullYear();
+  const month = padTime(date.getMonth() + 1);
+  const day = padTime(date.getDate());
+  return `${year}-${month}-${day}T${timeToString(getTimeFromDate(date))}`;
+}

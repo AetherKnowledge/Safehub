@@ -33,7 +33,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
     popup.showSuccess("Changes saved successfully!");
 
     if (!result.success) {
-      popup.showError(result.error.message || "Failed to save changes");
+      popup.showError(result.message || "Failed to save changes");
     }
   }
 

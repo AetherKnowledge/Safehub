@@ -5,16 +5,16 @@ import { size } from "zod";
 import InputInterface from "../InputInterface";
 import Legend from "../Legend";
 import TimePicker from "./TimePicker";
-import { getTimeFromDate, padTime, Time, TimePeriod } from "./utils";
+import { getTimeFromDate, padTime, Time, timeToString } from "./utils";
 
-export type TimePickerSelectorProps = InputInterface & {
+export type TimeSelectorProps = InputInterface & {
   value?: Time;
   onChange?: (time: Time) => void;
   min?: Time | "now"; // inclusive lower bound
   max?: Time; // inclusive upper bound
 };
 
-const TimePickerSelector = ({
+const TimeSelector = ({
   name,
   legend,
   className,
@@ -25,7 +25,8 @@ const TimePickerSelector = ({
   onChange,
   min,
   max,
-}: TimePickerSelectorProps) => {
+  noFormOutput = false,
+}: TimeSelectorProps) => {
   const [hasError, setHasError] = useState(false);
 
   const popoverName = name + "-popover";
@@ -60,15 +61,8 @@ const TimePickerSelector = ({
           </div>
 
           <input
-            name={name}
-            value={
-              selectedTime
-                ? `${padTime(
-                    selectedTime.hour +
-                      (selectedTime.period === TimePeriod.PM ? 12 : 0)
-                  )}:${padTime(selectedTime.minute)}`
-                : "Select Time"
-            }
+            name={noFormOutput ? undefined : name}
+            value={selectedTime ? timeToString(selectedTime) : "00:00"}
             type="time"
             className="sr-only h-full static validator-2 outline-none ring-0 focus:outline-none focus:ring-0"
             required={required}
@@ -124,4 +118,4 @@ const TimePickerSelector = ({
   );
 };
 
-export default TimePickerSelector;
+export default TimeSelector;

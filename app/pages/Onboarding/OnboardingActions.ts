@@ -91,7 +91,8 @@ export async function completeOnboarding(
   } catch (error: any) {
     return {
       success: false,
-      error: { message: error.message, cause: error.cause },
+      message: error.message,
+      cause: error.cause,
     };
   }
 

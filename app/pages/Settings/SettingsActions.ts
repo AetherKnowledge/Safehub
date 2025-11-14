@@ -177,7 +177,8 @@ export async function changeUserInfo(
   } catch (error: any) {
     return {
       success: false,
-      error: { message: error.message, cause: error.cause },
+      message: error.message,
+      cause: error.cause,
     };
   }
 

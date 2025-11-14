@@ -20,7 +20,7 @@ const ImageInput = ({
   multiple = false,
   accept = "image/*",
   onChange,
-
+  noFormOutput = false,
   defaultValue,
 }: ImageInputProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -167,7 +167,7 @@ const ImageInput = ({
       >
         <input
           ref={inputRef}
-          name={name}
+          name={noFormOutput ? undefined : name}
           type="file"
           accept={accept}
           multiple={multiple}

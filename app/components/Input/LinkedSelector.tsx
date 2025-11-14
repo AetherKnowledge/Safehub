@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { QuestionType } from "../Forms/FormBuilder";
 import QuestionBG from "../Forms/QuestionBG";
-import { Option } from "./InputInterface";
+import InputInterface, { Option } from "./InputInterface";
 import Legend from "./Legend";
 import RadioBox, { RadioBoxProps } from "./RadioBox";
 import SelectBox, { SelectBoxProps } from "./SelectBox";
@@ -22,16 +22,13 @@ type LinkedQuestion =
       props: RadioBoxProps;
     };
 
-export type LinkedSelectorProps = {
-  name: string;
+export type LinkedSelectorProps = InputInterface & {
   parent: LinkedQuestion;
   child: LinkedQuestion;
   linkedOptions: LinkedOption[];
+
+  // numbering and legend only works if horizontal is true
   horizontal?: boolean;
-  // only works if horizontal is true
-  legend?: string;
-  required?: boolean;
-  number?: number;
 };
 
 const LinkedSelector = ({
@@ -99,10 +96,12 @@ const LinkedQuestionBuilder = ({
   linkedQuestion,
   options,
   onChange,
+  noFormOutput,
 }: {
   linkedQuestion: LinkedQuestion;
   options: Option[];
   onChange?: (value: Option) => void;
+  noFormOutput?: boolean;
 }) => {
   switch (linkedQuestion.type) {
     case QuestionType.SELECT:

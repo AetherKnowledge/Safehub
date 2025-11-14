@@ -294,15 +294,17 @@ model Appointment {
   status      AppointmentStatus @default(Pending)
   createdAt   DateTime          @default(now())
 
-  focus               String
-  hadCounselingBefore Boolean
-  sessionPreference   SessionPreference
-  urgencyLevel        Int
-  startTime           DateTime
-  endTime             DateTime?
+  startTime DateTime
+  endTime   DateTime?
+
+  focus               String?
+  hadCounselingBefore Boolean?
+  sessionPreference   SessionPreference?
+  urgencyLevel        Int?
   notes               String?
   room                String?
-  appointmentData     Json?
+
+  appointmentData Json?
 
   student   Student   @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
   counselor Counselor @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)

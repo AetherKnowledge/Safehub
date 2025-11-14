@@ -29,6 +29,7 @@ const SelectBox = ({
   onInvalid,
   placeholder = "Select an option",
   value,
+  noFormOutput = false,
 }: SelectBoxProps) => {
   const [selectedOption, setSelectedOption] = useState<Option | null>(
     options.find((option) => option.value === defaultValue) || null
@@ -93,7 +94,7 @@ const SelectBox = ({
           )}
 
           <input
-            name={name}
+            name={noFormOutput ? undefined : name}
             value={selectedOption?.value ?? ""}
             type="text"
             className="sr-only h-full static validator-2 outline-none ring-0 focus:outline-none focus:ring-0"

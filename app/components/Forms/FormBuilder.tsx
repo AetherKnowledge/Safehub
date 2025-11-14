@@ -1,10 +1,9 @@
 import { Fragment } from "react";
-import DatePickerSelector, {
-  DatePickerSelectorProps,
-} from "../Input/Date/DatePickerSelector";
-import TimePickerSelector, {
-  TimePickerSelectorProps,
-} from "../Input/Date/TimePickerSelector";
+import DateSelector, { DateSelectorProps } from "../Input/Date/DateSelector";
+import DateTimeSelector, {
+  DateTimeSelectorProps,
+} from "../Input/Date/DateTimeSelector";
+import TimeSelector, { TimeSelectorProps } from "../Input/Date/TimeSelector";
 import HorizontalItemsBox, {
   HorizontalItemsBoxProps,
 } from "../Input/HorizontalItemsBox";
@@ -30,22 +29,52 @@ export enum QuestionType {
   LINKED_SELECTOR,
   DATE,
   TIME,
+  DATETIME,
 }
 
-export type QuestionBox = {
-  questionType: QuestionType;
-  props:
-    | SeparatorProps
-    | TextBoxProps
-    | TextAreaProps
-    | HorizontalItemsBoxProps
-    | SelectBoxProps
-    | RadioBoxProps
-    | LinkedSelectorProps
-    | DatePickerSelectorProps
-    | TimePickerSelectorProps;
-  version: string;
-};
+export type QuestionBox =
+  | {
+      questionType: QuestionType.SEPARATOR;
+      props: SeparatorProps;
+      version: string;
+    }
+  | { questionType: QuestionType.TEXT; props: TextBoxProps; version: string }
+  | {
+      questionType: QuestionType.TEXTAREA;
+      props: TextAreaProps;
+      version: string;
+    }
+  | {
+      questionType: QuestionType.HORIZONTAL_ITEMS;
+      props: HorizontalItemsBoxProps;
+      version: string;
+    }
+  | { questionType: QuestionType.RADIO; props: RadioBoxProps; version: string }
+  | {
+      questionType: QuestionType.SELECT;
+      props: SelectBoxProps;
+      version: string;
+    }
+  | {
+      questionType: QuestionType.LINKED_SELECTOR;
+      props: LinkedSelectorProps;
+      version: string;
+    }
+  | {
+      questionType: QuestionType.DATE;
+      props: DateSelectorProps;
+      version: string;
+    }
+  | {
+      questionType: QuestionType.TIME;
+      props: TimeSelectorProps;
+      version: string;
+    }
+  | {
+      questionType: QuestionType.DATETIME;
+      props: DateTimeSelectorProps;
+      version: string;
+    };
 
 const FormsBuilder = ({
   header,
@@ -105,15 +134,15 @@ const QuestionBuilder = ({ question }: { question: QuestionBox }) => {
     case QuestionType.SELECT:
       return <SelectBox {...(question.props as SelectBoxProps)} />;
     case QuestionType.DATE:
-      return (
-        <DatePickerSelector {...(question.props as DatePickerSelectorProps)} />
-      );
+      return <DateSelector {...(question.props as DateSelectorProps)} />;
     case QuestionType.TIME:
-      return (
-        <TimePickerSelector {...(question.props as TimePickerSelectorProps)} />
-      );
+      return <TimeSelector {...(question.props as TimeSelectorProps)} />;
     case QuestionType.LINKED_SELECTOR:
       return <LinkedSelector {...(question.props as LinkedSelectorProps)} />;
+    case QuestionType.DATETIME:
+      return (
+        <DateTimeSelector {...(question.props as DateTimeSelectorProps)} />
+      );
 
     default:
       return <div>Unknown Question Type</div>;

@@ -2,6 +2,7 @@ import { UserType } from "@/app/generated/prisma";
 import { Order, SortBy } from "@/app/pages/Dashboard/Student/Dashboard";
 import { PostData } from "@/app/pages/Post/PostActions";
 import { prisma } from "@/prisma/client";
+import { ZodError } from "zod";
 
 export const createManyChatsWithOthers = async (
   userType: UserType,
@@ -187,4 +188,16 @@ export function sortPosts(
   }
 
   return sortedPosts;
+}
+
+export function prettifyZodErrorMessage(error: ZodError<any>): string {
+  return error.issues
+    .map((issue) => {
+      const path = issue.path.length ? issue.path.join(".") : "root";
+      const expected = (issue as any).expected
+        ? `, Expected: ${(issue as any).expected}`
+        : "";
+      return `Field: ${path}, Error: ${issue.message}${expected}`;
+    })
+    .join("\n---\n");
 }

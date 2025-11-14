@@ -2,7 +2,7 @@
 
 import { convertLocalToUTC, formatDate } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 
@@ -18,7 +18,8 @@ interface DatePickerProps {
   /** If true, the date picker will push local date to the router */
   local?: boolean;
 
-  cannotPickPast?: boolean;
+  min?: Date | "now"; // inclusive lower bound
+  max?: Date; // inclusive upper bound
   defaultValue?: Date;
 }
 
@@ -31,34 +32,34 @@ export default function DatePicker({
   highlightedDates,
   pushToRouter = false,
   local = false,
-  cannotPickPast = false,
+  min,
+  max,
 }: DatePickerProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(value || null);
   const router = useRouter();
-  const [currentMonth, setCurrentMonth] = useState(
+  const [currentMonthAndYear, setCurrentMonthAndYear] = useState(
     value ? new Date(value) : new Date()
   );
   const startOfMonth = new Date(
-    currentMonth.getFullYear(),
-    currentMonth.getMonth(),
+    currentMonthAndYear.getFullYear(),
+    currentMonthAndYear.getMonth(),
     1
   );
   const daysInMonth = new Date(
-    currentMonth.getFullYear(),
-    currentMonth.getMonth() + 1,
+    currentMonthAndYear.getFullYear(),
+    currentMonthAndYear.getMonth() + 1,
     0
   ).getDate();
 
   const handleSelect = (day: number) => {
     const localDate = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth(),
+      currentMonthAndYear.getFullYear(),
+      currentMonthAndYear.getMonth(),
       day
     );
 
     const utcDate = convertLocalToUTC(localDate, false);
     setSelectedDate(utcDate);
-    console.log("Selected date:", utcDate);
 
     if (onChange) {
       onChange?.(utcDate);
@@ -77,22 +78,44 @@ export default function DatePicker({
       (date) =>
         date &&
         date.getDate() === day &&
-        date.getMonth() === currentMonth.getMonth() &&
-        date.getFullYear() === currentMonth.getFullYear()
+        date.getMonth() === currentMonthAndYear.getMonth() &&
+        date.getFullYear() === currentMonthAndYear.getFullYear()
     );
   };
 
-  const isDisabled = (day: number) => {
-    if (!cannotPickPast) return false;
+  useEffect(() => {
+    if (!min) return;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const selectedDate = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth(),
-      day
-    );
-    return selectedDate < today;
+    const minDate = min === "now" ? new Date() : min;
+    if (selectedDate && selectedDate < minDate) {
+      setCurrentMonthAndYear(
+        new Date(minDate.getFullYear(), minDate.getMonth(), 1)
+      );
+      handleSelect(minDate.getDate());
+    }
+  }, [min]);
+
+  const isDisabled = (day: number) => {
+    if (min) {
+      const minDate = min === "now" ? new Date() : min;
+      minDate.setHours(0, 0, 0, 0);
+
+      const selectedDate = new Date(
+        currentMonthAndYear.getFullYear(),
+        currentMonthAndYear.getMonth(),
+        day
+      );
+      return selectedDate < minDate;
+    }
+    if (max) {
+      const selectedDate = new Date(
+        currentMonthAndYear.getFullYear(),
+        currentMonthAndYear.getMonth(),
+        day
+      );
+      return selectedDate > max;
+    }
+    return false;
   };
 
   return (
@@ -101,10 +124,10 @@ export default function DatePicker({
         <FaAngleDoubleLeft
           className="btn btn-ghost h-5 p-0 rounded cursor-pointer"
           onClick={() =>
-            setCurrentMonth(
+            setCurrentMonthAndYear(
               new Date(
-                currentMonth.getFullYear() - 1,
-                currentMonth.getMonth(),
+                currentMonthAndYear.getFullYear() - 1,
+                currentMonthAndYear.getMonth(),
                 1
               )
             )
@@ -113,26 +136,26 @@ export default function DatePicker({
         <FaAngleLeft
           className="btn btn-ghost h-5 p-0 rounded cursor-pointer"
           onClick={() =>
-            setCurrentMonth(
+            setCurrentMonthAndYear(
               new Date(
-                currentMonth.getFullYear(),
-                currentMonth.getMonth() - 1,
+                currentMonthAndYear.getFullYear(),
+                currentMonthAndYear.getMonth() - 1,
                 1
               )
             )
           }
         />
         <span className="font-semibold text-sm w-full text-center">
-          {currentMonth.toLocaleString("default", { month: "long" })}{" "}
-          {currentMonth.getFullYear()}
+          {currentMonthAndYear.toLocaleString("default", { month: "long" })}{" "}
+          {currentMonthAndYear.getFullYear()}
         </span>
         <FaAngleRight
           className="btn btn-ghost h-5 p-0 rounded cursor-pointer"
           onClick={() =>
-            setCurrentMonth(
+            setCurrentMonthAndYear(
               new Date(
-                currentMonth.getFullYear(),
-                currentMonth.getMonth() + 1,
+                currentMonthAndYear.getFullYear(),
+                currentMonthAndYear.getMonth() + 1,
                 1
               )
             )
@@ -141,10 +164,10 @@ export default function DatePicker({
         <FaAngleDoubleRight
           className="btn btn-ghost h-5 p-0 rounded cursor-pointer"
           onClick={() =>
-            setCurrentMonth(
+            setCurrentMonthAndYear(
               new Date(
-                currentMonth.getFullYear() + 1,
-                currentMonth.getMonth(),
+                currentMonthAndYear.getFullYear() + 1,
+                currentMonthAndYear.getMonth(),
                 1
               )
             )
@@ -170,8 +193,8 @@ export default function DatePicker({
           const isSelected =
             selectedDate &&
             selectedDate.getDate() === day &&
-            selectedDate.getMonth() === currentMonth.getMonth() &&
-            selectedDate.getFullYear() === currentMonth.getFullYear();
+            selectedDate.getMonth() === currentMonthAndYear.getMonth() &&
+            selectedDate.getFullYear() === currentMonthAndYear.getFullYear();
 
           return (
             <button

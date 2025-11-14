@@ -1,6 +1,6 @@
 import { QuestionBox, QuestionType } from "@/app/components/Forms/FormBuilder";
 import { SeparatorProps } from "@/app/components/Forms/Separator";
-import { DatePickerSelectorProps } from "@/app/components/Input/Date/DatePickerSelector";
+import { DateSelectorProps } from "@/app/components/Input/Date/DateSelector";
 import {
   HorizontalBoxItem,
   HorizontalItemsBoxProps,
@@ -158,7 +158,7 @@ export const studentQuestions: QuestionBox[] = [
       name: "birthDate",
       legend: "What is your birth date?",
       required: true,
-    } as DatePickerSelectorProps,
+    } as DateSelectorProps,
     version: "1",
   },
   {
@@ -296,7 +296,7 @@ export const guardianQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.RADIO,
+    questionType: QuestionType.SELECT,
     props: {
       name: "guardianRelationship",
       legend: "What is your relationship to the guardian?",

@@ -27,6 +27,7 @@ const TextArea = ({
   size = "textarea-md",
   onChange,
   onInvalid,
+  noFormOutput = false,
 }: TextAreaProps) => {
   const [hasError, setHasError] = useState(false);
 
@@ -41,7 +42,7 @@ const TextArea = ({
         />
       )}
       <textarea
-        name={name}
+        name={noFormOutput ? undefined : name}
         placeholder={placeholder}
         className={`textarea ${size} outline-none ring-0 focus:outline-none focus:ring-0 rounded text-base-content w-full ${bgColor} ${
           hasError ? "border-error" : "border-base-300"

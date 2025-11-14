@@ -2,7 +2,6 @@
 import {
   Appointment,
   AppointmentStatus,
-  SessionPreference,
   UserType,
 } from "@/app/generated/prisma";
 
@@ -11,11 +10,7 @@ import FormsBuilder, {
   QuestionType,
 } from "@/app/components/Forms/FormBuilder";
 import { FormsHeaderProps } from "@/app/components/Forms/FormsHeader";
-import { DatePickerSelectorProps } from "@/app/components/Input/Date/DatePickerSelector";
-import { TimePickerSelectorProps } from "@/app/components/Input/Date/TimePickerSelector";
 import { TimePeriod } from "@/app/components/Input/Date/utils";
-import { RadioBoxProps } from "@/app/components/Input/RadioBox";
-import { TextAreaProps } from "@/app/components/Input/TextArea";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import {
   createNewAppointment,
@@ -23,10 +18,6 @@ import {
 } from "@/app/pages/Appointment/AppointmentActions";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import {
-  NewAppointmentData,
-  UpdateAppointmentData,
-} from "../Appointment/schema";
 
 const header: FormsHeaderProps = {
   title: "Book a Counseling Appointment",
@@ -50,7 +41,7 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
         placeholder: "Type your response here...",
         defaultValue: appointment?.focus || "",
         required: true,
-      } as TextAreaProps,
+      },
       version: "1",
     },
     {
@@ -67,7 +58,7 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
           { value: "firstTime", label: "This is my first time" },
           { value: "hasAttended", label: "I have attended before" },
         ],
-      } as RadioBoxProps,
+      },
       version: "1",
     },
     {
@@ -76,13 +67,13 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
         name: "sessionPreference",
         required: true,
         legend: "Do you prefer in-person sessions, online sessions, or either?",
-        defaultValue: appointment?.sessionPreference,
+        defaultValue: appointment?.sessionPreference ?? undefined,
         options: [
           { value: "InPerson", label: "In-person sessions" },
           { value: "Online", label: "Online sessions" },
           { value: "Either", label: "Either" },
         ],
-      } as RadioBoxProps,
+      },
       version: "1",
     },
     {
@@ -100,40 +91,19 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
           { value: "4", label: "4" },
           { value: "5", label: "5" },
         ],
-      } as RadioBoxProps,
+      },
       version: "1",
     },
     {
-      questionType: QuestionType.DATE,
+      questionType: QuestionType.DATETIME,
       props: {
-        name: "schedule",
-        legend: "Pick a schedule.",
-        value: appointment?.startTime,
-        cannotPickPast: true,
+        name: "startTime",
+        legend: "Pick Schedule.",
+        defaultValue: appointment?.startTime,
+        minTime: { hour: 8, minute: 0, period: TimePeriod.AM },
+        maxTime: { hour: 8, minute: 0, period: TimePeriod.PM },
         required: true,
-      } as DatePickerSelectorProps,
-      version: "1",
-    },
-    {
-      questionType: QuestionType.TIME,
-      props: {
-        name: "time",
-        legend: "Pick a time.",
-        defaultValue: appointment
-          ? (() => {
-              const date = new Date(appointment.startTime);
-              let hours = date.getHours();
-              const minutes = date.getMinutes();
-              const period = hours >= 12 ? "PM" : "AM";
-              hours = hours % 12 || 12; // Convert to 12-hour format
-              return `${hours}:${minutes
-                .toString()
-                .padStart(2, "0")} ${period}`;
-            })()
-          : undefined,
-        max: { hour: 8, minute: 0, period: TimePeriod.PM },
-        required: true,
-      } as TimePickerSelectorProps,
+      },
       version: "1",
     },
     {
@@ -149,35 +119,12 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
   ];
 
   async function handleSubmit(formData: FormData) {
-    const startSchedule = new Date(formData.get("schedule") as string);
-    const timeString = formData.get("time") as string;
-    const [timePart, period] = timeString.split(" ");
-    const [hoursInitial, minutes] = timePart.split(":").map(Number);
-    let hours = hoursInitial;
-    if (period === "PM" && hours !== 12) {
-      hours += 12;
-    } else if (period === "AM" && hours === 12) {
-      hours = 0;
-    }
-
-    startSchedule.setHours(hours, minutes, 0, 0);
-
-    const parsedData: NewAppointmentData | UpdateAppointmentData = {
-      focus: formData.get("focus") as string,
-      hadCounselingBefore:
-        (formData.get("hadCounselingBefore") as string) === "hasAttended",
-      sessionPreference: formData.get("sessionPreference") as SessionPreference,
-      urgencyLevel: Number(formData.get("urgencyLevel") as string),
-      startTime: startSchedule,
-      notes: (formData.get("notes") as string) || undefined,
-    };
-
     const scheduleUpdated =
       session.data?.user.type === UserType.Student &&
       appointment &&
       appointment.status !== AppointmentStatus.Pending &&
       appointment.startTime.toISOString() !==
-        new Date(formData.get("schedule") as string)?.toISOString();
+        new Date(formData.get("startTime") as string)?.toISOString();
 
     const confirmation = scheduleUpdated
       ? await statusPopup.showYesNo(
@@ -193,20 +140,19 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
 
     console.log(formData);
     if (appointment) {
-      await updateAppointment(
-        appointment.id,
-        parsedData as UpdateAppointmentData
-      );
+      const response = await updateAppointment(appointment.id, formData);
+      if (!response.success) {
+        statusPopup.showError(response.message);
+        return;
+      }
       statusPopup.showSuccess(
         "Appointment updated successfully!",
         "/user/appointments"
       );
     } else {
-      const response = await createNewAppointment(
-        parsedData as NewAppointmentData
-      );
-      if (response?.error) {
-        statusPopup.showError(response.error);
+      const response = await createNewAppointment(formData);
+      if (!response.success) {
+        statusPopup.showError(response.message);
         return;
       }
 

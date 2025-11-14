@@ -63,40 +63,46 @@ const TimePicker = ({ className = "", onChange, value, min, max }: Props) => {
     )
   );
 
+  // Only call onChange if time actually changes
   useEffect(() => {
     onChange?.(time);
-  }, [time]);
+  }, [time, onChange]);
 
-  // If min/max change, keep current time within range
+  // Clamp time if min/max change, but avoid unnecessary setState
   useEffect(() => {
-    setTime((t) => clampToRange(t, min, max));
+    setTime((t) => {
+      const clamped = clampToRange(t, min, max);
+      // Only update if different
+      if (
+        clamped.hour === t.hour &&
+        clamped.minute === t.minute &&
+        clamped.period === t.period
+      ) {
+        return t;
+      }
+      return clamped;
+    });
   }, [min, max]);
 
   const adjustHour = (delta: number) => {
-    const raw = addHoursToTime(time, delta);
-    const candidate = isWithinRange(raw, min, max)
-      ? raw
-      : clampToRange(raw, min, max);
-    setTime(candidate);
+    setTime((t) => clampToRange(addHoursToTime(t, delta), min, max));
   };
 
   const adjustMinute = (delta: number) => {
-    const raw = addMinutesToTime(time, delta);
-    const candidate = isWithinRange(raw, min, max)
-      ? raw
-      : clampToRange(raw, min, max);
-    setTime(candidate);
+    setTime((t) => clampToRange(addMinutesToTime(t, delta), min, max));
   };
 
   const togglePeriod = () => {
-    const candidate = {
-      ...time,
-      period: time.period === TimePeriod.AM ? TimePeriod.PM : TimePeriod.AM,
-    };
-    const next = isWithinRange(candidate, min, max)
-      ? candidate
-      : clampToRange(candidate, min, max);
-    setTime(next);
+    setTime((t) =>
+      clampToRange(
+        {
+          ...t,
+          period: t.period === TimePeriod.AM ? TimePeriod.PM : TimePeriod.AM,
+        },
+        min,
+        max
+      )
+    );
   };
 
   const renderControl = (

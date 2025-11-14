@@ -1,7 +1,7 @@
 "use client";
 
-import DatePickerSelector from "@/app/components/Input/Date/DatePickerSelector";
-import TimePickerSelector from "@/app/components/Input/Date/TimePickerSelector";
+import DateSelector from "@/app/components/Input/Date/DateSelector";
+import TimeSelector from "@/app/components/Input/Date/TimeSelector";
 import {
   getTimeFromDate,
   setTimeToDate,
@@ -16,9 +16,8 @@ import { useState } from "react";
 import {
   AppointmentData,
   checkForConflictingDate,
-  updateAppointment,
+  rescheduleAppointment,
 } from "../AppointmentActions";
-import { UpdateAppointmentData } from "../schema";
 
 const RescheduleBooking = ({
   appointment,
@@ -42,11 +41,6 @@ const RescheduleBooking = ({
     onClose();
     statusPopup.showLoading("Updating appointment...");
 
-    const formData: UpdateAppointmentData = {
-      startTime,
-      endTime: endTime || addMinutes(startTime, 60),
-    };
-
     const conflicts = await checkForConflictingDate(
       startTime,
       endTime || addMinutes(startTime, 60),
@@ -63,14 +57,19 @@ const RescheduleBooking = ({
       }
     }
 
-    updateAppointment(appointment.id, formData)
-      .then(() => {
-        statusPopup.showSuccess("Appointment updated successfully!");
-        router.refresh();
-      })
-      .catch((error) => {
-        statusPopup.showError(error.message || "An error occurred");
-      });
+    const result = await rescheduleAppointment(
+      appointment.id,
+      startTime,
+      endTime || addMinutes(startTime, 60)
+    );
+
+    if (!result.success) {
+      statusPopup.showError(result.message || "Failed to update appointment.");
+      return;
+    }
+
+    statusPopup.showSuccess("Appointment updated successfully!");
+    router.refresh();
   }
 
   return (
@@ -79,13 +78,13 @@ const RescheduleBooking = ({
         <div className="flex flex-col gap-4">
           <p className="font-semibold text-2xl">Pick a new schedule</p>
           <div className="flex flex-col gap-5 items-center text-center">
-            <DatePickerSelector
+            <DateSelector
               name="date"
               value={startTime || undefined}
               onChange={(date) => setStartTime(date)}
-              cannotPickPast
+              min="now"
             />
-            <TimePickerSelector
+            <TimeSelector
               name="start-time"
               value={startTime ? getTimeFromDate(startTime) : undefined}
               min={{ hour: 8, minute: 0, period: TimePeriod.AM }}
@@ -97,7 +96,7 @@ const RescheduleBooking = ({
                 });
               }}
             />
-            <TimePickerSelector
+            <TimeSelector
               name="end-time"
               value={endTime ? getTimeFromDate(endTime) : undefined}
               min={

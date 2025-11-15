@@ -1,3 +1,4 @@
+import { QuestionBox } from "@/app/components/Forms/FormBuilder";
 import { SessionPreference } from "@/app/generated/prisma";
 import z from "zod";
 
@@ -24,11 +25,16 @@ import z from "zod";
 // });
 // export type UpdateAppointmentData = z.infer<typeof updateAppointmentSchema>;
 
+export type AppointmentFormData = {
+  questions: QuestionBox[];
+  answers: Record<string, any>;
+};
+
 export const newAppointmentSchema = z.object({
   // counselorId: z.string(),
 
   focus: z.string(),
-  hadCounselingBefore: z.string().transform((val) => val === "true"),
+  hadCounselingBefore: z.string(),
   sessionPreference: z.enum(SessionPreference),
   urgencyLevel: z
     .string()
@@ -45,10 +51,7 @@ export type NewAppointmentData = z.infer<typeof newAppointmentSchema>;
 
 export const updateAppointmentSchema = z.object({
   focus: z.string().optional(),
-  hadCounselingBefore: z
-    .string()
-    .transform((val) => val === "true")
-    .optional(),
+  hadCounselingBefore: z.string().optional(),
   sessionPreference: z.enum(SessionPreference).optional(),
   urgencyLevel: z
     .string()

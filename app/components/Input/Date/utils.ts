@@ -16,6 +16,17 @@ export function getTimeFromDate(date: Date): Time {
   return { hour, minute: minutes, period };
 }
 
+export function stringToTime(timeStr: string): Time {
+  const [hhStr, mmStr] = timeStr.split(":");
+  let hh = parseInt(hhStr, 10);
+  const mm = parseInt(mmStr, 10);
+
+  const period = hh >= 12 ? TimePeriod.PM : TimePeriod.AM;
+  const hour = hh % 12 || 12;
+
+  return { hour, minute: mm, period };
+}
+
 export const padTime = (num: number) => num.toString().padStart(2, "0");
 export enum TimePeriod {
   AM = "AM",
@@ -66,14 +77,19 @@ export function isDateToday(date: Date | "now"): boolean {
 }
 
 export function timeToString(time: Time): string {
-  return `${padTime(
-    time.hour + (time.period === TimePeriod.PM ? 12 : 0) - 1
-  )}:${padTime(time.minute)}`;
+  let hour24 = time.hour % 12;
+  if (time.period === TimePeriod.PM) hour24 += 12;
+  if (time.period === TimePeriod.AM && time.hour === 12) hour24 = 0;
+
+  return `${padTime(hour24)}:${padTime(time.minute)}:00`;
 }
 
 export function dateToString(date: Date): string {
   const year = date.getFullYear();
   const month = padTime(date.getMonth() + 1);
   const day = padTime(date.getDate());
-  return `${year}-${month}-${day}T${timeToString(getTimeFromDate(date))}`;
+  const hours = padTime(date.getHours());
+  const minutes = padTime(date.getMinutes());
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:00`;
 }

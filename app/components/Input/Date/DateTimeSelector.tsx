@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InputInterface from "../InputInterface";
 import Legend from "../Legend";
 import DateSelector from "./DateSelector";
@@ -10,6 +10,7 @@ import {
   getTimeFromDate,
   isDateTimeAfter,
   isDateToday,
+  setTimeToDate,
   Time,
 } from "./utils";
 
@@ -21,6 +22,7 @@ export type DateTimeSelectorProps = InputInterface & {
   minTime?: Time | "now";
   maxTime?: Time;
   noFormOutput?: boolean;
+  horizontal?: boolean;
 };
 
 const DateTimeSelector = ({
@@ -36,25 +38,36 @@ const DateTimeSelector = ({
   minTime: initialMinTime,
   maxTime,
   noFormOutput = false,
+  horizontal = false,
   onInvalid,
 }: DateTimeSelectorProps) => {
   const [hasError, setHasError] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    defaultValue || undefined
-  );
-  const [selectedTime, setSelectedTime] = useState<Time | undefined>(
-    defaultValue ? getTimeFromDate(defaultValue) : undefined
-  );
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => {
+    return defaultValue ?? undefined;
+  });
+  const [selectedTime, setSelectedTime] = useState<Time | undefined>(() => {
+    return defaultValue ? getTimeFromDate(defaultValue) : undefined;
+  });
   const [minDate, setMinDate] = useState<Date | "now" | undefined>(
     initialMinDate
   );
   const [minTime, setMinTime] = useState<Time | "now" | undefined>(() => {
-    if (!minDate) return undefined;
+    // If a value is provided, we don't apply "now" restrictions.
+    if (defaultValue) return initialMinTime ?? undefined;
 
-    // If date isn't provided, just return the time
-    if (!minDate || !isDateToday(minDate)) return initialMinTime;
+    // No min date → no min time
+    if (!initialMinDate) return undefined;
 
-    return "now";
+    // minDate = "now" → time must be "now"
+    if (initialMinDate === "now") return "now";
+
+    // minDate is a real Date
+    if (isDateToday(initialMinDate)) {
+      return "now";
+    }
+
+    // min date is in the future → use the provided min time
+    return initialMinTime ?? undefined;
   });
 
   function handleDateChange(date: Date) {
@@ -95,13 +108,24 @@ const DateTimeSelector = ({
     }
   }
 
+  useEffect(() => {
+    if (!defaultValue) return;
+
+    handleDateChange(defaultValue);
+    handleTimeChange(getTimeFromDate(defaultValue));
+  }, []);
+
   return (
     <>
       <fieldset className="fieldset w-full">
         {legend && (
           <Legend legend={legend} required={required} number={number} />
         )}
-        <div className={`flex flex-row gap-2 ${className}`}>
+        <div
+          className={`flex ${
+            horizontal ? "flex-col gap-0" : "flex-row gap-2"
+          } ${className}`}
+        >
           <DateSelector
             name="date"
             noFormOutput
@@ -114,7 +138,9 @@ const DateTimeSelector = ({
           <input
             name={noFormOutput ? undefined : name}
             value={
-              selectedDate && selectedTime ? dateToString(selectedDate) : ""
+              selectedDate && selectedTime
+                ? dateToString(setTimeToDate(selectedDate, selectedTime))
+                : ""
             }
             type="datetime-local"
             className="sr-only h-full static validator-2 outline-none ring-0 focus:outline-none focus:ring-0"

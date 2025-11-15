@@ -34,9 +34,12 @@ const DateSelector = ({
   max,
   noFormOutput = false,
 }: DateSelectorProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(
-    value || min === "now" ? new Date() : min || null
-  );
+  const [selectedDate, setSelectedDate] = useState<Date | null>(() => {
+    if (value) return value;
+    if (min === "now") return new Date();
+    if (min instanceof Date) return min;
+    return null;
+  });
   const [hasError, setHasError] = useState(false);
 
   const popoverName = name + "-popover";

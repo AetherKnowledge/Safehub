@@ -1,6 +1,6 @@
 "use client";
 
-import DateSelector from "@/app/components/Input/Date/DateSelector";
+import DateTimeSelector from "@/app/components/Input/Date/DateTimeSelector";
 import TimeSelector from "@/app/components/Input/Date/TimeSelector";
 import {
   getTimeFromDate,
@@ -26,11 +26,11 @@ const RescheduleBooking = ({
   appointment: AppointmentData;
   onClose: () => void;
 }) => {
-  const [startTime, setStartTime] = useState<Date | null>(
-    appointment?.startTime || null
+  const [startTime, setStartTime] = useState<Date | undefined>(
+    appointment?.startTime
   );
-  const [endTime, setEndTime] = useState<Date | null>(
-    appointment?.endTime || null
+  const [endTime, setEndTime] = useState<Date | undefined>(
+    appointment?.endTime || undefined
   );
   const statusPopup = usePopup();
   const router = useRouter();
@@ -77,24 +77,15 @@ const RescheduleBooking = ({
       <div className="flex flex-col bg-base-100 rounded-lg p-4 gap-4">
         <div className="flex flex-col gap-4">
           <p className="font-semibold text-2xl">Pick a new schedule</p>
-          <div className="flex flex-col gap-5 items-center text-center">
-            <DateSelector
-              name="date"
-              value={startTime || undefined}
+          <div className="flex flex-col gap-3 items-center text-center">
+            <DateTimeSelector
+              name="startTime"
+              horizontal
+              minDate="now"
+              minTime={{ hour: 8, minute: 0, period: TimePeriod.AM }}
+              maxTime={{ hour: 7, minute: 0, period: TimePeriod.PM }}
+              defaultValue={appointment?.startTime}
               onChange={(date) => setStartTime(date)}
-              min="now"
-            />
-            <TimeSelector
-              name="start-time"
-              value={startTime ? getTimeFromDate(startTime) : undefined}
-              min={{ hour: 8, minute: 0, period: TimePeriod.AM }}
-              max={{ hour: 7, minute: 0, period: TimePeriod.PM }}
-              onChange={(time: Time) => {
-                setStartTime((prev) => {
-                  if (!prev) return prev;
-                  return setTimeToDate(new Date(prev), time);
-                });
-              }}
             />
             <TimeSelector
               name="end-time"

@@ -118,6 +118,11 @@ export default function DatePicker({
     return false;
   };
 
+  useEffect(() => {
+    setCurrentMonthAndYear(new Date(value.getFullYear(), value.getMonth(), 1));
+    setSelectedDate(value);
+  }, [value]);
+
   return (
     <div className="bg-base-100 border border-base-content/10 rounded p-3 w-80">
       <div className="flex justify-between items-center mb-2 gap-2">

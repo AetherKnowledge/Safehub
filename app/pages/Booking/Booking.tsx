@@ -5,12 +5,8 @@ import {
   UserType,
 } from "@/app/generated/prisma";
 
-import FormsBuilder, {
-  QuestionBox,
-  QuestionType,
-} from "@/app/components/Forms/FormBuilder";
+import FormsBuilder from "@/app/components/Forms/FormBuilder";
 import { FormsHeaderProps } from "@/app/components/Forms/FormsHeader";
-import { TimePeriod } from "@/app/components/Input/Date/utils";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import {
   createNewAppointment,
@@ -18,6 +14,8 @@ import {
 } from "@/app/pages/Appointment/AppointmentActions";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import { bookingQuestions } from "../Appointment/Question";
+import { AppointmentFormData } from "../Appointment/schema";
 
 const header: FormsHeaderProps = {
   title: "Book a Counseling Appointment",
@@ -29,94 +27,8 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
   const statusPopup = usePopup();
   const session = useSession();
 
-  console.log("Editing appointment:", appointment);
-
-  const questions: QuestionBox[] = [
-    {
-      questionType: QuestionType.TEXTAREA,
-      props: {
-        name: "focus",
-        legend:
-          "What brings you in today, and what would you like to focus on?",
-        placeholder: "Type your response here...",
-        defaultValue: appointment?.focus || "",
-        required: true,
-      },
-      version: "1",
-    },
-    {
-      questionType: QuestionType.RADIO,
-      props: {
-        name: "hadCounselingBefore",
-        required: true,
-        defaultValue: appointment?.hadCounselingBefore
-          ? "hasAttended"
-          : "firstTime",
-        legend:
-          "Have you attended counseling before, or would this be your first time?",
-        options: [
-          { value: "firstTime", label: "This is my first time" },
-          { value: "hasAttended", label: "I have attended before" },
-        ],
-      },
-      version: "1",
-    },
-    {
-      questionType: QuestionType.RADIO,
-      props: {
-        name: "sessionPreference",
-        required: true,
-        legend: "Do you prefer in-person sessions, online sessions, or either?",
-        defaultValue: appointment?.sessionPreference ?? undefined,
-        options: [
-          { value: "InPerson", label: "In-person sessions" },
-          { value: "Online", label: "Online sessions" },
-          { value: "Either", label: "Either" },
-        ],
-      },
-      version: "1",
-    },
-    {
-      questionType: QuestionType.RADIO,
-      props: {
-        name: "urgencyLevel",
-        legend:
-          "How urgent is your concern? From 1 to 5, 5 is the highest urgency.",
-        required: true,
-        defaultValue: appointment?.urgencyLevel?.toString(),
-        options: [
-          { value: "1", label: "1" },
-          { value: "2", label: "2" },
-          { value: "3", label: "3" },
-          { value: "4", label: "4" },
-          { value: "5", label: "5" },
-        ],
-      },
-      version: "1",
-    },
-    {
-      questionType: QuestionType.DATETIME,
-      props: {
-        name: "startTime",
-        legend: "Pick Schedule.",
-        defaultValue: appointment?.startTime,
-        minTime: { hour: 8, minute: 0, period: TimePeriod.AM },
-        maxTime: { hour: 8, minute: 0, period: TimePeriod.PM },
-        required: true,
-      },
-      version: "1",
-    },
-    {
-      questionType: QuestionType.TEXTAREA,
-      props: {
-        name: "notes",
-        legend: "Any additional notes or comments?",
-        placeholder: "Type your response here...",
-        defaultValue: appointment?.notes || "",
-      },
-      version: "1",
-    },
-  ];
+  const appointmentData = appointment?.appointmentData as AppointmentFormData;
+  const questions = appointmentData?.questions || bookingQuestions;
 
   async function handleSubmit(formData: FormData) {
     const scheduleUpdated =
@@ -167,6 +79,7 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
     <FormsBuilder
       header={header}
       questions={questions}
+      defaultValues={appointmentData?.answers}
       onSubmit={handleSubmit}
       onBack={() => redirect("/user/appointments")}
     />

@@ -41,12 +41,6 @@ const addMinutesToTime = (t: Time, deltaMinutes: number): Time => {
 const addHoursToTime = (t: Time, deltaHours: number): Time => {
   return addMinutesToTime(t, deltaHours * 60);
 };
-const isWithinRange = (t: Time, min?: Time, max?: Time) => {
-  const m = timeToMinutes(t);
-  if (min && m < timeToMinutes(min)) return false;
-  if (max && m > timeToMinutes(max)) return false;
-  return true;
-};
 const clampToRange = (t: Time, min?: Time, max?: Time) => {
   const m = timeToMinutes(t);
   if (min && m < timeToMinutes(min)) return min;
@@ -63,11 +57,6 @@ const TimePicker = ({ className = "", onChange, value, min, max }: Props) => {
     )
   );
 
-  // Only call onChange if time actually changes
-  useEffect(() => {
-    onChange?.(time);
-  }, [time, onChange]);
-
   // Clamp time if min/max change, but avoid unnecessary setState
   useEffect(() => {
     setTime((t) => {
@@ -82,14 +71,17 @@ const TimePicker = ({ className = "", onChange, value, min, max }: Props) => {
       }
       return clamped;
     });
+    onChange?.(clampToRange(time, min, max));
   }, [min, max]);
 
   const adjustHour = (delta: number) => {
     setTime((t) => clampToRange(addHoursToTime(t, delta), min, max));
+    onChange?.(clampToRange(addHoursToTime(time, delta), min, max));
   };
 
   const adjustMinute = (delta: number) => {
     setTime((t) => clampToRange(addMinutesToTime(t, delta), min, max));
+    onChange?.(clampToRange(addMinutesToTime(time, delta), min, max));
   };
 
   const togglePeriod = () => {
@@ -103,54 +95,74 @@ const TimePicker = ({ className = "", onChange, value, min, max }: Props) => {
         max
       )
     );
+    onChange?.(
+      clampToRange(
+        {
+          ...time,
+          period: time.period === TimePeriod.AM ? TimePeriod.PM : TimePeriod.AM,
+        },
+        min,
+        max
+      )
+    );
   };
-
-  const renderControl = (
-    label: string,
-    onIncrement: () => void,
-    onDecrement: () => void,
-    value: string
-  ) => (
-    <div className="flex flex-col items-center gap-y-1">
-      <FaCaretUp
-        onClick={onIncrement}
-        aria-label={`Increment ${label}`}
-        className="btn btn-ghost btn-xs size-7"
-      />
-      <div className="text-xl font-medium w-10 text-center">{value}</div>
-      <FaCaretDown
-        onClick={onDecrement}
-        aria-label={`Decrement ${label}`}
-        className="btn btn-ghost btn-xs size-7"
-      />
-    </div>
-  );
 
   return (
     <div
       className={`border border-base-content/20 rounded p-4 inline-block text-center text-base-content bg-base-100 ${className}`}
     >
       <div className="grid grid-cols-5 items-center">
-        {renderControl(
-          "Hour",
-          () => adjustHour(1),
-          () => adjustHour(-1),
-          padTime(time.hour)
-        )}
+        <TimeControl
+          label="Hour"
+          onIncrement={() => adjustHour(1)}
+          onDecrement={() => adjustHour(-1)}
+          value={padTime(time.hour)}
+        />
         <div className="text-2xl flex vertical pb-1 items-center justify-center">
           :
         </div>
-        {renderControl(
-          "Minute",
-          () => adjustMinute(1),
-          () => adjustMinute(-1),
-          padTime(time.minute)
-        )}
+        <TimeControl
+          label="Minute"
+          onIncrement={() => adjustMinute(1)}
+          onDecrement={() => adjustMinute(-1)}
+          value={padTime(time.minute)}
+        />
         <div></div>
-        {renderControl("Period", togglePeriod, togglePeriod, time.period)}
+        <TimeControl
+          label="Period"
+          onIncrement={togglePeriod}
+          onDecrement={togglePeriod}
+          value={time.period}
+        />
       </div>
     </div>
   );
 };
+
+const TimeControl = ({
+  label,
+  onIncrement,
+  onDecrement,
+  value,
+}: {
+  label: string;
+  onIncrement: () => void;
+  onDecrement: () => void;
+  value: string | number;
+}) => (
+  <div className="flex flex-col items-center gap-y-1">
+    <FaCaretUp
+      onClick={onIncrement}
+      aria-label={`Increment ${label}`}
+      className="btn btn-ghost btn-xs size-7"
+    />
+    <div className="text-xl font-medium w-10 text-center">{value}</div>
+    <FaCaretDown
+      onClick={onDecrement}
+      aria-label={`Decrement ${label}`}
+      className="btn btn-ghost btn-xs size-7"
+    />
+  </div>
+);
 
 export default TimePicker;

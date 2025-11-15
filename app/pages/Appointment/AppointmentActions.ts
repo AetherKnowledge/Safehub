@@ -10,9 +10,10 @@ import {
 import { auth } from "@/auth";
 import { addMinutes, prettifyZodErrorMessage } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
+import { bookingQuestions } from "./Question";
 import {
+  AppointmentFormData,
   newAppointmentSchema,
-  UpdateAppointmentData,
   updateAppointmentSchema,
 } from "./schema";
 
@@ -188,13 +189,12 @@ export async function createNewAppointment(
       data: {
         counselorId: counselor.counselorId,
         studentId: session.user.id,
-        focus: validation.data.focus,
-        hadCounselingBefore: validation.data.hadCounselingBefore,
-        sessionPreference: validation.data.sessionPreference,
-        urgencyLevel: validation.data.urgencyLevel,
         startTime: validation.data.startTime,
         endTime: addMinutes(validation.data.startTime, 60), // Default to 60 minutes if endTime not provided
-        notes: validation.data.notes,
+        appointmentData: {
+          questions: JSON.parse(JSON.stringify(bookingQuestions)),
+          answers: JSON.parse(JSON.stringify(validation.data)),
+        },
       },
     });
 
@@ -224,16 +224,13 @@ export async function updateAppointment(
   const data = Object.fromEntries(formData.entries());
   try {
     const session = await auth();
-    if (!session?.user?.id) {
+    if (!session?.user?.id || session.user.type !== UserType.Student) {
       throw new Error("Unauthorized");
     }
 
     // Verify the appointment belongs to this user
     const appointment = await prisma.appointment.findFirst({
-      where:
-        session.user.type === UserType.Student
-          ? { studentId: session.user.id, id: appointmentId }
-          : { counselorId: session.user.id, id: appointmentId },
+      where: { studentId: session.user.id, id: appointmentId },
     });
 
     if (!appointment) {
@@ -246,7 +243,7 @@ export async function updateAppointment(
       throw new Error("Invalid appointment data");
     }
 
-    if (validation.data.endTime && session.user.type === UserType.Student) {
+    if (validation.data.endTime) {
       throw new Error("Students cannot update end time");
     }
 
@@ -254,63 +251,44 @@ export async function updateAppointment(
       throw new Error("Cannot book appointment in the past");
     }
 
-    if (
-      validation.data.endTime &&
-      validation.data.startTime &&
-      validation.data.endTime <= validation.data.startTime
-    ) {
-      throw new Error("End time must be greater than start time");
-    }
-
     // If a student changes the start time, set status to Pending and adjust end time
     // to be 60 minutes after the new start time
     let status: AppointmentStatus | undefined = undefined;
+    let startTime: Date = validation.data.startTime || appointment.startTime;
+    let endTime: Date | undefined = validation.data.endTime;
+
     if (
-      session.user.type === UserType.Student &&
       validation.data.startTime &&
       validation.data.startTime !== appointment.startTime
     ) {
       status = AppointmentStatus.Pending;
-      validation.data.endTime = addMinutes(validation.data.startTime, 60);
+      endTime = addMinutes(startTime, 60);
     }
 
+    const oldAppointmentFormData = JSON.parse(
+      JSON.stringify(appointment.appointmentData)
+    ) as AppointmentFormData;
+    const updatedAppointmentFormData: AppointmentFormData = {
+      questions: oldAppointmentFormData.questions,
+      answers: {
+        ...oldAppointmentFormData.answers,
+        ...validation.data,
+        startTime: startTime,
+      },
+    };
+
     // Update the appointment status
-    const updatedAppointment = await prisma.appointment.update({
+    await prisma.appointment.update({
       where: { id: appointmentId },
-      data: validation.data as UpdateAppointmentData,
-      include: {
-        student: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                section: true,
-                program: true,
-                year: true,
-                image: true,
-              },
-            },
-          },
-        },
-        counselor: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                image: true,
-              },
-            },
-          },
-        },
-        feedback: true,
+      data: {
+        startTime,
+        endTime,
+        status,
+        appointmentData: JSON.parse(JSON.stringify(updatedAppointmentFormData)),
       },
     });
 
-    return { success: true, data: updatedAppointment };
+    return { success: true };
   } catch (error) {
     return { success: false, message: (error as Error).message };
   }

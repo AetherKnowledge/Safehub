@@ -4,6 +4,7 @@ import DateTimeSelector, {
   DateTimeSelectorProps,
 } from "../Input/Date/DateTimeSelector";
 import TimeSelector, { TimeSelectorProps } from "../Input/Date/TimeSelector";
+import { getTimeFromDate, stringToTime } from "../Input/Date/utils";
 import HorizontalItemsBox, {
   HorizontalItemsBoxProps,
 } from "../Input/HorizontalItemsBox";
@@ -79,6 +80,7 @@ export type QuestionBox =
 const FormsBuilder = ({
   header,
   questions,
+  defaultValues,
   hasTermsAndConditions = false,
   onSubmit,
   onBack,
@@ -88,6 +90,7 @@ const FormsBuilder = ({
   hasTermsAndConditions?: boolean;
   onBack?: () => void;
   onSubmit?: (formData: FormData) => void;
+  defaultValues?: Record<string, any>;
 }) => {
   return (
     <FormBG onSubmit={onSubmit}>
@@ -97,10 +100,22 @@ const FormsBuilder = ({
           <Fragment key={header.title + "-question-fragment-" + index}>
             {question.questionType === QuestionType.LINKED_SELECTOR &&
             !(question.props as LinkedSelectorProps).horizontal ? (
-              <QuestionBuilder question={question} />
+              <QuestionBuilder
+                question={question}
+                answer={
+                  defaultValues ? defaultValues[question.props.name] : undefined
+                }
+              />
             ) : (
               <QuestionBG>
-                <QuestionBuilder question={question} />
+                <QuestionBuilder
+                  question={question}
+                  answer={
+                    defaultValues
+                      ? defaultValues[question.props.name]
+                      : undefined
+                  }
+                />
               </QuestionBG>
             )}
           </Fragment>
@@ -117,31 +132,85 @@ const FormsBuilder = ({
   );
 };
 
-const QuestionBuilder = ({ question }: { question: QuestionBox }) => {
+const QuestionBuilder = ({
+  question,
+  answer,
+}: {
+  question: QuestionBox;
+  answer?: any;
+}) => {
   switch (question.questionType) {
     case QuestionType.SEPARATOR:
       return <Separator {...(question.props as SeparatorProps)} />;
     case QuestionType.TEXT:
-      return <TextBox {...(question.props as TextBoxProps)} />;
+      return (
+        <TextBox {...(question.props as TextBoxProps)} defaultValue={answer} />
+      );
     case QuestionType.HORIZONTAL_ITEMS:
       return (
         <HorizontalItemsBox {...(question.props as HorizontalItemsBoxProps)} />
       );
     case QuestionType.TEXTAREA:
-      return <TextArea {...(question.props as TextAreaProps)} />;
+      return (
+        <TextArea
+          {...(question.props as TextAreaProps)}
+          defaultValue={answer}
+        />
+      );
     case QuestionType.RADIO:
-      return <RadioBox {...(question.props as RadioBoxProps)} />;
+      return (
+        <RadioBox
+          {...(question.props as RadioBoxProps)}
+          defaultValue={answer ? (answer as Object).toString() : undefined}
+        />
+      );
     case QuestionType.SELECT:
-      return <SelectBox {...(question.props as SelectBoxProps)} />;
+      return (
+        <SelectBox
+          {...(question.props as SelectBoxProps)}
+          defaultValue={answer ? (answer as Object).toString() : undefined}
+        />
+      );
     case QuestionType.DATE:
-      return <DateSelector {...(question.props as DateSelectorProps)} />;
+      return (
+        <DateSelector
+          {...(question.props as DateSelectorProps)}
+          value={
+            answer
+              ? answer === "now"
+                ? new Date()
+                : new Date(answer)
+              : undefined
+          }
+        />
+      );
     case QuestionType.TIME:
-      return <TimeSelector {...(question.props as TimeSelectorProps)} />;
+      return (
+        <TimeSelector
+          {...(question.props as TimeSelectorProps)}
+          value={
+            answer
+              ? answer === "now"
+                ? getTimeFromDate(new Date())
+                : stringToTime(answer)
+              : undefined
+          }
+        />
+      );
     case QuestionType.LINKED_SELECTOR:
       return <LinkedSelector {...(question.props as LinkedSelectorProps)} />;
     case QuestionType.DATETIME:
       return (
-        <DateTimeSelector {...(question.props as DateTimeSelectorProps)} />
+        <DateTimeSelector
+          {...(question.props as DateTimeSelectorProps)}
+          defaultValue={
+            answer
+              ? answer === "now"
+                ? new Date()
+                : new Date(answer)
+              : undefined
+          }
+        />
       );
 
     default:

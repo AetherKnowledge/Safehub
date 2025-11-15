@@ -32,12 +32,13 @@ const TimeSelector = ({
   const popoverName = name + "-popover";
   const anchorName = "--" + name + "-anchor";
 
-  const [selectedTime, setSelectedTime] = useState<Time | null>(null);
+  const [selectedTime, setSelectedTime] = useState<Time | null>(value || null);
 
   useEffect(() => {
     if (selectedTime) {
       onChange?.(selectedTime);
     }
+    setSelectedTime(selectedTime);
     setHasError(false);
   }, [selectedTime]);
 
@@ -108,7 +109,7 @@ const TimeSelector = ({
         style={{ positionAnchor: anchorName } as React.CSSProperties}
       >
         <TimePicker
-          value={value}
+          value={selectedTime || value}
           onChange={setSelectedTime}
           min={min === "now" ? getTimeFromDate(new Date()) : min}
           max={max}

@@ -26,11 +26,15 @@ const FormsHeader = ({
 
 export const BaseFormsHeader = ({
   children,
+  className,
 }: {
   children: React.ReactNode;
+  className?: string;
 }) => {
   return (
-    <div className="flex flex-col w-full p-7 items-center justify-between text-center gap-1">
+    <div
+      className={`flex flex-col w-full p-7 items-center justify-between text-center gap-1 ${className}`}
+    >
       {children}
     </div>
   );

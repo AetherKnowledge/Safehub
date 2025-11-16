@@ -8,11 +8,12 @@ import {
   guardianQuestions,
   studentQuestions,
 } from "@/app/pages/Onboarding/Questions";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { completeOnboarding } from "./OnboardingActions";
 
 const Onboarding = () => {
   const statusPopup = usePopup();
+  const router = useRouter();
 
   async function onSubmit(formData: FormData) {
     statusPopup.showLoading("Submitting your responses...");
@@ -24,7 +25,7 @@ const Onboarding = () => {
     }
 
     statusPopup.showSuccess("Onboarding completed successfully.");
-    redirect("user/dashboard");
+    router.push("user/dashboard");
   }
 
   const header: FormsHeaderProps = {
@@ -34,15 +35,20 @@ const Onboarding = () => {
       "Answer the registration form truthfully to complete the initial account setup.",
   };
 
-  const question: FormComponent[] = [...studentQuestions, ...guardianQuestions];
+  const questions: FormComponent[] = [
+    ...studentQuestions,
+    ...guardianQuestions,
+  ];
 
   return (
     <FormsBuilder
-      header={header}
-      components={question}
-      hasTermsAndConditions
+      form={{
+        header,
+        components: questions,
+        termsAndConditions: true,
+      }}
       onSubmit={onSubmit}
-      onBack={() => redirect("/")}
+      onBack={() => router.push("/")}
     />
   );
 };

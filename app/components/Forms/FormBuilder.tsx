@@ -15,9 +15,10 @@ import SelectBox, { SelectBoxProps } from "../Input/SelectBox";
 import TermsAndConditions from "../Input/TermsAndConditions";
 import TextArea, { TextAreaProps } from "../Input/TextArea";
 import TextBox, { TextBoxProps } from "../Input/TextBox";
+import { BuiltFormData } from "./EditableFormBuilder";
 import FormBG from "./FormBG";
 import FormComponentBG from "./FormComponentBG";
-import FormsHeader, { FormsHeaderProps } from "./FormsHeader";
+import FormsHeader from "./FormsHeader";
 import Separator, { SeparatorProps } from "./Separator";
 import Submit from "./Submit";
 
@@ -93,20 +94,18 @@ export type FormComponent =
     };
 
 const FormsBuilder = ({
-  header,
-  components,
+  form,
   defaultValues,
-  hasTermsAndConditions = false,
   onSubmit,
   onBack,
 }: {
-  header: FormsHeaderProps;
-  components: FormComponent[];
-  hasTermsAndConditions?: boolean;
+  form: BuiltFormData;
   onBack?: () => void;
   onSubmit?: (formData: FormData) => void;
   defaultValues?: Record<string, any>;
 }) => {
+  const { header, components } = form;
+
   return (
     <FormBG onSubmit={onSubmit}>
       <FormComponentBG>
@@ -140,7 +139,7 @@ const FormsBuilder = ({
           </Fragment>
         );
       })}
-      {hasTermsAndConditions && (
+      {form.termsAndConditions && (
         <FormComponentBG className="py-5">
           <TermsAndConditions />
         </FormComponentBG>

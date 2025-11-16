@@ -5,33 +5,50 @@ import {
   UserType,
 } from "@/app/generated/prisma";
 
+import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
 import FormsBuilder from "@/app/components/Forms/FormBuilder";
-import { FormsHeaderProps } from "@/app/components/Forms/FormsHeader";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import {
   createNewAppointment,
   updateAppointment,
 } from "@/app/pages/Appointment/AppointmentActions";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
-import { bookingQuestions } from "../Appointment/Question";
+import { useRouter } from "next/navigation";
 import { AppointmentFormData } from "../Appointment/schema";
 
-const header: FormsHeaderProps = {
-  name: "bookingHeader",
-  title: "Book a Counseling Appointment",
-  description:
-    "Please fill out the following form to schedule your counseling appointment.",
-};
-
-const Booking = ({ appointment }: { appointment?: Appointment }) => {
+const Booking = ({
+  appointment,
+  form,
+}: {
+  appointment?: Appointment;
+  form?: BuiltFormData;
+}) => {
   const statusPopup = usePopup();
   const session = useSession();
+  const router = useRouter();
 
-  const appointmentData = JSON.parse(
-    appointment?.appointmentData as string
-  ) as AppointmentFormData;
-  const questions = appointmentData?.questions || bookingQuestions;
+  const appointmentData = appointment
+    ? (JSON.parse(
+        JSON.stringify(appointment.appointmentData)
+      ) as AppointmentFormData)
+    : undefined;
+
+  if (appointment && !appointmentData?.questions) {
+    statusPopup.showError(
+      "Failed to load appointment data. Please try again later."
+    );
+    router.push("/user/appointments");
+    return null;
+  }
+
+  if (!appointment && !form) {
+    statusPopup.showError(
+      "Failed to load booking form. Please try again later."
+    );
+    return null;
+  }
+
+  const questions = appointment ? appointmentData?.questions : form;
 
   async function handleSubmit(formData: FormData) {
     const scheduleUpdated =
@@ -80,11 +97,10 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
 
   return (
     <FormsBuilder
-      header={header}
-      components={questions}
+      form={questions!}
       defaultValues={appointmentData?.answers}
       onSubmit={handleSubmit}
-      onBack={() => redirect("/user/appointments")}
+      onBack={() => router.push("/user/appointments")}
     />
   );
 };

@@ -20,7 +20,7 @@ const FormBG = ({
       <div className="flex flex-col w-full h-full rounded-xl p-5 items-center">
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-4 max-w-3xl w-full"
+          className="flex flex-col gap-4 max-w-3xl w-full pb-5"
         >
           {children}
         </form>

@@ -4,13 +4,13 @@ import {
   Appointment,
   AppointmentStatus,
   Feedback,
+  FormType,
   User,
   UserType,
 } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { addMinutes, prettifyZodErrorMessage } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
-import { bookingQuestions } from "./Question";
 import {
   AppointmentFormData,
   newAppointmentSchema,
@@ -185,6 +185,14 @@ export async function createNewAppointment(
       throw new Error("Cannot book appointment in the past");
     }
 
+    const bookingForms = await prisma.formSchema.findUnique({
+      where: { type: FormType.BOOKING },
+    });
+
+    if (!bookingForms) {
+      throw new Error("Booking form not found");
+    }
+
     const appointment = await prisma.appointment.create({
       data: {
         counselorId: counselor.counselorId,
@@ -192,7 +200,7 @@ export async function createNewAppointment(
         startTime: validation.data.startTime,
         endTime: addMinutes(validation.data.startTime, 60), // Default to 60 minutes if endTime not provided
         appointmentData: {
-          questions: JSON.parse(JSON.stringify(bookingQuestions)),
+          questions: bookingForms.schema,
           answers: JSON.parse(JSON.stringify(validation.data)),
         },
       },
@@ -268,6 +276,7 @@ export async function updateAppointment(
     const oldAppointmentFormData = JSON.parse(
       JSON.stringify(appointment.appointmentData)
     ) as AppointmentFormData;
+
     const updatedAppointmentFormData: AppointmentFormData = {
       questions: oldAppointmentFormData.questions,
       answers: {

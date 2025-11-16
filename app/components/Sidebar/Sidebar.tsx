@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { AiFillHome } from "react-icons/ai";
 import { FaCalendar, FaUsers } from "react-icons/fa";
 import { IoIosCall, IoIosSettings } from "react-icons/io";
-import { IoChatboxEllipses } from "react-icons/io5";
+import { IoChatboxEllipses, IoDocumentText } from "react-icons/io5";
 import { MdFeedback } from "react-icons/md";
 import { RiGeminiFill } from "react-icons/ri";
 import Divider from "../Divider";
@@ -175,6 +175,9 @@ const adminSidebar = (isLarge: boolean) => {
       </SidebarButton>
       <SidebarButton href="/user/hotline" icon={IoIosCall} isLarge={isLarge}>
         Hotline
+      </SidebarButton>
+      <SidebarButton href="/user/forms" icon={IoDocumentText} isLarge={isLarge}>
+        Forms
       </SidebarButton>
       <SidebarButton
         href="/user/ai-management"

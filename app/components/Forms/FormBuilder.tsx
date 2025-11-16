@@ -109,7 +109,9 @@ const FormsBuilder = ({
 }) => {
   return (
     <FormBG onSubmit={onSubmit}>
-      <FormsHeader {...header} />
+      <FormComponentBG>
+        <FormsHeader {...header} />
+      </FormComponentBG>
       {components.map((component, index) => {
         return (
           <Fragment key={header.title + "-component-fragment-" + index}>

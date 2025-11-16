@@ -1,59 +1,129 @@
 "use client";
 import EditableFormComponent from "@/app/components/Forms/EditableInput/EditableFormComponent";
+import EditableHeader from "@/app/components/Forms/EditableInput/EditableHeader";
+import { createFormComponent } from "@/app/components/Forms/EditableInput/utils";
 import FormBG from "@/app/components/Forms/FormBG";
-import { FormComponentType } from "@/app/components/Forms/FormBuilder";
-import FormComponentBG from "@/app/components/Forms/FormComponentBG";
-import SelectBox from "@/app/components/Input/SelectBox";
+import {
+  FormComponent,
+  FormComponentType,
+} from "@/app/components/Forms/FormBuilder";
+import { FormsHeaderProps } from "@/app/components/Forms/FormsHeader";
+import { bookingQuestions } from "@/app/pages/Appointment/Question";
+import { motion } from "motion/react";
 import { useState } from "react";
 
 const Test = () => {
+  const [questions, setQuestions] = useState<FormComponent[]>(bookingQuestions);
   const [selectedComponent, setSelectedComponent] = useState<string | null>(
     null
   );
+  const [header, setHeader] = useState<FormsHeaderProps>({
+    name: "header",
+    title: "Test Question",
+    description: "This is a test description.",
+  });
 
   return (
-    <>
-      <FormBG>
-        <EditableFormComponent
-          defaultValue={{
-            type: FormComponentType.TEXT,
-            props: { name: "name", legend: "Test Question" },
-            version: "1",
-          }}
-          selected={selectedComponent === "name"}
-          onClick={(id: string) => setSelectedComponent(id)}
-        />
-        <EditableFormComponent
-          defaultValue={{
-            type: FormComponentType.TEXT,
-            props: { name: "name2", legend: "Test Question 2" },
-            version: "1",
-          }}
-          selected={selectedComponent === "name2"}
-          onClick={(id: string) => setSelectedComponent(id)}
-        />
-        <FormComponentBG>
-          <SelectBox
-            name="test-select"
-            legend="Test Select Box"
-            placeholder="Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure vero temporibus ut quidem, delectus, veniam saepe dolorum illo amet animi nesciunt qui quibusdam voluptatibus at adipisci, similique distinctio magnam nemo!"
-            options={[
-              {
-                label:
-                  "Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure vero temporibus ut quidem, delectus, veniam saepe dolorum illo amet animi nesciunt qui quibusdam voluptatibus at adipisci, similique distinctio magnam nemo!",
-                value: "option1",
-              },
-              { label: "Option 2", value: "option2" },
-              { label: "Option 3", value: "option3" },
-            ]}
-            required
+    <FormBG>
+      <div className="relative">
+        <motion.div layout>
+          <EditableHeader
+            selected={selectedComponent === header.name}
+            onClick={(name) => setSelectedComponent(name)}
+            component={header}
+            onChange={(component) => {
+              setHeader(component);
+            }}
+            onAdd={() => {
+              const newQuestion = createFormComponent({
+                type: FormComponentType.TEXT,
+              });
+              setQuestions([newQuestion, ...questions]);
+            }}
+            onAddSeparator={() => {
+              const newQuestion = createFormComponent({
+                type: FormComponentType.SEPARATOR,
+              });
+              setQuestions([newQuestion, ...questions]);
+            }}
           />
-        </FormComponentBG>
-        <button type="submit" className="btn btn-primary">
-          Submit
-        </button>
-      </FormBG>
-    </>
+        </motion.div>
+      </div>
+      {questions.map((component, index) => {
+        return (
+          <div key={component.props.name} className="relative">
+            <motion.div layout>
+              <EditableFormComponent
+                defaultValue={component}
+                selected={selectedComponent === component.props.name}
+                onClick={setSelectedComponent}
+                onChange={(updatedComponent) => {
+                  const updatedQuestions = [...questions];
+                  updatedQuestions[index] = updatedComponent;
+                  setQuestions(updatedQuestions);
+                }}
+                onDelete={() => {
+                  const updatedQuestions = [...questions];
+                  updatedQuestions.splice(index, 1);
+                  setQuestions(updatedQuestions);
+                }}
+                onDuplicate={() => {
+                  const updatedQuestions = [...questions];
+
+                  const newComponent = {
+                    ...component,
+                    props: {
+                      ...component.props,
+                      name: crypto.randomUUID(),
+                    },
+                  };
+
+                  // @ts-expect-error TypeScript cannot infer this type correctly
+                  updatedQuestions.splice(index + 1, 0, newComponent);
+                  setQuestions(updatedQuestions);
+                }}
+                onAdd={() => {
+                  const newQuestion = createFormComponent({
+                    type: FormComponentType.TEXT,
+                  });
+                  const updatedQuestions = [...questions];
+                  updatedQuestions.splice(index + 1, 0, newQuestion);
+                  setQuestions(updatedQuestions);
+                }}
+                onAddSeparator={() => {
+                  const newQuestion = createFormComponent({
+                    type: FormComponentType.SEPARATOR,
+                  });
+                  const updatedQuestions = [...questions];
+                  updatedQuestions.splice(index + 1, 0, newQuestion);
+                  setQuestions(updatedQuestions);
+                }}
+                onMoveUp={() => {
+                  if (index === 0) return;
+                  const updatedQuestions = [...questions];
+                  const temp = updatedQuestions[index - 1];
+                  updatedQuestions[index - 1] = updatedQuestions[index];
+                  updatedQuestions[index] = temp;
+                  setQuestions(updatedQuestions);
+                }}
+                onMoveDown={() => {
+                  if (index === questions.length - 1) return;
+                  const updatedQuestions = [...questions];
+                  const temp = updatedQuestions[index + 1];
+                  updatedQuestions[index + 1] = updatedQuestions[index];
+                  updatedQuestions[index] = temp;
+                  setQuestions(updatedQuestions);
+                }}
+              />
+            </motion.div>
+          </div>
+        );
+      })}
+
+      <button type="submit" className="btn btn-primary">
+        Submit
+      </button>
+    </FormBG>
   );
 };
 

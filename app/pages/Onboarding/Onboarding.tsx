@@ -28,6 +28,7 @@ const Onboarding = () => {
   }
 
   const header: FormsHeaderProps = {
+    name: "onboardingHeader",
     title: "Registration Form",
     description:
       "Answer the registration form truthfully to complete the initial account setup.",

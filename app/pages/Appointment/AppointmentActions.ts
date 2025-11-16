@@ -11,11 +11,8 @@ import {
 import { auth } from "@/auth";
 import { addMinutes, prettifyZodErrorMessage } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
-import {
-  AppointmentFormData,
-  newAppointmentSchema,
-  updateAppointmentSchema,
-} from "./schema";
+import { buildZodSchema } from "../Forms/schema";
+import { AppointmentFormData } from "./schema";
 
 export type AppointmentData = Appointment & {
   student: {
@@ -148,14 +145,35 @@ export async function createNewAppointment(
       throw new Error("Unauthorized");
     }
 
-    const validation = newAppointmentSchema.safeParse(data);
+    const counselor = await getCounselorBasedOnSchedule();
+
+    const questions = await prisma.formSchema.findUnique({
+      where: { type: FormType.BOOKING },
+    });
+
+    if (!questions) {
+      throw new Error("Booking form not found");
+    }
+
+    const questionsData = JSON.parse(
+      JSON.stringify(questions.schema)
+    ) as AppointmentFormData["questions"];
+
+    const validation = buildZodSchema(questionsData).safeParse(data);
+
     if (!validation.success) {
       throw new Error(
         "Invalid appointment data: " + prettifyZodErrorMessage(validation.error)
       );
     }
 
-    const counselor = await getCounselorBasedOnSchedule();
+    if (
+      !validation.data.startTime ||
+      !(validation.data.startTime instanceof Date) ||
+      isNaN(validation.data.startTime.getTime())
+    ) {
+      throw new Error("Start time is required and must be a valid date");
+    }
 
     const startOfDay = new Date(validation.data.startTime);
     startOfDay.setHours(0, 0, 0, 0);
@@ -245,10 +263,36 @@ export async function updateAppointment(
       throw new Error("Appointment not found");
     }
 
-    const validation = updateAppointmentSchema.safeParse(data);
+    const oldAppointmentFormData = JSON.parse(
+      JSON.stringify(appointment.appointmentData)
+    ) as AppointmentFormData;
+
+    const questions = JSON.parse(
+      JSON.stringify(oldAppointmentFormData.questions)
+    ) as AppointmentFormData["questions"];
+
+    if (!questions) {
+      throw new Error("Appointment questions not found");
+    }
+
+    const validation = buildZodSchema(questions).safeParse(data);
 
     if (!validation.success) {
-      throw new Error("Invalid appointment data");
+      throw new Error(
+        "Invalid appointment data: " + prettifyZodErrorMessage(validation.error)
+      );
+    }
+
+    if (
+      !validation.data.startTime ||
+      !(validation.data.startTime instanceof Date) ||
+      isNaN(validation.data.startTime.getTime())
+    ) {
+      throw new Error("Start time is required and must be a valid date");
+    }
+
+    if (!validation.data.startTime || validation.data.startTime === null) {
+      throw new Error("Start time is required");
     }
 
     if (validation.data.endTime) {
@@ -263,7 +307,7 @@ export async function updateAppointment(
     // to be 60 minutes after the new start time
     let status: AppointmentStatus | undefined = undefined;
     const startTime: Date = validation.data.startTime || appointment.startTime;
-    let endTime: Date | undefined = validation.data.endTime;
+    let endTime: Date | undefined = undefined;
 
     if (
       validation.data.startTime &&
@@ -272,10 +316,6 @@ export async function updateAppointment(
       status = AppointmentStatus.Pending;
       endTime = addMinutes(startTime, 60);
     }
-
-    const oldAppointmentFormData = JSON.parse(
-      JSON.stringify(appointment.appointmentData)
-    ) as AppointmentFormData;
 
     const updatedAppointmentFormData: AppointmentFormData = {
       questions: oldAppointmentFormData.questions,

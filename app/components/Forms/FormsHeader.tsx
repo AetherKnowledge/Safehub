@@ -10,7 +10,6 @@ export const headerDescriptionClass =
   "text-base-content/70 text-sm w-full text-center";
 
 const FormsHeader = ({
-  name,
   title = "Form",
   description = "Answer the form truthfully to complete.",
 }: FormsHeaderProps) => {
@@ -25,15 +24,19 @@ const FormsHeader = ({
 };
 
 export const BaseFormsHeader = ({
-  children,
+  children = null,
   className,
+  skeleton = false,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
+  skeleton?: boolean;
 }) => {
   return (
     <div
-      className={`flex flex-col w-full p-7 items-center justify-between text-center gap-1 ${className}`}
+      className={`flex flex-col w-full p-7 items-center justify-between text-center gap-1 ${
+        skeleton ? "skeleton h-30" : ""
+      } ${className}`}
     >
       {children}
     </div>

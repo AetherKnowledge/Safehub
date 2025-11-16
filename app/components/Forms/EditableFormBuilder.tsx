@@ -79,7 +79,7 @@ const EditableFormBuilder = ({
             <div key={component.props.name} className="relative">
               <motion.div layout>
                 <EditableFormComponent
-                  defaultValue={component}
+                  component={component}
                   selected={selectedComponent === component.props.name}
                   onClick={setSelectedComponent}
                   onChange={(updatedComponent) => {

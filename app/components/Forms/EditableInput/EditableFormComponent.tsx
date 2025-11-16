@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useState } from "react";
 import Legend from "../../Input/Legend";
 import SelectBox from "../../Input/SelectBox";
 import TextArea from "../../Input/TextArea";
@@ -18,7 +17,7 @@ import FormsOptions from "./FormsOptions";
 import { createFormComponent, SaveableSettings } from "./utils";
 
 export type EditableFormComponentProps = {
-  defaultValue?: FormComponent;
+  component: FormComponent;
   selected?: boolean;
   onClick?: (id: string) => void;
   onDuplicate?: () => void;
@@ -31,7 +30,7 @@ export type EditableFormComponentProps = {
 };
 
 const EditableFormComponent = ({
-  defaultValue,
+  component,
   onClick,
   selected = false,
   onDuplicate,
@@ -42,20 +41,6 @@ const EditableFormComponent = ({
   onMoveUp,
   onMoveDown,
 }: EditableFormComponentProps) => {
-  const [component, setComponent] = useState<FormComponent>(
-    defaultValue ?? createFormComponent({ type: FormComponentType.TEXT })
-  );
-
-  useEffect(() => {
-    safeOnChange(component);
-  }, [component]);
-
-  function safeOnChange(updatedComponent: FormComponent) {
-    setTimeout(() => {
-      onChange?.(updatedComponent);
-    }, 0);
-  }
-
   if (component.type === FormComponentType.SEPARATOR) {
     return (
       <EditableSeparator
@@ -65,7 +50,7 @@ const EditableFormComponent = ({
         onDuplicate={onDuplicate}
         onDelete={onDelete}
         onChange={(updatedComponent) => {
-          setComponent({
+          onChange?.({
             ...component,
             ...updatedComponent,
           });
@@ -98,9 +83,9 @@ const EditableFormComponent = ({
             className="p-2 bg-neutral border-b-1 border-primary no-outline w-full rounded-sm h-10"
             value={component.props?.legend || "Edit your question here"}
             onChange={(e) => {
-              setComponent({
+              // @ts-expect-error TypeScript cannot infer this type correctly
+              onChange?.({
                 ...component,
-                // @ts-expect-error TypeScript cannot infer this type correctly
                 props: {
                   ...component.props,
                   legend: e.target.value,
@@ -135,13 +120,13 @@ const EditableFormComponent = ({
             value={component.type}
             onChange={(option) => {
               if (option.value === component.type) return;
-
-              setComponent((prev) =>
-                createFormComponent({
-                  ...(prev.props as SaveableSettings),
+              onChange?.({
+                ...component,
+                ...createFormComponent({
+                  ...(component.props as SaveableSettings),
                   type: option.value as FormComponentType,
-                })
-              );
+                }),
+              });
             }}
           />
         </div>
@@ -165,7 +150,7 @@ const EditableFormComponent = ({
             selected={selected}
             options={component.props?.options || []}
             onChange={(options) => {
-              setComponent({
+              onChange?.({
                 ...component,
                 props: {
                   ...component.props,
@@ -181,7 +166,7 @@ const EditableFormComponent = ({
             options={component.props?.options || []}
             onChange={(options) => {
               console.log("Options changed:", options);
-              setComponent({
+              onChange?.({
                 ...component,
                 props: {
                   ...component.props,
@@ -196,7 +181,7 @@ const EditableFormComponent = ({
             selected={selected}
             settings={component?.props}
             onChange={(settings) => {
-              setComponent({
+              onChange?.({
                 ...component,
                 props: {
                   ...component.props,
@@ -211,7 +196,7 @@ const EditableFormComponent = ({
             selected={selected}
             settings={component?.props}
             onChange={(settings) => {
-              setComponent({
+              onChange?.({
                 ...component,
                 props: {
                   ...component.props,
@@ -226,7 +211,7 @@ const EditableFormComponent = ({
             selected={selected}
             settings={component?.props}
             onChange={(settings) => {
-              setComponent({
+              onChange?.({
                 ...component,
                 props: {
                   ...component.props,
@@ -241,7 +226,7 @@ const EditableFormComponent = ({
             selected={selected}
             settings={component.props}
             onChange={(settings) => {
-              setComponent({
+              onChange?.({
                 ...component,
                 props: {
                   ...component.props,
@@ -260,9 +245,9 @@ const EditableFormComponent = ({
           onDuplicate={onDuplicate}
           onDelete={onDelete}
           onRequiredToggle={(value) =>
-            setComponent({
+            // @ts-expect-error TypeScript cannot infer this type correctly
+            onChange?.({
               ...component,
-              // @ts-expect-error TypeScript cannot infer this type correctly
               props: {
                 ...component.props,
                 required: value,

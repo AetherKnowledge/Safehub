@@ -31,8 +31,6 @@ export async function fetchForms(
       JSON.stringify(formData.schema)
     );
 
-    console.log("Built form data:", builtFormData);
-    console.log("Raw form data from DB:", formData.schema);
     return { success: true, data: builtFormData };
   } catch (error) {
     console.error("Error fetching forms:", error);

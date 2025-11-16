@@ -1,36 +1,38 @@
 "use client";
-import EditableQuestionBox from "@/app/components/Forms/EditableInput/EditableQuestionBox";
+import EditableFormComponent from "@/app/components/Forms/EditableInput/EditableFormComponent";
 import FormBG from "@/app/components/Forms/FormBG";
-import { QuestionType } from "@/app/components/Forms/FormBuilder";
-import QuestionBG from "@/app/components/Forms/QuestionBG";
+import { FormComponentType } from "@/app/components/Forms/FormBuilder";
+import FormComponentBG from "@/app/components/Forms/FormComponentBG";
 import SelectBox from "@/app/components/Input/SelectBox";
 import { useState } from "react";
 
 const Test = () => {
-  const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
+  const [selectedComponent, setSelectedComponent] = useState<string | null>(
+    null
+  );
 
   return (
     <>
       <FormBG>
-        <EditableQuestionBox
-          questionBox={{
-            questionType: QuestionType.TEXT,
+        <EditableFormComponent
+          defaultValue={{
+            type: FormComponentType.TEXT,
             props: { name: "name", legend: "Test Question" },
             version: "1",
           }}
-          selected={selectedQuestion === "name"}
-          onClick={(id: string) => setSelectedQuestion(id)}
+          selected={selectedComponent === "name"}
+          onClick={(id: string) => setSelectedComponent(id)}
         />
-        <EditableQuestionBox
-          questionBox={{
-            questionType: QuestionType.TEXT,
+        <EditableFormComponent
+          defaultValue={{
+            type: FormComponentType.TEXT,
             props: { name: "name2", legend: "Test Question 2" },
             version: "1",
           }}
-          selected={selectedQuestion === "name2"}
-          onClick={(id: string) => setSelectedQuestion(id)}
+          selected={selectedComponent === "name2"}
+          onClick={(id: string) => setSelectedComponent(id)}
         />
-        <QuestionBG>
+        <FormComponentBG>
           <SelectBox
             name="test-select"
             legend="Test Select Box"
@@ -46,7 +48,7 @@ const Test = () => {
             ]}
             required
           />
-        </QuestionBG>
+        </FormComponentBG>
         <button type="submit" className="btn btn-primary">
           Submit
         </button>

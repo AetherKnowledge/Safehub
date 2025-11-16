@@ -8,6 +8,7 @@ export type EditableRadioBoxProps = {
   bgColor?: string;
   size?: "radio-xs" | "radio-sm" | "radio-md" | "radio-lg" | "radio-xl";
   selected?: boolean;
+  options?: Option[];
   onChange?: (options: Option[]) => void;
 };
 
@@ -16,21 +17,12 @@ const EditableRadioBox = ({
   bgColor = "bg-neutral",
   size,
   selected = false,
+  options = [],
   onChange,
 }: EditableRadioBoxProps) => {
-  const [options, setOptions] = useState<Option[]>([
-    { label: "Option 1", value: "option1" },
-    { label: "Option 2", value: "option2" },
-  ]);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (onChange) {
-      onChange(options);
-    }
-  }, [options, onChange]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -58,7 +50,6 @@ const EditableRadioBox = ({
             className="flex flex-row items-center justify-center gap-2"
           >
             <label
-              key={option.value}
               onClick={() => setSelectedOption(option)}
               className={`flex flex-row w-full cursor-pointer items-center ${bgColor} p-2 rounded-lg border ${
                 selectedOption?.value === option.value
@@ -78,23 +69,25 @@ const EditableRadioBox = ({
                 value={option.label}
                 placeholder="Option text here"
                 onChange={(e) => {
-                  setOptions((prevOptions) =>
-                    prevOptions.map((opt) =>
-                      opt.value === option.value
-                        ? { ...opt, label: e.target.value }
-                        : opt
-                    )
+                  const updatedOptions = options.map((opt) =>
+                    opt.value === option.value
+                      ? { ...opt, label: e.target.value }
+                      : opt
                   );
+
+                  onChange?.(updatedOptions);
                 }}
               />
             </label>
             {selected && (
               <button
+                type="button"
                 className="btn btn-ghost btn-sm p-2"
                 onClick={() => {
-                  setOptions((prevOptions) =>
-                    prevOptions.filter((opt) => opt.value !== option.value)
+                  const updatedOptions = options.filter(
+                    (opt) => opt.value !== option.value
                   );
+                  onChange?.(updatedOptions);
                 }}
               >
                 <FaX className="w-4 h-4" />
@@ -105,19 +98,17 @@ const EditableRadioBox = ({
 
         {selected && (
           <button
+            type="button"
             className="btn btn-ghost btn-sm p-2"
             onClick={() => {
-              setOptions((prevOptions) => {
-                const nextNum = getNextOptionName(prevOptions);
-
-                return [
-                  ...prevOptions,
-                  {
-                    label: `Option ${nextNum}`,
-                    value: crypto.randomUUID(),
-                  },
-                ];
-              });
+              const updatedOptions = [
+                ...options,
+                {
+                  label: `Option ${getNextOptionName(options)}`,
+                  value: crypto.randomUUID(),
+                },
+              ];
+              onChange?.(updatedOptions);
             }}
           >
             <FaPlus className="w-4 h-4" />

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { QuestionType } from "../Forms/FormBuilder";
-import QuestionBG from "../Forms/QuestionBG";
+import { FormComponentType } from "../Forms/FormBuilder";
+import FormComponentBG from "../Forms/FormComponentBG";
 import InputInterface, { Option } from "./InputInterface";
 import Legend from "./Legend";
 import RadioBox, { RadioBoxProps } from "./RadioBox";
@@ -12,19 +12,19 @@ export interface LinkedOption {
   childOptions: Option[];
 }
 
-type LinkedQuestion =
+type LinkedComponent =
   | {
-      type: QuestionType.SELECT;
+      type: FormComponentType.SELECT;
       props: SelectBoxProps;
     }
   | {
-      type: QuestionType.RADIO;
+      type: FormComponentType.RADIO;
       props: RadioBoxProps;
     };
 
 export type LinkedSelectorProps = InputInterface & {
-  parent: LinkedQuestion;
-  child: LinkedQuestion;
+  parent: LinkedComponent;
+  child: LinkedComponent;
   linkedOptions: LinkedOption[];
 
   // numbering and legend only works if horizontal is true
@@ -60,62 +60,62 @@ const LinkedSelector = ({
             <Legend legend={legend} required={required} number={number} />
           )}
           <div className="flex flex-row gap-2">
-            <LinkedQuestionBuilder
-              linkedQuestion={parent}
+            <LinkedComponentBuilder
+              linkedComponent={parent}
               options={parentOptions}
               onChange={handleParentChange}
             />
-            <LinkedQuestionBuilder
-              linkedQuestion={child}
+            <LinkedComponentBuilder
+              linkedComponent={child}
               options={childOptions}
             />
           </div>
         </fieldset>
       ) : (
         <>
-          <QuestionBG>
-            <LinkedQuestionBuilder
-              linkedQuestion={parent}
+          <FormComponentBG>
+            <LinkedComponentBuilder
+              linkedComponent={parent}
               options={parentOptions}
               onChange={handleParentChange}
             />
-          </QuestionBG>
-          <QuestionBG>
-            <LinkedQuestionBuilder
-              linkedQuestion={child}
+          </FormComponentBG>
+          <FormComponentBG>
+            <LinkedComponentBuilder
+              linkedComponent={child}
               options={childOptions}
             />
-          </QuestionBG>{" "}
+          </FormComponentBG>{" "}
         </>
       )}
     </>
   );
 };
 
-const LinkedQuestionBuilder = ({
-  linkedQuestion,
+const LinkedComponentBuilder = ({
+  linkedComponent,
   options,
   onChange,
   noFormOutput,
 }: {
-  linkedQuestion: LinkedQuestion;
+  linkedComponent: LinkedComponent;
   options: Option[];
   onChange?: (value: Option) => void;
   noFormOutput?: boolean;
 }) => {
-  switch (linkedQuestion.type) {
-    case QuestionType.SELECT:
+  switch (linkedComponent.type) {
+    case FormComponentType.SELECT:
       return (
         <SelectBox
-          {...(linkedQuestion.props as SelectBoxProps)}
+          {...(linkedComponent.props as SelectBoxProps)}
           options={options}
           onChange={onChange}
         />
       );
-    case QuestionType.RADIO:
+    case FormComponentType.RADIO:
       return (
         <RadioBox
-          {...(linkedQuestion.props as RadioBoxProps)}
+          {...(linkedComponent.props as RadioBoxProps)}
           options={options}
           onChange={onChange}
         />

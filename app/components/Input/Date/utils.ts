@@ -18,7 +18,7 @@ export function getTimeFromDate(date: Date): Time {
 
 export function stringToTime(timeStr: string): Time {
   const [hhStr, mmStr] = timeStr.split(":");
-  let hh = parseInt(hhStr, 10);
+  const hh = parseInt(hhStr, 10);
   const mm = parseInt(mmStr, 10);
 
   const period = hh >= 12 ? TimePeriod.PM : TimePeriod.AM;

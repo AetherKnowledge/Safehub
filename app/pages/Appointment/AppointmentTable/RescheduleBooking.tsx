@@ -90,12 +90,12 @@ const RescheduleBooking = ({
             <TimeSelector
               name="end-time"
               value={endTime ? getTimeFromDate(endTime) : undefined}
-              min={
+              minTime={
                 startTime
                   ? getTimeFromDate(addMinutes(startTime, 60))
                   : { hour: 8, minute: 0, period: TimePeriod.AM }
               }
-              max={{ hour: 8, minute: 0, period: TimePeriod.PM }}
+              maxTime={{ hour: 8, minute: 0, period: TimePeriod.PM }}
               onChange={(time: Time) => {
                 setEndTime((prev) => {
                   if (!prev) return prev;

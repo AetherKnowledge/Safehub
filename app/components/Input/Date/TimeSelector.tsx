@@ -10,8 +10,8 @@ import { getTimeFromDate, padTime, Time, timeToString } from "./utils";
 export type TimeSelectorProps = InputInterface & {
   value?: Time;
   onChange?: (time: Time) => void;
-  min?: Time | "now"; // inclusive lower bound
-  max?: Time; // inclusive upper bound
+  minTime?: Time | "now"; // inclusive lower bound
+  maxTime?: Time; // inclusive upper bound
   size?: "radio-xs" | "radio-sm" | "radio-md" | "radio-lg" | "radio-xl";
 };
 
@@ -24,8 +24,8 @@ const TimeSelector = ({
   bgColor = "bg-neutral",
   value,
   onChange,
-  min,
-  max,
+  minTime,
+  maxTime,
   noFormOutput = false,
   readonly = false,
 }: TimeSelectorProps) => {
@@ -117,8 +117,8 @@ const TimeSelector = ({
         <TimePicker
           value={selectedTime || value}
           onChange={setSelectedTime}
-          min={min === "now" ? getTimeFromDate(new Date()) : min}
-          max={max}
+          minTime={minTime === "now" ? getTimeFromDate(new Date()) : minTime}
+          maxTime={maxTime}
         />
       </div>
     </>

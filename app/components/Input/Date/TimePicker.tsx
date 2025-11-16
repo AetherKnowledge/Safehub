@@ -8,8 +8,8 @@ interface Props {
   onChange?: (value: Time) => void;
   value?: Time;
   // ...existing code...
-  min?: Time; // inclusive lower bound
-  max?: Time; // inclusive upper bound
+  minTime?: Time; // inclusive lower bound
+  maxTime?: Time; // inclusive upper bound
 }
 
 // Helpers to compare/clamp times
@@ -48,19 +48,25 @@ const clampToRange = (t: Time, min?: Time, max?: Time) => {
   return t;
 };
 
-const TimePicker = ({ className = "", onChange, value, min, max }: Props) => {
+const TimePicker = ({
+  className = "",
+  onChange,
+  value,
+  minTime,
+  maxTime,
+}: Props) => {
   const [time, setTime] = useState<Time>(() =>
     clampToRange(
       value || { hour: 12, minute: 0, period: TimePeriod.AM },
-      min,
-      max
+      minTime,
+      maxTime
     )
   );
 
   // Clamp time if min/max change, but avoid unnecessary setState
   useEffect(() => {
     setTime((t) => {
-      const clamped = clampToRange(t, min, max);
+      const clamped = clampToRange(t, minTime, maxTime);
       // Only update if different
       if (
         clamped.hour === t.hour &&
@@ -71,17 +77,17 @@ const TimePicker = ({ className = "", onChange, value, min, max }: Props) => {
       }
       return clamped;
     });
-    onChange?.(clampToRange(time, min, max));
-  }, [min, max]);
+    onChange?.(clampToRange(time, minTime, maxTime));
+  }, [minTime, maxTime]);
 
   const adjustHour = (delta: number) => {
-    setTime((t) => clampToRange(addHoursToTime(t, delta), min, max));
-    onChange?.(clampToRange(addHoursToTime(time, delta), min, max));
+    setTime((t) => clampToRange(addHoursToTime(t, delta), minTime, maxTime));
+    onChange?.(clampToRange(addHoursToTime(time, delta), minTime, maxTime));
   };
 
   const adjustMinute = (delta: number) => {
-    setTime((t) => clampToRange(addMinutesToTime(t, delta), min, max));
-    onChange?.(clampToRange(addMinutesToTime(time, delta), min, max));
+    setTime((t) => clampToRange(addMinutesToTime(t, delta), minTime, maxTime));
+    onChange?.(clampToRange(addMinutesToTime(time, delta), minTime, maxTime));
   };
 
   const togglePeriod = () => {
@@ -91,8 +97,8 @@ const TimePicker = ({ className = "", onChange, value, min, max }: Props) => {
           ...t,
           period: t.period === TimePeriod.AM ? TimePeriod.PM : TimePeriod.AM,
         },
-        min,
-        max
+        minTime,
+        maxTime
       )
     );
     onChange?.(
@@ -101,8 +107,8 @@ const TimePicker = ({ className = "", onChange, value, min, max }: Props) => {
           ...time,
           period: time.period === TimePeriod.AM ? TimePeriod.PM : TimePeriod.AM,
         },
-        min,
-        max
+        minTime,
+        maxTime
       )
     );
   };

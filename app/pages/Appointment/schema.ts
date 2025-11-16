@@ -1,4 +1,4 @@
-import { QuestionBox } from "@/app/components/Forms/FormBuilder";
+import { FormComponent } from "@/app/components/Forms/FormBuilder";
 import { SessionPreference } from "@/app/generated/prisma";
 import z from "zod";
 
@@ -26,7 +26,7 @@ import z from "zod";
 // export type UpdateAppointmentData = z.infer<typeof updateAppointmentSchema>;
 
 export type AppointmentFormData = {
-  questions: QuestionBox[];
+  questions: FormComponent[];
   answers: Record<string, any>;
 };
 

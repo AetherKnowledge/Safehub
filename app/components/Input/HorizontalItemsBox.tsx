@@ -1,5 +1,5 @@
 "use client";
-import { QuestionType } from "../Forms/FormBuilder";
+import { FormComponentType } from "../Forms/FormBuilder";
 import InputInterface from "./InputInterface";
 import Legend from "./Legend";
 import RadioBox, { RadioBoxProps } from "./RadioBox";
@@ -7,9 +7,9 @@ import SelectBox, { SelectBoxProps } from "./SelectBox";
 import TextBox, { TextBoxProps } from "./TextBox";
 
 export type HorizontalBoxItem =
-  | { type: QuestionType.TEXT; props: TextBoxProps }
-  | { type: QuestionType.RADIO; props: RadioBoxProps }
-  | { type: QuestionType.SELECT; props: SelectBoxProps };
+  | { type: FormComponentType.TEXT; props: TextBoxProps }
+  | { type: FormComponentType.RADIO; props: RadioBoxProps }
+  | { type: FormComponentType.SELECT; props: SelectBoxProps };
 
 export type HorizontalItemsBoxProps = InputInterface & {
   items: HorizontalBoxItem[];
@@ -49,11 +49,11 @@ function HorizontalItemBuilder({
   noFormOutput?: boolean;
 }) {
   switch (item.type) {
-    case QuestionType.TEXT:
+    case FormComponentType.TEXT:
       return <TextBox {...item.props} noFormOutput={noFormOutput} />;
-    case QuestionType.RADIO:
+    case FormComponentType.RADIO:
       return <RadioBox {...item.props} noFormOutput={noFormOutput} />;
-    case QuestionType.SELECT:
+    case FormComponentType.SELECT:
       return <SelectBox {...item.props} noFormOutput={noFormOutput} />;
   }
 }

@@ -1,9 +1,12 @@
-import { QuestionBox, QuestionType } from "@/app/components/Forms/FormBuilder";
+import {
+  FormComponent,
+  FormComponentType,
+} from "@/app/components/Forms/FormBuilder";
 import { TimePeriod } from "@/app/components/Input/Date/utils";
 
-export const bookingQuestions: QuestionBox[] = [
+export const bookingQuestions: FormComponent[] = [
   {
-    questionType: QuestionType.TEXTAREA,
+    type: FormComponentType.TEXTAREA,
     props: {
       name: "focus",
       legend: "What brings you in today, and what would you like to focus on?",
@@ -13,7 +16,7 @@ export const bookingQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.RADIO,
+    type: FormComponentType.RADIO,
     props: {
       name: "hadCounselingBefore",
       required: true,
@@ -27,7 +30,7 @@ export const bookingQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.RADIO,
+    type: FormComponentType.RADIO,
     props: {
       name: "sessionPreference",
       required: true,
@@ -41,7 +44,7 @@ export const bookingQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.RADIO,
+    type: FormComponentType.RADIO,
     props: {
       name: "urgencyLevel",
       legend:
@@ -58,7 +61,7 @@ export const bookingQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.DATETIME,
+    type: FormComponentType.DATETIME,
     props: {
       name: "startTime",
       legend: "Pick Schedule.",
@@ -69,7 +72,7 @@ export const bookingQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.TEXTAREA,
+    type: FormComponentType.TEXTAREA,
     props: {
       name: "notes",
       legend: "Any additional notes or comments?",

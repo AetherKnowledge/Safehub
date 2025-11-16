@@ -2,7 +2,15 @@ import {
   FormComponent,
   FormComponentType,
 } from "@/app/components/Forms/FormBuilder";
+import { FormsHeaderProps } from "@/app/components/Forms/FormsHeader";
 import { TimePeriod } from "@/app/components/Input/Date/utils";
+
+export const header: FormsHeaderProps = {
+  name: "bookingHeader",
+  title: "Book a Counseling Appointment",
+  description:
+    "Please fill out the following form to schedule your counseling appointment.",
+};
 
 export const bookingQuestions: FormComponent[] = [
   {

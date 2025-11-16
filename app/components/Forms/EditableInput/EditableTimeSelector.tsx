@@ -1,10 +1,9 @@
-import { useState } from "react";
 import TimeSelector from "../../Input/Date/TimeSelector";
-import { Time } from "../../Input/Date/utils";
+import { getTimeFromDate, Time } from "../../Input/Date/utils";
 import ExtraOptionsBG from "./ExtraOptionsBG";
 
 export type TimeSettings = {
-  minTime?: Time;
+  minTime?: Time | "now";
   maxTime?: Time;
 };
 
@@ -35,9 +34,6 @@ export const EditableTimeSettings = ({
   settings,
   onChange,
 }: EditableTimeSelectorProps) => {
-  const [minTime, setMinTime] = useState<Time | undefined>(settings?.minTime);
-  const [maxTime, setMaxTime] = useState<Time | undefined>(settings?.maxTime);
-
   return (
     <>
       <div className="flex col items-center gap-2 mt-2">
@@ -45,10 +41,14 @@ export const EditableTimeSettings = ({
         <TimeSelector
           name="min"
           className="w-50"
-          value={minTime}
+          value={
+            settings?.minTime === "now"
+              ? getTimeFromDate(new Date())
+              : settings?.minTime
+          }
           onChange={(time) => {
-            setMinTime(time);
-            if (onChange) onChange({ minTime: time, maxTime });
+            if (onChange)
+              onChange({ minTime: time, maxTime: settings?.maxTime });
           }}
         />
       </div>
@@ -57,10 +57,10 @@ export const EditableTimeSettings = ({
         <TimeSelector
           name="max"
           className="w-50"
-          value={maxTime}
+          value={settings?.maxTime}
           onChange={(time) => {
-            setMaxTime(time);
-            if (onChange) onChange({ minTime, maxTime: time });
+            if (onChange)
+              onChange({ minTime: settings?.minTime, maxTime: time });
           }}
         />
       </div>

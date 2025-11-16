@@ -132,8 +132,8 @@ const DateTimeSelector = ({
             noFormOutput
             value={selectedDate}
             onChange={handleDateChange}
-            min={minDate}
-            max={maxDate}
+            minDate={minDate}
+            maxDate={maxDate}
             readonly={readonly}
           />
 
@@ -160,8 +160,8 @@ const DateTimeSelector = ({
             noFormOutput
             value={selectedTime}
             onChange={handleTimeChange}
-            min={minTime}
-            max={maxTime}
+            minTime={minTime}
+            maxTime={maxTime}
             readonly={readonly}
           />
         </div>

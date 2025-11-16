@@ -3,7 +3,7 @@ import Toggle from "../../Input/Toggle";
 import ExtraOptionsBG from "./ExtraOptionsBG";
 
 export type DateSettings = {
-  canPickPastDates?: boolean;
+  minDate?: Date | "now";
 };
 
 export type EditableTimeSelectorProps = {
@@ -36,8 +36,8 @@ export const EditableDateSettings = ({
   return (
     <>
       <Toggle
-        isChecked={settings?.canPickPastDates || false}
-        onToggle={(val) => onChange?.({ canPickPastDates: val })}
+        isChecked={settings?.minDate === "now"}
+        onToggle={(val) => onChange?.({ minDate: val ? "now" : undefined })}
         leftText
         size="toggle-sm"
         fontWeight="font-normal"

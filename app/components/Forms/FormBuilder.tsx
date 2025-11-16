@@ -16,12 +16,12 @@ import TermsAndConditions from "../Input/TermsAndConditions";
 import TextArea, { TextAreaProps } from "../Input/TextArea";
 import TextBox, { TextBoxProps } from "../Input/TextBox";
 import FormBG from "./FormBG";
+import FormComponentBG from "./FormComponentBG";
 import FormsHeader, { FormsHeaderProps } from "./FormsHeader";
-import QuestionBG from "./QuestionBG";
 import Separator, { SeparatorProps } from "./Separator";
 import Submit from "./Submit";
 
-export enum QuestionType {
+export enum FormComponentType {
   SEPARATOR = "SEPARATOR",
   TEXT = "TEXT",
   HORIZONTAL_ITEMS = "HORIZONTAL_ITEMS",
@@ -35,65 +35,73 @@ export enum QuestionType {
   LINEAR_SCALE = "LINEAR_SCALE",
 }
 
-export type QuestionBox =
+export type FormComponent =
   | {
-      questionType: QuestionType.SEPARATOR;
+      type: FormComponentType.SEPARATOR;
       props: SeparatorProps;
       version: string;
     }
-  | { questionType: QuestionType.TEXT; props: TextBoxProps; version: string }
   | {
-      questionType: QuestionType.TEXTAREA;
+      type: FormComponentType.TEXT;
+      props: TextBoxProps;
+      version: string;
+    }
+  | {
+      type: FormComponentType.TEXTAREA;
       props: TextAreaProps;
       version: string;
     }
   | {
-      questionType: QuestionType.HORIZONTAL_ITEMS;
+      type: FormComponentType.HORIZONTAL_ITEMS;
       props: HorizontalItemsBoxProps;
       version: string;
     }
-  | { questionType: QuestionType.RADIO; props: RadioBoxProps; version: string }
   | {
-      questionType: QuestionType.SELECT;
+      type: FormComponentType.RADIO;
+      props: RadioBoxProps;
+      version: string;
+    }
+  | {
+      type: FormComponentType.SELECT;
       props: SelectBoxProps;
       version: string;
     }
   | {
-      questionType: QuestionType.LINKED_SELECTOR;
+      type: FormComponentType.LINKED_SELECTOR;
       props: LinkedSelectorProps;
       version: string;
     }
   | {
-      questionType: QuestionType.DATE;
+      type: FormComponentType.DATE;
       props: DateSelectorProps;
       version: string;
     }
   | {
-      questionType: QuestionType.TIME;
+      type: FormComponentType.TIME;
       props: TimeSelectorProps;
       version: string;
     }
   | {
-      questionType: QuestionType.DATETIME;
+      type: FormComponentType.DATETIME;
       props: DateTimeSelectorProps;
       version: string;
     }
   | {
-      questionType: QuestionType.LINEAR_SCALE;
+      type: FormComponentType.LINEAR_SCALE;
       props: LinearScaleProps;
       version: string;
     };
 
 const FormsBuilder = ({
   header,
-  questions,
+  components,
   defaultValues,
   hasTermsAndConditions = false,
   onSubmit,
   onBack,
 }: {
   header: FormsHeaderProps;
-  questions: QuestionBox[];
+  components: FormComponent[];
   hasTermsAndConditions?: boolean;
   onBack?: () => void;
   onSubmit?: (formData: FormData) => void;
@@ -102,36 +110,38 @@ const FormsBuilder = ({
   return (
     <FormBG onSubmit={onSubmit}>
       <FormsHeader {...header} />
-      {questions.map((question, index) => {
+      {components.map((component, index) => {
         return (
-          <Fragment key={header.title + "-question-fragment-" + index}>
-            {question.questionType === QuestionType.LINKED_SELECTOR &&
-            !(question.props as LinkedSelectorProps).horizontal ? (
-              <QuestionBuilder
-                question={question}
+          <Fragment key={header.title + "-component-fragment-" + index}>
+            {component.type === FormComponentType.LINKED_SELECTOR &&
+            !(component.props as LinkedSelectorProps).horizontal ? (
+              <FormComponentBuilder
+                component={component}
                 answer={
-                  defaultValues ? defaultValues[question.props.name] : undefined
+                  defaultValues
+                    ? defaultValues[component.props.name]
+                    : undefined
                 }
               />
             ) : (
-              <QuestionBG>
-                <QuestionBuilder
-                  question={question}
+              <FormComponentBG>
+                <FormComponentBuilder
+                  component={component}
                   answer={
                     defaultValues
-                      ? defaultValues[question.props.name]
+                      ? defaultValues[component.props.name]
                       : undefined
                   }
                 />
-              </QuestionBG>
+              </FormComponentBG>
             )}
           </Fragment>
         );
       })}
       {hasTermsAndConditions && (
-        <QuestionBG className="py-5">
+        <FormComponentBG className="py-5">
           <TermsAndConditions />
-        </QuestionBG>
+        </FormComponentBG>
       )}
 
       <Submit onBack={onBack} />
@@ -139,49 +149,49 @@ const FormsBuilder = ({
   );
 };
 
-export const QuestionBuilder = ({
-  question,
+export const FormComponentBuilder = ({
+  component,
   answer,
 }: {
-  question: QuestionBox;
+  component: FormComponent;
   answer?: any;
 }) => {
-  switch (question.questionType) {
-    case QuestionType.SEPARATOR:
-      return <Separator {...(question.props as SeparatorProps)} />;
-    case QuestionType.TEXT:
+  switch (component.type) {
+    case FormComponentType.SEPARATOR:
+      return <Separator {...(component.props as SeparatorProps)} />;
+    case FormComponentType.TEXT:
       return (
-        <TextBox {...(question.props as TextBoxProps)} defaultValue={answer} />
+        <TextBox {...(component.props as TextBoxProps)} defaultValue={answer} />
       );
-    case QuestionType.HORIZONTAL_ITEMS:
+    case FormComponentType.HORIZONTAL_ITEMS:
       return (
-        <HorizontalItemsBox {...(question.props as HorizontalItemsBoxProps)} />
+        <HorizontalItemsBox {...(component.props as HorizontalItemsBoxProps)} />
       );
-    case QuestionType.TEXTAREA:
+    case FormComponentType.TEXTAREA:
       return (
         <TextArea
-          {...(question.props as TextAreaProps)}
+          {...(component.props as TextAreaProps)}
           defaultValue={answer}
         />
       );
-    case QuestionType.RADIO:
+    case FormComponentType.RADIO:
       return (
         <RadioBox
-          {...(question.props as RadioBoxProps)}
-          defaultValue={answer ? (answer as Object).toString() : undefined}
+          {...(component.props as RadioBoxProps)}
+          defaultValue={answer ? (answer as object).toString() : undefined}
         />
       );
-    case QuestionType.SELECT:
+    case FormComponentType.SELECT:
       return (
         <SelectBox
-          {...(question.props as SelectBoxProps)}
-          defaultValue={answer ? (answer as Object).toString() : undefined}
+          {...(component.props as SelectBoxProps)}
+          defaultValue={answer ? (answer as object).toString() : undefined}
         />
       );
-    case QuestionType.DATE:
+    case FormComponentType.DATE:
       return (
         <DateSelector
-          {...(question.props as DateSelectorProps)}
+          {...(component.props as DateSelectorProps)}
           value={
             answer
               ? answer === "now"
@@ -191,10 +201,10 @@ export const QuestionBuilder = ({
           }
         />
       );
-    case QuestionType.TIME:
+    case FormComponentType.TIME:
       return (
         <TimeSelector
-          {...(question.props as TimeSelectorProps)}
+          {...(component.props as TimeSelectorProps)}
           value={
             answer
               ? answer === "now"
@@ -204,12 +214,12 @@ export const QuestionBuilder = ({
           }
         />
       );
-    case QuestionType.LINKED_SELECTOR:
-      return <LinkedSelector {...(question.props as LinkedSelectorProps)} />;
-    case QuestionType.DATETIME:
+    case FormComponentType.LINKED_SELECTOR:
+      return <LinkedSelector {...(component.props as LinkedSelectorProps)} />;
+    case FormComponentType.DATETIME:
       return (
         <DateTimeSelector
-          {...(question.props as DateTimeSelectorProps)}
+          {...(component.props as DateTimeSelectorProps)}
           defaultValue={
             answer
               ? answer === "now"
@@ -219,16 +229,16 @@ export const QuestionBuilder = ({
           }
         />
       );
-    case QuestionType.LINEAR_SCALE:
+    case FormComponentType.LINEAR_SCALE:
       return (
         <LinearScale
-          {...(question.props as LinearScaleProps)}
+          {...(component.props as LinearScaleProps)}
           defaultValue={answer}
         />
       );
 
     default:
-      return <div>Unknown Question Type</div>;
+      return <div>Unknown Component Type</div>;
   }
 };
 

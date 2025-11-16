@@ -1,6 +1,6 @@
 "use client";
 
-const QuestionBG = ({
+const FormComponentBG = ({
   children,
   className,
   onClick,
@@ -19,4 +19,4 @@ const QuestionBG = ({
   );
 };
 
-export default QuestionBG;
+export default FormComponentBG;

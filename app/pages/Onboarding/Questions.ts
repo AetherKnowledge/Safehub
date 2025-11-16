@@ -1,4 +1,7 @@
-import { QuestionBox, QuestionType } from "@/app/components/Forms/FormBuilder";
+import {
+  FormComponent,
+  FormComponentType,
+} from "@/app/components/Forms/FormBuilder";
 import { HorizontalBoxItem } from "@/app/components/Input/HorizontalItemsBox";
 import { Option } from "@/app/components/Input/InputInterface";
 import { LinkedOption } from "@/app/components/Input/LinkedSelector";
@@ -97,9 +100,9 @@ export const genderOptions: Option[] = [
   { label: "Other", value: Gender.OTHER },
 ];
 
-export const studentQuestions: QuestionBox[] = [
+export const studentQuestions: FormComponent[] = [
   {
-    questionType: QuestionType.SEPARATOR,
+    type: FormComponentType.SEPARATOR,
     props: {
       name: "user-details",
       legend: "User Details",
@@ -107,13 +110,13 @@ export const studentQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.HORIZONTAL_ITEMS,
+    type: FormComponentType.HORIZONTAL_ITEMS,
     props: {
       name: "fullName",
       legend: "What is your full name?",
       items: [
         {
-          type: QuestionType.TEXT,
+          type: FormComponentType.TEXT,
           props: {
             name: "firstName",
             placeholder: "First Name",
@@ -121,14 +124,14 @@ export const studentQuestions: QuestionBox[] = [
           },
         } as HorizontalBoxItem,
         {
-          type: QuestionType.TEXT,
+          type: FormComponentType.TEXT,
           props: {
             name: "middleName",
             placeholder: "Middle Name",
           },
         } as HorizontalBoxItem,
         {
-          type: QuestionType.TEXT,
+          type: FormComponentType.TEXT,
           props: {
             name: "lastName",
             placeholder: "Last Name",
@@ -136,7 +139,7 @@ export const studentQuestions: QuestionBox[] = [
           },
         } as HorizontalBoxItem,
         {
-          type: QuestionType.TEXT,
+          type: FormComponentType.TEXT,
           props: {
             name: "suffix",
             placeholder: "Suffix",
@@ -147,7 +150,7 @@ export const studentQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.DATE,
+    type: FormComponentType.DATE,
     props: {
       name: "birthDate",
       legend: "What is your birth date?",
@@ -156,21 +159,21 @@ export const studentQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.LINKED_SELECTOR,
+    type: FormComponentType.LINKED_SELECTOR,
     props: {
       name: "department-and-program",
       horizontal: true,
       legend: "What is your department and program?",
       required: true,
       parent: {
-        type: QuestionType.SELECT,
+        type: FormComponentType.SELECT,
         props: {
           name: "department",
           required: true,
         } as SelectBoxProps,
       },
       child: {
-        type: QuestionType.SELECT,
+        type: FormComponentType.SELECT,
         props: {
           name: "program",
           required: true,
@@ -182,13 +185,13 @@ export const studentQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.HORIZONTAL_ITEMS,
+    type: FormComponentType.HORIZONTAL_ITEMS,
     props: {
       name: "year-and-section",
       legend: "What is your year and section?",
       items: [
         {
-          type: QuestionType.SELECT,
+          type: FormComponentType.SELECT,
           props: {
             name: "year",
             options: yearOptions,
@@ -196,7 +199,7 @@ export const studentQuestions: QuestionBox[] = [
           },
         },
         {
-          type: QuestionType.SELECT,
+          type: FormComponentType.SELECT,
           props: {
             name: "section",
             options: sectionOptions,
@@ -208,7 +211,7 @@ export const studentQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.RADIO,
+    type: FormComponentType.RADIO,
     props: {
       name: "gender",
       legend: "What is your gender?",
@@ -218,7 +221,7 @@ export const studentQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.TEXT,
+    type: FormComponentType.TEXT,
     props: {
       name: "contact",
       legend: "What is your contact number?",
@@ -230,9 +233,9 @@ export const studentQuestions: QuestionBox[] = [
   },
 ];
 
-export const guardianQuestions: QuestionBox[] = [
+export const guardianQuestions: FormComponent[] = [
   {
-    questionType: QuestionType.SEPARATOR,
+    type: FormComponentType.SEPARATOR,
     props: {
       name: "guardian-details",
       legend: "Guardian Details",
@@ -240,13 +243,13 @@ export const guardianQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.HORIZONTAL_ITEMS,
+    type: FormComponentType.HORIZONTAL_ITEMS,
     props: {
       name: "guardian-full-name",
       legend: "What is your guardian's full name?",
       items: [
         {
-          type: QuestionType.TEXT,
+          type: FormComponentType.TEXT,
           props: {
             name: "guardianFirstName",
             placeholder: "First Name",
@@ -254,14 +257,14 @@ export const guardianQuestions: QuestionBox[] = [
           },
         },
         {
-          type: QuestionType.TEXT,
+          type: FormComponentType.TEXT,
           props: {
             name: "guardianMiddleName",
             placeholder: "Middle Name",
           },
         },
         {
-          type: QuestionType.TEXT,
+          type: FormComponentType.TEXT,
           props: {
             name: "guardianLastName",
             placeholder: "Last Name",
@@ -269,7 +272,7 @@ export const guardianQuestions: QuestionBox[] = [
           },
         },
         {
-          type: QuestionType.TEXT,
+          type: FormComponentType.TEXT,
           props: {
             name: "guardianSuffix",
             placeholder: "Suffix",
@@ -280,7 +283,7 @@ export const guardianQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.TEXT,
+    type: FormComponentType.TEXT,
     props: {
       name: "guardianContact",
       legend: "What is your guardian's contact number?",
@@ -291,7 +294,7 @@ export const guardianQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.SELECT,
+    type: FormComponentType.SELECT,
     props: {
       name: "guardianRelationship",
       legend: "What is your relationship to the guardian?",
@@ -306,7 +309,7 @@ export const guardianQuestions: QuestionBox[] = [
     version: "1",
   },
   {
-    questionType: QuestionType.TEXT,
+    type: FormComponentType.TEXT,
     props: {
       name: "guardianEmail",
       legend: "What is your guardian's email address?",

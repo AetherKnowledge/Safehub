@@ -27,7 +27,9 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
   const statusPopup = usePopup();
   const session = useSession();
 
-  const appointmentData = appointment?.appointmentData as AppointmentFormData;
+  const appointmentData = JSON.parse(
+    appointment?.appointmentData as string
+  ) as AppointmentFormData;
   const questions = appointmentData?.questions || bookingQuestions;
 
   async function handleSubmit(formData: FormData) {
@@ -78,7 +80,7 @@ const Booking = ({ appointment }: { appointment?: Appointment }) => {
   return (
     <FormsBuilder
       header={header}
-      questions={questions}
+      components={questions}
       defaultValues={appointmentData?.answers}
       onSubmit={handleSubmit}
       onBack={() => redirect("/user/appointments")}

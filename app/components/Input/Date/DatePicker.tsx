@@ -18,8 +18,8 @@ interface DatePickerProps {
   /** If true, the date picker will push local date to the router */
   local?: boolean;
 
-  min?: Date | "now"; // inclusive lower bound
-  max?: Date; // inclusive upper bound
+  minDate?: Date | "now"; // inclusive lower bound
+  maxDate?: Date; // inclusive upper bound
   defaultValue?: Date;
   readonly?: boolean;
 }
@@ -33,8 +33,8 @@ export default function DatePicker({
   highlightedDates,
   pushToRouter = false,
   local = false,
-  min,
-  max,
+  minDate: min,
+  maxDate: max,
 }: DatePickerProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(value || null);
   const router = useRouter();

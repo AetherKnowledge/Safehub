@@ -1,4 +1,3 @@
-import { useState } from "react";
 import LinearScale from "../../Input/LinearScale";
 import SelectBox from "../../Input/SelectBox";
 import TextBox from "../../Input/TextBox";
@@ -22,13 +21,6 @@ const EditableLinearScale = ({
   onChange,
   selected,
 }: EditableLinearScaleProps) => {
-  const [min, setMin] = useState<0 | 1 | undefined>(settings?.min || 1);
-  const [max, setMax] = useState<
-    2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | undefined
-  >(settings?.max || 5);
-  const [minText, setMinText] = useState<string | undefined>(settings?.minText);
-  const [maxText, setMaxText] = useState<string | undefined>(settings?.maxText);
-
   const minOptions = [
     { label: "0", value: "0" },
     { label: "1", value: "1" },
@@ -51,10 +43,10 @@ const EditableLinearScale = ({
       <LinearScale
         name="preview"
         noFormOutput
-        minText={minText}
-        min={min}
-        max={max}
-        maxText={maxText}
+        minText={settings?.minText || ""}
+        min={settings?.min}
+        max={settings?.max}
+        maxText={settings?.maxText || ""}
       />
       {selected && (
         <ExtraOptionsBG>
@@ -62,12 +54,11 @@ const EditableLinearScale = ({
             <SelectBox
               className="w-19"
               name="min"
-              defaultValue={min?.toString()}
+              defaultValue={settings?.min?.toString()}
               options={minOptions}
               onChange={(option) => {
                 const newMin = parseInt(option.value) as 0 | 1;
-                setMin(newMin);
-                if (onChange) onChange({ min: newMin, max, minText, maxText });
+                if (onChange) onChange({ ...settings, min: newMin });
               }}
               noFormOutput
             />
@@ -75,7 +66,7 @@ const EditableLinearScale = ({
             <SelectBox
               className="w-19"
               name="max"
-              defaultValue={max?.toString()}
+              defaultValue={settings?.max?.toString()}
               options={maxOptions}
               noFormOutput
               onChange={(option) => {
@@ -89,33 +80,30 @@ const EditableLinearScale = ({
                   | 8
                   | 9
                   | 10;
-                setMax(newMax);
-                if (onChange) onChange({ min, max: newMax, minText, maxText });
+                if (onChange) onChange({ ...settings, max: newMax });
               }}
             />
           </div>
           <div className="flex col items-center gap-2 mt-2">
-            <p className="text-sm w-30 text-right">{min}</p>
+            <p className="text-sm w-30 text-right">{settings?.min}</p>
             <TextBox
               name="minText"
               className="w-50"
-              defaultValue={minText}
+              defaultValue={settings?.minText}
               onChange={(text) => {
-                setMinText(text);
-                if (onChange) onChange({ minText: text, maxText });
+                if (onChange) onChange({ ...settings, minText: text });
               }}
               noFormOutput
             />
           </div>
           <div className="flex col items-center gap-2 mt-2">
-            <p className="text-sm w-30 text-right">{max}</p>
+            <p className="text-sm w-30 text-right">{settings?.max}</p>
             <TextBox
               name="maxText"
               className="w-50"
-              defaultValue={maxText}
+              defaultValue={settings?.maxText}
               onChange={(text) => {
-                setMaxText(text);
-                if (onChange) onChange({ minText, maxText: text });
+                if (onChange) onChange({ ...settings, maxText: text });
               }}
               noFormOutput
             />

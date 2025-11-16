@@ -254,7 +254,7 @@ export async function updateAppointment(
     // If a student changes the start time, set status to Pending and adjust end time
     // to be 60 minutes after the new start time
     let status: AppointmentStatus | undefined = undefined;
-    let startTime: Date = validation.data.startTime || appointment.startTime;
+    const startTime: Date = validation.data.startTime || appointment.startTime;
     let endTime: Date | undefined = validation.data.endTime;
 
     if (

@@ -15,8 +15,8 @@ export type DateSelectorProps = InputInterface & {
   /** Returns utc date not local date */
   onChange?: (date: Date) => void;
 
-  min?: Date | "now"; // inclusive lower bound
-  max?: Date; // inclusive upper bound
+  minDate?: Date | "now"; // inclusive lower bound
+  maxDate?: Date; // inclusive upper bound
 };
 
 const DateSelector = ({
@@ -30,15 +30,15 @@ const DateSelector = ({
   highlightedDates,
 
   onChange,
-  min,
-  max,
+  minDate,
+  maxDate,
   noFormOutput = false,
   readonly = false,
 }: DateSelectorProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(() => {
     if (value) return value;
-    if (min === "now") return new Date();
-    if (min instanceof Date) return min;
+    if (minDate === "now") return new Date();
+    if (minDate instanceof Date) return minDate;
     return null;
   });
   const [hasError, setHasError] = useState(false);
@@ -126,8 +126,8 @@ const DateSelector = ({
           onChange={(date) => {
             selectDate(date);
           }}
-          min={min}
-          max={max}
+          minDate={minDate}
+          maxDate={maxDate}
         />
       </div>
     </>

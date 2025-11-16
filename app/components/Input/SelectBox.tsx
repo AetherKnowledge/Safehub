@@ -47,10 +47,15 @@ const SelectBox = ({
   const anchorName = "--" + name + "-anchor";
 
   useEffect(() => {
-    handleSelect(
-      options.find((option) => option.value === (value || defaultValue)) || null
-    );
-  }, [value, options]);
+    const newOption =
+      options.find((o) => o.value === (value ?? defaultValue)) || null;
+
+    // Only update internal state — DO NOT call onChange here
+    setSelectedOption((prev) => {
+      if (prev?.value === newOption?.value) return prev; // avoid unnecessary state updates
+      return newOption;
+    });
+  }, [value, defaultValue, options]);
 
   useEffect(() => {
     const element = sizeRef.current;

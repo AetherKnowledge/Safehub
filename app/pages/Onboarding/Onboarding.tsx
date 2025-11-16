@@ -1,5 +1,7 @@
 "use client";
-import FormsBuilder, { QuestionBox } from "@/app/components/Forms/FormBuilder";
+import FormsBuilder, {
+  FormComponent,
+} from "@/app/components/Forms/FormBuilder";
 import { FormsHeaderProps } from "@/app/components/Forms/FormsHeader";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import {
@@ -31,12 +33,12 @@ const Onboarding = () => {
       "Answer the registration form truthfully to complete the initial account setup.",
   };
 
-  const question: QuestionBox[] = [...studentQuestions, ...guardianQuestions];
+  const question: FormComponent[] = [...studentQuestions, ...guardianQuestions];
 
   return (
     <FormsBuilder
       header={header}
-      questions={question}
+      components={question}
       hasTermsAndConditions
       onSubmit={onSubmit}
       onBack={() => redirect("/")}

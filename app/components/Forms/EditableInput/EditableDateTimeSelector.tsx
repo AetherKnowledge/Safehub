@@ -1,4 +1,3 @@
-import { useState } from "react";
 import DateTimeSelector from "../../Input/Date/DateTimeSelector";
 import { DateSettings, EditableDateSettings } from "./EditableDateSelector";
 import { EditableTimeSettings, TimeSettings } from "./EditableTimeSelector";
@@ -17,28 +16,22 @@ const EditableDateTimeSelector = ({
   onChange,
   selected = false,
 }: EditableTimeSelectorProps) => {
-  const [settingsState, setSettingsState] = useState<EditableDateTimeSettings>(
-    settings || {}
-  );
-
   return (
     <>
       <DateTimeSelector name="preview" readonly noFormOutput />
       {selected && (
         <ExtraOptionsBG>
           <EditableDateSettings
-            settings={settingsState}
-            onChange={(settings) => {
-              const newSettings = { ...settingsState, ...settings };
-              setSettingsState(newSettings);
+            settings={settings}
+            onChange={(updatedSettings) => {
+              const newSettings = { ...settings, ...updatedSettings };
               onChange?.(newSettings);
             }}
           />
           <EditableTimeSettings
-            settings={settingsState}
-            onChange={(settings) => {
-              const newSettings = { ...settingsState, ...settings };
-              setSettingsState(newSettings);
+            settings={settings}
+            onChange={(updatedSettings) => {
+              const newSettings = { ...settings, ...updatedSettings };
               onChange?.(newSettings);
             }}
           />

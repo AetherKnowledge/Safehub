@@ -1,6 +1,6 @@
 "use client";
 import Divider from "@/app/components/Divider";
-import { QuestionType } from "@/app/components/Forms/FormBuilder";
+import { FormComponentType } from "@/app/components/Forms/FormBuilder";
 import HorizontalItemsBox from "@/app/components/Input/HorizontalItemsBox";
 import LinkedSelector from "@/app/components/Input/LinkedSelector";
 import { SelectBoxProps } from "@/app/components/Input/SelectBox";
@@ -60,7 +60,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
           name="full-name"
           items={[
             {
-              type: QuestionType.TEXT,
+              type: FormComponentType.TEXT,
               props: {
                 name: "firstName",
                 legend: "First Name",
@@ -69,7 +69,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
               },
             },
             {
-              type: QuestionType.TEXT,
+              type: FormComponentType.TEXT,
               props: {
                 name: "middleName",
                 legend: "Middle Name",
@@ -78,7 +78,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
               },
             },
             {
-              type: QuestionType.TEXT,
+              type: FormComponentType.TEXT,
               props: {
                 name: "lastName",
                 legend: "Last Name",
@@ -87,7 +87,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
               },
             },
             {
-              type: QuestionType.TEXT,
+              type: FormComponentType.TEXT,
               props: {
                 name: "suffix",
                 legend: "Suffix",
@@ -103,7 +103,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
               name="department-and-program"
               horizontal={true}
               parent={{
-                type: QuestionType.SELECT,
+                type: FormComponentType.SELECT,
                 props: {
                   name: "department",
                   legend: "Department",
@@ -111,7 +111,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
                 } as SelectBoxProps,
               }}
               child={{
-                type: QuestionType.SELECT,
+                type: FormComponentType.SELECT,
                 props: {
                   name: "program",
                   legend: "Program",
@@ -124,7 +124,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
               name="year-and-section"
               items={[
                 {
-                  type: QuestionType.SELECT,
+                  type: FormComponentType.SELECT,
                   props: {
                     name: "year",
                     legend: "Year",
@@ -133,7 +133,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
                   } as SelectBoxProps,
                 },
                 {
-                  type: QuestionType.SELECT,
+                  type: FormComponentType.SELECT,
                   props: {
                     name: "section",
                     legend: "Section",
@@ -149,7 +149,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
           name="gender-and-contact"
           items={[
             {
-              type: QuestionType.SELECT,
+              type: FormComponentType.SELECT,
               props: {
                 name: "gender",
                 legend: "Gender",
@@ -158,7 +158,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
               } as SelectBoxProps,
             },
             {
-              type: QuestionType.TEXT,
+              type: FormComponentType.TEXT,
               props: {
                 name: "contactNumber",
                 legend: "Contact Number",
@@ -214,7 +214,7 @@ function GuardianDetails({ user }: { user: SettingsUser }) {
         name="guardian-full-name"
         items={[
           {
-            type: QuestionType.TEXT,
+            type: FormComponentType.TEXT,
             props: {
               name: "guardianFirstName",
               legend: "First Name",
@@ -223,7 +223,7 @@ function GuardianDetails({ user }: { user: SettingsUser }) {
             },
           },
           {
-            type: QuestionType.TEXT,
+            type: FormComponentType.TEXT,
             props: {
               name: "guardianMiddleName",
               legend: "Middle Name",
@@ -232,7 +232,7 @@ function GuardianDetails({ user }: { user: SettingsUser }) {
             },
           },
           {
-            type: QuestionType.TEXT,
+            type: FormComponentType.TEXT,
             props: {
               name: "guardianLastName",
               legend: "Last Name",
@@ -241,7 +241,7 @@ function GuardianDetails({ user }: { user: SettingsUser }) {
             },
           },
           {
-            type: QuestionType.TEXT,
+            type: FormComponentType.TEXT,
             props: {
               name: "guardianSuffix",
               legend: "Suffix",
@@ -255,7 +255,7 @@ function GuardianDetails({ user }: { user: SettingsUser }) {
         name="guardian-contact-and-email"
         items={[
           {
-            type: QuestionType.TEXT,
+            type: FormComponentType.TEXT,
             props: {
               name: "guardianContact",
               legend: "Guardian Contact Number",
@@ -265,7 +265,7 @@ function GuardianDetails({ user }: { user: SettingsUser }) {
             } as TextBoxProps,
           },
           {
-            type: QuestionType.TEXT,
+            type: FormComponentType.TEXT,
             props: {
               name: "guardianEmail",
               legend: "Guardian Email",

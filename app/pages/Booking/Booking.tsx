@@ -18,6 +18,7 @@ import { bookingQuestions } from "../Appointment/Question";
 import { AppointmentFormData } from "../Appointment/schema";
 
 const header: FormsHeaderProps = {
+  name: "bookingHeader",
   title: "Book a Counseling Appointment",
   description:
     "Please fill out the following form to schedule your counseling appointment.",

@@ -3,14 +3,28 @@ import InputInterface from "../Input/InputInterface";
 
 export type SeparatorProps = InputInterface;
 
-const Separator = ({ className, legend, name }: SeparatorProps) => {
+export const BaseSeparator = ({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) => {
   return (
     <div
       className={`text-primary font-semibold text-lg gap-2 text-center ${className}`}
     >
-      <h2>{legend || name}</h2>
+      {children}
       <Divider colorClass="bg-primary" height={3} className="rounded-lg" />
     </div>
+  );
+};
+
+const Separator = ({ className, legend }: SeparatorProps) => {
+  return (
+    <BaseSeparator className={className}>
+      <h2>{legend}</h2>
+    </BaseSeparator>
   );
 };
 

@@ -1,45 +1,96 @@
 "use client";
-import { useState } from "react";
-import Divider from "../../Divider";
+import { useEffect, useState } from "react";
 import Legend from "../../Input/Legend";
 import SelectBox from "../../Input/SelectBox";
 import TextArea from "../../Input/TextArea";
 import TextBox from "../../Input/TextBox";
-import Toggle from "../../Input/Toggle";
 import { FormComponent, FormComponentType } from "../FormBuilder";
-import FormComponentBG from "../FormComponentBG";
+import BottomActionRow from "./BottomActionRow";
 import EditableDateSelector from "./EditableDateSelector";
 import EditableDateTimeSelector from "./EditableDateTimeSelector";
+import EditableFormComponentBG from "./EditableFormComponentBG";
 import EditableLinearScale from "./EditableLinearScale";
 import EditableRadioBox from "./EditableRadioBox";
 import EditableSelectBox from "./EditableSelectBox";
+import EditableSeparator from "./EditableSeparator";
 import EditableTimeSelector from "./EditableTimeSelector";
+import FormsOptions from "./FormsOptions";
+import { createFormComponent, SaveableSettings } from "./utils";
 
 export type EditableFormComponentProps = {
   defaultValue?: FormComponent;
   selected?: boolean;
   onClick?: (id: string) => void;
+  onDuplicate?: () => void;
+  onDelete?: () => void;
+  onChange?: (component: FormComponent) => void;
+  onAdd?: () => void;
+  onAddSeparator?: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
 };
 
 const EditableFormComponent = ({
   defaultValue,
   onClick,
   selected = false,
+  onDuplicate,
+  onDelete,
+  onChange,
+  onAdd,
+  onAddSeparator,
+  onMoveUp,
+  onMoveDown,
 }: EditableFormComponentProps) => {
   const [component, setComponent] = useState<FormComponent>(
-    defaultValue ?? getDefaultProps(FormComponentType.TEXT)
+    defaultValue ?? createFormComponent({ type: FormComponentType.TEXT })
   );
 
+  useEffect(() => {
+    safeOnChange(component);
+  }, [component]);
+
+  function safeOnChange(updatedComponent: FormComponent) {
+    setTimeout(() => {
+      onChange?.(updatedComponent);
+    }, 0);
+  }
+
+  if (component.type === FormComponentType.SEPARATOR) {
+    return (
+      <EditableSeparator
+        component={component}
+        selected={selected}
+        onClick={onClick}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+        onChange={(updatedComponent) => {
+          setComponent({
+            ...component,
+            ...updatedComponent,
+          });
+        }}
+        onAdd={onAdd}
+        onAddSeparator={onAddSeparator}
+      />
+    );
+  }
+
   return (
-    <FormComponentBG
-      className={`card w-full border-0 transition-all cursor-pointer 
-          ${
-            selected
-              ? "border-primary border-l-4 shadow-lg"
-              : "border-transparent"
-          } p-4 py-4`}
+    <EditableFormComponentBG
+      selected={selected}
       onClick={() => onClick?.(component.props?.name)}
     >
+      {/* Form Options Panel */}
+      {selected && (
+        <FormsOptions
+          onAdd={onAdd}
+          onAddSeparator={onAddSeparator}
+          onMoveUp={onMoveUp}
+          onMoveDown={onMoveDown}
+        />
+      )}
+
       {/* Component Label */}
       {selected ? (
         <div className="flex flex-row w-full gap-2">
@@ -86,10 +137,10 @@ const EditableFormComponent = ({
               if (option.value === component.type) return;
 
               setComponent((prev) =>
-                getDefaultProps(
-                  option.value as FormComponentType,
-                  prev.props?.name
-                )
+                createFormComponent({
+                  ...(prev.props as SaveableSettings),
+                  type: option.value as FormComponentType,
+                })
               );
             }}
           />
@@ -112,6 +163,7 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.RADIO && (
           <EditableRadioBox
             selected={selected}
+            options={component.props?.options || []}
             onChange={(options) => {
               setComponent({
                 ...component,
@@ -203,135 +255,24 @@ const EditableFormComponent = ({
 
       {/* Bottom Action Row */}
       {selected && (
-        <>
-          <Divider className="mt-2" />
-          <div className="flex justify-between items-center mt-3">
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="btn btn-ghost btn-xs text-base-content/50"
-              >
-                Duplicate
-              </button>
-              <button type="button" className="btn btn-ghost btn-xs text-error">
-                Delete
-              </button>
-            </div>
-
-            {/* Required Toggle */}
-            <Toggle
-              isChecked={component.props?.required ?? false}
-              onToggle={(value) =>
-                setComponent({
-                  ...component,
-                  // @ts-expect-error TypeScript cannot infer this type correctly
-                  props: {
-                    ...component.props,
-                    required: value,
-                  },
-                })
-              }
-              leftText
-              size="toggle-sm"
-              fontWeight="font-normal"
-              onText="Required"
-              offText="Required"
-            />
-          </div>
-        </>
+        <BottomActionRow
+          component={component}
+          onDuplicate={onDuplicate}
+          onDelete={onDelete}
+          onRequiredToggle={(value) =>
+            setComponent({
+              ...component,
+              // @ts-expect-error TypeScript cannot infer this type correctly
+              props: {
+                ...component.props,
+                required: value,
+              },
+            })
+          }
+        />
       )}
-    </FormComponentBG>
+    </EditableFormComponentBG>
   );
 };
-
-function getDefaultProps(
-  type: FormComponentType,
-  name?: string
-): FormComponent {
-  const defaultLegend = "Edit your question here";
-  const defaultOptions = [
-    { label: "Option 1", value: "Option 1" },
-    { label: "Option 2", value: "Option 2" },
-    { label: "Option 3", value: "Option 3" },
-  ];
-
-  switch (type) {
-    case FormComponentType.TEXT:
-      return {
-        type: FormComponentType.TEXT,
-        props: { name: name ?? crypto.randomUUID(), legend: defaultLegend },
-        version: "1",
-      } as FormComponent;
-
-    case FormComponentType.TEXTAREA:
-      return {
-        type: FormComponentType.TEXTAREA,
-        props: { name: name ?? crypto.randomUUID(), legend: defaultLegend },
-        version: "1",
-      } as FormComponent;
-
-    case FormComponentType.RADIO:
-      return {
-        type: FormComponentType.RADIO,
-        props: {
-          name: name ?? crypto.randomUUID(),
-          legend: defaultLegend,
-          options: defaultOptions,
-        },
-        version: "1",
-      } as FormComponent;
-
-    case FormComponentType.SELECT:
-      return {
-        type: FormComponentType.SELECT,
-        props: {
-          name: name ?? crypto.randomUUID(),
-          legend: defaultLegend,
-          options: defaultOptions,
-        },
-        version: "1",
-      } as FormComponent;
-
-    case FormComponentType.DATE:
-      return {
-        type: FormComponentType.DATE,
-        props: { name: name ?? crypto.randomUUID(), legend: defaultLegend },
-        version: "1",
-      } as FormComponent;
-
-    case FormComponentType.TIME:
-      return {
-        type: FormComponentType.TIME,
-        props: { name: name ?? crypto.randomUUID(), legend: defaultLegend },
-        version: "1",
-      } as FormComponent;
-
-    case FormComponentType.DATETIME:
-      return {
-        type: FormComponentType.DATETIME,
-        props: { name: name ?? crypto.randomUUID(), legend: defaultLegend },
-        version: "1",
-      } as FormComponent;
-
-    case FormComponentType.LINEAR_SCALE:
-      return {
-        type: FormComponentType.LINEAR_SCALE,
-        props: {
-          name: name ?? crypto.randomUUID(),
-          legend: defaultLegend,
-          min: 0,
-          max: 5,
-        },
-        version: "1",
-      } as FormComponent;
-
-    default:
-      return {
-        type: FormComponentType.TEXT,
-        props: { name: name ?? crypto.randomUUID(), legend: defaultLegend },
-        version: "1",
-      } as FormComponent;
-  }
-}
 
 export default EditableFormComponent;

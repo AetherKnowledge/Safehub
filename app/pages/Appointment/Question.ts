@@ -52,19 +52,15 @@ export const bookingQuestions: FormComponent[] = [
     version: "1",
   },
   {
-    type: FormComponentType.RADIO,
+    type: FormComponentType.LINEAR_SCALE,
     props: {
       name: "urgencyLevel",
-      legend:
-        "How urgent is your concern? From 1 to 5, 5 is the highest urgency.",
+      legend: "How urgent is your concern? (1 = Not Urgent, 5 = Very Urgent)",
       required: true,
-      options: [
-        { value: "1", label: "1" },
-        { value: "2", label: "2" },
-        { value: "3", label: "3" },
-        { value: "4", label: "4" },
-        { value: "5", label: "5" },
-      ],
+      min: 1,
+      max: 5,
+      minText: "Not Urgent",
+      maxText: "Very Urgent",
     },
     version: "1",
   },

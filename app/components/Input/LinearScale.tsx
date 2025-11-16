@@ -102,9 +102,10 @@ const LinearScale = ({
               }}
             >
               <input
+                name={noFormOutput ? undefined : name}
                 type="radio"
                 className={`radio ${size} disabled:opacity-100`}
-                name={noFormOutput ? undefined : name}
+                value={n}
                 required={required}
                 checked={currentValue === n}
                 onInvalid={() => {

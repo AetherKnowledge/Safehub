@@ -28,6 +28,7 @@ const TextArea = ({
   onChange,
   onInvalid,
   noFormOutput = false,
+  readonly = false,
 }: TextAreaProps) => {
   const [hasError, setHasError] = useState(false);
 
@@ -56,6 +57,7 @@ const TextArea = ({
         onChange={(e) => {
           if (onChange) onChange(e.target.value);
         }}
+        readOnly={readonly}
       />
       <p
         className={`text-xs text-error ml-1 mt-[-5px] ${

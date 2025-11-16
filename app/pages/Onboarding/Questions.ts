@@ -1,13 +1,7 @@
 import { QuestionBox, QuestionType } from "@/app/components/Forms/FormBuilder";
-import { SeparatorProps } from "@/app/components/Forms/Separator";
-import { DateSelectorProps } from "@/app/components/Input/Date/DateSelector";
-import {
-  HorizontalBoxItem,
-  HorizontalItemsBoxProps,
-} from "@/app/components/Input/HorizontalItemsBox";
+import { HorizontalBoxItem } from "@/app/components/Input/HorizontalItemsBox";
 import { Option } from "@/app/components/Input/InputInterface";
 import { LinkedOption } from "@/app/components/Input/LinkedSelector";
-import { RadioBoxProps } from "@/app/components/Input/RadioBox";
 import { SelectBoxProps } from "@/app/components/Input/SelectBox";
 import { Department, Gender, Program, Section } from "./schema";
 
@@ -108,10 +102,10 @@ export const studentQuestions: QuestionBox[] = [
     questionType: QuestionType.SEPARATOR,
     props: {
       name: "user-details",
-      text: "User Details",
-    } as SeparatorProps,
+      legend: "User Details",
+    },
     version: "1",
-  } as QuestionBox,
+  },
   {
     questionType: QuestionType.HORIZONTAL_ITEMS,
     props: {
@@ -147,9 +141,9 @@ export const studentQuestions: QuestionBox[] = [
             name: "suffix",
             placeholder: "Suffix",
           },
-        } as HorizontalBoxItem,
+        },
       ],
-    } as HorizontalItemsBoxProps,
+    },
     version: "1",
   },
   {
@@ -158,7 +152,7 @@ export const studentQuestions: QuestionBox[] = [
       name: "birthDate",
       legend: "What is your birth date?",
       required: true,
-    } as DateSelectorProps,
+    },
     version: "1",
   },
   {
@@ -180,7 +174,8 @@ export const studentQuestions: QuestionBox[] = [
         props: {
           name: "program",
           required: true,
-        } as SelectBoxProps,
+          options: [],
+        },
       },
       linkedOptions: departmentsWithPrograms,
     },
@@ -198,7 +193,7 @@ export const studentQuestions: QuestionBox[] = [
             name: "year",
             options: yearOptions,
             required: true,
-          } as SelectBoxProps,
+          },
         },
         {
           type: QuestionType.SELECT,
@@ -206,10 +201,10 @@ export const studentQuestions: QuestionBox[] = [
             name: "section",
             options: sectionOptions,
             required: true,
-          } as SelectBoxProps,
+          },
         },
       ],
-    } as HorizontalItemsBoxProps,
+    },
     version: "1",
   },
   {
@@ -219,7 +214,7 @@ export const studentQuestions: QuestionBox[] = [
       legend: "What is your gender?",
       options: genderOptions,
       required: true,
-    } as RadioBoxProps,
+    },
     version: "1",
   },
   {
@@ -240,8 +235,8 @@ export const guardianQuestions: QuestionBox[] = [
     questionType: QuestionType.SEPARATOR,
     props: {
       name: "guardian-details",
-      text: "Guardian Details",
-    } as SeparatorProps,
+      legend: "Guardian Details",
+    },
     version: "1",
   },
   {
@@ -257,14 +252,14 @@ export const guardianQuestions: QuestionBox[] = [
             placeholder: "First Name",
             required: true,
           },
-        } as HorizontalBoxItem,
+        },
         {
           type: QuestionType.TEXT,
           props: {
             name: "guardianMiddleName",
             placeholder: "Middle Name",
           },
-        } as HorizontalBoxItem,
+        },
         {
           type: QuestionType.TEXT,
           props: {
@@ -272,16 +267,16 @@ export const guardianQuestions: QuestionBox[] = [
             placeholder: "Last Name",
             required: true,
           },
-        } as HorizontalBoxItem,
+        },
         {
           type: QuestionType.TEXT,
           props: {
             name: "guardianSuffix",
             placeholder: "Suffix",
           },
-        } as HorizontalBoxItem,
+        },
       ],
-    } as HorizontalItemsBoxProps,
+    },
     version: "1",
   },
   {
@@ -307,7 +302,7 @@ export const guardianQuestions: QuestionBox[] = [
         { label: "Other", value: "other" },
       ],
       required: true,
-    } as SelectBoxProps,
+    },
     version: "1",
   },
   {

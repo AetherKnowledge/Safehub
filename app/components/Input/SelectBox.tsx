@@ -70,7 +70,10 @@ const SelectBox = ({
 
   return (
     <>
-      <fieldset ref={sizeRef} className="fieldset w-full">
+      <fieldset
+        ref={sizeRef}
+        className={`fieldset ${className ? className : "w-full"}`}
+      >
         {legend && (
           <Legend
             legend={legend}
@@ -93,22 +96,8 @@ const SelectBox = ({
             </p>
           )}
 
-          <input
-            name={noFormOutput ? undefined : name}
-            value={selectedOption?.value ?? ""}
-            type="text"
-            className="sr-only h-full static validator-2 outline-none ring-0 focus:outline-none focus:ring-0"
-            required={required}
-            onInvalid={(e) => {
-              setHasError(true);
-              if (onInvalid) onInvalid();
-            }}
-            onChange={() => {}}
-            style={{ caretColor: "transparent" }}
-          />
-
           <p
-            className={`w-full p-2 text-left ${
+            className={`ml-1 p-2 text-left ${
               selectedOption ? "" : "text-base-content/50"
             }`}
           >
@@ -118,7 +107,21 @@ const SelectBox = ({
           <FaChevronDown className="cursor-pointer" />
         </button>
 
-        <div className="flex flex-col">
+        <input
+          name={noFormOutput ? undefined : name}
+          value={selectedOption?.value ?? ""}
+          type="text"
+          className={`sr-only text-transparent w-full static validator-2 outline-none ring-0 focus:outline-none focus:ring-0 bg-transparent -mt-1.5 -mb-1.5`}
+          required={required}
+          onInvalid={(e) => {
+            setHasError(true);
+            if (onInvalid) onInvalid();
+          }}
+          onChange={() => {}}
+          style={{ caretColor: "transparent" }}
+        />
+
+        <div className="flex flex-col -mt-1.5">
           <p
             className={`text-xs text-error ml-1 mt-[-5px] ${
               hasError ? "" : "hidden"
@@ -139,7 +142,11 @@ const SelectBox = ({
           <li key={option.value}>
             <button
               type="button"
-              className="w-full text-left p-2 hover:bg-base-200"
+              className={`w-full text-left p-2 ${
+                bgColor == "bg-base-200"
+                  ? "hover:bg-base-100"
+                  : "hover:bg-base-200"
+              }`}
               onClick={() => handleSelect(option)}
             >
               {option.label}

@@ -40,6 +40,7 @@ const DateTimeSelector = ({
   noFormOutput = false,
   horizontal = false,
   onInvalid,
+  readonly = false,
 }: DateTimeSelectorProps) => {
   const [hasError, setHasError] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => {
@@ -133,6 +134,7 @@ const DateTimeSelector = ({
             onChange={handleDateChange}
             min={minDate}
             max={maxDate}
+            readonly={readonly}
           />
 
           <input
@@ -160,6 +162,7 @@ const DateTimeSelector = ({
             onChange={handleTimeChange}
             min={minTime}
             max={maxTime}
+            readonly={readonly}
           />
         </div>
 

@@ -8,6 +8,7 @@ type InputInterface = {
   onInvalid?: () => void;
   disabled?: boolean;
   noFormOutput?: boolean;
+  readonly?: boolean;
 };
 
 export type Option = {

@@ -21,7 +21,7 @@ const Legend = ({
 
   return (
     <legend
-      className={`pl-1 fieldset-legend pb-1 gap-1 justify-between w-full ${textSizeClass} font-medium`}
+      className={`pl-1 fieldset-legend pt-1 pb-1 gap-1 justify-between w-full ${textSizeClass} font-medium`}
     >
       <span>
         {number ? number.toString() + ". " : ""} {legend}

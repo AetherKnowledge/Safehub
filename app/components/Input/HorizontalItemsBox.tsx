@@ -13,7 +13,6 @@ export type HorizontalBoxItem =
 
 export type HorizontalItemsBoxProps = InputInterface & {
   items: HorizontalBoxItem[];
-  layout?: "vertical" | "horizontal";
 };
 
 const HorizontalItemsBox = ({

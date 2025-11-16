@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { IconType } from "react-icons";
 import InputInterface from "./InputInterface";
 import Legend from "./Legend";
@@ -42,10 +43,13 @@ const TextBox = ({
   onChange,
   onInvalid,
   noFormOutput,
+  readonly = false,
 }: TextBoxProps) => {
+  const [hasError, setHasError] = useState(false);
+
   return (
     <>
-      <fieldset className="fieldset w-full">
+      <fieldset className={`fieldset ${className || "w-full"}`}>
         {legend && (
           <Legend
             legend={legend}
@@ -56,7 +60,7 @@ const TextBox = ({
         )}
         <label
           className={`input validator-2 ${size} no-outline rounded-lg text-base-content w-full ${bgColor} ${
-            className || ""
+            hasError ? "border-error" : "border-base-300"
           }`}
         >
           {Icon && <Icon />}
@@ -70,11 +74,14 @@ const TextBox = ({
             defaultValue={defaultValue}
             required={required}
             onInvalid={(e) => {
+              setHasError(true);
               onInvalid && onInvalid();
             }}
             onChange={(e) => {
+              setHasError(false);
               onChange && onChange(e.target.value);
             }}
+            readOnly={readonly}
           />
         </label>
         <p className="validator-hint hidden ml-1 mt-[-5px]">

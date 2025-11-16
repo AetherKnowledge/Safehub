@@ -1,30 +1,57 @@
+"use client";
+import EditableQuestionBox from "@/app/components/Forms/EditableInput/EditableQuestionBox";
 import FormBG from "@/app/components/Forms/FormBG";
+import { QuestionType } from "@/app/components/Forms/FormBuilder";
 import QuestionBG from "@/app/components/Forms/QuestionBG";
-import DateTimeSelector from "@/app/components/Input/Date/DateTimeSelector";
-import { TimePeriod } from "@/app/components/Input/Date/utils";
+import SelectBox from "@/app/components/Input/SelectBox";
+import { useState } from "react";
 
-const Test = async () => {
-  async function onSubmit(formData: FormData) {
-    "use server";
-    const data = Object.fromEntries(formData.entries());
-    console.log("Form Data Submitted:", data);
-  }
+const Test = () => {
+  const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
 
   return (
-    <FormBG onSubmit={onSubmit}>
-      <QuestionBG>
-        <DateTimeSelector
-          name="dateTime"
-          legend="Pick Date and Time"
-          minDate="now"
-          minTime={{ hour: 12, minute: 1, period: TimePeriod.AM }}
-          maxTime={{ hour: 9, minute: 0, period: TimePeriod.PM }}
+    <>
+      <FormBG>
+        <EditableQuestionBox
+          questionBox={{
+            questionType: QuestionType.TEXT,
+            props: { name: "name", legend: "Test Question" },
+            version: "1",
+          }}
+          selected={selectedQuestion === "name"}
+          onClick={(id: string) => setSelectedQuestion(id)}
         />
+        <EditableQuestionBox
+          questionBox={{
+            questionType: QuestionType.TEXT,
+            props: { name: "name2", legend: "Test Question 2" },
+            version: "1",
+          }}
+          selected={selectedQuestion === "name2"}
+          onClick={(id: string) => setSelectedQuestion(id)}
+        />
+        <QuestionBG>
+          <SelectBox
+            name="test-select"
+            legend="Test Select Box"
+            placeholder="Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure vero temporibus ut quidem, delectus, veniam saepe dolorum illo amet animi nesciunt qui quibusdam voluptatibus at adipisci, similique distinctio magnam nemo!"
+            options={[
+              {
+                label:
+                  "Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure vero temporibus ut quidem, delectus, veniam saepe dolorum illo amet animi nesciunt qui quibusdam voluptatibus at adipisci, similique distinctio magnam nemo!",
+                value: "option1",
+              },
+              { label: "Option 2", value: "option2" },
+              { label: "Option 3", value: "option3" },
+            ]}
+            required
+          />
+        </QuestionBG>
         <button type="submit" className="btn btn-primary">
           Submit
         </button>
-      </QuestionBG>
-    </FormBG>
+      </FormBG>
+    </>
   );
 };
 

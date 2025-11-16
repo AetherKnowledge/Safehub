@@ -8,6 +8,7 @@ import { getTimeFromDate, stringToTime } from "../Input/Date/utils";
 import HorizontalItemsBox, {
   HorizontalItemsBoxProps,
 } from "../Input/HorizontalItemsBox";
+import LinearScale, { LinearScaleProps } from "../Input/LinearScale";
 import LinkedSelector, { LinkedSelectorProps } from "../Input/LinkedSelector";
 import RadioBox, { RadioBoxProps } from "../Input/RadioBox";
 import SelectBox, { SelectBoxProps } from "../Input/SelectBox";
@@ -21,16 +22,17 @@ import Separator, { SeparatorProps } from "./Separator";
 import Submit from "./Submit";
 
 export enum QuestionType {
-  SEPARATOR,
-  TEXT,
-  HORIZONTAL_ITEMS,
-  TEXTAREA,
-  RADIO,
-  SELECT,
-  LINKED_SELECTOR,
-  DATE,
-  TIME,
-  DATETIME,
+  SEPARATOR = "SEPARATOR",
+  TEXT = "TEXT",
+  HORIZONTAL_ITEMS = "HORIZONTAL_ITEMS",
+  TEXTAREA = "TEXTAREA",
+  RADIO = "RADIO",
+  SELECT = "SELECT",
+  LINKED_SELECTOR = "LINKED_SELECTOR",
+  DATE = "DATE",
+  TIME = "TIME",
+  DATETIME = "DATETIME",
+  LINEAR_SCALE = "LINEAR_SCALE",
 }
 
 export type QuestionBox =
@@ -74,6 +76,11 @@ export type QuestionBox =
   | {
       questionType: QuestionType.DATETIME;
       props: DateTimeSelectorProps;
+      version: string;
+    }
+  | {
+      questionType: QuestionType.LINEAR_SCALE;
+      props: LinearScaleProps;
       version: string;
     };
 
@@ -132,7 +139,7 @@ const FormsBuilder = ({
   );
 };
 
-const QuestionBuilder = ({
+export const QuestionBuilder = ({
   question,
   answer,
 }: {
@@ -210,6 +217,13 @@ const QuestionBuilder = ({
                 : new Date(answer)
               : undefined
           }
+        />
+      );
+    case QuestionType.LINEAR_SCALE:
+      return (
+        <LinearScale
+          {...(question.props as LinearScaleProps)}
+          defaultValue={answer}
         />
       );
 

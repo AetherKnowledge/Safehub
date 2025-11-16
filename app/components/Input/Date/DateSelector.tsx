@@ -33,6 +33,7 @@ const DateSelector = ({
   min,
   max,
   noFormOutput = false,
+  readonly = false,
 }: DateSelectorProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(() => {
     if (value) return value;
@@ -64,8 +65,12 @@ const DateSelector = ({
           className={`flex pr-2 justify-between items-center ${bgColor} rounded-lg cursor-pointer border ${
             hasError ? "border-error" : "border-base-300"
           } ${className} ${size}`}
-          popoverTarget={popoverName}
-          style={{ anchorName } as React.CSSProperties}
+          popoverTarget={readonly ? undefined : popoverName}
+          style={
+            readonly
+              ? { pointerEvents: "none" }
+              : ({ anchorName } as React.CSSProperties)
+          }
         >
           <div className="flex flex-row items-center text-center border border-transparent border-r-base-300 gap-1 p-0 px-2 h-full">
             <MdOutlineDateRange className="w-5 h-5" />

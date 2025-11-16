@@ -21,13 +21,14 @@ interface DatePickerProps {
   min?: Date | "now"; // inclusive lower bound
   max?: Date; // inclusive upper bound
   defaultValue?: Date;
+  readonly?: boolean;
 }
 
 const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
 /** Date Picker Component */
 export default function DatePicker({
-  value = new Date(),
+  value,
   onChange,
   highlightedDates,
   pushToRouter = false,
@@ -119,8 +120,16 @@ export default function DatePicker({
   };
 
   useEffect(() => {
-    setCurrentMonthAndYear(new Date(value.getFullYear(), value.getMonth(), 1));
-    setSelectedDate(value);
+    if (!value) return;
+
+    setCurrentMonthAndYear((prev) => {
+      const newVal = new Date(value.getFullYear(), value.getMonth(), 1);
+      return prev.getTime() === newVal.getTime() ? prev : newVal;
+    });
+
+    setSelectedDate((prev) => {
+      return prev?.getTime() === value.getTime() ? prev : value;
+    });
   }, [value]);
 
   return (

@@ -12,6 +12,7 @@ export type TimeSelectorProps = InputInterface & {
   onChange?: (time: Time) => void;
   min?: Time | "now"; // inclusive lower bound
   max?: Time; // inclusive upper bound
+  size?: "radio-xs" | "radio-sm" | "radio-md" | "radio-lg" | "radio-xl";
 };
 
 const TimeSelector = ({
@@ -26,6 +27,7 @@ const TimeSelector = ({
   min,
   max,
   noFormOutput = false,
+  readonly = false,
 }: TimeSelectorProps) => {
   const [hasError, setHasError] = useState(false);
 
@@ -44,7 +46,7 @@ const TimeSelector = ({
 
   return (
     <>
-      <fieldset className="fieldset w-full">
+      <fieldset className={`fieldset ${className ? className : "w-full"}`}>
         {legend && (
           <Legend legend={legend} required={required} number={number} />
         )}
@@ -53,8 +55,12 @@ const TimeSelector = ({
           className={`flex pr-2 justify-between items-center ${bgColor} rounded-lg cursor-pointer border ${
             hasError ? "border-error" : "border-base-300"
           } ${className}`}
-          popoverTarget={popoverName}
-          style={{ anchorName } as React.CSSProperties}
+          popoverTarget={readonly ? undefined : popoverName}
+          style={
+            readonly
+              ? { pointerEvents: "none" }
+              : ({ anchorName } as React.CSSProperties)
+          }
         >
           <div className="flex flex-row items-center text-center border border-transparent border-r-base-300 gap-1 p-0 px-2 h-full">
             <FaRegClock className="w-5 h-5" />

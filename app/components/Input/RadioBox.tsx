@@ -98,7 +98,7 @@ const RadioBox = ({
               <input
                 type="text"
                 className={`no-outline border-b-1 border-dotted w-full ml-2`}
-                value={otherText}
+                value={otherText || ""}
                 required={required && option.value === currentValue?.value}
                 onInvalid={(e) => {
                   setOtherError(true);

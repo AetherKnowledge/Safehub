@@ -11,6 +11,7 @@ import {
 import { Actions } from "./AppointmentsTable";
 import ApproveButton from "./ApproveButton";
 import CancelButton from "./CancelButton";
+import CancelButtonStudent from "./CancelButtonStudent";
 import EditButton from "./EditButton";
 import FeedbackButton from "./FeedbackButton";
 import MarkDoneButton from "./MarkDoneButton";
@@ -30,18 +31,22 @@ const ActionBox = ({ actions, appointment, userType }: ActionBoxProps) => {
     setLoading(true);
     statusPopup.showLoading("Updating appointment...");
 
-    await updateAppointmentStatus(appointment.id, appointmentStatus)
-      .then(() => {
-        setLoading?.(false);
-        statusPopup.showSuccess(
-          `Appointment ${appointmentStatus.toLowerCase()} successfully`
-        );
-        router.refresh();
-      })
-      .catch((error) => {
-        setLoading?.(false);
-        statusPopup.showError(error.message || "Failed to update appointment.");
-      });
+    const result = await updateAppointmentStatus({
+      appointmentId: appointment.id,
+      status: appointmentStatus,
+    });
+
+    if (!result.success) {
+      setLoading(false);
+      statusPopup.showError(result.message || "Failed to update appointment.");
+      return;
+    }
+
+    setLoading?.(false);
+    statusPopup.showSuccess(
+      `Appointment ${appointmentStatus.toLowerCase()} successfully`
+    );
+    router.refresh();
   };
 
   return (
@@ -66,11 +71,13 @@ const ActionBox = ({ actions, appointment, userType }: ActionBoxProps) => {
               onClick={() => handleUpdate(AppointmentStatus.Completed)}
             />
           )}
-          {actions.includes(Actions.CANCEL) && (
+          {actions.includes(Actions.REJECT) && (
             <CancelButton
-              appointmentStatus={appointment.status}
-              onClick={() => handleUpdate(AppointmentStatus.Rejected)}
+              onCancel={() => handleUpdate(AppointmentStatus.Rejected)}
             />
+          )}
+          {actions.includes(Actions.CANCEL) && (
+            <CancelButtonStudent appointment={appointment} />
           )}
         </>
       )}

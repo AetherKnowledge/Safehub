@@ -1,5 +1,6 @@
 "use server";
 import ActionResult from "@/app/components/ActionResult";
+import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
 import {
   Appointment,
   AppointmentStatus,
@@ -12,7 +13,12 @@ import { auth } from "@/auth";
 import { addMinutes, prettifyZodErrorMessage } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { buildZodSchema } from "../Forms/schema";
-import { AppointmentFormData } from "./schema";
+import {
+  AppointmentFormData,
+  cancelAppointmentSchema,
+  UpdateAppointmentStatusData,
+  updateAppointmentStatusSchema,
+} from "./schema";
 
 export type AppointmentData = Appointment & {
   student: {
@@ -157,7 +163,7 @@ export async function createNewAppointment(
 
     const questionsData = JSON.parse(
       JSON.stringify(questions.schema)
-    ) as AppointmentFormData["questions"];
+    ) as BuiltFormData;
 
     const validation = buildZodSchema(questionsData).safeParse(data);
 
@@ -269,7 +275,7 @@ export async function updateAppointment(
 
     const questions = JSON.parse(
       JSON.stringify(oldAppointmentFormData.questions)
-    ) as AppointmentFormData["questions"];
+    ) as BuiltFormData;
 
     if (!questions) {
       throw new Error("Appointment questions not found");
@@ -411,42 +417,57 @@ export async function checkForConflictingDate(
 }
 
 export async function updateAppointmentStatus(
-  appointmentId: string,
-  status: AppointmentStatus
-): Promise<void> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+  data: UpdateAppointmentStatusData
+): Promise<ActionResult<void>> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id || session.user.type !== UserType.Counselor) {
+      throw new Error("Unauthorized");
+    }
+
+    const validation = updateAppointmentStatusSchema.safeParse(data);
+    if (!validation.success) {
+      throw new Error("Invalid data");
+    }
+    const { appointmentId, status } = validation.data;
+
+    // Verify the appointment belongs to this counselor
+    const appointment = await prisma.appointment.findFirst({
+      where: { counselorId: session.user.id, id: appointmentId },
+    });
+
+    if (!appointment) {
+      throw new Error("Appointment not found");
+    }
+
+    if (
+      appointment.status === AppointmentStatus.Rejected ||
+      appointment.status === AppointmentStatus.Cancelled
+    ) {
+      throw new Error("Cannot update rejected or cancelled appointment");
+    }
+
+    if (appointment.status === AppointmentStatus.Completed) {
+      throw new Error("Cannot update completed appointment");
+    }
+
+    if (status === AppointmentStatus.Cancelled) {
+      throw new Error(
+        "Only students can cancel appointments, counselors can only reject them."
+      );
+    }
+
+    // Update the appointment status
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { status },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: (error as Error).message };
   }
-
-  if (
-    session.user.type === UserType.Student &&
-    status !== AppointmentStatus.Rejected
-  ) {
-    throw new Error("Students can only cancel appointments");
-  }
-
-  // Verify the appointment belongs to this user
-  const appointment = await prisma.appointment.findFirst({
-    where:
-      session.user.type === UserType.Student
-        ? { studentId: session.user.id, id: appointmentId }
-        : { counselorId: session.user.id, id: appointmentId },
-  });
-
-  if (!appointment) {
-    throw new Error("Appointment not found");
-  }
-
-  if (appointment.status === AppointmentStatus.Rejected) {
-    throw new Error("Cannot update rejected appointment");
-  }
-
-  // Update the appointment status
-  await prisma.appointment.update({
-    where: { id: appointmentId },
-    data: { status },
-  });
 }
 
 export async function getAppointmentsForDateRange(
@@ -607,4 +628,45 @@ export async function getTodayAppointmentsCount(date: Date): Promise<number> {
   });
 
   return appointments;
+}
+
+export async function cancelAppointmentStudent(
+  formData: FormData
+): Promise<ActionResult<void>> {
+  const data = Object.fromEntries(formData.entries());
+  try {
+    const session = await auth();
+    if (!session?.user?.id || session.user.type !== UserType.Student) {
+      throw new Error("Unauthorized");
+    }
+    console.log("Cancel Data:", data);
+    const validation = cancelAppointmentSchema.safeParse(data);
+    if (!validation.success) {
+      throw new Error(
+        "Invalid data: " + prettifyZodErrorMessage(validation.error)
+      );
+    }
+    const { appointmentId, reason } = validation.data;
+
+    // Verify the appointment belongs to this user
+    const appointment = await prisma.appointment.findFirst({
+      where: { studentId: session.user.id, id: appointmentId },
+    });
+    if (!appointment) {
+      throw new Error("Appointment not found");
+    }
+
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        status: AppointmentStatus.Cancelled,
+        cancellationReason: reason,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: (error as Error).message };
+  }
 }

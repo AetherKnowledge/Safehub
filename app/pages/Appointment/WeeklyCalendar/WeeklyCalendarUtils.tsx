@@ -37,13 +37,13 @@ export const TIME_SLOTS = (() => {
 // Status color mapping
 export const getBgStatusColor = (status: AppointmentStatus) => {
   switch (status) {
-    case "Approved":
+    case AppointmentStatus.Approved:
       return "bg-info/20";
-    case "Pending":
+    case AppointmentStatus.Pending:
       return "bg-warning/20";
-    case "Completed":
+    case AppointmentStatus.Completed:
       return "bg-success/20";
-    case "Rejected":
+    case AppointmentStatus.Rejected || AppointmentStatus.Cancelled:
       return "bg-error/20";
     default:
       return "bg-base-content/20";
@@ -52,13 +52,13 @@ export const getBgStatusColor = (status: AppointmentStatus) => {
 
 export const getStatusTextColor = (status: AppointmentStatus) => {
   switch (status) {
-    case "Approved":
+    case AppointmentStatus.Approved:
       return "text-info";
-    case "Pending":
+    case AppointmentStatus.Pending:
       return "text-warning";
-    case "Completed":
+    case AppointmentStatus.Completed:
       return "text-success";
-    case "Rejected":
+    case AppointmentStatus.Rejected || AppointmentStatus.Cancelled:
       return "text-error";
     default:
       return "text-base-content";
@@ -67,13 +67,13 @@ export const getStatusTextColor = (status: AppointmentStatus) => {
 
 export const getBorderStatusColor = (status: AppointmentStatus) => {
   switch (status) {
-    case "Approved":
+    case AppointmentStatus.Approved:
       return "border-l-info";
-    case "Pending":
+    case AppointmentStatus.Pending:
       return "border-l-warning";
-    case "Completed":
+    case AppointmentStatus.Completed:
       return "border-l-success";
-    case "Rejected":
+    case AppointmentStatus.Rejected || AppointmentStatus.Cancelled:
       return "border-l-error";
     default:
       return "border-l-base-content";

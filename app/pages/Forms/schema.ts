@@ -1,5 +1,6 @@
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
 import { FormComponentType } from "@/app/components/Forms/FormBuilder";
+import { Option } from "@/app/components/Input/InputInterface";
 import { FormType } from "@/app/generated/prisma";
 import z from "zod";
 
@@ -27,9 +28,25 @@ export function buildZodSchema(form: BuiltFormData) {
         );
         break;
 
-      case FormComponentType.RADIO:
-        field = z.enum((props as any).options.map((o: any) => o.value));
+      case FormComponentType.RADIO: {
+        const options = (props as any).options as Option[];
+
+        const normalValues = options
+          .filter((o) => !o.other)
+          .map((o) => o.value);
+
+        const hasOther = options.some((o) => o.other);
+
+        // If "other" exists → allow any string
+        if (hasOther) {
+          field = z.union([z.enum(normalValues), z.string().min(1)]);
+        } else {
+          // Normal behavior: enum only
+          field = z.enum(normalValues);
+        }
+
         break;
+      }
 
       case FormComponentType.LINEAR_SCALE:
         // Accept string or number, coerce to number

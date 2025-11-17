@@ -94,7 +94,7 @@ const TimeSelector = ({
               : "Select Time"}
           </p>
 
-          <FaChevronDown className="cursor-pointer" />
+          {!readonly && <FaChevronDown className="cursor-pointer" />}
         </button>
 
         <div className="flex flex-col">

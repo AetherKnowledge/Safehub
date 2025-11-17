@@ -27,7 +27,7 @@ const RadioBox = ({
   readonly = false,
 }: RadioBoxProps) => {
   const [currentValue, setCurrentValue] = useState<Option | undefined>(() => {
-    if (!defaultValue || readonly) return undefined;
+    if (!defaultValue) return undefined;
 
     const option = options.find((option) => option.value === defaultValue);
     const other = options.find((option) => option.other);
@@ -66,10 +66,12 @@ const RadioBox = ({
               hasError || (option.other && otherError)
                 ? "border-error"
                 : currentValue?.value === option.value
-                ? "border-base-content"
-                : "border-base-300 hover:border-base-content/50"
-            }`}
+                ? "border-base-content hover:border-base-content/50"
+                : "border-base-300"
+            } ${readonly ? "pointer-events-none" : ""}`}
             onClick={() => {
+              if (readonly) return;
+
               setHasError(false);
               setOtherError(false);
               setCurrentValue(option);

@@ -61,7 +61,7 @@ const TextBox = ({
         <label
           className={`input validator-2 ${size} no-outline rounded-lg text-base-content w-full ${bgColor} ${
             hasError ? "border-error" : "border-base-300"
-          }`}
+          } ${readonly && "pointer-events-none"}`}
         >
           {Icon && <Icon />}
           <input

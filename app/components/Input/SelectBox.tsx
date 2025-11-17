@@ -30,6 +30,7 @@ const SelectBox = ({
   placeholder = "Select an option",
   value,
   noFormOutput = false,
+  readonly = false,
 }: SelectBoxProps) => {
   const [selectedOption, setSelectedOption] = useState<Option | null>(
     options.find((option) => option.value === defaultValue) || null
@@ -92,8 +93,12 @@ const SelectBox = ({
           className={`flex pr-2 justify-between items-center ${bgColor} rounded-lg cursor-pointer border ${
             hasError ? "border-error" : "border-base-300"
           } ${className} ${size}`}
-          popoverTarget={popoverName}
-          style={{ anchorName } as React.CSSProperties}
+          popoverTarget={readonly ? undefined : popoverName}
+          style={
+            readonly
+              ? { pointerEvents: "none" }
+              : ({ anchorName } as React.CSSProperties)
+          }
         >
           {hint && (
             <p className="border p-2 border-transparent border-r-base-300">
@@ -109,7 +114,7 @@ const SelectBox = ({
             {selectedOption?.label || placeholder}
           </p>
 
-          <FaChevronDown className="cursor-pointer" />
+          {!readonly && <FaChevronDown className="cursor-pointer" />}
         </button>
 
         <input
@@ -124,6 +129,7 @@ const SelectBox = ({
           }}
           onChange={() => {}}
           style={{ caretColor: "transparent" }}
+          readOnly={readonly}
         />
 
         <div className="flex flex-col -mt-1.5">

@@ -45,9 +45,9 @@ const TextArea = ({
       <textarea
         name={noFormOutput ? undefined : name}
         placeholder={placeholder}
-        className={`textarea ${size} outline-none ring-0 focus:outline-none focus:ring-0 rounded text-base-content w-full ${bgColor} ${
+        className={`${className} textarea ${size} outline-none ring-0 focus:outline-none focus:ring-0 rounded text-base-content w-full ${bgColor} ${
           hasError ? "border-error" : "border-base-300"
-        } ${className}`}
+        } ${readonly && "pointer-events-none"}`}
         defaultValue={defaultValue}
         required={required}
         onInvalid={(e) => {

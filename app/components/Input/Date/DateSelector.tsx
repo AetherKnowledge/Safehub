@@ -100,7 +100,7 @@ const DateSelector = ({
             {selectedDate ? formatDateDisplay(selectedDate) : "Select Date"}
           </p>
 
-          <FaChevronDown className="cursor-pointer" />
+          {!readonly && <FaChevronDown className="cursor-pointer" />}
         </button>
 
         <div className="flex flex-col">

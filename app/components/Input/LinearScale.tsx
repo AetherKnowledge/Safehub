@@ -93,7 +93,7 @@ const LinearScale = ({
                   : currentValue === n
                   ? "border-base-content"
                   : "border-base-300"
-              }`}
+              } ${readonly && "pointer-events-none"}`}
               onClick={() => {
                 if (readonly) return;
                 setCurrentValue(n);

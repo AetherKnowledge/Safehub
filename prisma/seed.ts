@@ -264,6 +264,58 @@ async function main() {
     );
   `);
 
+  const hotlineId1 = "52866741-dc71-4ced-b5ad-993419a730b2";
+  const hotlineName1 = "NCMH Crisis Hotline";
+  const hotlineDesc1 =
+    "NCMH Crisis Hotline provides 24/7, free, compassionate and confidential support over the phone.  We support everyone in Philippines who may be experiencing emotional distress related to abuse & domestic violence, anxiety, bullying,";
+  const hotlineImg1 = "/images/hotline/ncmh.svg";
+  const hotlinePhone1 = "09178998727";
+  const hotlineWebsite1 = "https://ncmh.gov.ph/";
+
+  const hotlineId2 = "52866741-dc71-4ced-b5ad-993419a730b3";
+  const hotlineName2 = "Tawag Paglaum";
+  const hotlineDesc2 =
+    "Tawag Paglaum Centro Bisaya is a helpline, that is available 24/7, for individuals struggling with emotional and suicidal crisis in the Philippines. We are here to remind you that you are not alone and there is hope.";
+  const hotlineImg2 = "/images/hotline/tawag-paglaum.svg";
+  const hotlinePhone2 = "09399375433";
+  const hotlineWebsite2 = "https://tawagpaglaum.org/";
+
+  await client.query(
+    `
+    INSERT INTO public."Hotline" (id, name, description, image, phone, website, "createdAt", "updatedAt")
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    ON CONFLICT (id) DO NOTHING;
+  `,
+    [
+      hotlineId1,
+      hotlineName1,
+      hotlineDesc1,
+      hotlineImg1,
+      hotlinePhone1,
+      hotlineWebsite1,
+      now,
+      now,
+    ]
+  );
+
+  await client.query(
+    `
+    INSERT INTO public."Hotline" (id, name, description, image, phone, website, "createdAt", "updatedAt")
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    ON CONFLICT (id) DO NOTHING;
+  `,
+    [
+      hotlineId2,
+      hotlineName2,
+      hotlineDesc2,
+      hotlineImg2,
+      hotlinePhone2,
+      hotlineWebsite2,
+      now,
+      now,
+    ]
+  );
+
   console.log("✅ Hotline bucket setup complete");
 
   // Documents bucket setup

@@ -39,7 +39,7 @@ const EditableHeader = ({
           />
           <BaseFormsHeader className="gap-2">
             <input
-              type="title"
+              type="text"
               className={`${headerTitleClass} bg-neutral border-b-1 border-primary no-outline h-12 rounded-sm`}
               value={component.title}
               onChange={(e) => {
@@ -47,7 +47,7 @@ const EditableHeader = ({
               }}
             />
             <input
-              type="description"
+              type="text"
               className={`${headerDescriptionClass} bg-neutral border-b-1 border-primary no-outline h-10 rounded-sm`}
               value={component.description}
               placeholder="Description placeholder"

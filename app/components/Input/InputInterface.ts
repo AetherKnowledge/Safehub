@@ -14,6 +14,7 @@ type InputInterface = {
 export type Option = {
   label: string;
   value: string;
+  other?: boolean;
 };
 
 export default InputInterface;

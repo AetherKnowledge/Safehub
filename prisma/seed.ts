@@ -8,6 +8,92 @@ const client = new Client({
   connectionString: process.env.DATABASE_URL,
 });
 
+const form = {
+  header: {
+    name: "bookingHeader",
+    title: "Book a Counseling Appointment",
+    description:
+      "Please fill out the following form to schedule your counseling appointment.",
+  },
+  components: [
+    {
+      type: "TEXTAREA",
+      props: {
+        name: "focus",
+        legend:
+          "What brings you in today, and what would you like to focus on?",
+        placeholder: "Type your response here...",
+        required: true,
+      },
+      version: "1",
+    },
+    {
+      type: "RADIO",
+      props: {
+        name: "hadCounselingBefore",
+        required: true,
+        legend:
+          "Have you attended counseling before, or would this be your first time?",
+        options: [
+          { value: "firstTime", label: "This is my first time" },
+          { value: "hasAttended", label: "I have attended before" },
+        ],
+      },
+      version: "1",
+    },
+    {
+      type: "RADIO",
+      props: {
+        name: "sessionPreference",
+        required: true,
+        legend: "Do you prefer in-person sessions, online sessions, or either?",
+        options: [
+          { value: "InPerson", label: "In-person sessions" },
+          { value: "Online", label: "Online sessions" },
+          { value: "Either", label: "Either" },
+        ],
+      },
+      version: "1",
+    },
+    {
+      type: "LINEAR_SCALE",
+      props: {
+        name: "urgencyLevel",
+        legend: "How urgent is your concern? (1 = Not Urgent, 5 = Very Urgent)",
+        required: true,
+        min: 1,
+        max: 5,
+        minText: "Not Urgent",
+        maxText: "Very Urgent",
+      },
+      version: "1",
+    },
+    {
+      type: "DATETIME",
+      props: {
+        name: "startTime",
+        legend: "Pick Schedule.",
+        minTime: { hour: 8, minute: 0, period: "AM" },
+        maxTime: { hour: 8, minute: 0, period: "PM" },
+        required: true,
+      },
+      version: "1",
+    },
+    {
+      type: "TEXTAREA",
+      props: {
+        name: "notes",
+        legend: "Any additional notes or comments?",
+        placeholder: "Type your response here...",
+      },
+      version: "1",
+    },
+  ],
+  termsAndConditions: true,
+};
+
+export const bookingQuestions = [];
+
 async function main() {
   await client.connect();
 
@@ -465,6 +551,25 @@ async function main() {
   );
 
   console.log("✅ Admin user and post created (if not already exists)");
+
+  // ================================
+  // Default Forms Setup
+  // ================================
+
+  const id = 1;
+  const type = "BOOKING";
+  const jsonFormData = JSON.parse(JSON.stringify(form));
+
+  await client.query(
+    `
+    INSERT INTO public."FormSchema" (id, type, schema, "createdAt", "updatedAt")
+    VALUES ($1, $2, $3, $4, $5)
+    ON CONFLICT (type) DO NOTHING
+    `,
+    [id, type, jsonFormData, now, now]
+  );
+
+  console.log("✅ Default booking form seeded");
 
   await client.end();
 }

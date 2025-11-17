@@ -165,6 +165,8 @@ function StatusBadge({ status }: { status: AppointmentStatus }) {
   switch (status) {
     case AppointmentStatus.Rejected:
       return <div className="badge badge-error">Rejected</div>;
+    case AppointmentStatus.Cancelled:
+      return <div className="badge badge-error">Cancelled</div>;
     case AppointmentStatus.Pending:
       return <div className="badge badge-warning">Pending</div>;
     case AppointmentStatus.Approved:
@@ -178,6 +180,7 @@ function StatusBadge({ status }: { status: AppointmentStatus }) {
 
 export enum Actions {
   APPROVE = "approve",
+  REJECT = "reject",
   CANCEL = "cancel",
   EDIT = "edit",
   FEEDBACK = "feedback",
@@ -190,8 +193,6 @@ function StudentActionButton({
   appointment: AppointmentData;
 }) {
   switch (appointment.status) {
-    case AppointmentStatus.Rejected:
-      return null;
     case AppointmentStatus.Pending:
       return (
         <ActionBox
@@ -230,7 +231,7 @@ function CounselorActionButton({
     case AppointmentStatus.Pending:
       return (
         <ActionBox
-          actions={[Actions.APPROVE, Actions.EDIT, Actions.CANCEL]}
+          actions={[Actions.APPROVE, Actions.EDIT, Actions.REJECT]}
           appointment={appointment}
           userType={UserType.Counselor}
         />
@@ -238,7 +239,7 @@ function CounselorActionButton({
     case AppointmentStatus.Approved:
       return (
         <ActionBox
-          actions={[Actions.EDIT, Actions.CANCEL, Actions.MARK_DONE]}
+          actions={[Actions.EDIT, Actions.REJECT, Actions.MARK_DONE]}
           appointment={appointment}
           userType={UserType.Counselor}
         />

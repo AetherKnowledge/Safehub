@@ -20,6 +20,7 @@ enum AppointmentStatus {
   Pending
   Completed
   Rejected
+  Cancelled
 }
 
 enum Days {
@@ -311,7 +312,8 @@ model Appointment {
   notes               String?
   room                String?
 
-  appointmentData Json?
+  appointmentData    Json?
+  cancellationReason String?
 
   student   Student   @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
   counselor Counselor @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)

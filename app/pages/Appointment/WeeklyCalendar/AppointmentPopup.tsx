@@ -30,16 +30,18 @@ const AppointmentPopup = ({ appointment, onClose }: AppointmentPopupProps) => {
     onClose?.();
     statusPopup.showLoading("Updating appointment...");
 
-    await updateAppointmentStatus(appointment.id, appointmentStatus)
-      .then(() => {
-        statusPopup.showSuccess(
-          `Appointment ${appointmentStatus.toLowerCase()} successfully`
-        );
-        router.refresh();
-      })
-      .catch((error) => {
-        statusPopup.showError(error.message || "Failed to update appointment.");
-      });
+    const result = await updateAppointmentStatus({
+      appointmentId: appointment.id,
+      status: appointmentStatus,
+    });
+    if (!result.success) {
+      statusPopup.showError(result.message || "Failed to update appointment.");
+      return;
+    }
+    statusPopup.showSuccess(
+      `Appointment ${appointmentStatus.toLowerCase()} successfully`
+    );
+    router.refresh();
   };
 
   return (
@@ -109,8 +111,8 @@ const AppointmentPopup = ({ appointment, onClose }: AppointmentPopupProps) => {
           {(appointment.status === AppointmentStatus.Approved ||
             appointment.status === AppointmentStatus.Pending) && (
             <CancelButton
-              onClick={() => handleUpdate(AppointmentStatus.Rejected)}
-              appointmentStatus={appointment.status}
+              onCancel={() => handleUpdate(AppointmentStatus.Rejected)}
+              text="Reject"
             />
           )}
           <button

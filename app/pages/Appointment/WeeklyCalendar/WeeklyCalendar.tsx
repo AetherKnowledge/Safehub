@@ -117,7 +117,8 @@ function filterAppointments(appointments: AppointmentData[]) {
   const filteredAppointments = appointments.filter((appointment) => {
     if (
       appointment.status === AppointmentStatus.Rejected ||
-      appointment.status === AppointmentStatus.Pending
+      appointment.status === AppointmentStatus.Pending ||
+      appointment.status === AppointmentStatus.Cancelled
     ) {
       return false;
     }

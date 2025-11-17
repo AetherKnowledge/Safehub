@@ -145,7 +145,9 @@ const FormsBuilder = ({
         </FormComponentBG>
       )}
 
-      <Submit onBack={onBack} />
+      <FormComponentBG className="py-5 px-5">
+        <Submit onBack={onBack} />
+      </FormComponentBG>
     </FormBG>
   );
 };

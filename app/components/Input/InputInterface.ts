@@ -6,6 +6,7 @@ type InputInterface = {
   number?: number;
   bgColor?: string;
   onInvalid?: () => void;
+  onEnter?: () => void;
   disabled?: boolean;
   noFormOutput?: boolean;
   readonly?: boolean;

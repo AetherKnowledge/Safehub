@@ -463,6 +463,15 @@ export async function updateAppointmentStatus(
       data: { status },
     });
 
+    await prisma.appointmentLog.create({
+      data: {
+        appointmentId: appointmentId,
+        changedBy: session.user.id,
+        from: appointment.status,
+        to: status,
+      },
+    });
+
     return { success: true };
   } catch (error) {
     console.error(error);
@@ -661,6 +670,15 @@ export async function cancelAppointmentStudent(
       data: {
         status: AppointmentStatus.Cancelled,
         cancellationReason: reason,
+      },
+    });
+
+    await prisma.appointmentLog.create({
+      data: {
+        appointmentId: appointmentId,
+        changedBy: session.user.id,
+        from: appointment.status,
+        to: AppointmentStatus.Cancelled,
       },
     });
 

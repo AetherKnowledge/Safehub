@@ -5,7 +5,6 @@ import TermsAndConditions from "../Input/TermsAndConditions";
 import EditableFormHeader from "./EditableFormHeader";
 import EditableFormComponent from "./EditableInput/EditableFormComponent";
 import EditableHeader from "./EditableInput/EditableHeader";
-import { FormOptionsBottom } from "./EditableInput/FormsOptions";
 import { createFormComponent } from "./EditableInput/utils";
 import FormBG from "./FormBG";
 import { FormComponent, FormComponentType } from "./FormBuilder";
@@ -38,11 +37,72 @@ const EditableFormBuilder = ({
     <>
       <EditableFormHeader
         onSave={() => onSave?.()}
+        selectedComponent={selectedComponent}
         changeTerms={(value) =>
           onChange?.({ ...form, termsAndConditions: value })
         }
         termsAndConditions={form.termsAndConditions}
+        isHeader={selectedComponent === form.header.name}
+        onAdd={() => {
+          const newQuestion = createFormComponent({
+            type: FormComponentType.TEXT,
+          });
+
+          // Header selected → add at top
+          if (selectedIndex === -1) {
+            onChange?.({
+              ...form,
+              components: [newQuestion, ...form.components],
+            });
+            return;
+          }
+
+          // Otherwise insert after selected component
+          const updated = [...form.components];
+          updated.splice(selectedIndex + 1, 0, newQuestion);
+          onChange?.({ ...form, components: updated });
+        }}
+        onAddSeparator={() => {
+          const newQuestion = createFormComponent({
+            type: FormComponentType.SEPARATOR,
+          });
+
+          if (selectedIndex === -1) {
+            onChange?.({
+              ...form,
+              components: [newQuestion, ...form.components],
+            });
+            return;
+          }
+
+          const updated = [...form.components];
+          updated.splice(selectedIndex + 1, 0, newQuestion);
+          onChange?.({ ...form, components: updated });
+        }}
+        onMoveUp={() => {
+          if (selectedIndex <= 0) return;
+          const updated = [...form.components];
+          [updated[selectedIndex - 1], updated[selectedIndex]] = [
+            updated[selectedIndex],
+            updated[selectedIndex - 1],
+          ];
+          onChange?.({ ...form, components: updated });
+        }}
+        onMoveDown={() => {
+          if (
+            selectedIndex === -1 ||
+            selectedIndex >= form.components.length - 1
+          )
+            return;
+          const updated = [...form.components];
+          [updated[selectedIndex + 1], updated[selectedIndex]] = [
+            updated[selectedIndex],
+            updated[selectedIndex + 1],
+          ];
+          onChange?.({ ...form, components: updated });
+        }}
       />
+
       <FormBG>
         <div className="relative">
           <motion.div layout>
@@ -153,69 +213,6 @@ const EditableFormBuilder = ({
           </motion.div>
         )}
       </FormBG>
-      {selectedComponent !== null && (
-        <FormOptionsBottom
-          isHeader={selectedComponent === form.header.name}
-          onAdd={() => {
-            const newQuestion = createFormComponent({
-              type: FormComponentType.TEXT,
-            });
-
-            // Header selected → add at top
-            if (selectedIndex === -1) {
-              onChange?.({
-                ...form,
-                components: [newQuestion, ...form.components],
-              });
-              return;
-            }
-
-            // Otherwise insert after selected component
-            const updated = [...form.components];
-            updated.splice(selectedIndex + 1, 0, newQuestion);
-            onChange?.({ ...form, components: updated });
-          }}
-          onAddSeparator={() => {
-            const newQuestion = createFormComponent({
-              type: FormComponentType.SEPARATOR,
-            });
-
-            if (selectedIndex === -1) {
-              onChange?.({
-                ...form,
-                components: [newQuestion, ...form.components],
-              });
-              return;
-            }
-
-            const updated = [...form.components];
-            updated.splice(selectedIndex + 1, 0, newQuestion);
-            onChange?.({ ...form, components: updated });
-          }}
-          onMoveUp={() => {
-            if (selectedIndex <= 0) return;
-            const updated = [...form.components];
-            [updated[selectedIndex - 1], updated[selectedIndex]] = [
-              updated[selectedIndex],
-              updated[selectedIndex - 1],
-            ];
-            onChange?.({ ...form, components: updated });
-          }}
-          onMoveDown={() => {
-            if (
-              selectedIndex === -1 ||
-              selectedIndex >= form.components.length - 1
-            )
-              return;
-            const updated = [...form.components];
-            [updated[selectedIndex + 1], updated[selectedIndex]] = [
-              updated[selectedIndex],
-              updated[selectedIndex + 1],
-            ];
-            onChange?.({ ...form, components: updated });
-          }}
-        />
-      )}
     </>
   );
 };

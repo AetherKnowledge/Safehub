@@ -8,8 +8,8 @@ export enum SortBy {
   Comments = "Comments",
 }
 export enum Order {
-  Asc = "Asc",
-  Desc = "Desc",
+  Asc = "asc",
+  Desc = "desc",
 }
 
 type Props = { searchParams: { sortBy?: SortBy; order?: Order } };

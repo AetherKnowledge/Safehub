@@ -31,7 +31,8 @@ const FormsTab = ({
 }) => {
   const statusPopup = usePopup();
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState<BuiltFormData>({
+
+  const defaultForm: BuiltFormData = {
     header: {
       name: title,
       title: title,
@@ -43,7 +44,9 @@ const FormsTab = ({
         name: "text",
       }),
     ],
-  });
+  };
+
+  const [form, setForm] = useState<BuiltFormData>(defaultForm);
 
   useEffect(() => {
     async function fetchInitialData() {
@@ -54,7 +57,7 @@ const FormsTab = ({
         return;
       }
       if (result.data) {
-        setForm(result.data);
+        setForm(result.data || defaultForm);
       }
 
       setLoading(false);

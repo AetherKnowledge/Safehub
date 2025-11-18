@@ -2,9 +2,9 @@ import Cell from "@/app/components/Table/Cell";
 import HeaderItem from "@/app/components/Table/HeaderItem";
 import Table from "@/app/components/Table/Table";
 import TableHeader from "@/app/components/Table/TableHeader";
-import { AppointmentLogSortBy } from "@/app/user/appointment-logs/page";
 import { formatDateDisplay } from "@/lib/utils";
 import { ParsedAppointmentLog } from "./schema";
+import { AppointmentLogSortBy } from "./sort";
 
 const Logs = ({
   logs,
@@ -17,8 +17,8 @@ const Logs = ({
     <Table
       totalCount={totalCount}
       header={<LogsHeader />}
-      rows={logs.map((log) => (
-        <LogsRow log={log} />
+      rows={logs.map((log, index) => (
+        <LogsRow key={index} log={log} />
       ))}
     />
   );

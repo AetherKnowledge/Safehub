@@ -2,14 +2,11 @@ import LoadingPopup from "@/app/components/Popup/LoadingPopup";
 import { UserType } from "@/app/generated/prisma";
 import LogsTable from "@/app/pages/Appointment/LogsTable";
 import { getLogs } from "@/app/pages/Appointment/LogsTable/LogActions";
+import { AppointmentLogSortBy } from "@/app/pages/Appointment/LogsTable/sort";
 import { Order } from "@/app/pages/Dashboard/Student/Dashboard";
 import { auth } from "@/auth";
 import { Suspense } from "react";
 import { Await } from "react-router-dom";
-
-export enum AppointmentLogSortBy {
-  AppointmentDate = "startTime",
-}
 
 type Props = {
   searchParams: Promise<{
@@ -20,11 +17,12 @@ type Props = {
   }>;
 };
 
-const page = async ({ searchParams }: Props) => {
+const AppointmentLogsPage = async ({ searchParams }: Props) => {
   const session = await auth();
   if (!session?.user || session.user.type !== UserType.Admin) {
     throw new Error("Unauthorized");
   }
+
   const awaitedSearchParams = await searchParams;
 
   const perPageNum = parseInt(awaitedSearchParams.perPage || "5");
@@ -35,8 +33,6 @@ const page = async ({ searchParams }: Props) => {
 
   const perPage = !Number.isNaN(perPageNum) && perPageNum > 0 ? perPageNum : 5;
   const page = !Number.isNaN(pageNum) && pageNum > 0 ? pageNum : 1;
-
-  console.log("Fetching logs with perPage:", perPage, "and page:", page);
 
   return (
     <Suspense fallback={<LoadingPopup message="Logs loading..." />}>
@@ -57,4 +53,4 @@ const page = async ({ searchParams }: Props) => {
   );
 };
 
-export default page;
+export default AppointmentLogsPage;

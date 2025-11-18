@@ -26,9 +26,9 @@ const EditableFormBuilder = ({
   onChange?: (form: BuiltFormData) => void;
   onSave?: () => void;
 }) => {
-  const [selectedComponent, setSelectedComponent] = useState<string | null>(
-    null
-  );
+  const [selectedComponent, setSelectedComponent] = useState<
+    string | undefined
+  >(undefined);
   const selectedIndex = form.components.findIndex(
     (q) => q.props.name === selectedComponent
   );

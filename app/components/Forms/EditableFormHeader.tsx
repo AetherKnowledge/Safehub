@@ -21,13 +21,13 @@ const EditableFormHeader = ({
   onSave?: () => void;
   changeTerms?: (value: boolean) => void;
   termsAndConditions?: boolean;
-  selectedComponent: string | null;
+  selectedComponent?: string;
 } & FormsOptionsProps) => {
   const isMobile = useIsMobile();
 
   return (
     <div className="flex flex-row bg-base-100 w-full justify-end items-center p-2 gap-2 rounded-t-lg">
-      {selectedComponent !== null && (
+      {selectedComponent && (
         <AnimatePresence>
           {isMobile && (
             <motion.div

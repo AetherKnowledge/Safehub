@@ -30,20 +30,29 @@ const FormsOptions = ({
         >
           {!isHeader && (
             <div className="tooltip tooltip-left">
-              <button className="btn btn-ghost p-1 text-base-content/70">
+              <button
+                type="button"
+                className="btn btn-ghost p-1 text-base-content/70"
+              >
                 <FaChevronUp className="w-6 h-6" onClick={onMoveUp} />
               </button>
             </div>
           )}
 
           <div className="tooltip tooltip-left">
-            <button className="btn btn-ghost p-1 text-base-content/70">
+            <button
+              type="button"
+              className="btn btn-ghost p-1 text-base-content/70"
+            >
               <IoMdAddCircleOutline className="w-7 h-7" onClick={onAdd} />
             </button>
           </div>
 
           <div className="tooltip tooltip-left">
-            <button className="btn btn-ghost p-1 text-base-content/70">
+            <button
+              type="button"
+              className="btn btn-ghost p-1 text-base-content/70"
+            >
               <TfiLayoutAccordionSeparated
                 className="w-6 h-6"
                 onClick={onAddSeparator}
@@ -53,7 +62,10 @@ const FormsOptions = ({
 
           {!isHeader && (
             <div className="tooltip tooltip-left">
-              <button className="btn btn-ghost p-1 text-base-content/70">
+              <button
+                type="button"
+                className="btn btn-ghost p-1 text-base-content/70"
+              >
                 <FaChevronDown className="w-6 h-6" onClick={onMoveDown} />
               </button>
             </div>

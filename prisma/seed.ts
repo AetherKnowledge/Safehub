@@ -8,7 +8,7 @@ const client = new Client({
   connectionString: process.env.DATABASE_URL,
 });
 
-const form = {
+const bookingForm = {
   header: {
     name: "bookingHeader",
     title: "Book a Counseling Appointment",
@@ -85,6 +85,198 @@ const form = {
         name: "notes",
         legend: "Any additional notes or comments?",
         placeholder: "Type your response here...",
+      },
+      version: "1",
+    },
+  ],
+  termsAndConditions: true,
+};
+
+const evaluationForm = {
+  header: {
+    name: "Evaluation Form",
+    title: "Evaluation Form",
+    description:
+      "Kindly provide honest responses on the evaluation form, as changes cannot be made after submission. Your valuable feedback will help us continuously improve our services.",
+  },
+  components: [
+    {
+      name: "27b087ce-bb12-45e3-945b-3aa9985e3748",
+      type: "SEPARATOR",
+      props: {
+        name: "27b087ce-bb12-45e3-945b-3aa9985e3748",
+        legend: "Overall Experience",
+      },
+      legend: "Separatorg",
+      version: "1",
+    },
+    {
+      type: "LINEAR_SCALE",
+      props: {
+        max: 5,
+        min: 1,
+        name: "text",
+        legend: "How satisfied are you with today’s session?",
+        maxText: "Very Satisfied",
+        minText: "Very Dissatisfied",
+        required: true,
+      },
+      version: "1",
+    },
+    {
+      type: "SEPARATOR",
+      props: {
+        name: "4ac910c8-1bf5-47d2-bbe4-612017b98672",
+        legend: "Comfort and Communication",
+      },
+      version: "1",
+    },
+    {
+      type: "LINEAR_SCALE",
+      props: {
+        max: 5,
+        min: 1,
+        name: "e57080a3-1cbc-4814-a4a1-5504f99cb8f2",
+        legend: "Did you feel comfortable talking with the counselor?",
+        maxText: "Yes, completely",
+        minText: "Not at All",
+        required: true,
+      },
+      version: "1",
+    },
+    {
+      type: "LINEAR_SCALE",
+      props: {
+        max: 5,
+        min: 1,
+        name: "af4611c6-8d16-44f1-8579-545b7dcc1aef",
+        legend: "Did the counselor listen attentively to your concerns?",
+        maxText: "Always",
+        minText: "Rarely",
+        required: true,
+      },
+      version: "1",
+    },
+    {
+      type: "SEPARATOR",
+      props: {
+        name: "da87e671-7210-49a2-94a9-71c9a7d783df",
+        legend: "Understanding and Support",
+      },
+      version: "1",
+    },
+    {
+      type: "LINEAR_SCALE",
+      props: {
+        max: 5,
+        min: 1,
+        name: "6a01a50b-9da6-4f3f-96b8-d81469e43050",
+        legend: "How well did the counselor understand your situation?",
+        maxText: "Very well",
+        minText: "Not at all",
+        required: true,
+      },
+      version: "1",
+    },
+    {
+      type: "LINEAR_SCALE",
+      props: {
+        max: 5,
+        min: 1,
+        name: "8bb03f8e-7ffe-4272-b526-01a9843a8e0f",
+        legend: "Did you feel emotionally supported during the session?",
+        maxText: "Yes, fully",
+        minText: "Not at all",
+        required: true,
+      },
+      version: "1",
+    },
+    {
+      type: "SEPARATOR",
+      props: {
+        name: "43115be5-7c5f-4bb0-b67d-0ce43f6f17fd",
+        legend: "Professionalism",
+      },
+      version: "1",
+    },
+    {
+      type: "LINEAR_SCALE",
+      props: {
+        max: 5,
+        min: 1,
+        name: "8f231505-7caa-4382-95a0-c775239c5c6e",
+        legend: "Was the counselor respectful and nonjudgmental?",
+        maxText: "Yes, fully",
+        minText: "Not at All",
+      },
+      version: "1",
+    },
+    {
+      type: "LINEAR_SCALE",
+      props: {
+        max: 5,
+        min: 1,
+        name: "8e1b4310-a735-4228-ac9f-104e164ed2f5",
+        legend: "Did they maintain a professional and empathetic tone?",
+        maxText: "Yes, fully",
+        minText: "Not at all",
+      },
+      version: "1",
+    },
+    {
+      type: "SEPARATOR",
+      props: {
+        name: "5981d9c5-69c2-4e2f-946f-5e902f812a3c",
+        legend: "Effectiveness",
+      },
+      version: "1",
+    },
+    {
+      type: "LINEAR_SCALE",
+      props: {
+        max: 5,
+        min: 1,
+        name: "9c2e3422-6b3d-46fe-a22c-7e95f4bf0487",
+        legend:
+          "Did you gain any new insights, coping skills, or clarity from this session?",
+        maxText: "Yes, very much",
+        minText: "Not at all",
+      },
+      version: "1",
+    },
+    {
+      type: "LINEAR_SCALE",
+      props: {
+        max: 5,
+        min: 1,
+        name: "377b8193-42a8-4f6c-adb8-0c0605c00848",
+        legend: "How likely are you to continue sessions with this counselor?",
+        maxText: "Very Likely",
+        minText: "Unlikely",
+      },
+      version: "1",
+    },
+    {
+      type: "SEPARATOR",
+      props: {
+        name: "51036ed9-da7b-4ab0-b2ba-c20025226807",
+        legend: "Open feedback",
+      },
+      version: "1",
+    },
+    {
+      type: "TEXT",
+      props: {
+        name: "72efca33-bae8-4438-8054-ee42e2065dcf",
+        legend: "What did you find most helpful about the session?",
+      },
+      version: "1",
+    },
+    {
+      type: "TEXTAREA",
+      props: {
+        name: "bb8d6401-c6b1-4420-a722-343aa70e0fb2",
+        legend: "What could the counselor  improve in future sessions?",
       },
       version: "1",
     },
@@ -556,9 +748,9 @@ async function main() {
   // Default Forms Setup
   // ================================
 
-  const id = 1;
-  const type = "BOOKING";
-  const jsonFormData = JSON.parse(JSON.stringify(form));
+  const bookingId = 1;
+  const bookingType = "BOOKING";
+  const bookingFormData = JSON.parse(JSON.stringify(bookingForm));
 
   await client.query(
     `
@@ -566,7 +758,20 @@ async function main() {
     VALUES ($1, $2, $3, $4, $5)
     ON CONFLICT (type) DO NOTHING
     `,
-    [id, type, jsonFormData, now, now]
+    [bookingId, bookingType, bookingFormData, now, now]
+  );
+
+  const evaluationForm = 1;
+  const evaluationType = "EVALUATION";
+  const evaluationFormData = JSON.parse(JSON.stringify(evaluationForm));
+
+  await client.query(
+    `
+    INSERT INTO public."FormSchema" (id, type, schema, "createdAt", "updatedAt")
+    VALUES ($1, $2, $3, $4, $5)
+    ON CONFLICT (type) DO NOTHING
+    `,
+    [evaluationForm, evaluationType, evaluationFormData, now, now]
   );
 
   console.log("✅ Default booking form seeded");

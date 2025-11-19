@@ -1,4 +1,5 @@
 "use client";
+
 const FormBG = ({
   children,
   onSubmit,
@@ -16,7 +17,7 @@ const FormBG = ({
   };
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto items-center overflow-x-hidden">
+    <section className="flex-1 min-h-0 overflow-y-auto items-center overflow-x-hidden">
       <div className="flex flex-col w-full h-full rounded-xl p-5 items-center">
         <form
           onSubmit={handleSubmit}
@@ -25,7 +26,7 @@ const FormBG = ({
           {children}
         </form>
       </div>
-    </div>
+    </section>
   );
 };
 

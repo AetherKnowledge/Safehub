@@ -43,7 +43,10 @@ const EditableFormHeader = ({
                       <div className="tooltip-content">
                         <div className="text-sm">Move Question Up</div>
                       </div>
-                      <button className="btn btn-ghost p-1 text-base-content/70">
+                      <button
+                        type="button"
+                        className="btn btn-ghost p-1 text-base-content/70"
+                      >
                         <FaChevronUp className="w-6 h-6" onClick={onMoveUp} />
                       </button>
                     </div>
@@ -55,7 +58,10 @@ const EditableFormHeader = ({
                     <div className="tooltip-content">
                       <div className="text-sm">Add Question</div>
                     </div>
-                    <button className="btn btn-ghost p-1 text-base-content/70">
+                    <button
+                      type="button"
+                      className="btn btn-ghost p-1 text-base-content/70"
+                    >
                       <IoMdAddCircleOutline
                         className="w-7 h-7"
                         onClick={onAdd}
@@ -69,7 +75,10 @@ const EditableFormHeader = ({
                     <div className="tooltip-content">
                       <div className="text-sm">Add Separator</div>
                     </div>
-                    <button className="btn btn-ghost p-1 text-base-content/70">
+                    <button
+                      type="button"
+                      className="btn btn-ghost p-1 text-base-content/70"
+                    >
                       <TfiLayoutAccordionSeparated
                         className="w-6 h-6"
                         onClick={onAddSeparator}
@@ -84,7 +93,10 @@ const EditableFormHeader = ({
                       <div className="tooltip-content">
                         <div className="text-sm">Move Question Down</div>
                       </div>
-                      <button className="btn btn-ghost p-1 text-base-content/70">
+                      <button
+                        type="button"
+                        className="btn btn-ghost p-1 text-base-content/70"
+                      >
                         <FaChevronDown
                           className="w-6 h-6"
                           onClick={onMoveDown}

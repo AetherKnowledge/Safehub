@@ -33,6 +33,51 @@ const EditableFormBuilder = ({
     (q) => q.props.name === selectedComponent
   );
 
+  function handleAddComponent(type: FormComponentType) {
+    const newQuestion = createFormComponent({
+      type,
+    });
+
+    // Header selected → add at top
+    if (selectedIndex === -1) {
+      onChange?.({
+        ...form,
+        components: [newQuestion, ...form.components],
+      });
+      return;
+    }
+
+    // Otherwise insert after selected component
+    const updated = [...form.components];
+    updated.splice(selectedIndex + 1, 0, newQuestion);
+    onChange?.({ ...form, components: updated });
+
+    setTimeout(() => {
+      setSelectedComponent(newQuestion.props.name);
+    }, 0);
+  }
+
+  function handleMoveComponentUp() {
+    if (selectedIndex <= 0) return;
+    const updated = [...form.components];
+    [updated[selectedIndex - 1], updated[selectedIndex]] = [
+      updated[selectedIndex],
+      updated[selectedIndex - 1],
+    ];
+    onChange?.({ ...form, components: updated });
+  }
+
+  function handleMoveComponentDown() {
+    if (selectedIndex === -1 || selectedIndex >= form.components.length - 1)
+      return;
+    const updated = [...form.components];
+    [updated[selectedIndex + 1], updated[selectedIndex]] = [
+      updated[selectedIndex],
+      updated[selectedIndex + 1],
+    ];
+    onChange?.({ ...form, components: updated });
+  }
+
   return (
     <>
       <EditableFormHeader
@@ -43,64 +88,10 @@ const EditableFormBuilder = ({
         }
         termsAndConditions={form.termsAndConditions}
         isHeader={selectedComponent === form.header.name}
-        onAdd={() => {
-          const newQuestion = createFormComponent({
-            type: FormComponentType.TEXT,
-          });
-
-          // Header selected → add at top
-          if (selectedIndex === -1) {
-            onChange?.({
-              ...form,
-              components: [newQuestion, ...form.components],
-            });
-            return;
-          }
-
-          // Otherwise insert after selected component
-          const updated = [...form.components];
-          updated.splice(selectedIndex + 1, 0, newQuestion);
-          onChange?.({ ...form, components: updated });
-        }}
-        onAddSeparator={() => {
-          const newQuestion = createFormComponent({
-            type: FormComponentType.SEPARATOR,
-          });
-
-          if (selectedIndex === -1) {
-            onChange?.({
-              ...form,
-              components: [newQuestion, ...form.components],
-            });
-            return;
-          }
-
-          const updated = [...form.components];
-          updated.splice(selectedIndex + 1, 0, newQuestion);
-          onChange?.({ ...form, components: updated });
-        }}
-        onMoveUp={() => {
-          if (selectedIndex <= 0) return;
-          const updated = [...form.components];
-          [updated[selectedIndex - 1], updated[selectedIndex]] = [
-            updated[selectedIndex],
-            updated[selectedIndex - 1],
-          ];
-          onChange?.({ ...form, components: updated });
-        }}
-        onMoveDown={() => {
-          if (
-            selectedIndex === -1 ||
-            selectedIndex >= form.components.length - 1
-          )
-            return;
-          const updated = [...form.components];
-          [updated[selectedIndex + 1], updated[selectedIndex]] = [
-            updated[selectedIndex],
-            updated[selectedIndex + 1],
-          ];
-          onChange?.({ ...form, components: updated });
-        }}
+        onAdd={() => handleAddComponent(FormComponentType.TEXT)}
+        onAddSeparator={() => handleAddComponent(FormComponentType.SEPARATOR)}
+        onMoveUp={handleMoveComponentUp}
+        onMoveDown={handleMoveComponentDown}
       />
 
       <FormBG>
@@ -113,24 +104,10 @@ const EditableFormBuilder = ({
               onChange={(component) => {
                 onChange?.({ ...form, header: component });
               }}
-              onAdd={() => {
-                const newQuestion = createFormComponent({
-                  type: FormComponentType.TEXT,
-                });
-                onChange?.({
-                  ...form,
-                  components: [newQuestion, ...form.components],
-                });
-              }}
-              onAddSeparator={() => {
-                const newQuestion = createFormComponent({
-                  type: FormComponentType.SEPARATOR,
-                });
-                onChange?.({
-                  ...form,
-                  components: [newQuestion, ...form.components],
-                });
-              }}
+              onAdd={() => handleAddComponent(FormComponentType.TEXT)}
+              onAddSeparator={() =>
+                handleAddComponent(FormComponentType.SEPARATOR)
+              }
             />
           </motion.div>
         </div>
@@ -151,6 +128,11 @@ const EditableFormBuilder = ({
                     const updatedQuestions = [...form.components];
                     updatedQuestions.splice(index, 1);
                     onChange?.({ ...form, components: updatedQuestions });
+
+                    setTimeout(() => {
+                      const componentAbove = updatedQuestions[index - 1];
+                      setSelectedComponent(componentAbove?.props.name);
+                    }, 0);
                   }}
                   onDuplicate={() => {
                     const updatedQuestions = [...form.components];
@@ -166,39 +148,17 @@ const EditableFormBuilder = ({
                     // @ts-expect-error TypeScript cannot infer this type correctly
                     updatedQuestions.splice(index + 1, 0, newComponent);
                     onChange?.({ ...form, components: updatedQuestions });
+
+                    setTimeout(() => {
+                      setSelectedComponent(newComponent.props.name);
+                    }, 0);
                   }}
-                  onAdd={() => {
-                    const newQuestion = createFormComponent({
-                      type: FormComponentType.TEXT,
-                    });
-                    const updatedQuestions = [...form.components];
-                    updatedQuestions.splice(index + 1, 0, newQuestion);
-                    onChange?.({ ...form, components: updatedQuestions });
-                  }}
-                  onAddSeparator={() => {
-                    const newQuestion = createFormComponent({
-                      type: FormComponentType.SEPARATOR,
-                    });
-                    const updatedQuestions = [...form.components];
-                    updatedQuestions.splice(index + 1, 0, newQuestion);
-                    onChange?.({ ...form, components: updatedQuestions });
-                  }}
-                  onMoveUp={() => {
-                    if (index === 0) return;
-                    const updatedQuestions = [...form.components];
-                    const temp = updatedQuestions[index - 1];
-                    updatedQuestions[index - 1] = updatedQuestions[index];
-                    updatedQuestions[index] = temp;
-                    onChange?.({ ...form, components: updatedQuestions });
-                  }}
-                  onMoveDown={() => {
-                    if (index === form.components.length - 1) return;
-                    const updatedQuestions = [...form.components];
-                    const temp = updatedQuestions[index + 1];
-                    updatedQuestions[index + 1] = updatedQuestions[index];
-                    updatedQuestions[index] = temp;
-                    onChange?.({ ...form, components: updatedQuestions });
-                  }}
+                  onAdd={() => handleAddComponent(FormComponentType.TEXT)}
+                  onAddSeparator={() =>
+                    handleAddComponent(FormComponentType.SEPARATOR)
+                  }
+                  onMoveUp={handleMoveComponentUp}
+                  onMoveDown={handleMoveComponentDown}
                 />
               </motion.div>
             </div>

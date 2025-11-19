@@ -129,7 +129,7 @@ const SelectBox = ({
           }}
           onChange={() => {}}
           style={{ caretColor: "transparent" }}
-          readOnly={readonly}
+          readOnly
         />
 
         <div className="flex flex-col -mt-1.5">

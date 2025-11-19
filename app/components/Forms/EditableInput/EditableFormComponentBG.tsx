@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import FormComponentBG from "../FormComponentBG";
 
 const EditableFormComponentBG = ({
@@ -13,8 +14,22 @@ const EditableFormComponentBG = ({
   selected: boolean;
   className?: string;
 }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  function scrollIntoView() {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+
+  useEffect(() => {
+    if (selected) {
+      scrollIntoView();
+    }
+  }, [selected]);
+
   return (
-    <>
+    <section ref={ref}>
       <FormComponentBG
         className={`card w-full border-0 transition-all cursor-pointer  shadow-br
           ${
@@ -24,7 +39,7 @@ const EditableFormComponentBG = ({
       >
         {children}
       </FormComponentBG>
-    </>
+    </section>
   );
 };
 

@@ -60,6 +60,8 @@ const EditableFormComponent = ({
         }}
         onAdd={onAdd}
         onAddSeparator={onAddSeparator}
+        onMoveUp={onMoveUp}
+        onMoveDown={onMoveDown}
       />
     );
   }

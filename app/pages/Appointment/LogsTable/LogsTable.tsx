@@ -10,7 +10,7 @@ import { AppointmentLogSortBy } from "./sort";
 const Logs = ({
   logs,
   totalCount,
-  isLoading = true,
+  isLoading = false,
 }: {
   logs: ParsedAppointmentLog[];
   totalCount: number;

@@ -18,7 +18,7 @@ const Table = ({
   totalCount,
   topActions = false,
   perPageValues = [5, 10, 15],
-  isLoading = true,
+  isLoading = false,
 }: TableProps) => {
   return (
     <div className="flex-1 flex flex-col bg-base-100 shadow-br rounded-lg min-h-0 overflow-x-hidden">

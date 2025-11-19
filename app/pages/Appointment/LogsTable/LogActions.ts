@@ -5,7 +5,7 @@ import { UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { prisma } from "@/prisma/client";
 import { Order } from "../../Dashboard/Student/Dashboard";
-import { ParsedAppointmentLog } from "./schema";
+import { AppointmentLogsResult, ParsedAppointmentLog } from "./schema";
 import { AppointmentLogSortBy } from "./sort";
 
 export async function getLogs({
@@ -18,9 +18,7 @@ export async function getLogs({
   page: number;
   sortBy: AppointmentLogSortBy;
   order: Order;
-}): Promise<
-  ActionResult<{ logs: ParsedAppointmentLog[]; totalCount: number }>
-> {
+}): Promise<ActionResult<AppointmentLogsResult>> {
   try {
     if (perPage <= 0 || page <= 0) {
       return { success: false, message: "Invalid pagination parameters." };

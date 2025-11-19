@@ -2,13 +2,52 @@
 
 import LineChart from "@/app/components/Charts/LineChart";
 import { Chart, registerables } from "chart.js";
-import { useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import LogsTable from "../../Appointment/LogsTable";
+import { getLogs } from "../../Appointment/LogsTable/LogActions";
+import { AppointmentLogsResult } from "../../Appointment/LogsTable/schema";
+import { AppointmentLogSortBy } from "../../Appointment/LogsTable/sort";
+import { Order } from "../Student/Dashboard";
 
 Chart.register(...registerables);
 
 const Dashboard = () => {
   const moodChartRef = useRef<HTMLCanvasElement>(null);
   const moodChartInstanceRef = useRef<Chart | null>(null);
+  const searchParams = useSearchParams();
+  const [logsLoading, setLogsLoading] = useState(true);
+  const [logs, setLogs] = useState<AppointmentLogsResult>({
+    logs: [],
+    totalCount: 0,
+  });
+
+  useEffect(() => {
+    async function fetchLogs() {
+      setLogsLoading(true);
+
+      const perPageNum = parseInt(searchParams.get("perPage") || "5");
+      const pageNum = parseInt(searchParams.get("page") || "1");
+      const sortBy =
+        searchParams.get("sortBy") || AppointmentLogSortBy.AppointmentDate;
+      const order = searchParams.get("order") || Order.Desc;
+
+      const perPage =
+        !Number.isNaN(perPageNum) && perPageNum > 0 ? perPageNum : 5;
+      const page = !Number.isNaN(pageNum) && pageNum > 0 ? pageNum : 1;
+
+      const result = await getLogs({
+        perPage,
+        page,
+        sortBy: sortBy as AppointmentLogSortBy,
+        order: order as Order,
+      });
+      if (result.success && result.data) {
+        setLogs(result.data);
+      }
+    }
+    fetchLogs().finally(() => setLogsLoading(false));
+  }, [searchParams]);
 
   useEffect(() => {
     // Mood of all students chart
@@ -83,46 +122,8 @@ const Dashboard = () => {
     };
   }, []);
 
-  const appointments = [
-    {
-      date: "May 21, 2024",
-      number: "QP10408",
-      student: "Loraine Reyes",
-      status: "Open",
-      counselor: "Ms. Rosuelo",
-    },
-    {
-      date: "May 19, 2024",
-      number: "QP01037",
-      student: "Isabelle Cruz",
-      status: "Pending",
-      counselor: "Mr. Rosuelo",
-    },
-    {
-      date: "May 19, 2024",
-      number: "QP03573",
-      student: "Maria Pearl Jr.",
-      status: "Pending",
-      counselor: "Mr. Rosuelo",
-    },
-    {
-      date: "May 19, 2024",
-      number: "QP04818",
-      student: "Prof Bryan Reyes",
-      status: "Confirmed",
-      counselor: "Mr. Rosuelo",
-    },
-    {
-      date: "May 18, 2024",
-      number: "QP04023",
-      student: "Emma Longpre",
-      status: "Canceled",
-      counselor: "Mr. Rosuelo",
-    },
-  ];
-
   return (
-    <div className="flex flex-col gap-3 flex-1 min-h-0 overflow-auto p-4">
+    <div className="flex flex-col gap-3 flex-1 min-h-0 overflow-auto">
       {/* Top Grid - Charts */}
       <div className="grid grid-cols-2 gap-4">
         {/* Mood Chart */}
@@ -159,65 +160,11 @@ const Dashboard = () => {
       </div>
 
       {/* Latest Appointments Table */}
-      <div className="bg-base-100 rounded-lg overflow-hidden">
-        <div className="p-4 border-b border-base-300">
-          <h3 className="text-lg font-semibold">Latest Appointments</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="table w-full">
-            <thead className="bg-neutral">
-              <tr>
-                <th className="font-semibold">Appointment Date</th>
-                <th className="font-semibold">Appointment Number</th>
-                <th className="font-semibold">Student</th>
-                <th className="font-semibold">Status</th>
-                <th className="font-semibold">Assigned Counselor</th>
-                <th className="font-semibold"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {appointments.map((appointment, index) => (
-                <tr key={index} className="hover:bg-base-300">
-                  <td>{appointment.date}</td>
-                  <td>{appointment.number}</td>
-                  <td>{appointment.student}</td>
-                  <td>
-                    <span
-                      className={`badge badge-sm ${
-                        appointment.status === "Open"
-                          ? "badge-success"
-                          : appointment.status === "Pending"
-                          ? "badge-warning"
-                          : appointment.status === "Confirmed"
-                          ? "badge-info"
-                          : "badge-error"
-                      }`}
-                    >
-                      {appointment.status}
-                    </span>
-                  </td>
-                  <td>{appointment.counselor}</td>
-                  <td>
-                    <button className="btn btn-ghost btn-xs">Open</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="p-4 flex justify-between items-center border-t border-base-300 text-sm">
-          <span>Showing 5 to 10 of 43 Results</span>
-          <div className="flex gap-2">
-            <button className="btn btn-ghost btn-xs">1</button>
-            <button className="btn btn-ghost btn-xs">2</button>
-            <button className="btn btn-ghost btn-xs">3</button>
-            <button className="btn btn-ghost btn-xs">4</button>
-            <button className="btn btn-ghost btn-xs">10</button>
-            <button className="btn btn-ghost btn-xs">25</button>
-            <button className="btn btn-ghost btn-xs">50</button>
-          </div>
-        </div>
-      </div>
+      <LogsTable
+        logs={logs.logs || []}
+        totalCount={logs.totalCount || 0}
+        isLoading={logsLoading}
+      />
     </div>
   );
 };

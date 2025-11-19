@@ -306,16 +306,21 @@ model Appointment {
   startTime DateTime
   endTime   DateTime?
 
-  focus               String?
-  hadCounselingBefore Boolean?
-  sessionPreference   SessionPreference?
-  urgencyLevel        Int?
-  notes               String?
-  room                String?
-
+  sessionPreference  SessionPreference
   appointmentData    Json?
   cancellationReason String?
 
+  summary         String?
+  observations    String?
+  recommendations String?
+
+  // Foreign key for the 1→1 self relation
+  followUpId     String? @unique @db.Uuid
+  followUpReason String?
+
+  // Self-relation (1-to-1)
+  parent          Appointment?     @relation("FollowUpRelation")
+  followUp        Appointment?     @relation("FollowUpRelation", fields: [followUpId], references: [id])
   student         Student          @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
   counselor       Counselor        @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)
   feedback        Feedback?

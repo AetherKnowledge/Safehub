@@ -25,6 +25,7 @@ const ModalBase = ({
       onClick={onClose}
     >
       <div
+        className="flex overflow-y-auto p-5 max-h-full min-w-0 flex-1 items-center justify-center"
         onClick={(e) => e.stopPropagation()} // prevents closing when clicking inside
       >
         {children}

@@ -1,7 +1,8 @@
 "use server";
 
 import { ChatData, Message } from "@/@types/network";
-import { UserStatus } from "@/app/generated/prisma";
+import ActionResult from "@/app/components/ActionResult";
+import { ChatType, UserStatus } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
 import { Recipient } from "@/lib/socket/SocketEvents";
@@ -97,6 +98,41 @@ export async function getChats(): Promise<ChatData[]> {
   console.log("Fetched chats:", parsedChats);
 
   return parsedChats;
+}
+("");
+export async function getDirectChatId(
+  userId: string
+): Promise<ActionResult<string>> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      throw new Error("Unauthorized");
+    }
+
+    if (!userId || typeof userId !== "string") {
+      throw new Error("Invalid user ID");
+    }
+
+    const existingChat = await prisma.chat.findFirst({
+      where: {
+        type: ChatType.DIRECT,
+        members: {
+          every: {
+            userId: { in: [session.user.id, userId] },
+          },
+        },
+      },
+    });
+
+    if (!existingChat) {
+      return { success: false, message: "Direct chat not found" };
+    }
+
+    return { success: true, data: existingChat.id };
+  } catch (err) {
+    console.error("Error in getDirectChatId:", err);
+    return { success: false, message: (err as Error).message };
+  }
 }
 
 export type ChatInfo = {

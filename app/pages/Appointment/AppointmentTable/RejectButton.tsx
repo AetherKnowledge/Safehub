@@ -3,17 +3,13 @@
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { AppointmentStatus } from "@/app/generated/prisma";
 import { useRouter } from "next/navigation";
-import { FaCheckCircle } from "react-icons/fa";
+import { MdCancel } from "react-icons/md";
 import {
   AppointmentData,
   updateAppointmentStatus,
 } from "../AppointmentActions";
 
-interface MarkDoneButtonProps {
-  appointment: AppointmentData;
-}
-
-const MarkDoneButton = ({ appointment }: MarkDoneButtonProps) => {
+const RejectButton = ({ appointment }: { appointment: AppointmentData }) => {
   const router = useRouter();
   const statusPopup = usePopup();
 
@@ -38,13 +34,13 @@ const MarkDoneButton = ({ appointment }: MarkDoneButtonProps) => {
 
   return (
     <button
-      className="flex flex-row btn btn-info gap-1 justify-center items-center btn-sm h-8"
-      onClick={() => handleUpdate(AppointmentStatus.Completed)}
+      className="flex flex-row btn btn-error gap-1 justify-center items-center btn-sm h-8"
+      onClick={() => handleUpdate(AppointmentStatus.Rejected)}
     >
-      <FaCheckCircle className="w-3 h-3" />
-      Mark as Done
+      <MdCancel className="w-3 h-3" />
+      {appointment.parentId ? "Cancel" : "Reject"}
     </button>
   );
 };
 
-export default MarkDoneButton;
+export default RejectButton;

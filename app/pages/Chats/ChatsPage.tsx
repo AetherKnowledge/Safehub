@@ -17,7 +17,8 @@ const ChatsPage = async ({ chatId }: ChatsPageProps) => {
   }
   chats.push(...(await getChats()));
 
-  const chatForSelectedId = chats.find((chat) => chat.id === chatId);
+  const chatForSelectedId =
+    chats.find((chat) => chat.id === chatId) || chats[0];
 
   return (
     <div className="flex flex-row gap-3 flex-1 min-h-0">

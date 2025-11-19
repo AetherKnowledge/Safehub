@@ -1,15 +1,19 @@
-const Test = () => {
+import { getAppointments } from "@/app/pages/Appointment/AppointmentActions";
+import ViewAppointmentButton from "@/app/pages/Appointment/AppointmentTable/ViewAppointmentButton";
+
+const Test = async () => {
   async function wew() {
     "use server";
     // await testAction();
   }
 
+  const appointments = await getAppointments();
+
   return (
     <>
-      <form action={wew}>
-        <button className="btn">test</button>
-      </form>
-      hello
+      <div className="flex-1 flex flex-row">
+        <ViewAppointmentButton appointment={appointments[1]} />
+      </div>
     </>
   );
 };

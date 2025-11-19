@@ -100,7 +100,7 @@ export const onboardingSchema = z.object({
 
   guardianRelationship: z.enum(GuardianRelationship),
 
-  guardianEmail: z.email("Invalid guardian email address"),
+  guardianEmail: z.email("Invalid guardian email address").optional(),
 });
 
 export type OnboardingData = z.infer<typeof onboardingSchema>;

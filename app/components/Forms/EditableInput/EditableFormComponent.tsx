@@ -52,7 +52,10 @@ const EditableFormComponent = ({
         onChange={(updatedComponent) => {
           onChange?.({
             ...component,
-            ...updatedComponent,
+            props: {
+              ...component.props,
+              ...updatedComponent,
+            },
           });
         }}
         onAdd={onAdd}

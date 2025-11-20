@@ -1,13 +1,15 @@
 import { FaAngleDown } from "react-icons/fa6";
 
 const Collapse = ({
+  id,
   title,
   children,
 }: {
+  id: string;
   title: string;
   children?: React.ReactNode;
 }) => {
-  const inputId = "collapse-appointment-details";
+  const inputId = id;
   return (
     <div className="collapse rounded-none">
       {/* hide the checkbox visually but keep it accessible; use it as the peer */}

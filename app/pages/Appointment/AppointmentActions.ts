@@ -27,10 +27,7 @@ import {
 export type AppointmentData = Appointment & {
   chatId: string;
   student: {
-    user: Pick<
-      User,
-      "id" | "name" | "email" | "section" | "program" | "year" | "image"
-    >;
+    user: StudentDetailsData;
   };
   counselor: {
     user: Pick<User, "id" | "name" | "email" | "image">;
@@ -38,6 +35,38 @@ export type AppointmentData = Appointment & {
   feedback: Feedback | null;
   parentId?: string;
 };
+
+export interface StudentDetailsData {
+  id: string;
+  name: string | null;
+  email: string;
+  image: string | null;
+
+  firstName: string | null;
+  middleName: string | null;
+  lastName: string | null;
+  suffix: string | null;
+
+  birthDate: Date | null;
+  gender: string | null;
+
+  department: string | null;
+  program: string | null;
+  year: number | null;
+  section: string | null;
+
+  phoneNumber: string | null;
+
+  guardianName: string | null;
+  guardianFirstName: string | null;
+  guardianMiddleName: string | null;
+  guardianLastName: string | null;
+  guardianSuffix: string | null;
+
+  guardianContact: string | null;
+  guardianEmail: string | null;
+  relationToGuardian: string | null;
+}
 
 export async function getAppointments(): Promise<AppointmentData[]> {
   const session = await auth();
@@ -64,10 +93,32 @@ export async function getAppointments(): Promise<AppointmentData[]> {
               id: true,
               name: true,
               email: true,
-              section: true,
+              image: true,
+
+              firstName: true,
+              middleName: true,
+              lastName: true,
+              suffix: true,
+
+              birthDate: true,
+              gender: true,
+
+              department: true,
               program: true,
               year: true,
-              image: true,
+              section: true,
+
+              phoneNumber: true,
+
+              guardianName: true,
+              guardianFirstName: true,
+              guardianMiddleName: true,
+              guardianLastName: true,
+              guardianSuffix: true,
+
+              guardianContact: true,
+              guardianEmail: true,
+              relationToGuardian: true,
             },
           },
         },
@@ -143,10 +194,32 @@ export async function getAppointmentById(
                 id: true,
                 name: true,
                 email: true,
-                section: true,
+                image: true,
+
+                firstName: true,
+                middleName: true,
+                lastName: true,
+                suffix: true,
+
+                birthDate: true,
+                gender: true,
+
+                department: true,
                 program: true,
                 year: true,
-                image: true,
+                section: true,
+
+                phoneNumber: true,
+
+                guardianName: true,
+                guardianFirstName: true,
+                guardianMiddleName: true,
+                guardianLastName: true,
+                guardianSuffix: true,
+
+                guardianContact: true,
+                guardianEmail: true,
+                relationToGuardian: true,
               },
             },
           },
@@ -599,10 +672,32 @@ export async function getAppointmentsForDateRange(
               id: true,
               name: true,
               email: true,
-              section: true,
+              image: true,
+
+              firstName: true,
+              middleName: true,
+              lastName: true,
+              suffix: true,
+
+              birthDate: true,
+              gender: true,
+
+              department: true,
               program: true,
               year: true,
-              image: true,
+              section: true,
+
+              phoneNumber: true,
+
+              guardianName: true,
+              guardianFirstName: true,
+              guardianMiddleName: true,
+              guardianLastName: true,
+              guardianSuffix: true,
+
+              guardianContact: true,
+              guardianEmail: true,
+              relationToGuardian: true,
             },
           },
         },
@@ -697,10 +792,32 @@ export async function getAppointmentsForDate(
               id: true,
               name: true,
               email: true,
-              section: true,
+              image: true,
+
+              firstName: true,
+              middleName: true,
+              lastName: true,
+              suffix: true,
+
+              birthDate: true,
+              gender: true,
+
+              department: true,
               program: true,
               year: true,
-              image: true,
+              section: true,
+
+              phoneNumber: true,
+
+              guardianName: true,
+              guardianFirstName: true,
+              guardianMiddleName: true,
+              guardianLastName: true,
+              guardianSuffix: true,
+
+              guardianContact: true,
+              guardianEmail: true,
+              relationToGuardian: true,
             },
           },
         },

@@ -6,12 +6,14 @@ const UserImage = ({
   src,
   bordered,
   borderWidth = 2,
+  onClick,
 }: {
   name: string;
   width: number;
   src?: string | null;
   bordered?: boolean;
   borderWidth?: number;
+  onClick?: () => void;
 }) => {
   return (
     <div
@@ -25,6 +27,7 @@ const UserImage = ({
         height: `calc(var(--spacing) * ${width})`,
         borderWidth: `${borderWidth}px`,
       }}
+      onClick={onClick}
     >
       {src ? (
         <Image

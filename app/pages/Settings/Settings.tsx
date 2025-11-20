@@ -12,6 +12,7 @@ import { FaEdit } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
 import { usePopup } from "../../components/Popup/PopupProvider";
 import UserImage from "../../components/UserImage";
+import { StudentDetailsData } from "../Appointment/AppointmentActions";
 import {
   departmentsWithPrograms,
   genderOptions,
@@ -207,7 +208,13 @@ const Settings = ({ user }: { user: SettingsUser }) => {
   );
 };
 
-function GuardianDetails({ user }: { user: SettingsUser }) {
+export function GuardianDetails({
+  user,
+  readOnly = false,
+}: {
+  user: SettingsUser | StudentDetailsData;
+  readOnly?: boolean;
+}) {
   return (
     <>
       <HorizontalItemsBox
@@ -250,6 +257,7 @@ function GuardianDetails({ user }: { user: SettingsUser }) {
             },
           },
         ]}
+        readonly={readOnly}
       />
       <HorizontalItemsBox
         name="guardian-contact-and-email"
@@ -275,6 +283,7 @@ function GuardianDetails({ user }: { user: SettingsUser }) {
             } as TextBoxProps,
           },
         ]}
+        readonly={readOnly}
       />
     </>
   );

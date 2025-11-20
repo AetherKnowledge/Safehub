@@ -17,6 +17,11 @@ export type BuiltFormData = {
   termsAndConditions?: boolean;
 };
 
+export type BuiltFormDataWithAnswers = {
+  questions: BuiltFormData;
+  answers: { [key: string]: any };
+};
+
 const EditableFormBuilder = ({
   form,
   onChange,

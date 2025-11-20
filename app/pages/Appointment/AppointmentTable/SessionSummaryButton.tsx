@@ -40,7 +40,7 @@ const SessionSummaryButton = ({
   return (
     <>
       <button
-        className="flex flex-row btn gap-1 justify-center items-center btn-sm h-8"
+        className="flex flex-row btn gap-1 justify-center items-center btn-sm bg-gray-100 text-black hover:bg-gray-300 active:bg-gray-400 h-8"
         onClick={() => setShowModal(true)}
       >
         <LuClipboardList className="w-4 h-4" />

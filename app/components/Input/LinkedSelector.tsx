@@ -39,6 +39,8 @@ const LinkedSelector = ({
   legend,
   required = false,
   number,
+  readonly = false,
+  noFormOutput = false,
 }: LinkedSelectorProps) => {
   const [parentOptions, setParentOptions] = useState<Option[]>(
     linkedOptions.map((lo) => lo.parentOption)
@@ -64,10 +66,14 @@ const LinkedSelector = ({
               linkedComponent={parent}
               options={parentOptions}
               onChange={handleParentChange}
+              readonly={readonly}
+              noFormOutput={noFormOutput}
             />
             <LinkedComponentBuilder
               linkedComponent={child}
               options={childOptions}
+              readonly={readonly}
+              noFormOutput={noFormOutput}
             />
           </div>
         </fieldset>
@@ -78,12 +84,16 @@ const LinkedSelector = ({
               linkedComponent={parent}
               options={parentOptions}
               onChange={handleParentChange}
+              readonly={readonly}
+              noFormOutput={noFormOutput}
             />
           </FormComponentBG>
           <FormComponentBG>
             <LinkedComponentBuilder
               linkedComponent={child}
               options={childOptions}
+              readonly={readonly}
+              noFormOutput={noFormOutput}
             />
           </FormComponentBG>{" "}
         </>
@@ -97,11 +107,13 @@ const LinkedComponentBuilder = ({
   options,
   onChange,
   noFormOutput,
+  readonly = false,
 }: {
   linkedComponent: LinkedComponent;
   options: Option[];
   onChange?: (value: Option) => void;
   noFormOutput?: boolean;
+  readonly?: boolean;
 }) => {
   switch (linkedComponent.type) {
     case FormComponentType.SELECT:
@@ -110,6 +122,8 @@ const LinkedComponentBuilder = ({
           {...(linkedComponent.props as SelectBoxProps)}
           options={options}
           onChange={onChange}
+          noFormOutput={noFormOutput}
+          readonly={readonly}
         />
       );
     case FormComponentType.RADIO:
@@ -118,6 +132,8 @@ const LinkedComponentBuilder = ({
           {...(linkedComponent.props as RadioBoxProps)}
           options={options}
           onChange={onChange}
+          noFormOutput={noFormOutput}
+          readonly={readonly}
         />
       );
     default:

@@ -4,6 +4,8 @@ import Collapse from "@/app/components/Collapse";
 import Divider from "@/app/components/Divider";
 import ModalBase from "@/app/components/Popup/ModalBase";
 
+import { BuiltFormDataWithAnswers } from "@/app/components/Forms/EditableFormBuilder";
+import { FormComponentBuilder } from "@/app/components/Forms/FormBuilder";
 import StatusBadge from "@/app/components/Table/StatusBadge";
 import UserImage from "@/app/components/UserImage";
 import { AppointmentStatus, SessionPreference } from "@/app/generated/prisma";
@@ -21,6 +23,7 @@ import ApproveButton from "./ApproveButton";
 import CloseButton from "./CloseButton";
 import FollowUpButton from "./FollowUpButton";
 import SessionSummaryButton from "./SessionSummaryButton";
+import StudentDetailsPopup, { StudentDetails } from "./StudentDetailsPopup";
 
 const ViewAppointmentButton = ({
   appointment,
@@ -104,7 +107,7 @@ export const PreferenceBadge = ({
   preference: SessionPreference;
 }) => {
   return (
-    <div className="badge rounded-sm">
+    <div className="badge bg-gray-100 text-black rounded-sm">
       {preference === SessionPreference.Either && "Either"}
       {preference === SessionPreference.InPerson && "In-Person Meeting"}
       {preference === SessionPreference.Online && "Online Meeting"}
@@ -120,6 +123,11 @@ export const ViewModal = ({
   onClose: () => void;
 }) => {
   const { initiateCall } = useCallPopup();
+  const [showStudentDetails, setShowStudentDetails] = useState(false);
+
+  const formDataWithAnswers = JSON.parse(
+    JSON.stringify(appointment.appointmentData)
+  ) as BuiltFormDataWithAnswers;
 
   const handleInitiateCall = () => {
     if (!appointment.chatId) return;
@@ -140,7 +148,14 @@ export const ViewModal = ({
                 width={20}
                 bordered
                 borderWidth={3}
+                onClick={() => setShowStudentDetails(true)}
               />
+              {showStudentDetails && (
+                <StudentDetailsPopup
+                  appointment={appointment}
+                  onClose={() => setShowStudentDetails(false)}
+                />
+              )}
               <div className="flex flex-col flex-1">
                 <p className="text-xs font-semibold">Appointment with...</p>
                 <p className="font-semibold">
@@ -190,8 +205,24 @@ export const ViewModal = ({
                 </p>
               )}
               <Divider />
-              <Collapse title="Appointment Details">
-                {/* Add appointment details content here */}
+              <Collapse
+                id="collapse-appointment-details"
+                title="Appointment Details"
+              >
+                <div className="flex flex-col py-5 gap-5">
+                  {formDataWithAnswers.questions.components.map((component) => (
+                    <FormComponentBuilder
+                      key={component.props.name}
+                      component={component}
+                      answer={formDataWithAnswers.answers[component.props.name]}
+                      readOnly
+                    />
+                  ))}
+                </div>
+              </Collapse>
+              <Divider />
+              <Collapse id="collapse-student-details" title="Student Details">
+                <StudentDetails user={appointment.student.user} />
               </Collapse>
               <Divider />
             </div>

@@ -21,6 +21,8 @@ const HorizontalItemsBox = ({
   required = items.some((item) => item.props.required),
   number,
   className,
+  readonly = false,
+  noFormOutput = false,
 }: HorizontalItemsBoxProps) => {
   return (
     <>
@@ -33,6 +35,8 @@ const HorizontalItemsBox = ({
             <HorizontalItemBuilder
               key={item.props.name + "-" + index}
               item={item}
+              noFormOutput={noFormOutput}
+              readOnly={readonly}
             />
           ))}
         </div>
@@ -44,17 +48,37 @@ const HorizontalItemsBox = ({
 function HorizontalItemBuilder({
   item,
   noFormOutput,
+  readOnly,
 }: {
   item: HorizontalBoxItem;
   noFormOutput?: boolean;
+  readOnly?: boolean;
 }) {
   switch (item.type) {
     case FormComponentType.TEXT:
-      return <TextBox {...item.props} noFormOutput={noFormOutput} />;
+      return (
+        <TextBox
+          {...item.props}
+          noFormOutput={noFormOutput}
+          readonly={readOnly}
+        />
+      );
     case FormComponentType.RADIO:
-      return <RadioBox {...item.props} noFormOutput={noFormOutput} />;
+      return (
+        <RadioBox
+          {...item.props}
+          noFormOutput={noFormOutput}
+          readonly={readOnly}
+        />
+      );
     case FormComponentType.SELECT:
-      return <SelectBox {...item.props} noFormOutput={noFormOutput} />;
+      return (
+        <SelectBox
+          {...item.props}
+          noFormOutput={noFormOutput}
+          readonly={readOnly}
+        />
+      );
   }
 }
 

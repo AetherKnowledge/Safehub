@@ -24,7 +24,7 @@ const StatusBadge = ({
 };
 
 export const FollowUpBadge = () => {
-  return <div className="badge">Follow-Up</div>;
+  return <div className="badge bg-gray-100 text-black">Follow-Up</div>;
 };
 
 export default StatusBadge;

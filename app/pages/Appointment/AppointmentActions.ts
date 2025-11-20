@@ -4,7 +4,6 @@ import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
 import {
   Appointment,
   AppointmentStatus,
-  Feedback,
   FormType,
   SessionPreference,
   User,
@@ -32,7 +31,6 @@ export type AppointmentData = Appointment & {
   counselor: {
     user: Pick<User, "id" | "name" | "email" | "image">;
   };
-  feedback: Feedback | null;
   parentId?: string;
 };
 
@@ -135,7 +133,6 @@ export async function getAppointments(): Promise<AppointmentData[]> {
           },
         },
       },
-      feedback: true,
     },
   });
 
@@ -236,7 +233,6 @@ export async function getAppointmentById(
             },
           },
         },
-        feedback: true,
       },
     })
     .catch(() => {
@@ -714,7 +710,6 @@ export async function getAppointmentsForDateRange(
           },
         },
       },
-      feedback: true,
     },
     orderBy: {
       startTime: "asc",
@@ -834,7 +829,6 @@ export async function getAppointmentsForDate(
           },
         },
       },
-      feedback: true,
     },
     orderBy: {
       startTime: "asc",
@@ -948,7 +942,7 @@ export async function cancelAppointmentStudent(
   }
 }
 
-export async function updateSummary(
+export async function createSessionSummary(
   formData: FormData
 ): Promise<ActionResult<void>> {
   const data = Object.fromEntries(formData.entries());
@@ -973,6 +967,14 @@ export async function updateSummary(
     });
     if (!appointment) {
       throw new Error("Appointment not found");
+    }
+
+    if (
+      appointment.summary ||
+      appointment.observations ||
+      appointment.recommendations
+    ) {
+      throw new Error("Session summary has already been submitted");
     }
 
     await prisma.appointment.update({

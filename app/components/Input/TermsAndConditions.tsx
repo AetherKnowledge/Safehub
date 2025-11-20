@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ModalBase from "../Popup/ModalBase";
 
-const TermsAndConditions = () => {
+const TermsAndConditions = ({ readOnly = false }: { readOnly?: boolean }) => {
   const [showModal, setShowModal] = useState(false);
 
   return (
@@ -13,7 +13,9 @@ const TermsAndConditions = () => {
           name="termsAndConditions"
           type="checkbox"
           required
-          className="checkbox checkbox-ghost checkbox-primary rounded"
+          className="disabled:opacity-100 checkbox checkbox-ghost checkbox-primary rounded"
+          defaultChecked={readOnly}
+          disabled={readOnly}
         />
         <div className="flex flex-col text-base-content">
           I agree with the Terms & Conditions of Safehub{" "}

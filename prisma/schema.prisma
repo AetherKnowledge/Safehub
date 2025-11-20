@@ -142,7 +142,6 @@ model Student {
   studentId    String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user         User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
   appointments Appointment[]
-  feedbacks    Feedback[]
 }
 
 model Counselor {
@@ -151,7 +150,6 @@ model Counselor {
   appointments   Appointment[]
   available      Boolean         @default(false)
   availableSlots AvailableSlot[]
-  feedbacks      Feedback[]
 }
 
 model Admin {
@@ -310,6 +308,9 @@ model Appointment {
   appointmentData    Json?
   cancellationReason String?
 
+  evaluationData Json?
+  rating         Int?
+
   summary         String?
   observations    String?
   recommendations String?
@@ -323,24 +324,7 @@ model Appointment {
   followUp        Appointment?     @relation("FollowUpRelation", fields: [followUpId], references: [id])
   student         Student          @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
   counselor       Counselor        @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)
-  feedback        Feedback?
   appointmentLogs AppointmentLog[]
-}
-
-model Feedback {
-  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  appointmentId String   @unique @db.Uuid
-  counselorId   String   @db.Uuid
-  studentId     String   @db.Uuid
-  rating        Int
-  content       String?
-  isAnonymous   Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  counselor   Counselor   @relation(fields: [counselorId], references: [counselorId], onDelete: Cascade)
-  student     Student     @relation(fields: [studentId], references: [studentId], onDelete: Cascade)
 }
 
 model Hotline {

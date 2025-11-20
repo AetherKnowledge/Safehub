@@ -100,7 +100,7 @@ const Booking = ({
       form={questions!}
       defaultValues={appointmentData?.answers}
       onSubmit={handleSubmit}
-      onBack={() => router.push("/user/appointments")}
+      backHref="/user/appointments"
     />
   );
 };

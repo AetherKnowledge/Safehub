@@ -107,15 +107,13 @@ const evaluationForm = {
         name: "27b087ce-bb12-45e3-945b-3aa9985e3748",
         legend: "Overall Experience",
       },
-      legend: "Separatorg",
-      version: "1",
     },
     {
       type: "LINEAR_SCALE",
       props: {
         max: 5,
         min: 1,
-        name: "text",
+        name: "rating",
         legend: "How satisfied are you with today’s session?",
         maxText: "Very Satisfied",
         minText: "Very Dissatisfied",
@@ -761,7 +759,7 @@ async function main() {
     [bookingId, bookingType, bookingFormData, now, now]
   );
 
-  const evaluationForm = 1;
+  const evaluationFormID = 1;
   const evaluationType = "EVALUATION";
   const evaluationFormData = JSON.parse(JSON.stringify(evaluationForm));
 
@@ -771,7 +769,7 @@ async function main() {
     VALUES ($1, $2, $3, $4, $5)
     ON CONFLICT (type) DO NOTHING
     `,
-    [evaluationForm, evaluationType, evaluationFormData, now, now]
+    [evaluationFormID, evaluationType, evaluationFormData, now, now]
   );
 
   console.log("✅ Default booking form seeded");

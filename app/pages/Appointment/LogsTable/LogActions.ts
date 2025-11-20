@@ -5,40 +5,23 @@ import { UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { prisma } from "@/prisma/client";
 import { Order } from "../../Dashboard/Student/Dashboard";
-import { AppointmentLogsResult, ParsedAppointmentLog } from "./schema";
+import { ParsedAppointmentLog } from "./schema";
 import { AppointmentLogSortBy } from "./sort";
 
 export async function getLogs({
-  perPage = 5,
-  page = 1,
   sortBy = AppointmentLogSortBy.AppointmentDate,
   order = Order.Asc,
 }: {
-  perPage: number;
-  page: number;
   sortBy: AppointmentLogSortBy;
   order: Order;
-}): Promise<ActionResult<AppointmentLogsResult>> {
+}): Promise<ActionResult<ParsedAppointmentLog[]>> {
   try {
-    if (perPage <= 0 || page <= 0) {
-      return { success: false, message: "Invalid pagination parameters." };
-    }
-
-    if (isNaN(perPage) || isNaN(page)) {
-      return {
-        success: false,
-        message: "Pagination parameters must be numbers.",
-      };
-    }
-
     const session = await auth();
     if (!session?.user || session.user.type !== UserType.Admin) {
       return { success: false, message: "Unauthorized access." };
     }
 
     const logs = await prisma.appointmentLog.findMany({
-      skip: (page - 1) * perPage,
-      take: perPage,
       include: {
         appointment: {
           select: {
@@ -94,9 +77,7 @@ export async function getLogs({
       return 0;
     });
 
-    const count = await prisma.appointmentLog.count();
-
-    return { success: true, data: { logs: sortedLogs, totalCount: count } };
+    return { success: true, data: sortedLogs };
   } catch (error) {
     console.error(error);
     return { success: false, message: "Failed to fetch logs." };

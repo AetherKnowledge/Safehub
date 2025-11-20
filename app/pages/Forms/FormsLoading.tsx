@@ -1,11 +1,9 @@
-import EditableFormHeader from "@/app/components/Forms/EditableFormHeader";
 import FormBG from "@/app/components/Forms/FormBG";
 import FormComponentBG from "@/app/components/Forms/FormComponentBG";
 
 const FormsLoading = () => {
   return (
     <>
-      <EditableFormHeader />
       <FormBG>
         <FormComponentBG className="h-30" skeleton />
         <FormComponentBG skeleton />

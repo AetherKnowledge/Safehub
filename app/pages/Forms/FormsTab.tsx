@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { fetchForms, saveForms } from "./formsActions";
 import FormsLoading from "./FormsLoading";
+import EditableFormHeader from "@/app/components/Forms/EditableFormHeader";
 
 const FormsTab = ({
   title,
@@ -90,7 +91,10 @@ const FormsTab = ({
       <div className="tab-content bg-base-200 border-base-300 p-0 shadow-br h-full min-h-0">
         <div className="flex flex-col h-full">
           {loading ? (
-            <FormsLoading />
+            <>
+              <EditableFormHeader />
+              <FormsLoading />
+            </>
           ) : (
             <EditableFormBuilder
               form={form}

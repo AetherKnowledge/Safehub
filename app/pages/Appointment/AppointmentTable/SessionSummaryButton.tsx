@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { LuClipboardList } from "react-icons/lu";
-import { AppointmentData, updateSummary } from "../AppointmentActions";
+import { AppointmentData, createSessionSummary } from "../AppointmentActions";
 import CloseButton from "./CloseButton";
 
 const SessionSummaryButton = ({
@@ -25,7 +25,7 @@ const SessionSummaryButton = ({
     const formData = new FormData(event.currentTarget);
 
     statusPopup.showLoading("Submitting session summary...");
-    const result = await updateSummary(formData);
+    const result = await createSessionSummary(formData);
 
     if (!result.success) {
       statusPopup.showError(
@@ -36,6 +36,12 @@ const SessionSummaryButton = ({
 
     statusPopup.showSuccess("Session summary submitted successfully.");
   }
+
+  const canSubmit =
+    session?.data?.user.type === UserType.Counselor &&
+    !appointment.summary &&
+    !appointment.observations &&
+    !appointment.recommendations;
 
   return (
     <>
@@ -77,21 +83,24 @@ const SessionSummaryButton = ({
                   placeholder="Enter session summary here..."
                   defaultValue={appointment.summary || ""}
                   required
+                  readonly={canSubmit}
                 />
                 <TextArea
                   name="observations"
                   legend="Observations:"
                   placeholder="Enter observations here..."
                   defaultValue={appointment.observations || ""}
+                  readonly={canSubmit}
                 />
                 <TextArea
                   name="recommendations"
                   legend="Recommendations:"
                   placeholder="Enter recommendations here..."
                   defaultValue={appointment.recommendations || ""}
+                  readonly={canSubmit}
                 />
               </div>
-              {session?.data?.user.type === UserType.Counselor && (
+              {canSubmit && (
                 <button className="flex flex-row btn btn-primary gap-2 justify-center items-center text-center">
                   <FaRegCheckCircle className="w-4 h-4" />
                   Submit

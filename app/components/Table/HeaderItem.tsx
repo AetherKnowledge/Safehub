@@ -30,7 +30,7 @@ const HeaderItem = ({
   }, [searchParams]);
 
   return (
-    <div className="flex flex-row items-center justify-center w-full p-4 font-semibold">
+    <div className="flex flex-row items-center justify-center w-full p-4 text-sm font-semibold">
       {children}
       {sortKey && (
         <span

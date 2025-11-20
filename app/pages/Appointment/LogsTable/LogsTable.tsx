@@ -9,16 +9,13 @@ import { AppointmentLogSortBy } from "./sort";
 
 const Logs = ({
   logs,
-  totalCount,
   isLoading = false,
 }: {
   logs: ParsedAppointmentLog[];
-  totalCount: number;
   isLoading?: boolean;
 }) => {
   return (
     <Table
-      totalCount={totalCount}
       header={<LogsHeader />}
       rows={logs.map((log, index) => (
         <LogsRow key={index} log={log} />

@@ -48,7 +48,7 @@ const Onboarding = () => {
         termsAndConditions: true,
       }}
       onSubmit={onSubmit}
-      onBack={() => router.push("/")}
+      backHref="/"
     />
   );
 };

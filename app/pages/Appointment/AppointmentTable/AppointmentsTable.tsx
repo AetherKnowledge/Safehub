@@ -11,7 +11,7 @@ import { AppointmentData } from "../AppointmentActions";
 import ApproveButton from "./ApproveButton";
 import CancelButton from "./CancelButton";
 import EditButton from "./EditButton";
-import FeedbackButton from "./FeedbackButton";
+import EvaluationButton from "./EvaluationButton";
 import SessionSummaryButton from "./SessionSummaryButton";
 import UserCell from "./UserCell";
 import ViewAppointmentButton from "./ViewAppointmentButton";
@@ -109,7 +109,15 @@ function AppointmentRow({
           {userType === UserType.Student ? (
             <StudentActionButton appointment={appointment} />
           ) : (
-            <ViewAppointmentButton appointment={appointment} />
+            <>
+              <ViewAppointmentButton appointment={appointment} />
+              {appointment.evaluationData && (
+                <EvaluationButton
+                  appointment={appointment}
+                  userType={userType}
+                />
+              )}
+            </>
           )}
         </div>
       </td>
@@ -144,7 +152,10 @@ function StudentActionButton({
     case AppointmentStatus.Completed:
       return (
         <>
-          <FeedbackButton appointment={appointment} />
+          <EvaluationButton
+            appointment={appointment}
+            userType={UserType.Student}
+          />
           <SessionSummaryButton appointment={appointment} />
         </>
       );

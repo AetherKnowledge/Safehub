@@ -4,8 +4,6 @@ import { getLogs } from "@/app/pages/Appointment/LogsTable/LogActions";
 import { AppointmentLogSortBy } from "@/app/pages/Appointment/LogsTable/sort";
 import { Order } from "@/app/pages/Dashboard/Student/Dashboard";
 import { auth } from "@/auth";
-import { Suspense } from "react";
-import { Await } from "react-router-dom";
 
 type Props = {
   searchParams: Promise<{
@@ -24,35 +22,16 @@ const AppointmentLogsPage = async ({ searchParams }: Props) => {
 
   const awaitedSearchParams = await searchParams;
 
-  const perPageNum = parseInt(awaitedSearchParams.perPage || "5");
-  const pageNum = parseInt(awaitedSearchParams.page || "1");
   const sortBy =
     awaitedSearchParams.sortBy || AppointmentLogSortBy.AppointmentDate;
   const order = awaitedSearchParams.order || Order.Desc;
 
-  const perPage = !Number.isNaN(perPageNum) && perPageNum > 0 ? perPageNum : 5;
-  const page = !Number.isNaN(pageNum) && pageNum > 0 ? pageNum : 1;
+  const result = await getLogs({ sortBy, order });
+  if (!result.success) {
+    throw new Error("Failed to fetch logs");
+  }
 
-  return (
-    <Suspense
-      fallback={<LogsTable logs={[]} totalCount={0} isLoading={true} />}
-    >
-      <Await resolve={getLogs({ perPage, page, sortBy, order })}>
-        {(logsData) => {
-          if (!logsData.success) {
-            throw new Error(logsData.message || "Failed to load logs.");
-          }
-
-          return (
-            <LogsTable
-              logs={logsData.data?.logs || []}
-              totalCount={logsData.data?.totalCount || 0}
-            />
-          );
-        }}
-      </Await>
-    </Suspense>
-  );
+  return <LogsTable logs={result.data || []} />;
 };
 
 export default AppointmentLogsPage;

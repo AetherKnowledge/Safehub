@@ -97,14 +97,14 @@ const FormsBuilder = ({
   form,
   defaultValues,
   onSubmit,
-  onBack,
   readOnly = false,
+  backHref,
 }: {
   form: BuiltFormData;
-  onBack?: () => void;
   onSubmit?: (formData: FormData) => void;
   defaultValues?: Record<string, any>;
   readOnly?: boolean;
+  backHref?: string;
 }) => {
   const { header, components } = form;
 
@@ -145,19 +145,16 @@ const FormsBuilder = ({
           </Fragment>
         );
       })}
-      {!readOnly && (
-        <>
-          {form.termsAndConditions && (
-            <FormComponentBG className="py-5">
-              <TermsAndConditions />
-            </FormComponentBG>
-          )}
 
-          <FormComponentBG className="py-5 px-5">
-            <Submit onBack={onBack} />
-          </FormComponentBG>
-        </>
+      {form.termsAndConditions && (
+        <FormComponentBG className="py-5">
+          <TermsAndConditions readOnly={readOnly} />
+        </FormComponentBG>
       )}
+
+      <FormComponentBG className="py-5 px-5">
+        <Submit readOnly={readOnly} backHref={backHref} />
+      </FormComponentBG>
     </FormBG>
   );
 };

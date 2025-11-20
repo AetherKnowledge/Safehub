@@ -29,16 +29,16 @@ export async function testAction(): Promise<ActionResult<void>> {
       };
     }
 
-    for (let i = 0; i < 100; i++) {
-      await prisma.appointmentLog.create({
-        data: {
-          appointmentId: appointment.id,
-          changedBy: session.user.id,
-          from: getRandomAppointmentStatus(),
-          to: getRandomAppointmentStatus(),
-        },
-      });
-    }
+    // for (let i = 0; i < 100; i++) {
+    //   await prisma.appointmentLog.create({
+    //     data: {
+    //       appointmentId: appointment.id,
+    //       changedBy: session.user.id,
+    //       from: getRandomAppointmentStatus(),
+    //       to: getRandomAppointmentStatus(),
+    //     },
+    //   });
+    // }
 
     console.log("Appointment:", appointment);
 

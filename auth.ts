@@ -55,13 +55,28 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     async session({ session }) {
       const signingSecret = process.env.SUPABASE_JWT_SECRET;
 
+      const today = new Date();
+      const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
       const user = await prisma.user.findUnique({
         where: { email: session.user.email! },
+        include: {
+          dailyMoods: {
+            where: {
+              createdAt: {
+                gte: startOfDay,
+                lte: endOfDay,
+              },
+            },
+          },
+        },
       });
 
       session.user.id = user?.id || "";
       session.user.type = user?.type;
       session.user.darkMode = user?.darkMode || false;
+      session.user.moodToday = user?.dailyMoods[0]?.mood || undefined;
 
       if (signingSecret) {
         const payload = {

@@ -93,7 +93,7 @@ export type FormComponent =
       version: string;
     };
 
-const FormsBuilder = ({
+const FormBuilder = ({
   form,
   defaultValues,
   onSubmit,
@@ -268,4 +268,4 @@ export const FormComponentBuilder = ({
   }
 };
 
-export default FormsBuilder;
+export default FormBuilder;

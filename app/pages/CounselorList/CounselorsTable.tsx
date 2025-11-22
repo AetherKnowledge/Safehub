@@ -1,5 +1,6 @@
 "use client";
 
+import StarRating from "@/app/components/StarRating";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -90,7 +91,9 @@ const CounselorList = ({ name }: { name?: string }) => {
                     </div>
                   </td>
                   <td>{counselor.email}</td>
-                  <td>{counselor.rating.toFixed(1)} ★</td>
+                  <td>
+                    <StarRating rating={counselor.rating} />
+                  </td>
                   <td>
                     {
                       <motion.span

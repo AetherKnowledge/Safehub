@@ -1,7 +1,7 @@
 "use client";
 
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
-import FormsBuilder from "@/app/components/Forms/FormBuilder";
+import FormBuilder from "@/app/components/Forms/FormBuilder";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { useRouter } from "next/navigation";
 import { createEvaluation } from "./EvaluationActions";
@@ -40,7 +40,7 @@ It cannot be changed once submitted.`);
   }
 
   return (
-    <FormsBuilder
+    <FormBuilder
       form={form}
       defaultValues={defaultValues}
       readOnly={readOnly}

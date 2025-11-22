@@ -72,9 +72,12 @@ export async function getCounselors() {
 
 function calculateStarRating(feedbacks: { rating: number | null }[]) {
   if (feedbacks.length === 0) return 0;
+  const length = feedbacks.filter((fb) => fb.rating !== null).length;
+  if (length === 0) return 0;
+
   const total = feedbacks.reduce(
     (acc, feedback) => acc + (feedback.rating ?? 0),
     0
   );
-  return Math.round((total / feedbacks.length) * 100) / 100; // Round to 2 decimal place
+  return Math.round((total / length) * 100) / 100; // Round to 2 decimal place
 }

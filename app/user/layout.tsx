@@ -1,6 +1,7 @@
 import Sidebar from "@/app/components/Sidebar";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import MoodTrackerPopup from "../components/MoodTracker";
 import UserNavbar from "../components/Navbar/UserNavbar";
 import { UserType } from "../generated/prisma";
 import { hasOnboarded } from "../pages/Onboarding/OnboardingActions";
@@ -32,6 +33,9 @@ const Layout = async ({ children }: Props) => {
         <UserNavbar />
         {children}
       </div>
+      {!session.user.moodToday && session.user.type === UserType.Student && (
+        <MoodTrackerPopup />
+      )}
     </div>
   );
 };

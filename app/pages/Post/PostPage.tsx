@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { sortPosts } from "@/lib/utils";
+import DashboardPosts from "../Dashboard/DashboardPosts";
 import { Order, SortBy } from "../Dashboard/Student/Dashboard";
-import DashboardPosts from "../Dashboard/Student/DashboardPosts";
 import { getPosts } from "./PostActions";
 
 const PostPage = async ({

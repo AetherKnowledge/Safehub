@@ -39,6 +39,10 @@ const Table = ({
       if (rowHeight > 0) {
         const calculated = Math.max(1, Math.floor(containerHeight / rowHeight));
         setPerPage(calculated);
+        const pageContainingCurrentRow = Math.ceil(
+          (startIndex + 1) / calculated
+        );
+        setCurrentPage(pageContainingCurrentRow);
       }
     }
 
@@ -48,7 +52,7 @@ const Table = ({
     return () => {
       window.removeEventListener("resize", updatePerPage);
     };
-  }, [rows.length]);
+  }, [rows.length, perPage, currentPage, containerRef.current]);
 
   return (
     <div className="flex-1 flex flex-col bg-base-100 shadow-br rounded-lg min-h-0 overflow-x-hidden">

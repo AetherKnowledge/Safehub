@@ -6,11 +6,6 @@ import HorizontalItemsBox from "@/app/components/Input/HorizontalItemsBox";
 import LinkedSelector from "@/app/components/Input/LinkedSelector";
 import { SelectBoxProps } from "@/app/components/Input/SelectBox";
 import ModalBase from "@/app/components/Popup/ModalBase";
-import UserImage from "@/app/components/UserImage";
-import Link from "next/link";
-import { AiOutlineMessage } from "react-icons/ai";
-import { IoCallOutline } from "react-icons/io5";
-import { useCallPopup } from "../../Chats/ChatBox/CallPopupProvider";
 import {
   departmentsWithPrograms,
   genderOptions,
@@ -20,6 +15,7 @@ import {
 import { GuardianDetails } from "../../Settings/Settings";
 import { AppointmentData, StudentDetailsData } from "../AppointmentActions";
 import CloseButton from "./CloseButton";
+import UserTopBar from "./UserTopBar";
 
 const StudentDetailsPopup = ({
   appointment,
@@ -28,53 +24,18 @@ const StudentDetailsPopup = ({
   appointment: AppointmentData;
   onClose: () => void;
 }) => {
-  const { initiateCall } = useCallPopup();
-
-  const handleInitiateCall = () => {
-    if (!appointment.chatId) return;
-
-    initiateCall(appointment.chatId);
-  };
-
   return (
     <ModalBase onClose={onClose}>
       <div className="bg-base-100 p-0 rounded-lg shadow-lg text-base-content max-w-2xl flex-1 flex flex-col">
         <CloseButton onClick={onClose} />
         <div className="p-6 pt-0">
           <div className="flex flex-col gap-3">
-            <div className="flex flex-row gap-5 items-center">
-              <UserImage
-                src={appointment.student.user.image || undefined}
-                name={appointment.student.user.name || "Unknown"}
-                width={20}
-                bordered
-                borderWidth={3}
-              />
-
-              <div className="flex flex-col flex-1">
-                <p className="text-xs font-semibold">Appointment with...</p>
-                <p className="font-semibold">
-                  {appointment.student.user.name || "Unknown"}
-                </p>
-                <p className="text-xs font-semibold text-base-content/70">
-                  {appointment.student.user.email || "Unknown"}
-                </p>
-                <div className="flex flex-row gap-2 mt-2">
-                  <Link
-                    className="btn btn-primary rounded-full p-0 h-8 w-8"
-                    href={`/user/chats/${appointment.chatId}`}
-                  >
-                    <AiOutlineMessage className="h-5 w-5" />
-                  </Link>
-                  <button
-                    className="btn btn-primary rounded-full p-0 h-8 w-8"
-                    onClick={handleInitiateCall}
-                  >
-                    <IoCallOutline className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
+            <UserTopBar
+              userName={appointment.student.user.name || undefined}
+              userEmail={appointment.student.user.email}
+              userImgSrc={appointment.student.user.image || undefined}
+              chatId={appointment.chatId}
+            />
             <StudentDetails user={appointment.student.user} />
           </div>
         </div>

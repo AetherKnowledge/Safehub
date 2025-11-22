@@ -1,14 +1,14 @@
-import Contact from "@/app/components/Images/Contact";
-import Meeting from "@/app/components/Images/Meeting";
 import DatePicker from "@/app/components/Input/Date/DatePicker";
 import { UserType } from "@/app/generated/prisma";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { Suspense } from "react";
 import { FaCalendar } from "react-icons/fa6";
-import { getAppointments } from "../AppointmentActions";
+import { AppointmentData, getAppointments } from "../AppointmentActions";
 import AppointmentsTable from "../AppointmentTable";
-import UpcomingAppointmentsTable from "../AppointmentTable/UpcomingAppointmentsTable";
+import UpcomingAppointmentsTable, {
+  UpcomingAppointmentRow,
+} from "../AppointmentTable/UpcomingAppointmentsTable";
 
 type Props = {
   date?: string;
@@ -21,40 +21,22 @@ const AppointmentPage = async ({ date }: Props) => {
     <div className="flex flex-col gap-3 flex-1 min-h-0">
       <div className="flex flex-col xl:flex-row gap-3">
         <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1">
-          <h2 className="font-bold">Upcoming Appointments</h2>
+          <h2 className="font-bold">Todays Appointments</h2>
           <div className="flex flex-row min-w-150 gap-5 w-full">
             <Suspense>
-              <DatePickerWithAppointments date={date} />
+              <TodayAppointments appointments={appointments} />
             </Suspense>
           </div>
         </div>
         <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 w-full">
           <h2 className="font-bold">Book an Appointment</h2>
-          <div className="flex flex-row gap-10 px-5 items-center justify-between w-full">
-            <div className="flex flex-col gap-5 items-center justify-center pt-5">
-              <p className="w-96 text-center italic font-light">
-                LCUP’s Social Welfare Services are available from Mondays to
-                Fridays
-              </p>
-              <div className="flex flex-row gap-5">
-                <div className="w-40 h-35 overflow-y-hidden">
-                  <Contact />
-                </div>
-                <div className="w-40 h-35 overflow-y-hidden">
-                  <Meeting />
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col items-center justify-center w-full">
-              <Link
-                href="/user/appointments/new"
-                className="btn btn-primary p-4 w-40 h-12"
-              >
-                <FaCalendar className="mr-2" />
-                BOOK NOW
-              </Link>
-            </div>
-          </div>
+          <Link
+            href="/user/appointments/new"
+            className="btn btn-primary rounded-lg p-3 w-full h-12"
+          >
+            <FaCalendar className="mr-2" />
+            BOOK NOW
+          </Link>
         </div>
       </div>
       <div className="flex flex-col bg-base-100 rounded p-3 shadow-br gap-1 flex-1 min-h-0">
@@ -69,6 +51,75 @@ const AppointmentPage = async ({ date }: Props) => {
     </div>
   );
 };
+
+export async function TodayAppointments({
+  appointments: initialAppointments,
+}: {
+  appointments?: AppointmentData[];
+}) {
+  const appointments = initialAppointments || (await getAppointments());
+
+  const today = new Date(new Date().setHours(0, 0, 0, 0));
+  const filteredAppointments = appointments.filter((appointment) => {
+    const appointmentDate = new Date(appointment.startTime);
+    appointmentDate.setHours(0, 0, 0, 0);
+    return appointmentDate.getTime() === today.getTime();
+  });
+
+  if (filteredAppointments.length === 0)
+    return (
+      <div className="flex items-center justify-center text-center h-[66px] w-full">
+        No appointments today.
+      </div>
+    );
+
+  return (
+    <table className="w-full">
+      <tbody>
+        <UpcomingAppointmentRow appointment={filteredAppointments[0]} />
+      </tbody>
+    </table>
+  );
+}
+
+export async function ThisWeeksAppointments({
+  appointments: initialAppointments,
+}: {
+  appointments?: AppointmentData[];
+}) {
+  const appointments = initialAppointments || (await getAppointments());
+
+  const today = new Date(new Date().setHours(0, 0, 0, 0));
+  const filteredAppointments = appointments.filter((appointment) => {
+    const appointmentDate = new Date(appointment.startTime);
+    appointmentDate.setHours(0, 0, 0, 0);
+    const diffTime = appointmentDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 && diffDays < 7;
+  });
+
+  if (filteredAppointments.length === 0)
+    return (
+      <div className="flex items-center justify-center text-center h-[66px] w-full">
+        No appointments this week.
+      </div>
+    );
+
+  return (
+    <div className="scrollbar-gutter:stable overflow-y-auto w-full">
+      <table className="w-full">
+        <tbody>
+          {filteredAppointments.map((appointment) => (
+            <UpcomingAppointmentRow
+              key={appointment.id}
+              appointment={appointment}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 async function DatePickerWithAppointments({ date }: { date?: string }) {
   const appointments = await getAppointments();

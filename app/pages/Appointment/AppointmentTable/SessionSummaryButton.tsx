@@ -10,6 +10,7 @@ import { FaRegCheckCircle } from "react-icons/fa";
 import { LuClipboardList } from "react-icons/lu";
 import { AppointmentData, createSessionSummary } from "../AppointmentActions";
 import CloseButton from "./CloseButton";
+import UserTopBar from "./UserTopBar";
 
 const SessionSummaryButton = ({
   appointment,
@@ -54,22 +55,32 @@ const SessionSummaryButton = ({
       </button>
       {showModal && (
         <ModalBase onClose={() => setShowModal(false)}>
-          <div className="bg-base-100 p-0 rounded-lg shadow-lg text-base-content max-w-2xl flex-1 flex flex-col">
+          <div className="bg-base-100 p-0 rounded-lg shadow-lg text-base-content max-w-2xl w-full flex flex-col">
             <CloseButton onClick={() => setShowModal(false)} />
             <form
               onSubmit={handleSubmit}
               className="flex flex-col items-center justify-center text-center p-6 pt-0 gap-6"
             >
-              <div className="flex flex-col gap-2">
-                <h2 className="text-2xl font-semibold text-primary">
-                  Session Summary
-                </h2>
-                <p className="font-light">
-                  {session?.data?.user.type === UserType.Counselor
-                    ? "Answer the form based on your findings about the student you counseled."
-                    : "Review the session summary provided by your counselor."}
-                </p>
-              </div>
+              {session?.data?.user.type === UserType.Counselor ? (
+                <div className="flex flex-col gap-2">
+                  <h2 className="text-2xl font-semibold text-primary">
+                    Session Summary
+                  </h2>
+                  <p className="font-light">
+                    {session?.data?.user.type === UserType.Counselor
+                      ? "Answer the form based on your findings about the student you counseled."
+                      : "Review the session summary provided by your counselor."}
+                  </p>
+                </div>
+              ) : (
+                <UserTopBar
+                  userEmail={appointment.counselor.user.email}
+                  userName={appointment.counselor.user.name || undefined}
+                  userImgSrc={appointment.counselor.user.image || undefined}
+                  appointmentStatus={appointment.status}
+                  chatId={appointment.chatId}
+                />
+              )}
               <div className="flex flex-col w-full gap-4">
                 <input
                   type="hidden"
@@ -83,21 +94,21 @@ const SessionSummaryButton = ({
                   placeholder="Enter session summary here..."
                   defaultValue={appointment.summary || ""}
                   required
-                  readonly={canSubmit}
+                  readonly={!canSubmit}
                 />
                 <TextArea
                   name="observations"
                   legend="Observations:"
                   placeholder="Enter observations here..."
                   defaultValue={appointment.observations || ""}
-                  readonly={canSubmit}
+                  readonly={!canSubmit}
                 />
                 <TextArea
                   name="recommendations"
                   legend="Recommendations:"
                   placeholder="Enter recommendations here..."
                   defaultValue={appointment.recommendations || ""}
-                  readonly={canSubmit}
+                  readonly={!canSubmit}
                 />
               </div>
               {canSubmit && (

@@ -37,7 +37,7 @@ const UpcomingAppointmentsTable = async ({
   );
 };
 
-function UpcomingAppointmentRow({
+export function UpcomingAppointmentRow({
   appointment,
 }: {
   appointment: AppointmentData;

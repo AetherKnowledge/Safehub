@@ -7,8 +7,3 @@ export type ParsedAppointmentLog = AppointmentLog & {
   startTime: Appointment["startTime"];
   endTime: Appointment["endTime"];
 };
-
-export type AppointmentLogsResult = {
-  logs: ParsedAppointmentLog[];
-  totalCount: number;
-};

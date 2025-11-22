@@ -80,6 +80,13 @@ enum FormType {
   REGISTRATION
 }
 
+enum NotificationType {
+  AppointmentCreated
+  AppointmentUpdated
+  AppointmentReminder
+  NewPost
+}
+
 model documents {
   id        BigInt                 @id @default(autoincrement())
   content   String?
@@ -146,6 +153,7 @@ model User {
   comments        Comment[]
   appointmentLogs AppointmentLog[]
   dailyMoods      DailyMood[]
+  notifications   Notification[]
 }
 
 model Student {
@@ -443,11 +451,23 @@ model AppointmentLog {
 }
 
 model DailyMood {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id        String   @id
   userId    String   @db.Uuid
   mood      MoodType
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String           @db.Uuid
+  type      NotificationType
+  data      Json
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

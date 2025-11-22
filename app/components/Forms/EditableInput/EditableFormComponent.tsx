@@ -1,6 +1,7 @@
 "use client";
 import Legend from "../../Input/Legend";
-import SelectBox from "../../Input/SelectBox";
+import { RadioBoxProps } from "../../Input/RadioBox";
+import SelectBox, { SelectBoxProps } from "../../Input/SelectBox";
 import TextArea from "../../Input/TextArea";
 import TextBox from "../../Input/TextBox";
 import { FormComponent, FormComponentType } from "../FormBuilder";
@@ -8,7 +9,9 @@ import BottomActionRow from "./BottomActionRow";
 import EditableDateSelector from "./EditableDateSelector";
 import EditableDateTimeSelector from "./EditableDateTimeSelector";
 import EditableFormComponentBG from "./EditableFormComponentBG";
-import EditableLinearScale from "./EditableLinearScale";
+import EditableLinearScale, {
+  LinearScaleSettings,
+} from "./EditableLinearScale";
 import EditableRadioBox from "./EditableRadioBox";
 import EditableSelectBox from "./EditableSelectBox";
 import EditableSeparator from "./EditableSeparator";
@@ -153,14 +156,16 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.RADIO && (
           <EditableRadioBox
             selected={selected}
-            options={component.props?.options || []}
+            options={
+              component.props ? (component.props as RadioBoxProps).options : []
+            }
             onChange={(options) => {
               onChange?.({
                 ...component,
                 props: {
                   ...component.props,
                   options: options,
-                },
+                } as RadioBoxProps,
               });
             }}
           />
@@ -168,7 +173,9 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.SELECT && (
           <EditableSelectBox
             selected={selected}
-            options={component.props?.options || []}
+            options={
+              component.props ? (component.props as SelectBoxProps).options : []
+            }
             onChange={(options) => {
               console.log("Options changed:", options);
               onChange?.({
@@ -176,7 +183,7 @@ const EditableFormComponent = ({
                 props: {
                   ...component.props,
                   options: options,
-                },
+                } as SelectBoxProps,
               });
             }}
           />
@@ -184,7 +191,7 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.DATE && (
           <EditableDateSelector
             selected={selected}
-            settings={component?.props}
+            settings={component?.props as SaveableSettings}
             onChange={(settings) => {
               onChange?.({
                 ...component,
@@ -199,7 +206,7 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.TIME && (
           <EditableTimeSelector
             selected={selected}
-            settings={component?.props}
+            settings={component?.props as SaveableSettings}
             onChange={(settings) => {
               onChange?.({
                 ...component,
@@ -214,7 +221,7 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.DATETIME && (
           <EditableDateTimeSelector
             selected={selected}
-            settings={component?.props}
+            settings={component?.props as SaveableSettings}
             onChange={(settings) => {
               onChange?.({
                 ...component,
@@ -229,7 +236,7 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.LINEAR_SCALE && (
           <EditableLinearScale
             selected={selected}
-            settings={component.props}
+            settings={component.props as LinearScaleSettings}
             onChange={(settings) => {
               onChange?.({
                 ...component,

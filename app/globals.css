@@ -6,6 +6,7 @@
 @plugin "@tailwindcss/typography";
 @plugin "daisyui" {
   themes: lcup --default lcup-dark --dark;
+  exclude: rootscrollgutter;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));

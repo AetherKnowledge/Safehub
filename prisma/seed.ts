@@ -73,6 +73,7 @@ const bookingForm = {
       props: {
         name: "startTime",
         legend: "Pick Schedule.",
+        minDate: "now",
         minTime: { hour: 8, minute: 0, period: "AM" },
         maxTime: { hour: 8, minute: 0, period: "PM" },
         required: true,
@@ -295,13 +296,98 @@ async function main() {
   const counselorHashedPassword = await hash("test", 10);
   const counselorUUID = "52866741-dc71-4ced-b5ad-993419a730bc";
 
+  await client.query(`
+    GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE "DailyMood" TO authenticated;
+  `);
+
+  await client.query(`GRANT USAGE ON SCHEMA public to authenticated;`);
+
+  // ===============================
+  // Notifications Setup
+  // ===============================
+
+  await client.query(
+    `ALTER TABLE public."Notification" ENABLE ROW LEVEL SECURITY;`
+  );
+  await client.query(`
+  DO $$
+  BEGIN
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_publication_tables
+      WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'Notification'
+    ) THEN
+      ALTER PUBLICATION supabase_realtime ADD TABLE public."Notification";
+    END IF;
+  END
+  $$;
+`);
+
+  await client.query(
+    `GRANT SELECT ON TABLE public."Notification" TO authenticated;`
+  );
+
+  await client.query(
+    `DROP POLICY IF EXISTS "Allow users to see their notifications" ON public."Notification";`
+  );
+
+  await client.query(`
+    CREATE POLICY "Allow users to see their notifications"
+    ON public."Notification" FOR SELECT to authenticated
+    USING (
+      public.uid() = "userId"
+    );
+  `);
+
+  console.log("✅ Notifications RLS policies set up");
+
+  // ===============================
+  // Daily Moods Setup
+  // ===============================
+
+  await client.query(
+    `ALTER TABLE public."DailyMood" ENABLE ROW LEVEL SECURITY;`
+  );
+
+  await client.query(`
+  DO $$
+  BEGIN
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pg_publication_tables
+      WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'DailyMood'
+    ) THEN
+      ALTER PUBLICATION supabase_realtime ADD TABLE public."DailyMood";
+    END IF;
+  END
+  $$;
+`);
+
+  await client.query(
+    `GRANT SELECT ON TABLE public."DailyMood" TO authenticated;`
+  );
+
+  await client.query(
+    `DROP POLICY IF EXISTS "Enable read access admin users" ON public."DailyMood";`
+  );
+
+  await client.query(`
+    CREATE POLICY "Enable read access admin users"
+    ON public."DailyMood" FOR SELECT to authenticated
+    USING (
+      public.role() = 'Admin' OR public.role() = 'Counselor'
+    );
+  `);
+
+  console.log("✅ DailyMood RLS policies set up");
+
   // ================================
   // Default Ai Settings Setup
   // ================================
-
-  await client.query(`
-    GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE "AiPreset" TO service_role;
-  `);
 
   await client.query(`
     GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE "AiSettings" TO service_role;

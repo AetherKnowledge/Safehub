@@ -1,6 +1,6 @@
 import { ExtraOptions } from "@/app/components/Input/schema";
 import SelectBox from "@/app/components/Input/SelectBox";
-import VideoContainer from "@/app/components/Video/VideoContainer";
+import TermsAndConditions from "@/app/components/Input/TermsAndConditions";
 import { clearNotifications, testAction } from "./testActions";
 
 const Test = async () => {
@@ -18,7 +18,7 @@ const Test = async () => {
         extraOptions={ExtraOptions.COUNSELOR_LIST}
       />
       <div className="flex-1 flex flex-row"></div>
-      <VideoContainer isLocalStream={true} stream={null} />
+      <TermsAndConditions readOnly />
     </>
   );
 };

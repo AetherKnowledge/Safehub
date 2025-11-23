@@ -20,7 +20,7 @@ const DashboardPosts = async ({
     <div className="flex flex-col min-w-0 w-full max-w-2xl gap-3 flex-1 min-h-0">
       {/* Post Header */}
       <div className="flex flex-row justify-between items-center bg-base-100 shadow-br rounded-xl px-4 w-full">
-        <p className="text-base-content font-bold text-xl">Newsfeed</p>
+        <p className="text-base-content font-bold text-xl py-2">Newsfeed</p>
         <div className="flex flex-row gap-2 items-center">
           {/* <Sorter sortBy={sortBy} order={order} /> */}
           {userType === UserType.Admin && <AddPostButton />}

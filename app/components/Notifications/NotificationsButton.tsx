@@ -160,7 +160,15 @@ const NotificationsButton = () => {
 
         <div className="menu bg-base-200 min-h-full w-100 p-0">
           {/* Sidebar content here */}
-          <h2 className="text-xl font-bold p-4 pb-0">Notifications</h2>
+          <div className="flex flex-row">
+            <h2 className="text-xl font-bold p-4 pb-0 w-full">Notifications</h2>
+            <label
+              htmlFor={drawerId}
+              className="btn btn-ghost p-0 h-8 w-8 m-2 cursor-pointer"
+            >
+              <IoMdClose className="w-5 h-5" />
+            </label>
+          </div>
           <button
             className="text-error hover:underline p-4 pt-0 text-left cursor-pointer"
             onClick={handleDeleteAll}

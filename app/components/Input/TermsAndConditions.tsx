@@ -42,8 +42,12 @@ const TermsAndConditionsModal = ({ onClose }: { onClose?: () => void }) => {
   return (
     <ModalBase onClose={onClose}>
       <div className="bg-white p-4 rounded shadow-md text-base-content">
-        <h2 className="text-lg font-semibold mb-2">Terms and Conditions</h2>
-        <p className="mb-4">Please read and accept our terms and conditions.</p>
+        <h2 className="text-lg font-semibold mb-2 ">Terms and Conditions</h2>
+        <div className="flex min-h-0 max-h-200 overflow-y-auto">
+          <p className="mb-4">
+            Please read and accept our terms and conditions.
+          </p>
+        </div>
         <button onClick={onClose} className="btn">
           Close
         </button>

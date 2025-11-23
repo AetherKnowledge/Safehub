@@ -1,6 +1,7 @@
 import Sidebar from "@/app/components/Sidebar";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import BottomBar from "../components/BottomBar/BottomBar";
 import MoodTrackerPopup from "../components/MoodTracker";
 import UserNavbar from "../components/Navbar/UserNavbar";
 import { UserType } from "../generated/prisma";
@@ -32,6 +33,7 @@ const Layout = async ({ children }: Props) => {
       <div className="flex flex-col flex-1 gap-3 h-full">
         <UserNavbar />
         {children}
+        <BottomBar />
       </div>
       {!session.user.moodToday && session.user.type === UserType.Student && (
         <MoodTrackerPopup />

@@ -6,7 +6,7 @@ import { formatDateDisplay, formatTime } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { AppointmentData } from "../AppointmentActions";
 
-const UpcomingAppointmentRow = async ({
+const UpcomingAppointmentRow = ({
   appointment,
 }: {
   appointment: AppointmentData;

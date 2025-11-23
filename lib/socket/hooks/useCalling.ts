@@ -378,8 +378,7 @@ export function useCalling() {
     async (chatId: string, recipients: Recipient[], chatName?: string) => {
       const stream = await getMediaStream();
       if (!stream) {
-        console.warn("No media stream available. Cannot initiate call.");
-        return;
+        console.warn("No media stream available.");
       }
 
       if (!socket || socket.readyState !== WebSocket.OPEN) {

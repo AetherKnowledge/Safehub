@@ -1,6 +1,7 @@
-import SelectBox from "@/app/components/Input/SelectBox";
-import { clearNotifications, testAction } from "./testActions";
 import { ExtraOptions } from "@/app/components/Input/schema";
+import SelectBox from "@/app/components/Input/SelectBox";
+import VideoContainer from "@/app/components/Video/VideoContainer";
+import { clearNotifications, testAction } from "./testActions";
 
 const Test = async () => {
   return (
@@ -17,6 +18,7 @@ const Test = async () => {
         extraOptions={ExtraOptions.COUNSELOR_LIST}
       />
       <div className="flex-1 flex flex-row"></div>
+      <VideoContainer isLocalStream={true} stream={null} />
     </>
   );
 };

@@ -1,7 +1,8 @@
 "use client";
 import { ChatData } from "@/@types/network";
 import { UserStatus } from "@/app/generated/prisma";
-import { IoIosCall } from "react-icons/io";
+import Link from "next/link";
+import { IoIosArrowBack, IoIosCall } from "react-icons/io";
 import UserImage from "../../../components/UserImage";
 import { useCallPopup } from "./CallPopupProvider";
 
@@ -24,6 +25,9 @@ const ChatHeader = ({ chat }: ChatHeaderProps) => {
     <div className="border-b-1 border-base-content/20 rounded-t-2xl pb-2">
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row gap-2 items-center">
+          <Link className="btn btn-ghost p-1 flex xl:hidden" href="/user/chats">
+            <IoIosArrowBack className="w-5 h-5" />
+          </Link>
           <div
             className={`flex flex-col border-2 border-transparent rounded-full ${
               chat.status === UserStatus.Online ? "border-primary" : ""

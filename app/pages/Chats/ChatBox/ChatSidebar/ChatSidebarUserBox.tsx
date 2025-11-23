@@ -48,7 +48,7 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
         src={chat.src || undefined}
         bordered={chat.status === UserStatus.Online}
       />
-      <div className="flex flex-col justify-center max-w-59 overflow-hidden flex-1 min-w-0">
+      <div className="flex flex-col justify-center overflow-hidden flex-1 min-w-0">
         <h2 className="font-semibold text-sm overflow-hidden text-ellipsis whitespace-nowrap">
           {chat.name}
         </h2>

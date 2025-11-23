@@ -17,12 +17,11 @@ const ChatsPage = async ({ chatId }: ChatsPageProps) => {
   }
   chats.push(...(await getChats()));
 
-  const chatForSelectedId =
-    chats.find((chat) => chat.id === chatId) || chats[0];
+  const chatForSelectedId = chats.find((chat) => chat.id === chatId) || null;
 
   return (
     <div className="flex flex-row gap-3 flex-1 min-h-0">
-      <ChatSidebar chatId={chatId || chats[0]?.id} chats={chats} />
+      <ChatSidebar chatId={chatId || undefined} chats={chats} />
 
       {chatForSelectedId && <ChatBox chat={chatForSelectedId} />}
     </div>

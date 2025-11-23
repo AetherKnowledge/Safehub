@@ -93,24 +93,28 @@ export type FormComponent =
       version: string;
     };
 
-const FormsBuilder = ({
+const FormBuilder = ({
   form,
   defaultValues,
   onSubmit,
-  onBack,
+  readOnly = false,
+  backHref,
 }: {
   form: BuiltFormData;
-  onBack?: () => void;
   onSubmit?: (formData: FormData) => void;
   defaultValues?: Record<string, any>;
+  readOnly?: boolean;
+  backHref?: string;
 }) => {
   const { header, components } = form;
 
   return (
     <FormBG onSubmit={onSubmit}>
-      <FormComponentBG>
-        <FormsHeader {...header} />
-      </FormComponentBG>
+      {!readOnly && (
+        <FormComponentBG>
+          <FormsHeader {...header} />
+        </FormComponentBG>
+      )}
       {components.map((component, index) => {
         return (
           <Fragment key={header.title + "-component-fragment-" + index}>
@@ -123,6 +127,7 @@ const FormsBuilder = ({
                     ? defaultValues[component.props.name]
                     : undefined
                 }
+                readOnly={readOnly}
               />
             ) : (
               <FormComponentBG>
@@ -133,20 +138,22 @@ const FormsBuilder = ({
                       ? defaultValues[component.props.name]
                       : undefined
                   }
+                  readOnly={readOnly}
                 />
               </FormComponentBG>
             )}
           </Fragment>
         );
       })}
+
       {form.termsAndConditions && (
         <FormComponentBG className="py-5">
-          <TermsAndConditions />
+          <TermsAndConditions readOnly={readOnly} />
         </FormComponentBG>
       )}
 
       <FormComponentBG className="py-5 px-5">
-        <Submit onBack={onBack} />
+        <Submit readOnly={readOnly} backHref={backHref} />
       </FormComponentBG>
     </FormBG>
   );
@@ -155,26 +162,36 @@ const FormsBuilder = ({
 export const FormComponentBuilder = ({
   component,
   answer,
+  readOnly,
 }: {
   component: FormComponent;
   answer?: any;
+  readOnly?: boolean;
 }) => {
   switch (component.type) {
     case FormComponentType.SEPARATOR:
       return <Separator {...(component.props as SeparatorProps)} />;
     case FormComponentType.TEXT:
       return (
-        <TextBox {...(component.props as TextBoxProps)} defaultValue={answer} />
+        <TextBox
+          {...(component.props as TextBoxProps)}
+          defaultValue={answer}
+          readonly={readOnly}
+        />
       );
     case FormComponentType.HORIZONTAL_ITEMS:
       return (
-        <HorizontalItemsBox {...(component.props as HorizontalItemsBoxProps)} />
+        <HorizontalItemsBox
+          {...(component.props as HorizontalItemsBoxProps)}
+          readonly={readOnly}
+        />
       );
     case FormComponentType.TEXTAREA:
       return (
         <TextArea
           {...(component.props as TextAreaProps)}
           defaultValue={answer}
+          readonly={readOnly}
         />
       );
     case FormComponentType.RADIO:
@@ -182,6 +199,7 @@ export const FormComponentBuilder = ({
         <RadioBox
           {...(component.props as RadioBoxProps)}
           defaultValue={answer ? (answer as object).toString() : undefined}
+          readonly={readOnly}
         />
       );
     case FormComponentType.SELECT:
@@ -189,6 +207,7 @@ export const FormComponentBuilder = ({
         <SelectBox
           {...(component.props as SelectBoxProps)}
           defaultValue={answer ? (answer as object).toString() : undefined}
+          readonly={readOnly}
         />
       );
     case FormComponentType.DATE:
@@ -202,6 +221,7 @@ export const FormComponentBuilder = ({
                 : new Date(answer)
               : undefined
           }
+          readonly={readOnly}
         />
       );
     case FormComponentType.TIME:
@@ -215,6 +235,7 @@ export const FormComponentBuilder = ({
                 : stringToTime(answer)
               : undefined
           }
+          readonly={readOnly}
         />
       );
     case FormComponentType.LINKED_SELECTOR:
@@ -230,6 +251,7 @@ export const FormComponentBuilder = ({
                 : new Date(answer)
               : undefined
           }
+          readonly={readOnly}
         />
       );
     case FormComponentType.LINEAR_SCALE:
@@ -237,6 +259,7 @@ export const FormComponentBuilder = ({
         <LinearScale
           {...(component.props as LinearScaleProps)}
           defaultValue={answer}
+          readonly={readOnly}
         />
       );
 
@@ -245,4 +268,4 @@ export const FormComponentBuilder = ({
   }
 };
 
-export default FormsBuilder;
+export default FormBuilder;

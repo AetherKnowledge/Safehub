@@ -2,13 +2,13 @@
 
 import ActionResult from "@/app/components/ActionResult";
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
-import { UserType } from "@/app/generated/prisma";
+import { FormType, UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { prisma } from "@/prisma/client";
 import { formTypeSchema } from "./schema";
 
 export async function fetchForms(
-  formType: unknown
+  formType: FormType
 ): Promise<ActionResult<BuiltFormData | undefined>> {
   try {
     const session = await auth();
@@ -39,7 +39,7 @@ export async function fetchForms(
 }
 
 export async function saveForms(
-  formType: unknown,
+  formType: FormType,
   builtFormData: BuiltFormData
 ): Promise<ActionResult<void>> {
   try {

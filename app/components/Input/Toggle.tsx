@@ -8,6 +8,7 @@ type ToggleProps = {
   onText?: string;
   offText?: string;
   fontWeight?: "font-light" | "font-normal" | "font-semibold" | "font-bold";
+  className?: string;
 };
 
 const Toggle = ({
@@ -20,6 +21,7 @@ const Toggle = ({
   onText = "On",
   offText = "Off",
   fontWeight = "font-semibold",
+  className,
 }: ToggleProps) => {
   return (
     <div
@@ -30,7 +32,7 @@ const Toggle = ({
         type="checkbox"
         className={`toggle border-base-300/50 bg-base-300/50 text-white checked:border-primary checked:bg-primary checked:text-white ${
           disabled && "cursor-not-allowed opacity-50"
-        } ${size}`}
+        } ${size} ${className}`}
         checked={isChecked}
         onChange={(e) => {
           if (disabled) return;

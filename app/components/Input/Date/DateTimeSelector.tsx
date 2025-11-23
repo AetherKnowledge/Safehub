@@ -17,8 +17,8 @@ import {
 export type DateTimeSelectorProps = InputInterface & {
   defaultValue?: Date;
   onChange?: (dateTime: Date) => void;
-  minDate?: Date | "now"; // inclusive lower bound
-  maxDate?: Date; // inclusive upper bound
+  minDate?: Date | "now";
+  maxDate?: Date;
   minTime?: Time | "now";
   maxTime?: Time;
   noFormOutput?: boolean;
@@ -43,78 +43,97 @@ const DateTimeSelector = ({
   readonly = false,
 }: DateTimeSelectorProps) => {
   const [hasError, setHasError] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => {
-    return defaultValue ?? undefined;
-  });
-  const [selectedTime, setSelectedTime] = useState<Time | undefined>(() => {
-    return defaultValue ? getTimeFromDate(defaultValue) : undefined;
-  });
-  const [minDate, setMinDate] = useState<Date | "now" | undefined>(
-    initialMinDate
-  );
-  const [minTime, setMinTime] = useState<Time | "now" | undefined>(() => {
-    // If a value is provided, we don't apply "now" restrictions.
-    if (defaultValue) return initialMinTime ?? undefined;
+  const [initialized, setInitialized] = useState(false);
 
-    // No min date → no min time
-    if (!initialMinDate) return undefined;
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [selectedTime, setSelectedTime] = useState<Time | undefined>();
 
-    // minDate = "now" → time must be "now"
-    if (initialMinDate === "now") return "now";
+  const [minDate, setMinDate] = useState<Date | "now" | undefined>();
+  const [minTime, setMinTime] = useState<Time | "now" | undefined>();
 
-    // minDate is a real Date
-    if (isDateToday(initialMinDate)) {
-      return "now";
+  // ---------------------------------------------------------------
+  // INITIALIZATION (Runs Only Once)
+  // ---------------------------------------------------------------
+  useEffect(() => {
+    if (initialized) return;
+    setInitialized(true);
+
+    // Handle initial default value
+    if (defaultValue) {
+      const time = getTimeFromDate(defaultValue);
+      setSelectedDate(defaultValue);
+      setSelectedTime(time);
+
+      if (isDateToday(defaultValue)) {
+        setMinTime("now");
+      } else {
+        setMinTime(initialMinTime ?? undefined);
+      }
+
+      setMinDate(initialMinDate);
+
+      if (onChange) onChange(defaultValue);
+      return;
     }
 
-    // min date is in the future → use the provided min time
-    return initialMinTime ?? undefined;
-  });
+    // If NO default value → apply min rules
+    setMinDate(initialMinDate);
+    if (
+      initialMinDate === "now" ||
+      (initialMinDate && isDateToday(initialMinDate))
+    ) {
+      setMinTime("now");
+    } else {
+      setMinTime(initialMinTime ?? undefined);
+    }
+  }, [initialized, defaultValue, initialMinDate, initialMinTime, onChange]);
+
+  // ---------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------
+
+  function combineDateTime(date: Date, time: Time) {
+    const combined = new Date(date);
+    let hour = time.hour % 12;
+    if (time.period === "PM") hour += 12;
+    if (time.period === "AM" && time.hour === 12) hour = 0;
+    combined.setHours(hour, time.minute, 0, 0);
+    return combined;
+  }
+
+  function emit(date?: Date, time?: Time) {
+    if (!date || !time) return;
+    const dt = combineDateTime(date, time);
+    if (onChange) onChange(dt);
+  }
 
   function handleDateChange(date: Date) {
     setSelectedDate(date);
 
-    // Update minTime depending on whether selected date is today
-    const newMinTime = isDateToday(date) ? "now" : initialMinTime;
-    setMinTime(newMinTime);
+    // time must be "now" if picking today
+    if (isDateToday(date)) setMinTime("now");
+    else setMinTime(initialMinTime);
 
-    if (onChange && date && selectedTime) {
-      const combinedDateTime = new Date(date);
-      let hour = selectedTime.hour % 12;
-      if (selectedTime.period === "PM") hour += 12;
-      if (selectedTime.period === "AM" && selectedTime.hour === 12) hour = 0;
-      combinedDateTime.setHours(hour, selectedTime.minute, 0, 0);
-      onChange(combinedDateTime);
-    }
+    emit(date, selectedTime);
   }
 
   function handleTimeChange(time: Time) {
     setSelectedTime(time);
 
-    // Update minDate based on whether the selected date + time is before initialMinDate
     if (selectedDate && initialMinDate) {
-      const newMinDate = isDateTimeAfter(selectedDate, time, initialMinDate)
-        ? initialMinDate
-        : addDays(initialMinDate, 1);
-      setMinDate(newMinDate);
+      const allowed =
+        isDateTimeAfter(selectedDate, time, initialMinDate) ||
+        selectedDate > initialMinDate;
+
+      setMinDate(allowed ? initialMinDate : addDays(initialMinDate, 1));
     }
 
-    if (onChange && selectedDate && time) {
-      const combinedDateTime = new Date(selectedDate);
-      let hour = time.hour % 12;
-      if (time.period === "PM") hour += 12;
-      if (time.period === "AM" && time.hour === 12) hour = 0;
-      combinedDateTime.setHours(hour, time.minute, 0, 0);
-      onChange(combinedDateTime);
-    }
+    emit(selectedDate, time);
   }
 
-  useEffect(() => {
-    if (!defaultValue) return;
-
-    handleDateChange(defaultValue);
-    handleTimeChange(getTimeFromDate(defaultValue));
-  }, []);
+  // ---------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------
 
   return (
     <>
@@ -122,6 +141,7 @@ const DateTimeSelector = ({
         {legend && (
           <Legend legend={legend} required={required} number={number} />
         )}
+
         <div
           className={`flex ${
             horizontal ? "flex-col gap-0" : "flex-row gap-2"

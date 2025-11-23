@@ -36,7 +36,7 @@ export const EditableDateSettings = ({
   return (
     <>
       <Toggle
-        isChecked={settings?.minDate === "now"}
+        isChecked={settings?.minDate !== "now"}
         onToggle={(val) => onChange?.({ minDate: val ? "now" : undefined })}
         leftText
         size="toggle-sm"

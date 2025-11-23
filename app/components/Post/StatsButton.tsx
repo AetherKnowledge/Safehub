@@ -20,23 +20,28 @@ function StatButton({
   className,
 }: ButtonProps) {
   return (
-    <label className="swap btn btn-ghost btn-xs px-1 cursor-pointer">
-      <input
-        type="checkbox"
-        checked={value.selected}
-        onChange={(e) => {
-          onChange(e.target.checked);
-        }}
-      />
-      <div className="swap-on flex flex-col items-center justify-between hover:cursor-pointer">
-        {Icon && <Icon className={`text-xl ${color} ${className || ""}`} />}
-      </div>
-      <div className="swap-off flex flex-col items-center justify-between hover:cursor-pointer">
-        {Icon && (
-          <Icon className={`text-xl text-base-content ${className || ""}`} />
-        )}
-      </div>
-    </label>
+    <div className="flex flex-col items-center justify-center">
+      <label className="swap btn btn-ghost btn-xs px-1 cursor-pointer w-8">
+        <input
+          type="checkbox"
+          checked={value.selected}
+          onChange={(e) => {
+            onChange(e.target.checked);
+          }}
+        />
+        <div className="swap-on flex flex-col items-center justify-between hover:cursor-pointer">
+          {Icon && <Icon className={`text-xl ${color} ${className || ""}`} />}
+        </div>
+        <div className="swap-off flex flex-col items-center justify-between hover:cursor-pointer">
+          {Icon && (
+            <Icon className={`text-xl text-base-content ${className || ""}`} />
+          )}
+        </div>
+      </label>
+      <span className="text-xs">
+        {value.count} {label}
+      </span>
+    </div>
   );
 }
 

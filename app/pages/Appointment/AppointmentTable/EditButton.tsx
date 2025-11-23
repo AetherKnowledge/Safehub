@@ -1,43 +1,21 @@
-"use client";
-import { UserType } from "@/app/generated/prisma";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import Link from "next/link";
 import { MdEdit } from "react-icons/md";
 import { AppointmentData } from "../AppointmentActions";
-import RescheduleBooking from "./RescheduleBooking";
 
 interface EditButtonProps {
   appointment: AppointmentData;
-  userType: UserType;
 }
 
-const EditButton = ({ appointment, userType }: EditButtonProps) => {
-  const router = useRouter();
-  const [showReschedule, setShowReschedule] = useState(false);
-
-  const handleEdit = () => {
-    if (userType === UserType.Student) {
-      router.push(`/user/appointments/${appointment.id}`);
-    } else {
-      setShowReschedule(true);
-    }
-  };
-
+const EditButton = ({ appointment }: EditButtonProps) => {
   return (
     <>
-      <div
+      <Link
+        href={`/user/appointments/${appointment.id}`}
         className="flex flex-row h-8 btn btn-sm btn-ghost gap-1 justify-center items-center"
-        onClick={handleEdit}
       >
         <MdEdit className="w-3 h-3" />
-        {userType === UserType.Student ? "Edit" : "Reschedule"}
-      </div>
-      {showReschedule && (
-        <RescheduleBooking
-          appointment={appointment}
-          onClose={() => setShowReschedule(false)}
-        />
-      )}
+        Edit
+      </Link>
     </>
   );
 };

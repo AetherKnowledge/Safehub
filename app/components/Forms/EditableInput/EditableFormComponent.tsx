@@ -1,6 +1,7 @@
 "use client";
 import Legend from "../../Input/Legend";
-import SelectBox from "../../Input/SelectBox";
+import { RadioBoxProps } from "../../Input/RadioBox";
+import SelectBox, { SelectBoxProps } from "../../Input/SelectBox";
 import TextArea from "../../Input/TextArea";
 import TextBox from "../../Input/TextBox";
 import { FormComponent, FormComponentType } from "../FormBuilder";
@@ -8,7 +9,9 @@ import BottomActionRow from "./BottomActionRow";
 import EditableDateSelector from "./EditableDateSelector";
 import EditableDateTimeSelector from "./EditableDateTimeSelector";
 import EditableFormComponentBG from "./EditableFormComponentBG";
-import EditableLinearScale from "./EditableLinearScale";
+import EditableLinearScale, {
+  LinearScaleSettings,
+} from "./EditableLinearScale";
 import EditableRadioBox from "./EditableRadioBox";
 import EditableSelectBox from "./EditableSelectBox";
 import EditableSeparator from "./EditableSeparator";
@@ -27,6 +30,7 @@ export type EditableFormComponentProps = {
   onAddSeparator?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
+  requiredComponent?: boolean;
 };
 
 const EditableFormComponent = ({
@@ -40,6 +44,7 @@ const EditableFormComponent = ({
   onAddSeparator,
   onMoveUp,
   onMoveDown,
+  requiredComponent = false,
 }: EditableFormComponentProps) => {
   if (component.type === FormComponentType.SEPARATOR) {
     return (
@@ -52,11 +57,16 @@ const EditableFormComponent = ({
         onChange={(updatedComponent) => {
           onChange?.({
             ...component,
-            ...updatedComponent,
+            props: {
+              ...component.props,
+              ...updatedComponent,
+            },
           });
         }}
         onAdd={onAdd}
         onAddSeparator={onAddSeparator}
+        onMoveUp={onMoveUp}
+        onMoveDown={onMoveDown}
       />
     );
   }
@@ -94,41 +104,43 @@ const EditableFormComponent = ({
             }}
             placeholder="Edit component name here"
           />
-          <SelectBox
-            className="w-40 h-10 rounded-sm p-0 pl-1"
-            bgColor="bg-neutral"
-            name="componentType"
-            options={[
-              { label: "Short Answer", value: FormComponentType.TEXT },
-              { label: "Paragraph", value: FormComponentType.TEXTAREA },
-              {
-                label: "Multiple Choice",
-                value: FormComponentType.RADIO,
-              },
-              { label: "Dropdown", value: FormComponentType.SELECT },
-              { label: "Date", value: FormComponentType.DATE },
-              { label: "Time", value: FormComponentType.TIME },
-              {
-                label: "Date and Time",
-                value: FormComponentType.DATETIME,
-              },
-              {
-                label: "Linear Scale",
-                value: FormComponentType.LINEAR_SCALE,
-              },
-            ]}
-            value={component.type}
-            onChange={(option) => {
-              if (option.value === component.type) return;
-              onChange?.({
-                ...component,
-                ...createFormComponent({
-                  ...(component.props as SaveableSettings),
-                  type: option.value as FormComponentType,
-                }),
-              });
-            }}
-          />
+          {!requiredComponent && (
+            <SelectBox
+              className="w-40 h-10 rounded-sm p-0 pl-1"
+              bgColor="bg-neutral"
+              name="componentType"
+              options={[
+                { label: "Short Answer", value: FormComponentType.TEXT },
+                { label: "Paragraph", value: FormComponentType.TEXTAREA },
+                {
+                  label: "Multiple Choice",
+                  value: FormComponentType.RADIO,
+                },
+                { label: "Dropdown", value: FormComponentType.SELECT },
+                { label: "Date", value: FormComponentType.DATE },
+                { label: "Time", value: FormComponentType.TIME },
+                {
+                  label: "Date and Time",
+                  value: FormComponentType.DATETIME,
+                },
+                {
+                  label: "Linear Scale",
+                  value: FormComponentType.LINEAR_SCALE,
+                },
+              ]}
+              value={component.type}
+              onChange={(option) => {
+                if (option.value === component.type) return;
+                onChange?.({
+                  ...component,
+                  ...createFormComponent({
+                    ...(component.props as SaveableSettings),
+                    type: option.value as FormComponentType,
+                  }),
+                });
+              }}
+            />
+          )}
         </div>
       ) : (
         <Legend
@@ -148,14 +160,16 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.RADIO && (
           <EditableRadioBox
             selected={selected}
-            options={component.props?.options || []}
+            options={
+              component.props ? (component.props as RadioBoxProps).options : []
+            }
             onChange={(options) => {
               onChange?.({
                 ...component,
                 props: {
                   ...component.props,
                   options: options,
-                },
+                } as RadioBoxProps,
               });
             }}
           />
@@ -163,7 +177,9 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.SELECT && (
           <EditableSelectBox
             selected={selected}
-            options={component.props?.options || []}
+            options={
+              component.props ? (component.props as SelectBoxProps).options : []
+            }
             onChange={(options) => {
               console.log("Options changed:", options);
               onChange?.({
@@ -171,7 +187,7 @@ const EditableFormComponent = ({
                 props: {
                   ...component.props,
                   options: options,
-                },
+                } as SelectBoxProps,
               });
             }}
           />
@@ -179,7 +195,7 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.DATE && (
           <EditableDateSelector
             selected={selected}
-            settings={component?.props}
+            settings={component?.props as SaveableSettings}
             onChange={(settings) => {
               onChange?.({
                 ...component,
@@ -194,7 +210,7 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.TIME && (
           <EditableTimeSelector
             selected={selected}
-            settings={component?.props}
+            settings={component?.props as SaveableSettings}
             onChange={(settings) => {
               onChange?.({
                 ...component,
@@ -209,7 +225,7 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.DATETIME && (
           <EditableDateTimeSelector
             selected={selected}
-            settings={component?.props}
+            settings={component?.props as SaveableSettings}
             onChange={(settings) => {
               onChange?.({
                 ...component,
@@ -224,7 +240,7 @@ const EditableFormComponent = ({
         {component.type === FormComponentType.LINEAR_SCALE && (
           <EditableLinearScale
             selected={selected}
-            settings={component.props}
+            settings={component.props as LinearScaleSettings}
             onChange={(settings) => {
               onChange?.({
                 ...component,
@@ -242,6 +258,7 @@ const EditableFormComponent = ({
       {selected && (
         <BottomActionRow
           component={component}
+          requiredComponent={requiredComponent}
           onDuplicate={onDuplicate}
           onDelete={onDelete}
           onRequiredToggle={(value) =>

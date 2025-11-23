@@ -8,7 +8,7 @@ const PageTitle = () => {
   const rawTitleFormatted = rawTitleWords.join(" ");
 
   return (
-    <h1 className="flex text-2xl font-bold text-primary">
+    <h1 className="flex text-2xl font-bold text-primary w-full">
       {rawTitleFormatted}
     </h1>
   );

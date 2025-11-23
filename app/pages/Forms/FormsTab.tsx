@@ -3,12 +3,9 @@
 import EditableFormBuilder, {
   BuiltFormData,
 } from "@/app/components/Forms/EditableFormBuilder";
+import EditableFormHeader from "@/app/components/Forms/EditableFormHeader";
 import { createFormComponent } from "@/app/components/Forms/EditableInput/utils";
-import {
-  FormComponent,
-  FormComponentType,
-} from "@/app/components/Forms/FormBuilder";
-import { FormsHeaderProps } from "@/app/components/Forms/FormsHeader";
+import { FormComponentType } from "@/app/components/Forms/FormBuilder";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { FormType } from "@/app/generated/prisma";
 import { useEffect, useState } from "react";
@@ -25,13 +22,25 @@ const FormsTab = ({
   title: string;
   formType: FormType;
   groupName: string;
-  header?: FormsHeaderProps;
-  components?: FormComponent[];
   defaultChecked?: boolean;
 }) => {
   const statusPopup = usePopup();
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState<BuiltFormData>({
+
+  const bookingRequiredComponents = [
+    "sessionPreference",
+    "startTime",
+    "counselorId",
+  ];
+  const evaluationRequiredComponents = ["rating"];
+  const requiredComponents =
+    formType === FormType.BOOKING
+      ? bookingRequiredComponents
+      : formType === FormType.EVALUATION
+      ? evaluationRequiredComponents
+      : [];
+
+  const defaultForm: BuiltFormData = {
     header: {
       name: title,
       title: title,
@@ -43,7 +52,9 @@ const FormsTab = ({
         name: "text",
       }),
     ],
-  });
+  };
+
+  const [form, setForm] = useState<BuiltFormData>(defaultForm);
 
   useEffect(() => {
     async function fetchInitialData() {
@@ -54,7 +65,7 @@ const FormsTab = ({
         return;
       }
       if (result.data) {
-        setForm(result.data);
+        setForm(result.data || defaultForm);
       }
 
       setLoading(false);
@@ -87,12 +98,16 @@ const FormsTab = ({
       <div className="tab-content bg-base-200 border-base-300 p-0 shadow-br h-full min-h-0">
         <div className="flex flex-col h-full">
           {loading ? (
-            <FormsLoading />
+            <>
+              <EditableFormHeader />
+              <FormsLoading />
+            </>
           ) : (
             <EditableFormBuilder
               form={form}
               onChange={(updatedForm) => setForm(updatedForm)}
               onSave={() => onSave(form)}
+              requiredComponents={requiredComponents}
             />
           )}
         </div>

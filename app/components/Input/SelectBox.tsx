@@ -1,8 +1,10 @@
 "use client";
+import { getCounselors } from "@/app/pages/CounselorList/CounselorsActions";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import InputInterface, { Option } from "./InputInterface";
 import Legend from "./Legend";
+import { ExtraOptions } from "./schema";
 
 export type SelectBoxProps = InputInterface & {
   defaultValue?: Option["value"];
@@ -12,6 +14,7 @@ export type SelectBoxProps = InputInterface & {
   onChange?: (value: Option) => void;
   placeholder?: string;
   value?: string;
+  extraOptions?: ExtraOptions;
 };
 
 const SelectBox = ({
@@ -22,7 +25,7 @@ const SelectBox = ({
   hint,
   number,
   defaultValue,
-  options,
+  options: initialOptions,
   bgColor = "bg-neutral",
   size = "text-xs",
   onChange,
@@ -31,10 +34,39 @@ const SelectBox = ({
   value,
   noFormOutput = false,
   readonly = false,
+  extraOptions,
 }: SelectBoxProps) => {
+  const [options, setOptions] = useState<Option[]>(initialOptions);
+
   const [selectedOption, setSelectedOption] = useState<Option | null>(
     options.find((option) => option.value === defaultValue) || null
   );
+
+  useEffect(() => {
+    async function setOptionsToCounselors() {
+      const counselors = await getCounselors();
+      console.log("Fetched counselors for SelectBox:", counselors);
+
+      const counselorOptions: Option[] = counselors.map((counselor) => ({
+        label: (counselor.name || counselor.email) + " - " + counselor.email,
+        value: counselor.id,
+      }));
+      setOptions(counselorOptions);
+      setSelectedOption((prev) => {
+        if (prev) return prev;
+        return (
+          counselorOptions.find(
+            (option) => option.value === (value ?? defaultValue)
+          ) || null
+        );
+      });
+    }
+
+    if (extraOptions === ExtraOptions.COUNSELOR_LIST) {
+      setOptionsToCounselors();
+    }
+  }, [extraOptions]);
+
   const [hasError, setHasError] = useState(false);
   function handleSelect(item: Option | null) {
     if (onChange && item) onChange(item);
@@ -119,7 +151,7 @@ const SelectBox = ({
 
         <input
           name={noFormOutput ? undefined : name}
-          value={selectedOption?.value ?? ""}
+          value={selectedOption?.value || ""}
           type="text"
           className={`sr-only text-transparent w-full static validator-2 outline-none ring-0 focus:outline-none focus:ring-0 bg-transparent -mt-1.5 -mb-1.5`}
           required={required}

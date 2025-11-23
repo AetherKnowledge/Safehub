@@ -1,5 +1,6 @@
 import { UserType } from "@/app/generated/prisma";
 import AdminDashboard from "@/app/pages/Dashboard/Admin/Dashboard";
+import CounselorDashboard from "@/app/pages/Dashboard/Counselor/Dashboard";
 import StudentDashboard from "@/app/pages/Dashboard/Student";
 import { Order, SortBy } from "@/app/pages/Dashboard/Student/Dashboard";
 import { auth } from "@/auth";
@@ -13,17 +14,13 @@ const UserDashboard = async ({ searchParams }: Props) => {
     <>
       {session?.user.type === UserType.Admin ? (
         <AdminDashboard />
+      ) : session?.user.type === UserType.Counselor ? (
+        <CounselorDashboard searchParams={await searchParams} />
       ) : (
         <StudentDashboard searchParams={await searchParams} />
       )}
     </>
   );
-
-  // if (session.user.type === UserType.Student) return <StudentDashboard />;
-  // else if (session.user.type === UserType.Counselor)
-  //   return <div>Not built</div>;
-  // else if (session.user.type === UserType.Admin) return <AdminDashboard />;
-  // else redirect("/login");
 };
 
 export default UserDashboard;

@@ -1,5 +1,8 @@
 import Hero from "./components/Hero";
 import About from "./components/Hero/About";
+import ContactUs from "./components/Hero/ContactUs";
+import Footer from "./components/Hero/Footer";
+import Staff from "./components/Hero/Staff";
 import Navbar from "./components/Navbar";
 
 export default function Home() {
@@ -8,6 +11,9 @@ export default function Home() {
       <Navbar />
       <Hero />
       <About />
+      <Staff />
+      <ContactUs />
+      <Footer />
     </div>
   );
 }

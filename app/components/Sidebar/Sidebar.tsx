@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { AiFillHome } from "react-icons/ai";
 import { FaCalendar, FaUsers } from "react-icons/fa";
+import { FaClipboardList } from "react-icons/fa6";
 import { IoIosCall, IoIosSettings } from "react-icons/io";
 import { IoChatboxEllipses, IoDocumentText } from "react-icons/io5";
 import { MdFeedback } from "react-icons/md";
@@ -46,7 +47,7 @@ const Sidebar = () => {
         width: isLarge ? "200px" : "60px",
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="flex flex-col justify-between sticky pt-1 top-0 h-[calc(100vh-3rem)] min-w-[60px] max-w-[200px] bg-base-100 shadow-br rounded-lg z-10 overflow-x-hidden overflow-y-auto"
+      className="hidden lg:flex flex-col justify-between sticky pt-1 top-0 h-[calc(100vh-3rem)] min-w-[60px] max-w-[200px] bg-base-100 shadow-br rounded-lg z-10 overflow-x-hidden overflow-y-auto"
     >
       {/* Top Section */}
       <div className="flex flex-col items-center space-y-4">
@@ -185,6 +186,13 @@ const adminSidebar = (isLarge: boolean) => {
         isLarge={isLarge}
       >
         AI Management
+      </SidebarButton>
+      <SidebarButton
+        href="/user/appointment-logs"
+        icon={FaClipboardList}
+        isLarge={isLarge}
+      >
+        Logs
       </SidebarButton>
     </>
   );

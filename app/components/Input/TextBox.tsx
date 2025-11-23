@@ -25,6 +25,7 @@ export type TextBoxProps = InputInterface & {
   pattern?: string;
   onChange?: (value: string) => void;
   icon?: IconType;
+  value?: string;
 };
 
 const TextBox = ({
@@ -44,6 +45,7 @@ const TextBox = ({
   onInvalid,
   noFormOutput,
   readonly = false,
+  onEnter,
 }: TextBoxProps) => {
   const [hasError, setHasError] = useState(false);
 
@@ -80,6 +82,11 @@ const TextBox = ({
             onChange={(e) => {
               setHasError(false);
               onChange && onChange(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                onEnter && onEnter();
+              }
             }}
             readOnly={readonly}
           />

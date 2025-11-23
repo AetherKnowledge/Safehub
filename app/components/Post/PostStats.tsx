@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { FaRegBookmark, FaRegComment, FaRegHeart } from "react-icons/fa6";
+import { FaRegComment, FaRegHeart } from "react-icons/fa6";
 import {
   PostData,
   PostStat,
@@ -75,13 +75,13 @@ const PostStats = ({ post, showPopup, setShowPopup }: PostStatsProps) => {
         />
       </div>
       <div className="flex items-end gap-2">
-        <StatButton
+        {/* <StatButton
           onChange={async (value: boolean) => {}}
           icon={FaRegBookmark}
           value={{ count: 4, selected: false }}
           label="Saved"
           className=""
-        />
+        /> */}
         <PostDropdown post={post} />
       </div>
     </div>

@@ -5,52 +5,50 @@ const UserImage = ({
   width,
   src,
   bordered,
-  borderColor = "primary",
   borderWidth = 2,
+  onClick,
 }: {
   name: string;
   width: number;
   src?: string | null;
   bordered?: boolean;
-  borderColor?: string;
   borderWidth?: number;
+  onClick?: () => void;
 }) => {
-  const imageWidth = `w-${width}`;
-  const imageHeight = `h-${width}`;
-
   return (
-    <>
+    <div
+      className={`relative flex-shrink-0 border rounded-full ${
+        bordered
+          ? `border-primary bg-primary`
+          : "border-transparent bg-transparent"
+      }`}
+      style={{
+        width: `calc(var(--spacing) * ${width})`,
+        height: `calc(var(--spacing) * ${width})`,
+        borderWidth: `${borderWidth}px`,
+      }}
+      onClick={onClick}
+    >
       {src ? (
-        <div
-          className={`border-${borderWidth} rounded-full ${
-            bordered ? ` border-${borderColor}` : "border-transparent"
-          }`}
-        >
-          <Image
-            src={src}
-            alt={name ?? "counselor Avatar"}
-            className={`rounded-full`}
-            width={width * 4}
-            height={width * 4}
-          />
-        </div>
+        <Image
+          src={src}
+          alt={name ?? "counselor Avatar"}
+          className={`rounded-full`}
+          fill
+        />
       ) : (
         <div
-          className={`rounded-full border-${borderWidth} ${
-            bordered ? `border-${borderColor}` : "border-transparent"
-          }`}
+          role="button"
+          tabIndex={0}
+          className={`rounded-full w-full h-full bg-gray-500 text-white flex items-center justify-center font-bold hover:brightness-90 active:brightness-75 transition duration-150 select-none cursor-pointer`}
+          style={{
+            fontSize: `calc(var(--spacing) * ${width / 2})`,
+          }}
         >
-          <div
-            role="button"
-            tabIndex={0}
-            style={{ fontSize: `calc(var(--spacing) * ${width / 2})` }}
-            className={`${imageWidth} ${imageHeight} rounded-full bg-gray-500 text-white flex items-center justify-center font-bold hover:brightness-90 active:brightness-75 transition duration-150 select-none cursor-pointer`}
-          >
-            {name.charAt(0).toUpperCase()}
-          </div>
+          {name.charAt(0).toUpperCase()}
         </div>
       )}
-    </>
+    </div>
   );
 };
 

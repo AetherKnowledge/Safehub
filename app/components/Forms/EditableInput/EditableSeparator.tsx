@@ -1,5 +1,5 @@
 import { FormComponent, FormComponentType } from "../FormBuilder";
-import { BaseSeparator, SeparatorProps } from "../Separator";
+import Separator, { BaseSeparator, SeparatorProps } from "../Separator";
 import BottomActionRow from "./BottomActionRow";
 import EditableFormComponentBG from "./EditableFormComponentBG";
 import FormsOptions from "./FormsOptions";
@@ -44,23 +44,27 @@ const EditableSeparator = ({
         />
       )}
 
-      <BaseSeparator {...component.props}>
-        <input
-          type="text"
-          className="bg-transparent w-full text-center font-semibold text-lg text-primary focus:outline-none"
-          value={component.props.legend}
-          onChange={(e) => {
-            onChange?.({ ...component.props, legend: e.target.value });
-          }}
-        />
-      </BaseSeparator>
-      {selected && (
-        <BottomActionRow
-          component={component}
-          onDuplicate={onDuplicate}
-          onDelete={onDelete}
-          type={FormComponentType.SEPARATOR}
-        />
+      {selected ? (
+        <>
+          <BaseSeparator {...component.props}>
+            <input
+              type="text"
+              className="p-2 bg-neutral border-b-1 border-primary no-outline w-full rounded-sm h-10 text-center"
+              value={component.props.legend}
+              onChange={(e) => {
+                onChange?.({ ...component.props, legend: e.target.value });
+              }}
+            />
+          </BaseSeparator>
+          <BottomActionRow
+            component={component}
+            onDuplicate={onDuplicate}
+            onDelete={onDelete}
+            type={FormComponentType.SEPARATOR}
+          />
+        </>
+      ) : (
+        <Separator {...component.props} />
       )}
     </EditableFormComponentBG>
   );

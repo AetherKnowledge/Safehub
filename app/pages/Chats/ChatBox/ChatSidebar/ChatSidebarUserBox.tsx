@@ -4,6 +4,7 @@ import { useChatBot } from "@/app/components/ChatBot/ChatBotProvider";
 import UserImage from "@/app/components/UserImage";
 import { UserStatus } from "@/app/generated/prisma";
 import { useMessaging } from "@/lib/socket/hooks/useMessaging";
+import { getRelativeTime } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -34,27 +35,6 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
     }
   }, [messaging.messages]);
 
-  const getRelativeTime = (date: Date): string => {
-    const now = new Date();
-    const diffInMs = now.getTime() - new Date(date).getTime();
-    const diffInSeconds = Math.floor(diffInMs / 1000);
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    const diffInDays = Math.floor(diffInHours / 24);
-    const diffInWeeks = Math.floor(diffInDays / 7);
-    const diffInMonths = Math.floor(diffInDays / 30);
-    const diffInYears = Math.floor(diffInDays / 365);
-
-    if (diffInSeconds <= 0) return "now";
-    if (diffInSeconds < 60) return `${diffInSeconds}s`;
-    if (diffInMinutes < 60) return `${diffInMinutes}m`;
-    if (diffInHours < 24) return `${diffInHours}h`;
-    if (diffInDays < 7) return `${diffInDays}d`;
-    if (diffInWeeks < 4) return `${diffInWeeks}w`;
-    if (diffInMonths < 12) return `${diffInMonths}mo`;
-    return `${diffInYears}yr`;
-  };
-
   return (
     <Link
       href={`/user/chats/${chat.id}`}
@@ -68,7 +48,7 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
         src={chat.src || undefined}
         bordered={chat.status === UserStatus.Online}
       />
-      <div className="flex flex-col justify-center max-w-59 overflow-hidden flex-1 min-w-0">
+      <div className="flex flex-col justify-center overflow-hidden flex-1 min-w-0">
         <h2 className="font-semibold text-sm overflow-hidden text-ellipsis whitespace-nowrap">
           {chat.name}
         </h2>

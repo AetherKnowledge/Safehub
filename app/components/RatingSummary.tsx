@@ -1,8 +1,7 @@
-import { Feedback } from "@/app/generated/prisma/wasm";
 import StarRating from "./StarRating";
 
 export interface RatingSummaryProps {
-  feedbacks: Feedback[];
+  ratings: number[];
   className?: string;
   // Customize colors if needed
   barColorClassName?: string; // e.g., "bg-green-600"
@@ -18,20 +17,20 @@ function clampToRange(n: number, min: number, max: number) {
 }
 
 export default function RatingSummary({
-  feedbacks,
+  ratings,
   className,
   barColorClassName = "bg-primary",
   barBgClassName = "bg-base-content/10",
 }: RatingSummaryProps) {
-  const total = feedbacks?.length ?? 0;
+  const total = ratings.length;
 
   const counts = [0, 0, 0, 0, 0]; // index 0 => 1-star, 4 => 5-star
   let sum = 0;
-  if (feedbacks) {
-    for (const f of feedbacks) {
-      const r = clampToRange(Math.round(Number(f.rating) || 0), 1, 5);
-      counts[r - 1] += 1;
-      sum += r;
+  if (ratings && total > 0) {
+    for (const r of ratings) {
+      const rating = clampToRange(Math.round(Number(r)), 1, 5);
+      counts[rating - 1] += 1;
+      sum += rating;
     }
   }
 
@@ -47,7 +46,7 @@ export default function RatingSummary({
   return (
     <div className={"flex w-full items-center gap-6 ml-5" + (className || "")}>
       {/* Left summary */}
-      <div className="flex flex-col items-center min-w-[90px]">
+      <div className="flex flex-col items-center">
         <div className="text-5xl font-bold leading-none">{avg.toFixed(1)}</div>
         <StarRating rating={avg} size={20} />
         <div className="mt-1 text-sm text-base-content/70">

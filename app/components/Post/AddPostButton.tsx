@@ -8,7 +8,7 @@ const AddPostButton = () => {
   return (
     <>
       <button
-        className="btn btn-primary btn-sm"
+        className="btn btn-primary btn-sm py-2"
         onClick={() => setShowModal(true)}
       >
         New Post

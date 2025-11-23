@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { sortPosts } from "@/lib/utils";
+import DashboardPosts from "../Dashboard/DashboardPosts";
 import { Order, SortBy } from "../Dashboard/Student/Dashboard";
-import DashboardPosts from "../Dashboard/Student/DashboardPosts";
 import { getPosts } from "./PostActions";
 
 const PostPage = async ({
@@ -13,13 +13,15 @@ const PostPage = async ({
   const session = await auth();
 
   return (
-    <div className="flex flex-col gap-3 flex-1 min-h-0">
-      <DashboardPosts
-        posts={posts}
-        sortBy={sortBy}
-        order={order}
-        userType={session?.user?.type}
-      />
+    <div className="flex items-center justify-center h-full min-h-0 overflow-y-auto pb-1 pr-1">
+      <div className="flex flex-1 flex-row gap-3 h-full min-h-0 w-auto justify-center">
+        <DashboardPosts
+          posts={posts}
+          sortBy={sortBy}
+          order={order}
+          userType={session?.user?.type}
+        />
+      </div>
     </div>
   );
 };

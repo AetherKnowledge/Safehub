@@ -6,7 +6,7 @@ import {
 } from "@/app/generated/prisma";
 
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
-import FormsBuilder from "@/app/components/Forms/FormBuilder";
+import FormBuilder from "@/app/components/Forms/FormBuilder";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import {
   createNewAppointment,
@@ -96,11 +96,11 @@ const Booking = ({
   }
 
   return (
-    <FormsBuilder
+    <FormBuilder
       form={questions!}
       defaultValues={appointmentData?.answers}
       onSubmit={handleSubmit}
-      onBack={() => router.push("/user/appointments")}
+      backHref="/user/appointments"
     />
   );
 };

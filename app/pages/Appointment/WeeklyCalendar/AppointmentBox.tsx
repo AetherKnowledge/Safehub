@@ -2,7 +2,7 @@
 import { formatTime } from "@/lib/utils";
 import { useState } from "react";
 import { AppointmentData } from "../AppointmentActions";
-import AppointmentPopup from "./AppointmentPopup";
+import { ViewModal } from "../AppointmentTable/ViewAppointmentButton";
 import {
   getAppointmentHeight,
   getAppointmentTopPosition,
@@ -59,11 +59,7 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
 
       {/* Appointment Detail Modal */}
       {showPopup && (
-        <AppointmentPopup
-          key={`appointment-modal-${appointment.id}`}
-          appointment={appointment}
-          onClose={handleClose}
-        />
+        <ViewModal appointment={appointment} onClose={handleClose} />
       )}
     </>
   );

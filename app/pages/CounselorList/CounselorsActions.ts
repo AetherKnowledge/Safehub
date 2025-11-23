@@ -45,7 +45,7 @@ export async function getCounselors() {
       Counselor: {
         include: {
           availableSlots: true,
-          feedbacks: { select: { rating: true } },
+          appointments: { select: { rating: true } },
         },
       },
     },
@@ -57,12 +57,12 @@ export async function getCounselors() {
         ? {
             ...counselor,
             status: UserStatus.Online,
-            rating: calculateStarRating(counselor.Counselor!.feedbacks),
+            rating: calculateStarRating(counselor.Counselor!.appointments),
           }
         : {
             ...counselor,
             status: UserStatus.Offline,
-            rating: calculateStarRating(counselor.Counselor!.feedbacks),
+            rating: calculateStarRating(counselor.Counselor!.appointments),
           }
     )
   );
@@ -70,8 +70,14 @@ export async function getCounselors() {
   return counselorsWithStatus as CounselorData[];
 }
 
-function calculateStarRating(feedbacks: { rating: number }[]) {
+function calculateStarRating(feedbacks: { rating: number | null }[]) {
   if (feedbacks.length === 0) return 0;
-  const total = feedbacks.reduce((acc, feedback) => acc + feedback.rating, 0);
-  return Math.round((total / feedbacks.length) * 100) / 100; // Round to 2 decimal place
+  const length = feedbacks.filter((fb) => fb.rating !== null).length;
+  if (length === 0) return 0;
+
+  const total = feedbacks.reduce(
+    (acc, feedback) => acc + (feedback.rating ?? 0),
+    0
+  );
+  return Math.round((total / length) * 100) / 100; // Round to 2 decimal place
 }

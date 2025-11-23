@@ -25,7 +25,7 @@ const PostBox = ({
 
   return (
     <div
-      className={`card bg-base-100 min-w-[400px] w-full mx-auto ${maxHeight} overflow-hidden`}
+      className={`card bg-base-100 min-w-[400px] w-full ${maxHeight} overflow-hidden`}
     >
       {/* IMAGE GRID */}
       <div className="px-4">
@@ -90,7 +90,7 @@ export const PostBoxHandler = ({ post }: { post: PostData }) => {
       <PostBox post={post} showPopup={showPopup} setShowPopup={setShowPopup} />
       {showPopup && (
         <ModalBase className="px-20" onClose={() => setShowPopup(false)}>
-          <div className="relative w-full" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full" onClick={(e) => e.stopPropagation()}>
             <PostBox
               post={post}
               showPopup={showPopup}

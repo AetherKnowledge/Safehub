@@ -1,3 +1,4 @@
+import NotificationsButton from "../Notifications/NotificationsButton";
 import PageTitle from "./PageTitle";
 import UserButton from "./UserButton";
 
@@ -6,6 +7,7 @@ const UserNavbar = () => {
     <div className="flex flex-row bg-base-200 top-0 gap-3 sticky z-10 items-center justify-center ">
       <div className="flex bg-base-100 shadow-br rounded-lg w-full items-center h-full px-4 py-3 gap-5">
         <PageTitle />
+        <NotificationsButton />
         {/* <label className="flex-1 input text-base-content focus-within:outline-none focus-within:ring-0 input-sm ">
           <svg
             className="h-[1em] opacity-50"

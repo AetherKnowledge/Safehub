@@ -1,7 +1,5 @@
 "use client";
-import FormsBuilder, {
-  FormComponent,
-} from "@/app/components/Forms/FormBuilder";
+import FormBuilder, { FormComponent } from "@/app/components/Forms/FormBuilder";
 import { FormsHeaderProps } from "@/app/components/Forms/FormsHeader";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import {
@@ -41,14 +39,14 @@ const Onboarding = () => {
   ];
 
   return (
-    <FormsBuilder
+    <FormBuilder
       form={{
         header,
         components: questions,
         termsAndConditions: true,
       }}
       onSubmit={onSubmit}
-      onBack={() => router.push("/")}
+      backHref="/"
     />
   );
 };

@@ -1,6 +1,8 @@
 import Sidebar from "@/app/components/Sidebar";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import BottomBar from "../components/BottomBar/BottomBar";
+import MoodTrackerPopup from "../components/MoodTracker";
 import UserNavbar from "../components/Navbar/UserNavbar";
 import { UserType } from "../generated/prisma";
 import { hasOnboarded } from "../pages/Onboarding/OnboardingActions";
@@ -23,7 +25,7 @@ const Layout = async ({ children }: Props) => {
   }
 
   return (
-    <div className="flex bg-base-200 h-full w-full p-6 gap-3 overflow-y-hidden">
+    <div className="flex bg-base-200 h-full w-full p-6 gap-3 overflow-y-hidden min-h-0">
       {/* Resizable Floating Sidebar */}
       <Sidebar />
 
@@ -31,7 +33,11 @@ const Layout = async ({ children }: Props) => {
       <div className="flex flex-col flex-1 gap-3 h-full">
         <UserNavbar />
         {children}
+        <BottomBar />
       </div>
+      {!session.user.moodToday && session.user.type === UserType.Student && (
+        <MoodTrackerPopup />
+      )}
     </div>
   );
 };

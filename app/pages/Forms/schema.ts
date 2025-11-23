@@ -1,6 +1,10 @@
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
 import { FormComponentType } from "@/app/components/Forms/FormBuilder";
 import { Option } from "@/app/components/Input/InputInterface";
+import { LinearScaleProps } from "@/app/components/Input/LinearScale";
+import { RadioBoxProps } from "@/app/components/Input/RadioBox";
+import { ExtraOptions } from "@/app/components/Input/schema";
+import { SelectBoxProps } from "@/app/components/Input/SelectBox";
 import { FormType } from "@/app/generated/prisma";
 import z from "zod";
 
@@ -22,14 +26,21 @@ export function buildZodSchema(form: BuiltFormData) {
         break;
 
       case FormComponentType.SELECT:
+        if (
+          (props as SelectBoxProps).extraOptions === ExtraOptions.COUNSELOR_LIST
+        ) {
+          field = z.uuid();
+          break;
+        }
+
         field = z.enum(
-          (props as any).options.map((o: any) => o.value),
+          (props as SelectBoxProps).options.map((o: any) => o.value),
           "Invalid selection"
         );
         break;
 
       case FormComponentType.RADIO: {
-        const options = (props as any).options as Option[];
+        const options = (props as RadioBoxProps).options as Option[];
 
         const normalValues = options
           .filter((o) => !o.other)
@@ -52,8 +63,8 @@ export function buildZodSchema(form: BuiltFormData) {
         // Accept string or number, coerce to number
         field = z.coerce
           .number() // converts string to number if possible
-          .min(props.min || 1)
-          .max(props.max || 5);
+          .min((props as LinearScaleProps).min || 1)
+          .max((props as LinearScaleProps).max || 5);
         break;
 
       case FormComponentType.DATE:

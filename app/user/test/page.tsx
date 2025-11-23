@@ -1,39 +1,25 @@
-import DateSelector from "@/app/components/Input/Date/DateSelector";
-import DateTimeSelector from "@/app/components/Input/Date/DateTimeSelector";
-import TimeSelector from "@/app/components/Input/Date/TimeSelector";
-import LinearScale from "@/app/components/Input/LinearScale";
-import RadioBox from "@/app/components/Input/RadioBox";
+import { ExtraOptions } from "@/app/components/Input/schema";
 import SelectBox from "@/app/components/Input/SelectBox";
-import TextArea from "@/app/components/Input/TextArea";
-import TextBox from "@/app/components/Input/TextBox";
+import TermsAndConditions from "@/app/components/Input/TermsAndConditions";
+import { clearNotifications, testAction } from "./testActions";
 
-const Test = () => {
-  const options = [
-    { label: "option1", value: "option1" },
-    { label: "option2", value: "option2" },
-  ];
-
+const Test = async () => {
   return (
-    <div className="flex flex-col min-h-0 h-full">
-      <LinearScale name="test" readonly />
-      <TextBox name="test2" readonly />
-      <TextArea name="test3" readonly />
-      <TimeSelector name="test4" readonly />
-      <DateSelector name="test5" readonly />
-      <DateTimeSelector name="test6" readonly />
+    <>
+      <button className="btn" onClick={testAction}>
+        Test Action
+      </button>
+      <button className="btn" onClick={clearNotifications}>
+        Delete Action
+      </button>
       <SelectBox
-        name="test7"
-        options={options}
-        readonly
-        defaultValue="option1"
+        name="test"
+        options={[]}
+        extraOptions={ExtraOptions.COUNSELOR_LIST}
       />
-      <RadioBox
-        name="test8"
-        options={options}
-        defaultValue="option1"
-        readonly
-      />
-    </div>
+      <div className="flex-1 flex flex-row"></div>
+      <TermsAndConditions readOnly />
+    </>
   );
 };
 

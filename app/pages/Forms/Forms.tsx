@@ -16,12 +16,12 @@ const Forms = () => {
         groupName="forms-tabs"
         defaultChecked={false}
       />
-      <FormsTab
+      {/* <FormsTab
         title="Cancelation Form"
         formType={FormType.CANCELATION}
         groupName="forms-tabs"
         defaultChecked={false}
-      />
+      /> */}
     </div>
   );
 };

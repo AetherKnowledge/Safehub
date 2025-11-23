@@ -1,4 +1,4 @@
-import { UserType } from "@/app/generated/prisma";
+import { MoodType, UserType } from "@/app/generated/prisma";
 import { DefaultSession, DefaultUser } from "next-auth";
 
 declare module "next-auth" {
@@ -8,6 +8,7 @@ declare module "next-auth" {
       id?: string;
       type?: UserType;
       darkMode?: boolean;
+      moodToday?: MoodType; // Optional field for mood today
     } & DefaultSession["user"];
   }
 
@@ -15,6 +16,7 @@ declare module "next-auth" {
     id?: string;
     type?: UserType;
     darkMode?: boolean;
+    moodToday?: MoodType; // Optional field for mood today
   }
 }
 
@@ -23,6 +25,7 @@ declare module "next-auth/jwt" {
     id?: string;
     type?: UserType;
     darkMode?: boolean;
+    moodToday?: MoodType; // Optional field for mood today
   }
 }
 

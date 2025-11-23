@@ -1,7 +1,7 @@
 "use server";
 
 import ActionResult from "@/app/components/ActionResult";
-import { NotificationType } from "@/app/generated/prisma";
+import { AppointmentStatus, NotificationType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { prisma } from "@/prisma/client";
 
@@ -29,27 +29,27 @@ export async function testAction(): Promise<ActionResult<void>> {
       };
     }
 
-    // for (let i = 0; i < 5; i++) {
-    //   const type = getRandom();
-    //   let data = {};
-    //   if (type === NotificationType.AppointmentUpdated) {
-    //     data = {
-    //       appointmentId: appointment.id,
-    //       from: AppointmentStatus.Pending,
-    //       to: AppointmentStatus.Approved,
-    //     };
-    //   } else if (type === NotificationType.AppointmentCreated) {
-    //     data = { appointmentId: appointment.id };
-    //   }
+    for (let i = 0; i < 5; i++) {
+      const type = getRandom();
+      let data = {};
+      if (type === NotificationType.AppointmentUpdated) {
+        data = {
+          appointmentId: appointment.id,
+          from: AppointmentStatus.Pending,
+          to: AppointmentStatus.Approved,
+        };
+      } else if (type === NotificationType.AppointmentCreated) {
+        data = { appointmentId: appointment.id };
+      }
 
-    //   await prisma.notification.create({
-    //     data: {
-    //       userId: session.user.id,
-    //       type: type,
-    //       data: data,
-    //     },
-    //   });
-    // }
+      await prisma.notification.create({
+        data: {
+          userId: session.user.id,
+          type: type,
+          data: data,
+        },
+      });
+    }
 
     console.log("Appointment:", appointment);
 

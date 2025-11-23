@@ -35,3 +35,74 @@ export async function fetchNotificationsForUser(): Promise<
     };
   }
 }
+
+export async function markNotificationAsRead(
+  notificationId: string
+): Promise<ActionResult<null>> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        message: "User is not authenticated.",
+      };
+    }
+
+    await prisma.notification.updateMany({
+      where: {
+        id: notificationId,
+        userId: session.user.id,
+      },
+      data: {
+        isRead: true,
+      },
+    });
+
+    return {
+      success: true,
+      data: null,
+    };
+  } catch (error) {
+    console.error(
+      "Error marking notification as read:",
+      (error as Error).message
+    );
+    return {
+      success: false,
+      message:
+        "Failed to mark notification as read. " + (error as Error).message,
+    };
+  }
+}
+
+export async function deleteNotification(
+  notificationId: string
+): Promise<ActionResult<null>> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        message: "User is not authenticated.",
+      };
+    }
+
+    await prisma.notification.deleteMany({
+      where: {
+        id: notificationId,
+        userId: session.user.id,
+      },
+    });
+
+    return {
+      success: true,
+      data: null,
+    };
+  } catch (error) {
+    console.error("Error deleting notification:", (error as Error).message);
+    return {
+      success: false,
+      message: "Failed to delete notification. " + (error as Error).message,
+    };
+  }
+}

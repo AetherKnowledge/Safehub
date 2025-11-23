@@ -5,11 +5,17 @@ import { ReactNode, useEffect, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 import { getRelativeTime } from "@/lib/utils";
+import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { CiCalendarDate, CiImageOn } from "react-icons/ci";
+import { IoMdClose } from "react-icons/io";
 import { MdNotificationsNone } from "react-icons/md";
-import { fetchNotificationsForUser } from "./NotificationActions";
+import {
+  deleteNotification,
+  fetchNotificationsForUser,
+  markNotificationAsRead,
+} from "./NotificationActions";
 import {
   AppointmentCreateNotification,
   AppointmentUpdateNotification,
@@ -20,6 +26,9 @@ const NotificationsButton = () => {
   const drawerId = "notifications-drawer";
   const session = useSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const hasUnread = notifications.some((n) => !n.isRead);
 
   useEffect(() => {
     async function fetchNotifications() {
@@ -29,8 +38,27 @@ const NotificationsButton = () => {
       }
     }
 
-    fetchNotifications();
+    fetchNotifications().finally(() => setLoading(false));
   }, []);
+
+  function handleReadAll() {
+    const unreadNotifications = notifications.filter((n) => !n.isRead);
+    unreadNotifications.forEach(async (notification) => {
+      await markNotificationAsRead(notification.id);
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((n) =>
+          n.id === notification.id ? { ...n, isRead: true } : n
+        )
+      );
+    });
+  }
+
+  function handleDeleteAll() {
+    notifications.forEach(async (notification) => {
+      await deleteNotification(notification.id);
+    });
+    setNotifications([]);
+  }
 
   useEffect(() => {
     if (!session.data?.supabaseAccessToken) return;
@@ -41,6 +69,7 @@ const NotificationsButton = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "Notification" },
         (payload) => {
+          console.log("Notification payload:", payload);
           if (payload.eventType === "INSERT") {
             setNotifications((prevNotifications) => [
               ...prevNotifications,
@@ -72,12 +101,43 @@ const NotificationsButton = () => {
   }, [session.data?.supabaseAccessToken]);
 
   return (
-    <div className="drawer drawer-end w-auto">
-      <input id={drawerId} type="checkbox" className="drawer-toggle" />
+    <div className="drawer drawer-end w-full">
+      <input
+        id={drawerId}
+        type="checkbox"
+        className="drawer-toggle"
+        onChange={(e) => {
+          if (e.target.checked) {
+            handleReadAll();
+          }
+        }}
+      />
       <div className="drawer-content">
         {/* Page content here */}
-        <label htmlFor={drawerId} className="drawer-button btn btn-ghost p-2">
-          <MdNotificationsNone className="w-7 h-7" />
+        <label htmlFor={drawerId} className="drawer-button w-full">
+          <div className="flex flex-row items-center justify-end w-full gap-2">
+            <div className="btn btn-ghost p-1">
+              <motion.div
+                key={hasUnread ? "unread" : "read"}
+                animate={
+                  hasUnread
+                    ? { rotate: [0, -15, 15, -10, 10, 0, 0, 0, 0, 0, 0, 0, 0] }
+                    : { rotate: 0 }
+                }
+                transition={
+                  hasUnread
+                    ? { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                    : { duration: 0.3 }
+                }
+              >
+                <MdNotificationsNone
+                  className={`w-7 h-7 transition-colors duration-300 ${
+                    hasUnread ? "text-primary" : ""
+                  }`}
+                />
+              </motion.div>
+            </div>
+          </div>
         </label>
       </div>
       <div className="drawer-side">
@@ -89,26 +149,50 @@ const NotificationsButton = () => {
 
         <div className="menu bg-base-200 min-h-full w-100 p-0">
           {/* Sidebar content here */}
-          <h2 className="text-xl font-bold p-4">Notifications</h2>
+          <h2 className="text-xl font-bold p-4 pb-0">Notifications</h2>
+          <button
+            className="text-error hover:underline p-4 pt-0 text-left cursor-pointer"
+            onClick={handleDeleteAll}
+          >
+            Clear All
+          </button>
           {notifications.map((notification) => (
             <NotificationBox
               key={notification.id}
               notification={notification}
               isFirst={notifications[0].id === notification.id}
+              onCloseAction={() => {
+                deleteNotification(notification.id);
+              }}
             />
           ))}
+          {loading && (
+            <>
+              <NotificationBoxSkeleton />
+              <NotificationBoxSkeleton />
+              <NotificationBoxSkeleton />
+            </>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
+export const NotificationBoxSkeleton = () => {
+  return (
+    <div className="skeleton h-[87px] rounded-none border-l-2 border-primary" />
+  );
+};
+
 export const NotificationBox = ({
   notification,
   isFirst,
+  onCloseAction,
 }: {
   notification: Notification;
   isFirst?: boolean;
+  onCloseAction: () => void;
 }) => {
   const notificationData = parseNotificationData(notification);
   if (!notificationData) {
@@ -116,25 +200,34 @@ export const NotificationBox = ({
   }
 
   return (
-    <Link
-      className={`border border-b border-base-300 text-left cursor-pointer 
-        hover:bg-base-300/50 active:bg-base-300 transition-all 
+    <div
+      className={`border border-b border-base-300 text-left
         ${isFirst ? "border-t" : ""}
         ${notification.isRead ? "" : "border-l-primary border-l-2"}`}
-      href={notificationTypeToLink(notification.type)}
     >
       <div className="flex flex-row p-2 gap-2">
         <div className={`flex items-center justify-center m-2`}>
           {notificationTypeToImage(notification.type)}
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 w-full items-start">
           <p>{notificationTypeToMessage(notification, notificationData)}</p>
           <p className="font-light">
             {getRelativeTime(new Date(notification.createdAt))}
           </p>
+          <Link
+            className="text-primary hover:underline w-fit"
+            href={notificationTypeToLink(notification.type)}
+          >
+            View
+          </Link>
+        </div>
+        <div>
+          <button className="btn btn-ghost p-0 h-5 w-5" onClick={onCloseAction}>
+            <IoMdClose />
+          </button>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

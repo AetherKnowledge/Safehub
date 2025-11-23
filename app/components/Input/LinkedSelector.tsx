@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormComponentType } from "../Forms/FormBuilder";
 import FormComponentBG from "../Forms/FormComponentBG";
 import InputInterface, { Option } from "./InputInterface";
@@ -42,10 +42,20 @@ const LinkedSelector = ({
   readonly = false,
   noFormOutput = false,
 }: LinkedSelectorProps) => {
-  const [parentOptions, setParentOptions] = useState<Option[]>(
-    linkedOptions.map((lo) => lo.parentOption)
-  );
+  const [parentOptions, setParentOptions] = useState<Option[]>([]);
   const [childOptions, setChildOptions] = useState<Option[]>([]);
+
+  useEffect(() => {
+    setParentOptions(linkedOptions.map((lo) => lo.parentOption));
+    if (parent.props.defaultValue) {
+      const defaultParentOption = linkedOptions.find(
+        (lo) => lo.parentOption.value === parent.props.defaultValue
+      );
+      if (defaultParentOption) {
+        setChildOptions(defaultParentOption.childOptions);
+      }
+    }
+  }, [linkedOptions]);
 
   const handleParentChange = (option: Option) => {
     setChildOptions(

@@ -1,5 +1,5 @@
 import DatePicker from "@/app/components/Input/Date/DatePicker";
-import { UserType } from "@/app/generated/prisma";
+import { AppointmentStatus, UserType } from "@/app/generated/prisma";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -59,11 +59,17 @@ export async function TodayAppointments({
 }) {
   const appointments = initialAppointments || (await getAppointments());
 
-  const today = new Date(new Date().setHours(0, 0, 0, 0));
+  const today = new Date();
+  const tommorrow = new Date(new Date().setDate(today.getDate() + 1));
+
   const filteredAppointments = appointments.filter((appointment) => {
-    const appointmentDate = new Date(appointment.startTime);
-    appointmentDate.setHours(0, 0, 0, 0);
-    return appointmentDate.getTime() === today.getTime();
+    if (
+      appointment.status !== AppointmentStatus.Approved &&
+      appointment.status !== AppointmentStatus.Pending
+    )
+      return false;
+
+    return appointment.startTime >= today && appointment.startTime < tommorrow;
   });
 
   if (filteredAppointments.length === 0)
@@ -89,12 +95,19 @@ export async function ThisWeeksAppointments({
 }) {
   const appointments = initialAppointments || (await getAppointments());
 
-  const today = new Date(new Date().setHours(0, 0, 0, 0));
+  const today = new Date();
   const filteredAppointments = appointments.filter((appointment) => {
     const appointmentDate = new Date(appointment.startTime);
     appointmentDate.setHours(0, 0, 0, 0);
     const diffTime = appointmentDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (
+      appointment.status !== AppointmentStatus.Approved &&
+      appointment.status !== AppointmentStatus.Pending
+    )
+      return false;
+
     return diffDays >= 0 && diffDays < 7;
   });
 

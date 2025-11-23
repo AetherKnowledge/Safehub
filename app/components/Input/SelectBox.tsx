@@ -119,7 +119,7 @@ const SelectBox = ({
 
         <input
           name={noFormOutput ? undefined : name}
-          value={selectedOption?.value ?? ""}
+          value={selectedOption?.value || ""}
           type="text"
           className={`sr-only text-transparent w-full static validator-2 outline-none ring-0 focus:outline-none focus:ring-0 bg-transparent -mt-1.5 -mb-1.5`}
           required={required}
@@ -129,7 +129,7 @@ const SelectBox = ({
           }}
           onChange={() => {}}
           style={{ caretColor: "transparent" }}
-          readOnly
+          readOnly={readonly}
         />
 
         <div className="flex flex-col -mt-1.5">

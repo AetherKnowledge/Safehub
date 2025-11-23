@@ -88,7 +88,7 @@ const RescheduleButton = ({
               <p className="font-semibold text-2xl">Pick a new schedule</p>
               <div className="flex flex-col gap-3 items-center text-center">
                 <DateTimeSelector
-                  name="startTime"
+                  name="test"
                   horizontal
                   minDate="now"
                   minTime={{ hour: 8, minute: 0, period: TimePeriod.AM }}

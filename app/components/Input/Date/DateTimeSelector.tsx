@@ -148,7 +148,7 @@ const DateTimeSelector = ({
           } ${className}`}
         >
           <DateSelector
-            name="date"
+            name={`${name}-date`}
             noFormOutput
             value={selectedDate}
             onChange={handleDateChange}
@@ -176,7 +176,7 @@ const DateTimeSelector = ({
           />
 
           <TimeSelector
-            name="time"
+            name={`${name}-time`}
             noFormOutput
             value={selectedTime}
             onChange={handleTimeChange}

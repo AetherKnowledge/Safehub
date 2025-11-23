@@ -3,19 +3,15 @@
 import EditableFormBuilder, {
   BuiltFormData,
 } from "@/app/components/Forms/EditableFormBuilder";
+import EditableFormHeader from "@/app/components/Forms/EditableFormHeader";
 import { createFormComponent } from "@/app/components/Forms/EditableInput/utils";
-import {
-  FormComponent,
-  FormComponentType,
-} from "@/app/components/Forms/FormBuilder";
-import { FormsHeaderProps } from "@/app/components/Forms/FormsHeader";
+import { FormComponentType } from "@/app/components/Forms/FormBuilder";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { FormType } from "@/app/generated/prisma";
 import { useEffect, useState } from "react";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { fetchForms, saveForms } from "./formsActions";
 import FormsLoading from "./FormsLoading";
-import EditableFormHeader from "@/app/components/Forms/EditableFormHeader";
 
 const FormsTab = ({
   title,
@@ -26,12 +22,23 @@ const FormsTab = ({
   title: string;
   formType: FormType;
   groupName: string;
-  header?: FormsHeaderProps;
-  components?: FormComponent[];
   defaultChecked?: boolean;
 }) => {
   const statusPopup = usePopup();
   const [loading, setLoading] = useState(true);
+
+  const bookingRequiredComponents = [
+    "sessionPreference",
+    "startTime",
+    "counselorId",
+  ];
+  const evaluationRequiredComponents = ["rating"];
+  const requiredComponents =
+    formType === FormType.BOOKING
+      ? bookingRequiredComponents
+      : formType === FormType.EVALUATION
+      ? evaluationRequiredComponents
+      : [];
 
   const defaultForm: BuiltFormData = {
     header: {
@@ -100,6 +107,7 @@ const FormsTab = ({
               form={form}
               onChange={(updatedForm) => setForm(updatedForm)}
               onSave={() => onSave(form)}
+              requiredComponents={requiredComponents}
             />
           )}
         </div>

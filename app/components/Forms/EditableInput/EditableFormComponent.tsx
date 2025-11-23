@@ -30,6 +30,7 @@ export type EditableFormComponentProps = {
   onAddSeparator?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
+  requiredComponent?: boolean;
 };
 
 const EditableFormComponent = ({
@@ -43,6 +44,7 @@ const EditableFormComponent = ({
   onAddSeparator,
   onMoveUp,
   onMoveDown,
+  requiredComponent = false,
 }: EditableFormComponentProps) => {
   if (component.type === FormComponentType.SEPARATOR) {
     return (
@@ -102,41 +104,43 @@ const EditableFormComponent = ({
             }}
             placeholder="Edit component name here"
           />
-          <SelectBox
-            className="w-40 h-10 rounded-sm p-0 pl-1"
-            bgColor="bg-neutral"
-            name="componentType"
-            options={[
-              { label: "Short Answer", value: FormComponentType.TEXT },
-              { label: "Paragraph", value: FormComponentType.TEXTAREA },
-              {
-                label: "Multiple Choice",
-                value: FormComponentType.RADIO,
-              },
-              { label: "Dropdown", value: FormComponentType.SELECT },
-              { label: "Date", value: FormComponentType.DATE },
-              { label: "Time", value: FormComponentType.TIME },
-              {
-                label: "Date and Time",
-                value: FormComponentType.DATETIME,
-              },
-              {
-                label: "Linear Scale",
-                value: FormComponentType.LINEAR_SCALE,
-              },
-            ]}
-            value={component.type}
-            onChange={(option) => {
-              if (option.value === component.type) return;
-              onChange?.({
-                ...component,
-                ...createFormComponent({
-                  ...(component.props as SaveableSettings),
-                  type: option.value as FormComponentType,
-                }),
-              });
-            }}
-          />
+          {!requiredComponent && (
+            <SelectBox
+              className="w-40 h-10 rounded-sm p-0 pl-1"
+              bgColor="bg-neutral"
+              name="componentType"
+              options={[
+                { label: "Short Answer", value: FormComponentType.TEXT },
+                { label: "Paragraph", value: FormComponentType.TEXTAREA },
+                {
+                  label: "Multiple Choice",
+                  value: FormComponentType.RADIO,
+                },
+                { label: "Dropdown", value: FormComponentType.SELECT },
+                { label: "Date", value: FormComponentType.DATE },
+                { label: "Time", value: FormComponentType.TIME },
+                {
+                  label: "Date and Time",
+                  value: FormComponentType.DATETIME,
+                },
+                {
+                  label: "Linear Scale",
+                  value: FormComponentType.LINEAR_SCALE,
+                },
+              ]}
+              value={component.type}
+              onChange={(option) => {
+                if (option.value === component.type) return;
+                onChange?.({
+                  ...component,
+                  ...createFormComponent({
+                    ...(component.props as SaveableSettings),
+                    type: option.value as FormComponentType,
+                  }),
+                });
+              }}
+            />
+          )}
         </div>
       ) : (
         <Legend
@@ -254,6 +258,7 @@ const EditableFormComponent = ({
       {selected && (
         <BottomActionRow
           component={component}
+          requiredComponent={requiredComponent}
           onDuplicate={onDuplicate}
           onDelete={onDelete}
           onRequiredToggle={(value) =>

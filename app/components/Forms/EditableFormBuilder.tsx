@@ -24,11 +24,13 @@ export type BuiltFormDataWithAnswers = {
 
 const EditableFormBuilder = ({
   form,
+  requiredComponents,
   onChange,
   onSave,
 }: {
   form: BuiltFormData;
   onChange?: (form: BuiltFormData) => void;
+  requiredComponents?: string[];
   onSave?: () => void;
 }) => {
   const [selectedComponent, setSelectedComponent] = useState<
@@ -121,6 +123,9 @@ const EditableFormBuilder = ({
             <div key={component.props.name} className="relative">
               <motion.div layout>
                 <EditableFormComponent
+                  requiredComponent={requiredComponents?.includes(
+                    component.props.name
+                  )}
                   component={component}
                   selected={selectedComponent === component.props.name}
                   onClick={setSelectedComponent}

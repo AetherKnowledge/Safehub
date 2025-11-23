@@ -288,8 +288,6 @@ export async function createNewAppointment(
       throw new Error("Unauthorized");
     }
 
-    const counselor = await getCounselorBasedOnSchedule();
-
     const questions = await prisma.formSchema.findUnique({
       where: { type: FormType.BOOKING },
     });
@@ -308,6 +306,21 @@ export async function createNewAppointment(
       throw new Error(
         "Invalid appointment data: " + prettifyZodErrorMessage(validation.error)
       );
+    }
+
+    if (
+      !validation.data.counselorId ||
+      !(typeof validation.data.counselorId === "string")
+    ) {
+      throw new Error("Counselor ID is required and must be a valid string");
+    }
+
+    const counselor = await prisma.user.findUnique({
+      where: { id: validation.data.counselorId },
+    });
+
+    if (!counselor) {
+      throw new Error("Counselor not found");
     }
 
     if (
@@ -367,7 +380,7 @@ export async function createNewAppointment(
       data: {
         sessionPreference: validation.data
           .sessionPreference as SessionPreference,
-        counselorId: counselor.counselorId,
+        counselorId: counselor.id,
         studentId: session.user.id,
         startTime: validation.data.startTime,
         endTime: addMinutes(validation.data.startTime, 60), // Default to 60 minutes if endTime not provided

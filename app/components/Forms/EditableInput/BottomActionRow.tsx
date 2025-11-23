@@ -8,11 +8,13 @@ const BottomActionRow = ({
   onDelete,
   onRequiredToggle,
   type,
+  requiredComponent = false,
 }: {
   component: FormComponent;
   onDuplicate?: () => void;
   onDelete?: () => void;
   onRequiredToggle?: (value: boolean) => void;
+  requiredComponent?: boolean;
   type?: FormComponentType;
 }) => {
   return (
@@ -29,8 +31,9 @@ const BottomActionRow = ({
           </button>
           <button
             type="button"
-            className="btn btn-ghost btn-xs text-error"
+            className="btn btn-ghost btn-xs text-error disabled:text-error/50 disabled:cursor-not-allowed"
             onClick={onDelete}
+            disabled={requiredComponent}
           >
             Delete
           </button>
@@ -46,6 +49,7 @@ const BottomActionRow = ({
             fontWeight="font-normal"
             onText="Required"
             offText="Required"
+            disabled={requiredComponent}
           />
         )}
       </div>

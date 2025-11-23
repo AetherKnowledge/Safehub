@@ -31,9 +31,11 @@ const EditableFormComponentBG = ({
   return (
     <section ref={ref}>
       <FormComponentBG
-        className={`card w-full border-0 transition-all cursor-pointer  shadow-br
+        className={`card w-full border-0 transition-all shadow-br
           ${
-            selected ? "border-primary border-l-4" : "border-transparent"
+            selected
+              ? "border-primary border-l-4"
+              : "border-transparent cursor-pointer"
           } p-4 py-4 ${className}`}
         onClick={() => onClick?.()}
       >

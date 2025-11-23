@@ -81,6 +81,17 @@ const bookingForm = {
       version: "1",
     },
     {
+      type: "SELECT",
+      props: {
+        name: "counselorId",
+        legend: "Select a Counselor",
+        required: true,
+        options: [],
+        extraOptions: "counselor_list",
+      },
+      version: "1",
+    },
+    {
       type: "TEXTAREA",
       props: {
         name: "notes",

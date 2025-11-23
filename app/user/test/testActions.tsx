@@ -1,7 +1,7 @@
 "use server";
 
 import ActionResult from "@/app/components/ActionResult";
-import { AppointmentStatus, NotificationType } from "@/app/generated/prisma";
+import { NotificationType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { prisma } from "@/prisma/client";
 
@@ -29,29 +29,25 @@ export async function testAction(): Promise<ActionResult<void>> {
       };
     }
 
-    for (let i = 0; i < 5; i++) {
-      const type = getRandom();
-      let data = {};
-      if (type === NotificationType.AppointmentUpdated) {
-        data = {
-          appointmentId: appointment.id,
-          from: AppointmentStatus.Pending,
-          to: AppointmentStatus.Approved,
-        };
-      } else if (type === NotificationType.AppointmentCreated) {
-        data = { appointmentId: appointment.id };
-      }
+    const n8nWebhookUrl = process.env.N8N_EMAIL_URL!;
 
-      await prisma.notification.create({
-        data: {
-          userId: session.user.id,
-          type: type,
-          data: data,
-        },
-      });
-    }
+    // reminders are handled differently
+    // console.log(n8nWebhookUrl);
+    // console.log("Sending notification to n8n for appointment:", appointment.id);
+    // const result = await fetch(n8nWebhookUrl, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Authorization: `Bearer ${session.supabaseAccessToken}`,
+    //   },
+    //   body: JSON.stringify({
+    //     data: {
+    //       message: "tang ina mo gumana ka",
+    //     },
+    //   }),
+    // });
 
-    console.log("Appointment:", appointment);
+    // console.log("Result from n8n:", result);
 
     return { success: true };
   } catch (error) {

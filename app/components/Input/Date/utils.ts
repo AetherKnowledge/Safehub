@@ -93,3 +93,11 @@ export function dateToString(date: Date): string {
 
   return `${year}-${month}-${day} ${hours}:${minutes}:00`;
 }
+
+export function formatTimeDisplay(date: Date): string {
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const period = hours >= 12 ? TimePeriod.PM : TimePeriod.AM;
+  hours = hours % 12 || 12;
+  return `${hours}:${padTime(minutes)} ${period}`;
+}

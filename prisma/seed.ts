@@ -297,10 +297,21 @@ async function main() {
   const counselorUUID = "52866741-dc71-4ced-b5ad-993419a730bc";
 
   await client.query(`
-    GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE "DailyMood" TO authenticated;
+    GRANT USAGE ON schema public TO authenticated;
+  `);
+
+  await client.query(`
+    GRANT USAGE ON schema public TO anon;
   `);
 
   await client.query(`GRANT USAGE ON SCHEMA public to authenticated;`);
+
+  await client.query(
+    `GRANT SELECT ON TABLE public."Appointment" TO service_role;`
+  );
+  await client.query(
+    `GRANT SELECT, INSERT ON TABLE public."Notification" TO service_role;`
+  );
 
   // ===============================
   // Notifications Setup
@@ -328,6 +339,8 @@ async function main() {
   await client.query(
     `GRANT SELECT ON TABLE public."Notification" TO authenticated;`
   );
+
+  await client.query(`GRANT SELECT ON TABLE public."Notification" TO anon;`);
 
   await client.query(
     `DROP POLICY IF EXISTS "Allow users to see their notifications" ON public."Notification";`
@@ -370,6 +383,8 @@ async function main() {
   await client.query(
     `GRANT SELECT ON TABLE public."DailyMood" TO authenticated;`
   );
+
+  await client.query(`GRANT SELECT ON TABLE public."DailyMood" TO anon;`);
 
   await client.query(
     `DROP POLICY IF EXISTS "Enable read access admin users" ON public."DailyMood";`
@@ -845,7 +860,7 @@ async function main() {
     [bookingId, bookingType, bookingFormData, now, now]
   );
 
-  const evaluationFormID = 1;
+  const evaluationFormID = 2;
   const evaluationType = "EVALUATION";
   const evaluationFormData = JSON.parse(JSON.stringify(evaluationForm));
 

@@ -1,9 +1,149 @@
 "use server";
 
-import { Notification } from "@/app/generated/prisma";
+import {
+  Appointment,
+  AppointmentStatus,
+  Notification,
+  NotificationType,
+} from "@/app/generated/prisma";
 import { auth } from "@/auth";
+import { formatDateDisplay } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
+import { env } from "next-runtime-env";
 import ActionResult from "../ActionResult";
+import { formatTimeDisplay } from "../Input/Date/utils";
+import {
+  AppointmentCreateNotification,
+  AppointmentUpdateScheduleNotification,
+  AppointmentUpdateStatusNotification,
+} from "./schema";
+
+export async function createAppointmentNotification(
+  appointment: Appointment,
+  type: NotificationType,
+  data:
+    | AppointmentCreateNotification
+    | AppointmentUpdateStatusNotification
+    | AppointmentUpdateScheduleNotification
+): Promise<ActionResult<void>> {
+  try {
+    console.log("Creating notification of type:", type, "with data:", data);
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        message: "User is not authenticated.",
+      };
+    }
+
+    if (!appointment.counselorId || !appointment.studentId) {
+      return {
+        success: false,
+        message: "Appointment must have both counselor and student assigned.",
+      };
+    }
+
+    await prisma.notification.create({
+      data: {
+        userId: appointment.counselorId,
+        type: type,
+        data: {
+          ...data,
+        },
+      },
+    });
+
+    await prisma.notification.create({
+      data: {
+        userId: appointment.studentId,
+        type: type,
+        data: {
+          ...data,
+        },
+      },
+    });
+
+    if (!session.supabaseAccessToken) {
+      return {
+        success: false,
+        message: "Supabase access token is missing.",
+      };
+    }
+
+    const appointmentData = await prisma.appointment.findUnique({
+      where: { id: appointment.id },
+      include: {
+        student: { include: { user: true } },
+        counselor: { include: { user: true } },
+      },
+    });
+    const n8nWebhookUrl = process.env.N8N_EMAIL_URL!;
+
+    function appointmentStatusToTitle(status: AppointmentStatus) {
+      switch (status) {
+        case AppointmentStatus.Approved:
+          return "Approved";
+        case AppointmentStatus.Rejected:
+          return "Rejected";
+        case AppointmentStatus.Completed:
+          return "Completed";
+        case AppointmentStatus.Cancelled:
+          return "Cancelled";
+        case AppointmentStatus.Pending:
+          return "Pending";
+        default:
+          return "Updated";
+      }
+    }
+
+    // reminders are handled differently
+    console.log(n8nWebhookUrl);
+    if (type !== NotificationType.AppointmentReminder && appointmentData) {
+      console.log(
+        "Sending notification to n8n for appointment:",
+        appointment.id
+      );
+      await fetch(n8nWebhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.supabaseAccessToken}`,
+        },
+        body: JSON.stringify({
+          data: {
+            type: type,
+            url: env("NEXT_PUBLIC_URL")!,
+            title: `Appointment ${appointmentStatusToTitle(
+              appointmentData.status
+            )}`,
+            cancelText:
+              appointmentData.status === AppointmentStatus.Rejected
+                ? "Rejected"
+                : "Cancelled",
+            schedDate: formatDateDisplay(appointmentData.startTime),
+            schedTime: formatTimeDisplay(appointmentData.startTime),
+            studentEmail: appointmentData.student.user.email!,
+            counselorEmail: appointmentData.counselor.user.email!,
+            mode: appointmentData.sessionPreference,
+            studentName: appointmentData.student.user.name,
+            counselorName: appointmentData.counselor.user.name,
+            ...appointmentData,
+          },
+        }),
+      });
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error creating notification:", (error as Error).message);
+    return {
+      success: false,
+      message: "Failed to create notification. " + (error as Error).message,
+    };
+  }
+}
 
 export async function fetchNotificationsForUser(): Promise<
   ActionResult<Notification[]>

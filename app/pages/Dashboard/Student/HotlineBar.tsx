@@ -1,4 +1,5 @@
 import { Hotline } from "@/app/generated/prisma";
+import Link from "next/link";
 import { Suspense } from "react";
 import { SlCallIn } from "react-icons/sl";
 import { Await } from "react-router-dom";
@@ -14,9 +15,7 @@ const HotlineBar = ({ className }: HotlineBarProps) => {
     <div
       className={`${className} bg-base-100 p-2 rounded-lg shadow-br text-left text-base-content`}
     >
-      <h2 className="font-semibold text-lg text-base-content px-2">
-        Mood Tracking
-      </h2>
+      <h2 className="font-semibold text-lg text-base-content px-2">Hotlines</h2>
       <div className="flex flex-row min-h-20">
         <div className="flex flex-col items-center justify-center text-center max-h-70 max-w-80">
           <p className="italic p-4">
@@ -55,15 +54,18 @@ const HotlineTable = async ({ hotlines }: { hotlines: Hotline[] }) => {
       ) : (
         <div className="flex flex-col gap-2 w-full overflow-y-auto max-h-70 min-h-0">
           {hotlines.map((hotline) => (
-            <div
+            <Link
               key={hotline.id}
-              className="flex flex-row border border-base-300 rounded-lg p-2 items-center justify-center gap-2"
+              className="flex flex-row border border-base-300 rounded-lg p-2 items-center justify-center gap-2
+              hover:bg-base-300/50 active:bg-base-300 transition-colors
+              "
+              href={"/user/hotline"}
             >
               <div className="btn btn-primary rounded-full p-2">
                 <SlCallIn className="w-5 h-5" />
               </div>
               <p className="font-semibold w-full">{hotline.name}</p>
-            </div>
+            </Link>
           ))}
         </div>
       )}

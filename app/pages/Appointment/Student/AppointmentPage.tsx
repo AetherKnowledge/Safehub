@@ -6,9 +6,8 @@ import { Suspense } from "react";
 import { FaCalendar } from "react-icons/fa6";
 import { AppointmentData, getAppointments } from "../AppointmentActions";
 import AppointmentsTable from "../AppointmentTable";
-import UpcomingAppointmentsTable, {
-  UpcomingAppointmentRow,
-} from "../AppointmentTable/UpcomingAppointmentsTable";
+import UpcomingAppointmentsTable from "../AppointmentTable/UpcomingAppointmentsTable";
+import UpcomingAppointmentRow from "../AppointmentTable/UpcomingAppointmentsRow";
 
 type Props = {
   date?: string;

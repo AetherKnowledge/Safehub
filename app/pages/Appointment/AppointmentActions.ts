@@ -1,10 +1,17 @@
 "use server";
 import ActionResult from "@/app/components/ActionResult";
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
+import { createAppointmentNotification } from "@/app/components/Notifications/NotificationActions";
+import {
+  AppointmentCreateNotification,
+  AppointmentUpdateScheduleNotification,
+  AppointmentUpdateStatusNotification,
+} from "@/app/components/Notifications/schema";
 import {
   Appointment,
   AppointmentStatus,
   FormType,
+  NotificationType,
   SessionPreference,
   User,
   UserType,
@@ -374,6 +381,18 @@ export async function createNewAppointment(
     if (!appointment) {
       throw new Error("Failed to create appointment");
     }
+
+    const result = await createAppointmentNotification(
+      appointment,
+      NotificationType.AppointmentCreated,
+      { appointmentId: appointment.id } as AppointmentCreateNotification
+    );
+    if (!result.success) {
+      console.error(
+        "Failed to create appointment notification:",
+        result.message
+      );
+    }
   } catch (error) {
     return { success: false, message: (error as Error).message };
   }
@@ -479,7 +498,7 @@ export async function updateAppointment(
     };
 
     // Update the appointment status
-    await prisma.appointment.update({
+    const updatedAppointment = await prisma.appointment.update({
       where: { id: appointmentId },
       data: {
         startTime,
@@ -488,6 +507,28 @@ export async function updateAppointment(
         appointmentData: JSON.parse(JSON.stringify(updatedAppointmentFormData)),
       },
     });
+
+    if (!updatedAppointment) {
+      throw new Error("Failed to create appointment");
+    }
+
+    if (appointment.startTime !== updatedAppointment.startTime) {
+      const result = await createAppointmentNotification(
+        updatedAppointment,
+        NotificationType.AppointmentUpdatedSchedule,
+        {
+          appointmentId: updatedAppointment.id,
+          from: appointment.startTime,
+          to: updatedAppointment.startTime,
+        } as AppointmentUpdateScheduleNotification
+      );
+      if (!result.success) {
+        console.error(
+          "Failed to create appointment notification:",
+          result.message
+        );
+      }
+    }
 
     return { success: true };
   } catch (error) {
@@ -522,10 +563,27 @@ export async function rescheduleAppointment(
       throw new Error("End time must be after start time");
     }
 
-    await prisma.appointment.update({
+    const updatedAppointment = await prisma.appointment.update({
       where: { id: appointmentId },
       data: { startTime, endTime },
     });
+
+    const result = await createAppointmentNotification(
+      updatedAppointment,
+      NotificationType.AppointmentUpdatedSchedule,
+      {
+        appointmentId: updatedAppointment.id,
+        from: appointment.startTime,
+        to: updatedAppointment.startTime,
+      } as AppointmentUpdateScheduleNotification
+    );
+    if (!result.success) {
+      console.error(
+        "Failed to create appointment notification:",
+        result.message
+      );
+    }
+
     return { success: true };
   } catch (error) {
     return { success: false, message: (error as Error).message };
@@ -609,7 +667,7 @@ export async function updateAppointmentStatus(
     }
 
     // Update the appointment status
-    await prisma.appointment.update({
+    const updatedAppointment = await prisma.appointment.update({
       where: { id: appointmentId },
       data: { status },
     });
@@ -622,6 +680,22 @@ export async function updateAppointmentStatus(
         to: status,
       },
     });
+
+    const result = await createAppointmentNotification(
+      updatedAppointment,
+      NotificationType.AppointmentUpdatedStatus,
+      {
+        appointmentId: updatedAppointment.id,
+        from: appointment.status,
+        to: updatedAppointment.status,
+      } as AppointmentUpdateStatusNotification
+    );
+    if (!result.success) {
+      console.error(
+        "Failed to create appointment notification:",
+        result.message
+      );
+    }
 
     return { success: true };
   } catch (error) {
@@ -918,7 +992,7 @@ export async function cancelAppointmentStudent(
       throw new Error("Appointment not found");
     }
 
-    await prisma.appointment.update({
+    const updatedAppointment = await prisma.appointment.update({
       where: { id: appointmentId },
       data: {
         status: AppointmentStatus.Cancelled,
@@ -934,6 +1008,22 @@ export async function cancelAppointmentStudent(
         to: AppointmentStatus.Cancelled,
       },
     });
+
+    const result = await createAppointmentNotification(
+      updatedAppointment,
+      NotificationType.AppointmentUpdatedStatus,
+      {
+        appointmentId: updatedAppointment.id,
+        from: appointment.status,
+        to: updatedAppointment.status,
+      } as AppointmentUpdateStatusNotification
+    );
+    if (!result.success) {
+      console.error(
+        "Failed to create appointment notification:",
+        result.message
+      );
+    }
 
     return { success: true };
   } catch (error) {
@@ -1049,6 +1139,19 @@ export async function createFollowUpAppointment(
         followUpId: followUp.id,
       },
     });
+
+    const result = await createAppointmentNotification(
+      appointment,
+      NotificationType.AppointmentCreated,
+      { appointmentId: appointment.id } as AppointmentCreateNotification
+    );
+    if (!result.success) {
+      console.error(
+        "Failed to create appointment notification:",
+        result.message
+      );
+    }
+
     return { success: true };
   } catch (error) {
     console.error(error);
@@ -1077,12 +1180,28 @@ export async function approveFollowUpAppointment(
       throw new Error("Not a follow-up appointment");
     }
 
-    await prisma.appointment.update({
+    const updatedAppointment = await prisma.appointment.update({
       where: { id: appointmentId },
       data: {
         status: AppointmentStatus.Approved,
       },
     });
+
+    const result = await createAppointmentNotification(
+      updatedAppointment,
+      NotificationType.AppointmentUpdatedStatus,
+      {
+        appointmentId: updatedAppointment.id,
+        from: appointment.status,
+        to: updatedAppointment.status,
+      } as AppointmentUpdateStatusNotification
+    );
+    if (!result.success) {
+      console.error(
+        "Failed to create appointment notification:",
+        result.message
+      );
+    }
 
     return { success: true };
   } catch (error) {

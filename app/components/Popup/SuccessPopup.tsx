@@ -15,7 +15,7 @@ const SuccessPopup = ({
 }: SuccessScreenProps) => {
   return (
     <ModalBase>
-      <div className="bg-base-100 p-6 rounded-lg shadow-lg text-center">
+      <div className="bg-base-100 p-6 rounded-lg shadow-lg text-center min-w-50">
         <div className="flex flex-col items-center justify-center h-full space-y-4">
           <p className="text-base-content text-2xl">Success</p>
           {message && <p className="text-base-content text-sm">{message}</p>}

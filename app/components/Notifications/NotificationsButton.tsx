@@ -18,7 +18,8 @@ import {
 } from "./NotificationActions";
 import {
   AppointmentCreateNotification,
-  AppointmentUpdateNotification,
+  AppointmentReminderNotification,
+  AppointmentUpdateStatusNotification,
   PostNotification,
 } from "./schema";
 
@@ -62,7 +63,17 @@ const NotificationsButton = () => {
 
   useEffect(() => {
     if (!session.data?.supabaseAccessToken) return;
-    const supabase = createClient(session.data?.supabaseAccessToken);
+    let supabase = null;
+
+    // sometimes creating the client fails
+    try {
+      supabase = createClient(session.data?.supabaseAccessToken);
+    } catch (error) {
+      console.error("Error creating Supabase client:", error);
+    }
+
+    if (!supabase) return;
+
     const subscription = supabase
       .channel("notifications-channel")
       .on(
@@ -238,12 +249,16 @@ function notificationTypeToMessage(
   switch (notification.type) {
     case NotificationType.AppointmentCreated:
       return "An appointment has been created";
-    case NotificationType.AppointmentUpdated:
+    case NotificationType.AppointmentUpdatedStatus:
       return `An appointment has been updated to ${
-        (data as AppointmentUpdateNotification).to
+        (data as AppointmentUpdateStatusNotification).to
       }`;
+    case NotificationType.AppointmentUpdatedSchedule:
+      return "An appointment's schedule has been updated.";
     case NotificationType.AppointmentReminder:
-      return "This is a reminder for your upcoming appointment.";
+      return `This is a reminder for your upcoming appointment in ${reminderTypeToMessage(
+        (data as AppointmentReminderNotification).type
+      )}.`;
     case NotificationType.NewPost:
       return "A new post has been published.";
     default:
@@ -255,7 +270,7 @@ function parseNotificationData(
   notification: Notification
 ):
   | AppointmentCreateNotification
-  | AppointmentUpdateNotification
+  | AppointmentUpdateStatusNotification
   | PostNotification
   | null {
   switch (notification.type) {
@@ -264,10 +279,14 @@ function parseNotificationData(
       return JSON.parse(
         JSON.stringify(notification.data)
       ) as AppointmentCreateNotification;
-    case NotificationType.AppointmentUpdated:
+    case NotificationType.AppointmentUpdatedStatus:
       return JSON.parse(
         JSON.stringify(notification.data)
-      ) as AppointmentUpdateNotification;
+      ) as AppointmentUpdateStatusNotification;
+    case NotificationType.AppointmentReminder:
+      return JSON.parse(
+        JSON.stringify(notification.data)
+      ) as AppointmentReminderNotification;
     case NotificationType.NewPost:
       return JSON.parse(JSON.stringify(notification.data)) as PostNotification;
     default:
@@ -279,7 +298,7 @@ function notificationTypeToImage(type: NotificationType): ReactNode {
   switch (type) {
     case NotificationType.AppointmentCreated ||
       NotificationType.AppointmentReminder ||
-      NotificationType.AppointmentUpdated:
+      NotificationType.AppointmentUpdatedStatus:
       return <CiCalendarDate className="w-5 h-5" />;
     default:
       return <CiImageOn className="w-5 h-5" />;
@@ -290,10 +309,25 @@ function notificationTypeToLink(type: NotificationType): string {
   switch (type) {
     case NotificationType.AppointmentCreated ||
       NotificationType.AppointmentReminder ||
-      NotificationType.AppointmentUpdated:
+      NotificationType.AppointmentUpdatedStatus:
       return "/user/appointments";
     default:
-      return "/";
+      return "/user/dashboard";
+  }
+}
+
+function reminderTypeToMessage(type: string): string {
+  switch (type) {
+    case "ONE_WEEK":
+      return "One Week";
+    case "ONE_DAY":
+      return "One Day";
+    case "SIX_HOURS":
+      return "Six Hours";
+    case "ONE_HOUR":
+      return "One Hour";
+    default:
+      return "";
   }
 }
 

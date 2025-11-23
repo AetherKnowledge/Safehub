@@ -1,7 +1,6 @@
 import MoodTrackerBox from "@/app/components/MoodTracker/MoodTrackerBox";
 import { getPosts } from "@/app/pages/Post/PostActions";
 import { sortPosts } from "@/lib/utils";
-import { Suspense } from "react";
 import { ThisWeeksAppointments } from "../../Appointment/Student/AppointmentPage";
 import DashboardPosts from "../DashboardPosts";
 import HotlineBar from "./HotlineBar";
@@ -30,9 +29,7 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
           <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 max-w-3xl w-full flex-1 min-h-30">
             <h2 className="font-bold">Upcoming Appointments</h2>
             <div className="flex flex-row min-w-150 gap-5 w-full flex-1 min-h-20">
-              <Suspense>
-                <ThisWeeksAppointments />
-              </Suspense>
+              <ThisWeeksAppointments />
             </div>
           </div>
           <MoodTrackerBox className="text-left max-w-3xl w-full" />

@@ -1,7 +1,6 @@
 import Divider from "@/app/components/Divider";
 import AddPostButton from "@/app/components/Post/AddPostButton";
 import PostBox from "@/app/components/Post/PostBox";
-import Sorter from "@/app/components/Post/Sorter";
 import { UserType } from "@/app/generated/prisma";
 import { PostData } from "../Post/PostActions";
 import { Order, SortBy } from "./Student/Dashboard";
@@ -23,7 +22,7 @@ const DashboardPosts = async ({
       <div className="flex flex-row justify-between items-center bg-base-100 shadow-br rounded-xl px-4 w-full">
         <p className="text-base-content font-bold text-xl">Newsfeed</p>
         <div className="flex flex-row gap-2 items-center">
-          <Sorter sortBy={sortBy} order={order} />
+          {/* <Sorter sortBy={sortBy} order={order} /> */}
           {userType === UserType.Admin && <AddPostButton />}
         </div>
       </div>

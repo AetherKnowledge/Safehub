@@ -82,7 +82,8 @@ enum FormType {
 
 enum NotificationType {
   AppointmentCreated
-  AppointmentUpdated
+  AppointmentUpdatedStatus
+  AppointmentUpdatedSchedule
   AppointmentReminder
   NewPost
 }

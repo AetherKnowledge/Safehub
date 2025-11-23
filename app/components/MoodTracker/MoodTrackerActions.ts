@@ -124,7 +124,7 @@ export async function getMoodsThisWeek(): Promise<ActionResult<DailyMood[]>> {
     if (!session?.user?.id || session.user.type === UserType.Student) {
       throw new Error("Unauthorized");
     }
-    const today = new Date();
+    const today = new Date(new Date().setHours(0, 0, 0, 0));
     const startOfWeek = new Date(
       today.setDate(today.getDate() - today.getDay())
     );

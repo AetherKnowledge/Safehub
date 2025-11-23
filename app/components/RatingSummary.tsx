@@ -46,7 +46,7 @@ export default function RatingSummary({
   return (
     <div className={"flex w-full items-center gap-6 ml-5" + (className || "")}>
       {/* Left summary */}
-      <div className="flex flex-col items-center min-w-[90px]">
+      <div className="flex flex-col items-center">
         <div className="text-5xl font-bold leading-none">{avg.toFixed(1)}</div>
         <StarRating rating={avg} size={20} />
         <div className="mt-1 text-sm text-base-content/70">

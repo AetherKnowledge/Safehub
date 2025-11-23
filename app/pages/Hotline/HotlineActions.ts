@@ -11,12 +11,21 @@ import { Buckets, getBucket } from "@/lib/supabase/client";
 import { prisma } from "@/prisma/client";
 
 export async function getAllHotline() {
-  const session = auth();
+  const session = await auth();
   if (!session) {
     throw new Error("Unauthorized");
   }
 
   return await prisma.hotline.findMany();
+}
+
+export async function getThreeHotlines() {
+  const session = await auth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  return await prisma.hotline.findMany({ take: 4 });
 }
 
 export async function upsertHotline(data: UploadHotlineData) {

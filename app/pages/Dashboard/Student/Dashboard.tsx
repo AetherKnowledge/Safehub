@@ -4,6 +4,7 @@ import { sortPosts } from "@/lib/utils";
 import { Suspense } from "react";
 import { ThisWeeksAppointments } from "../../Appointment/Student/AppointmentPage";
 import DashboardPosts from "../DashboardPosts";
+import HotlineBar from "./HotlineBar";
 
 export enum SortBy {
   Date = "Date",
@@ -21,20 +22,21 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
   const posts = sortPosts(await getPosts(), sortBy, order);
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex items-center justify-center h-full min-h-0 overflow-y-auto pb-1 pr-1">
       <div className="flex flex-1 flex-row gap-3 h-full min-h-0 w-auto justify-center">
         <DashboardPosts posts={posts} sortBy={sortBy} order={order} />
 
         <div className="flex-col gap-3 hidden 2xl:flex">
-          <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 max-w-3xl w-full">
+          <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 max-w-3xl w-full flex-1 min-h-30">
             <h2 className="font-bold">Upcoming Appointments</h2>
-            <div className="flex flex-row min-w-150 gap-5 w-full">
+            <div className="flex flex-row min-w-150 gap-5 w-full flex-1 min-h-20">
               <Suspense>
                 <ThisWeeksAppointments />
               </Suspense>
             </div>
           </div>
           <MoodTrackerBox className="text-left max-w-3xl w-full" />
+          <HotlineBar />
         </div>
       </div>
     </div>

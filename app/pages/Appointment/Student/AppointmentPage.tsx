@@ -100,7 +100,7 @@ export async function ThisWeeksAppointments({
 
   if (filteredAppointments.length === 0)
     return (
-      <div className="flex items-center justify-center text-center h-[66px] w-full">
+      <div className="flex items-center justify-center text-center h-full w-full">
         No appointments this week.
       </div>
     );

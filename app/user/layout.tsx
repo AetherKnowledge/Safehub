@@ -24,7 +24,7 @@ const Layout = async ({ children }: Props) => {
   }
 
   return (
-    <div className="flex bg-base-200 h-full w-full p-6 gap-3 overflow-y-hidden">
+    <div className="flex bg-base-200 h-full w-full p-6 gap-3 overflow-y-hidden min-h-0">
       {/* Resizable Floating Sidebar */}
       <Sidebar />
 

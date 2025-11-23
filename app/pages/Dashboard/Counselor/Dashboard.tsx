@@ -22,14 +22,14 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
   }
 
   return (
-    <div className="flex items-center justify-center h-full min-h-0">
-      <div className="flex flex-1 flex-row gap-3 h-full min-h-0 w-auto justify-center overflow-y-auto pb-1">
+    <div className="flex items-center justify-center h-full min-h-0 overflow-y-auto pb-1 pr-1">
+      <div className="flex flex-1 flex-row gap-3 h-full min-h-0 w-auto justify-center">
         <DashboardPosts posts={posts} sortBy={sortBy} order={order} />
 
         <div className="flex-col gap-3 hidden 2xl:flex">
-          <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 max-w-3xl w-full flex-1 min-h-0">
+          <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 max-w-3xl w-full flex-1 min-h-30">
             <h2 className="font-bold">Upcoming Appointments</h2>
-            <div className="flex flex-row min-w-150 gap-5 w-full flex-1 min-h-0">
+            <div className="flex flex-row min-w-150 gap-5 w-full flex-1 min-h-20">
               <Suspense>
                 <ThisWeeksAppointments />
               </Suspense>
@@ -43,7 +43,7 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
             <MoodTracker />
           </div>
 
-          <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 w-full h-[244px]">
+          <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 w-full overflow-x-hidden h-[244px]">
             <h2 className="font-semibold text-2xl">Satisfactory Rating</h2>
             <p className="text-sm mb-2">
               Rating and reviews are verified and are from people who use the

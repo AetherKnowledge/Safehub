@@ -1,6 +1,6 @@
 "use client";
 
-import DateTimeSelectorOld from "@/app/components/Input/Date/DateTimeSelectorOld";
+import DateTimeSelector from "@/app/components/Input/Date/DateTimeSelector";
 import TimeSelector from "@/app/components/Input/Date/TimeSelector";
 import {
   getTimeFromDate,
@@ -89,7 +89,7 @@ const RescheduleButton = ({
             <div className="flex flex-col gap-4">
               <p className="font-semibold text-2xl">Pick a new schedule</p>
               <div className="flex flex-col gap-3 items-center text-center">
-                <DateTimeSelectorOld
+                <DateTimeSelector
                   name="test"
                   horizontal
                   minDate="now"
@@ -98,10 +98,6 @@ const RescheduleButton = ({
                   defaultValue={appointment?.startTime}
                   onChange={(date) => {
                     setStartTime(date);
-                    const newEndTime = new Date(date);
-                    newEndTime.setHours(date.getHours() + 1);
-                    setEndTime(newEndTime);
-                    console.log("Start Time:", date);
                   }}
                   required
                 />

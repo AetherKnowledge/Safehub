@@ -53,6 +53,18 @@ export function isTimeAfter(
   if (fromTime === "now") fromTime = getTimeFromDate(new Date());
   if (compareTo === "now") compareTo = getTimeFromDate(new Date());
 
+  console.log(
+    "Comparing times",
+    fromTime,
+    compareTo,
+    "result:",
+    timeToMinutes(fromTime),
+    ">",
+    timeToMinutes(compareTo),
+    "=",
+    timeToMinutes(fromTime) > timeToMinutes(compareTo)
+  );
+
   return timeToMinutes(fromTime) > timeToMinutes(compareTo);
 }
 

@@ -135,7 +135,7 @@ function filterUsers(
     const matchesName =
       !name ||
       !user.name ||
-      user.name.toLowerCase().startsWith(name.toLowerCase());
+      user.name.toLowerCase().includes(name.toLowerCase());
 
     return matchesStatus && matchesName;
   });

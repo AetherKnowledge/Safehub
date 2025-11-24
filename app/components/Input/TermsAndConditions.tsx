@@ -42,7 +42,7 @@ const TermsAndConditions = ({ readOnly = false }: { readOnly?: boolean }) => {
 const TermsAndConditionsModal = ({ onClose }: { onClose?: () => void }) => {
   return (
     <ModalBase onClose={onClose}>
-      <div className="bg-white p-4 rounded shadow-md text-base-content">
+      <div className="bg-base-200 p-4 rounded shadow-md text-base-content">
         <div className="flex flex-col max-w-200 min-h-0 max-h-150 overflow-y-auto py-2">
           <div className={`prose max-w-none text-base-content`}>
             <ReactMarkdown>

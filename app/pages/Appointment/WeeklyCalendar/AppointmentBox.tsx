@@ -30,7 +30,7 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
   return (
     <>
       <div
-        className={`absolute left-1 right-1 rounded p-2 cursor-pointer ${getBgStatusColor(
+        className={`absolute left-1 right-1 rounded p-2 cursor-pointer min-h-0 overflow-y-auto ${getBgStatusColor(
           appointment.status
         )} bg-opacity-10 border-l-4 shadow-br hover:shadow-md transition-shadow ${getBorderStatusColor(
           appointment.status

@@ -75,7 +75,7 @@ const bookingForm = {
         legend: "Pick Schedule.",
         minDate: "now",
         minTime: { hour: 8, minute: 0, period: "AM" },
-        maxTime: { hour: 8, minute: 0, period: "PM" },
+        maxTime: { hour: 7, minute: 0, period: "PM" },
         required: true,
       },
       version: "1",

@@ -65,12 +65,15 @@ const DateTimeSelector = ({
 
     // Handle initial default value
     if (defaultValue) {
-      console.log("setting default value", defaultValue);
       const time = getTimeFromDate(defaultValue);
       setSelectedDate(defaultValue);
       setSelectedTime(time);
 
-      if (isDateToday(defaultValue)) {
+      if (
+        isDateToday(defaultValue) &&
+        initialMinTime &&
+        isTimeAfter(getTimeFromDate(new Date()), initialMinTime)
+      ) {
         setMinTime("now");
       } else {
         setMinTime(initialMinTime ?? undefined);
@@ -82,20 +85,22 @@ const DateTimeSelector = ({
       return;
     }
 
-    console.log("no default value");
-
     // If NO default value → apply min rules
     setMinDate(initialMinDate);
+    const now = new Date();
+    const currentTime = getTimeFromDate(now); // or however your helper returns time
+
+    const isMinDateToday =
+      initialMinDate === "now" ||
+      (initialMinDate && isDateToday(initialMinDate));
+
     if (
-      (initialMinDate === "now" ||
-        (initialMinDate && isDateToday(initialMinDate))) &&
+      isMinDateToday &&
       initialMinTime &&
-      isTimeAfter(getTimeFromDate(new Date()), initialMinTime)
+      isTimeAfter(currentTime, initialMinTime)
     ) {
-      console.log("setting min time to now");
       setMinTime("now");
     } else {
-      console.log("setting min time to initial");
       setMinTime(initialMinTime ?? undefined);
     }
   }, [initialized, defaultValue, initialMinDate, initialMinTime, onChange]);
@@ -120,11 +125,21 @@ const DateTimeSelector = ({
   }
 
   function handleDateChange(date: Date) {
+    if (date === selectedDate) return;
     setSelectedDate(date);
 
-    // time must be "now" if picking today
-    if (isDateToday(date)) setMinTime("now");
-    else setMinTime(initialMinTime);
+    // time must be "now" if picking today and minTime passed
+    const now = new Date();
+    const currentTime = getTimeFromDate(now);
+    if (
+      isDateToday(date) &&
+      initialMinTime &&
+      isTimeAfter(currentTime, initialMinTime)
+    ) {
+      setMinTime("now");
+    } else {
+      setMinTime(initialMinTime);
+    }
 
     // Only emit if we have a valid time already selected
     if (selectedTime) {
@@ -133,6 +148,8 @@ const DateTimeSelector = ({
   }
 
   function handleTimeChange(time: Time) {
+    if (time === selectedTime) return;
+
     setSelectedTime(time);
 
     if (selectedDate && initialMinDate && initialMinDate !== "now") {
@@ -173,9 +190,6 @@ const DateTimeSelector = ({
         >
           {/* Date */}
           <fieldset className="fieldset w-full">
-            {legend && (
-              <Legend legend={legend} required={required} number={number} />
-            )}
             <button
               type="button"
               className={`flex pr-2 justify-between items-center bg-neutral rounded-lg cursor-pointer border ${
@@ -225,9 +239,6 @@ const DateTimeSelector = ({
 
           {/* Time */}
           <fieldset className={`fieldset ${className ? className : "w-full"}`}>
-            {legend && (
-              <Legend legend={legend} required={required} number={number} />
-            )}
             <button
               type="button"
               className={`flex pr-2 justify-between items-center bg-neutral rounded-lg cursor-pointer border ${

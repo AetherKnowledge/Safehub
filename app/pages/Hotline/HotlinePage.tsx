@@ -83,7 +83,7 @@ function filterHotlines(hotlines: Hotline[], name?: string) {
     const matchesName =
       !name ||
       !hotline.name ||
-      hotline.name.toLowerCase().startsWith(name.toLowerCase());
+      hotline.name.toLowerCase().includes(name.toLowerCase());
 
     return matchesName;
   });

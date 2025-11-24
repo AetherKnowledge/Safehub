@@ -70,7 +70,7 @@ export const bookingQuestions: FormComponent[] = [
       name: "startTime",
       legend: "Pick Schedule.",
       minTime: { hour: 8, minute: 0, period: TimePeriod.AM },
-      maxTime: { hour: 8, minute: 0, period: TimePeriod.PM },
+      maxTime: { hour: 7, minute: 0, period: TimePeriod.PM },
       required: true,
     },
     version: "1",

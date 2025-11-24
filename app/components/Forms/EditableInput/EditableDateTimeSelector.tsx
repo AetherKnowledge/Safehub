@@ -1,4 +1,4 @@
-import DateTimeSelectorOld from "../../Input/Date/DateTimeSelectorOld";
+import DateTimeSelector from "../../Input/Date/DateTimeSelector";
 import { DateSettings, EditableDateSettings } from "./EditableDateSelector";
 import { EditableTimeSettings, TimeSettings } from "./EditableTimeSelector";
 import ExtraOptionsBG from "./ExtraOptionsBG";
@@ -18,7 +18,7 @@ const EditableDateTimeSelector = ({
 }: EditableTimeSelectorProps) => {
   return (
     <>
-      <DateTimeSelectorOld name="preview" readonly noFormOutput />
+      <DateTimeSelector name="preview" readonly noFormOutput />
       {selected && (
         <ExtraOptionsBG>
           <EditableDateSettings

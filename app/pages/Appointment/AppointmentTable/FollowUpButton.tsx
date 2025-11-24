@@ -1,6 +1,6 @@
 "use client";
 
-import DateTimeSelectorOld from "@/app/components/Input/Date/DateTimeSelectorOld";
+import DateTimeSelector from "@/app/components/Input/Date/DateTimeSelector";
 import TimeSelector from "@/app/components/Input/Date/TimeSelector";
 import {
   Time,
@@ -116,7 +116,7 @@ const FollowUpButton = ({ appointment }: { appointment: AppointmentData }) => {
                   readonly={appointment.followUpId ? true : false}
                   onChange={setReason}
                 />
-                <DateTimeSelectorOld
+                <DateTimeSelector
                   name={`startTime-followup-${appointment.id}`}
                   legend="Start Time"
                   minDate="now"

@@ -1,4 +1,4 @@
-import { auth, signIn } from "@/auth";
+import { auth } from "@/auth";
 import { Session } from "next-auth";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -37,19 +37,12 @@ const LoadingUserButton = () => {
 
 const SignInButton = () => {
   return (
-    <form
-      action={async () => {
-        "use server";
-        await signIn(undefined, { redirectTo: "/user/dashboard" });
-      }}
+    <Link
+      className="btn btn-primary w-25 font-semibold duration-150 ease-in-out hover:scale-105"
+      href="/api/auth/signin"
     >
-      <button
-        className="btn btn-primary w-25 font-semibold duration-150 ease-in-out hover:scale-105"
-        type="submit"
-      >
-        Sign in
-      </button>
-    </form>
+      Sign in
+    </Link>
   );
 };
 

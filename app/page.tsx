@@ -7,12 +7,14 @@ import Navbar from "./components/Navbar";
 
 export default function Home() {
   return (
-    <div className="flex flex-col bg-base-100 text-base-content gap-10 overflow-y-auto">
+    <div className="flex flex-col min-h-screen bg-base-100 text-base-content overflow-hidden">
       <Navbar />
-      <Hero />
-      <About />
-      <Staff />
-      <ContactUs />
+      <main className="flex-1 flex flex-col gap-0">
+        <Hero />
+        <About />
+        <Staff />
+        <ContactUs />
+      </main>
       <Footer />
     </div>
   );

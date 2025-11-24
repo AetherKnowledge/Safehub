@@ -1,56 +1,107 @@
-import Image from "next/image";
+"use client";
+
+import { motion } from "framer-motion";
 import SafehubIcon from "../Images/SafehubIcon";
 import LoginButton from "./LoginButton";
+
+const containerVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const Hero = () => {
   return (
     <section
       id="hero"
-      className="hero w-full h-[calc(100vh-5rem)] overflow-hidden py-6 mt-20"
-      style={{
-        backgroundImage:
-          "linear-gradient(to right, rgba(0,0,0,0.8), rgba(55,65,81,0.3)), url(/images/lcupBg.png)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+      className="relative w-full h-[calc(100vh-5rem)] overflow-hidden mt-18 flex items-center justify-center"
     >
-      {/* Content layer */}
-      <div className="flex isolate items-center gap-5 text-white lg:pl-20 flex-col w-full lg:flex-row">
-        <div className="text-center lg:text-left sm:items-center">
-          <h1 className="heading-step-1 font-bold">Need Guidance?</h1>
-          <p className="py-6 text-step-1 font-light px-20 lg:px-0">
-            Here at LCUP, our Social Welfare Services offers guidance either
-            offline or online through SafeHub
-          </p>
+      {/* Background overlay */}
+      <div className="absolute inset-0">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url(/images/lcupBg.png)" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-slate-800/60" />
+        <motion.div
+          className="absolute -right-40 -top-40 w-96 h-96 rounded-full bg-blue-500/30 blur-3xl"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+        />
+        <motion.div
+          className="absolute -left-40 bottom-0 w-[28rem] h-[28rem] rounded-full bg-indigo-500/25 blur-3xl"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.9, delay: 0.1 }}
+        />
+      </div>
 
-          <LoginButton />
-        </div>
-        <div className="flex items-center justify-center w-full ">
-          <div className="w-[clamp(25rem,30vw,80rem)]">
-            <SafehubIcon className="hidden lg:block" />
+      {/* Content layer */}
+      <div className="relative z-10 flex isolate items-center gap-10 text-white px-6 lg:px-20 flex-col-reverse lg:flex-row w-full max-w-6xl">
+        <motion.div
+          className="w-full lg:w-1/2 text-center lg:text-left flex flex-col items-center lg:items-start"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.p
+            variants={itemVariants}
+            className="mb-3 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-medium tracking-[0.2em] uppercase backdrop-blur-sm"
+          >
+            LCUP · Social Welfare Services
+          </motion.p>
+
+          <motion.h1
+            variants={itemVariants}
+            className="heading-step-1 font-extrabold leading-tight drop-shadow-lg"
+          >
+            Need guidance or
+            <span className="block bg-gradient-to-r from-sky-300 to-emerald-300 bg-clip-text text-transparent">
+              someone to talk to?
+            </span>
+          </motion.h1>
+
+          <motion.p
+            variants={itemVariants}
+            className="py-6 text-step-1 font-light max-w-xl text-white/80"
+          >
+            SafeHub connects LCUP students with counselors through a secure,
+            online platform. Book appointments, join video sessions, and reach
+            out whenever you need support—on-campus or at home.
+          </motion.p>
+
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col sm:flex-row items-center gap-4"
+          >
+            <LoginButton />
+            <p className="text-xs sm:text-sm text-white/70 max-w-xs">
+              Available for LCUP college students.
+            </p>
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          className="w-full lg:w-1/2 flex items-center justify-center"
+          initial={{ opacity: 0, scale: 0.9, x: 40 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+        >
+          <div className="relative w-[clamp(18rem,28vw,26rem)]">
+            <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-sky-400/40 to-emerald-400/40 blur-2xl" />
+            <div className="relative rounded-3xl bg-white/5 border border-white/15 backdrop-blur-xl p-6 shadow-2xl flex items-center justify-center">
+              <SafehubIcon className="w-full" />
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 };
-
-function BgImage() {
-  return (
-    <section
-      id="hero"
-      className="hero w-full bg-gradient-to-r h-[calc(50vh-5rem)] from-black/95 to-gray-700/95 overflow-hidden py-6 mt-20"
-    >
-      <Image
-        src="/images/lcupBg.png"
-        alt="LCUP background"
-        fill
-        priority
-        className="absolute inset-0 z-0 object-cover object-center opacity-30"
-        sizes="(max-width: 768px) 1280px"
-      />
-    </section>
-  );
-}
 
 export default Hero;

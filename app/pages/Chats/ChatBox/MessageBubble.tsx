@@ -11,6 +11,7 @@ interface Props {
   createdAt: string | Date;
   self?: boolean;
   showStatus?: boolean;
+  anonymous?: boolean;
 }
 
 const MessageBubble = ({
@@ -21,6 +22,7 @@ const MessageBubble = ({
   createdAt,
   self = false,
   showStatus = true,
+  anonymous = false,
 }: Props) => {
   const defaultPosition = self ? "chat chat-end" : "chat chat-start";
   const isLoading = !content || content.trim() === "";
@@ -29,11 +31,13 @@ const MessageBubble = ({
     <div className={defaultPosition}>
       <div className="chat-image avatar">
         <div className={`w-${imageSize} rounded-full`}>
-          {avatarGenerator(name, imageSize, image)}
+          {anonymous
+            ? avatarGenerator("Anonymous", imageSize)
+            : avatarGenerator(name, imageSize, image)}
         </div>
       </div>
       <div className="chat-header text-base-content text-xs/normal flex items-center ml-1 mr-1">
-        {!self && name}
+        {anonymous ? "Anonymous" : !self && name}
         <time className="text-xs opacity-50 ml-2 mr-2">
           {createdAt.toLocaleString() === new Date().toLocaleString()
             ? formatDateDisplay(createdAt, false)

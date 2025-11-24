@@ -23,21 +23,26 @@ import CloseButton from "./CloseButton";
 
 const FollowUpButton = ({ appointment }: { appointment: AppointmentData }) => {
   const [showModal, setShowModal] = useState(false);
-  const [startTime, setStartTime] = useState<Date | undefined>(
-    appointment?.startTime
-  );
-  const [endTime, setEndTime] = useState<Date | undefined>(
-    appointment?.endTime || undefined
-  );
-  const [reason, setReason] = useState<string>(
-    appointment?.followUpReason || ""
-  );
+  const [startTime, setStartTime] = useState<Date | undefined>();
+  const [endTime, setEndTime] = useState<Date | undefined>();
+  const [reason, setReason] = useState<string>("");
 
   const statusPopup = usePopup();
 
   async function handleSubmit() {
-    if (!startTime) return;
     statusPopup.showLoading("Creating follow up appointment...");
+
+    if (!startTime) {
+      statusPopup.hidePopup();
+      statusPopup.showError("Please select a valid start time.");
+      return;
+    }
+
+    if (!endTime) {
+      statusPopup.hidePopup();
+      statusPopup.showError("Please select a valid end time.");
+      return;
+    }
 
     const conflicts = await checkForConflictingDate(
       startTime,
@@ -112,15 +117,19 @@ const FollowUpButton = ({ appointment }: { appointment: AppointmentData }) => {
                   onChange={setReason}
                 />
                 <DateTimeSelector
-                  name="startTime"
+                  name={`startTime-followup-${appointment.id}`}
+                  legend="Start Time"
                   minDate="now"
                   minTime={{ hour: 8, minute: 0, period: TimePeriod.AM }}
                   maxTime={{ hour: 7, minute: 0, period: TimePeriod.PM }}
-                  defaultValue={appointment?.startTime}
-                  onChange={(date) => setStartTime(date)}
+                  onChange={(date) => {
+                    setStartTime(date);
+                  }}
+                  required
                 />
                 <TimeSelector
-                  name="endTime"
+                  name={`endTime-followup-${appointment.id}`}
+                  legend="End Time"
                   value={endTime ? getTimeFromDate(endTime) : undefined}
                   minTime={
                     startTime
@@ -134,6 +143,7 @@ const FollowUpButton = ({ appointment }: { appointment: AppointmentData }) => {
                       return setTimeToDate(new Date(prev), time);
                     });
                   }}
+                  required
                 />
               </div>
               {!appointment.followUpId && (

@@ -42,8 +42,16 @@ const LinkedSelector = ({
   readonly = false,
   noFormOutput = false,
 }: LinkedSelectorProps) => {
-  const [parentOptions, setParentOptions] = useState<Option[]>([]);
-  const [childOptions, setChildOptions] = useState<Option[]>([]);
+  const [parentOptions, setParentOptions] = useState<Option[]>(
+    linkedOptions.map((lo) => lo.parentOption)
+  );
+  const [childOptions, setChildOptions] = useState<Option[]>(
+    parentOptions
+      ? linkedOptions.find(
+          (lo) => lo.parentOption.value === parent.props.defaultValue
+        )?.childOptions || []
+      : []
+  );
 
   useEffect(() => {
     setParentOptions(linkedOptions.map((lo) => lo.parentOption));

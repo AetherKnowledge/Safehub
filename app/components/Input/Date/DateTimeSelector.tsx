@@ -114,13 +114,16 @@ const DateTimeSelector = ({
     if (isDateToday(date)) setMinTime("now");
     else setMinTime(initialMinTime);
 
-    emit(date, selectedTime);
+    // Only emit if we have a valid time already selected
+    if (selectedTime) {
+      emit(date, selectedTime);
+    }
   }
 
   function handleTimeChange(time: Time) {
     setSelectedTime(time);
 
-    if (selectedDate && initialMinDate) {
+    if (selectedDate && initialMinDate && initialMinDate !== "now") {
       const allowed =
         isDateTimeAfter(selectedDate, time, initialMinDate) ||
         selectedDate > initialMinDate;
@@ -128,7 +131,10 @@ const DateTimeSelector = ({
       setMinDate(allowed ? initialMinDate : addDays(initialMinDate, 1));
     }
 
-    emit(selectedDate, time);
+    // Only emit if we have a valid date already selected
+    if (selectedDate) {
+      emit(selectedDate, time);
+    }
   }
 
   // ---------------------------------------------------------------

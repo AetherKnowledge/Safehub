@@ -463,6 +463,21 @@ export async function updateAppointment(
       );
     }
 
+    if (
+      !validation.data.counselorId ||
+      !(typeof validation.data.counselorId === "string")
+    ) {
+      throw new Error("Counselor ID is required and must be a valid string");
+    }
+
+    const counselor = await prisma.user.findUnique({
+      where: { id: validation.data.counselorId },
+    });
+
+    if (!counselor) {
+      throw new Error("Counselor not found");
+    }
+
     if (appointment.parent) {
       throw new Error("Cannot update follow-up appointment");
     }
@@ -514,6 +529,7 @@ export async function updateAppointment(
     const updatedAppointment = await prisma.appointment.update({
       where: { id: appointmentId },
       data: {
+        counselorId: counselor.id,
         startTime,
         endTime,
         status,

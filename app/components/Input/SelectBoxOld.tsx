@@ -19,6 +19,7 @@ interface SelectBoxOldProps {
   bgColor?: string;
   textColor?: string;
   colorMap?: Record<string, { bg: string; text: string }>;
+  disabled?: boolean;
 }
 
 export default function SelectBoxOld({
@@ -33,6 +34,7 @@ export default function SelectBoxOld({
   bgColor = "bg-neutral",
   textColor = "text-base-content",
   colorMap,
+  disabled = false,
 }: SelectBoxOldProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -60,6 +62,8 @@ export default function SelectBoxOld({
   }
 
   function handleSelect(item: string) {
+    if (disabled) return;
+
     setSelected(item);
     onSelect?.(item);
     if (queryKey) handleSearchChange(queryKey, item);
@@ -104,15 +108,34 @@ export default function SelectBoxOld({
     <>
       <div
         ref={triggerRef}
-        className={`relative border rounded-xl shadow-sm ${className} ${selectedStyles} ${borderColor}`}
+        className={`relative border rounded-xl shadow-sm ${className} ${selectedStyles} ${borderColor} ${
+          disabled ? "cursor-not-allowed" : "cursor-pointer"
+        }`}
       >
-        <div className={`flex justify-center items-center ${padding}`}>
-          <button onClick={() => setOpen((prev) => !prev)} className="w-full">
+        <div
+          className={`flex justify-center items-center ${padding} ${
+            disabled ? "cursor-not-allowed" : "cursor-pointer"
+          }`}
+        >
+          <button
+            onClick={() => {
+              if (disabled) return;
+              setOpen((prev) => !prev);
+            }}
+            className={`w-full ${
+              disabled ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
+          >
             {selected && selected !== defaultValue ? selected : placeholder}
           </button>
           <IoMdArrowDropdown
-            className="text-xl cursor-pointer"
-            onClick={() => setOpen((prev) => !prev)}
+            className={`text-xl cursor-pointer ${
+              disabled ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
+            onClick={() => {
+              if (disabled) return;
+              setOpen((prev) => !prev);
+            }}
           />
         </div>
       </div>

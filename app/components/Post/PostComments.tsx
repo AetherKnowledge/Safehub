@@ -69,16 +69,23 @@ const PostComments = ({ post }: { post: PostData }) => {
         ref={messageContainerRef}
       >
         <div className="flex flex-col h-full">
-          {comments.map((comment) => (
-            <MessageBubble
-              key={comment.id}
-              name={comment.user.name}
-              image={comment.user.image}
-              content={comment.content}
-              createdAt={comment.createdAt}
-              showStatus={false}
-            />
-          ))}
+          {comments.map((comment) => {
+            const isImageFromSelf =
+              session.data?.user.image === comment.user.image;
+
+            return (
+              <MessageBubble
+                key={comment.id}
+                name={comment.user.name}
+                image={comment.user.image}
+                content={comment.content}
+                createdAt={comment.createdAt}
+                showStatus={false}
+                anonymous={!isImageFromSelf}
+                self={isImageFromSelf}
+              />
+            );
+          })}
         </div>
       </div>
       <Divider />
@@ -88,9 +95,9 @@ const PostComments = ({ post }: { post: PostData }) => {
       <div className="flex items-center gap-2 mt-2">
         <div className="avatar">
           <UserImage
-            name={post.author.name}
+            name={session.data?.user.name || session.data?.user.email || "You"}
             width={10}
-            src={post.author.image || undefined}
+            src={session.data?.user.image || undefined}
           />
         </div>
         <input

@@ -59,7 +59,7 @@ const BottomBar = () => {
         {items.map(({ href, Icon, label }) => {
           const active = pathname?.startsWith(href);
           return (
-            <li key={href} className="shrink-0 flex-1">
+            <li key={href} className="flex-1">
               <Link
                 href={href}
                 className={`flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-md min-w-[64px] transition-colors ${

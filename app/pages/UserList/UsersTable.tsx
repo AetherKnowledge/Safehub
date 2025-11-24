@@ -1,10 +1,12 @@
 "use client";
 
 import SelectBoxOld from "@/app/components/Input/SelectBoxOld";
+import { usePopup } from "@/app/components/Popup/PopupProvider";
 import UserImage from "@/app/components/UserImage";
 import { UserType } from "@/app/generated/prisma";
 import { UpdateUserTypeData } from "@/lib/schemas";
 import { AnimatePresence, motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getUsers, updateUserType, UserWithStatus } from "./UsersActions";
@@ -22,6 +24,8 @@ const roleColorMap = {
 };
 
 const UsersTable = ({ name }: { name?: string }) => {
+  const session = useSession();
+  const statusPopup = usePopup();
   const searchParams = useSearchParams();
   const roleFilter = searchParams.get("role") ?? undefined;
   const statusFilter = searchParams.get("status") ?? undefined;
@@ -53,12 +57,16 @@ const UsersTable = ({ name }: { name?: string }) => {
   }
 
   async function changeRole(userId: string, newRole: UserType) {
-    try {
-      await updateUserType({ id: userId, type: newRole } as UpdateUserTypeData);
-    } catch (error) {
-      console.error("Failed to update user role:", error);
-      return;
-    }
+    statusPopup.showLoading("Updating user role...");
+    const result = await updateUserType({
+      id: userId,
+      type: newRole,
+    } as UpdateUserTypeData);
+    if (!result.success) {
+      statusPopup.showError(
+        `Failed to update user role. ${result.message ?? ""}`.trim()
+      );
+    } else statusPopup.showSuccess("User role updated successfully!");
 
     await refreshUsers();
   }
@@ -68,7 +76,7 @@ const UsersTable = ({ name }: { name?: string }) => {
       {loading ? (
         <div className="flex flex-col items-center justify-center space-y-4 w-full h-full">
           <div className="loading loading-spinner loading-lg text-primary"></div>
-          <p className="text-base-content">Loading registered counselors...</p>
+          <p className="text-base-content">Loading registered users...</p>
         </div>
       ) : users.length === 0 ? (
         <p className="flex text-center text-base-content/70 w-full h-full justify-center items-center">
@@ -119,6 +127,7 @@ const UsersTable = ({ name }: { name?: string }) => {
                         onSelect={(item) => {
                           changeRole(user.id, item as UserType);
                         }}
+                        disabled={user.id === session.data?.user?.id}
                       />
                     </div>
                   </td>

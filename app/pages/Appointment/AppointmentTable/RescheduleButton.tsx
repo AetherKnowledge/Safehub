@@ -38,6 +38,8 @@ const RescheduleButton = ({
   async function confirmReschedule() {
     if (!startTime) return;
 
+    console.log(startTime, endTime);
+
     setShowModal(false);
     statusPopup.showLoading("Updating appointment...");
 
@@ -94,7 +96,14 @@ const RescheduleButton = ({
                   minTime={{ hour: 8, minute: 0, period: TimePeriod.AM }}
                   maxTime={{ hour: 7, minute: 0, period: TimePeriod.PM }}
                   defaultValue={appointment?.startTime}
-                  onChange={(date) => setStartTime(date)}
+                  onChange={(date) => {
+                    setStartTime(date);
+                    const newEndTime = new Date(date);
+                    newEndTime.setHours(date.getHours() + 1);
+                    setEndTime(newEndTime);
+                    console.log("Start Time:", date);
+                  }}
+                  required
                 />
                 <TimeSelector
                   name="endTime"

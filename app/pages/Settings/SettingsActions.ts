@@ -80,7 +80,10 @@ const updateUserInfoSchema = z.object({
 
   guardianRelationship: z.enum(GuardianRelationship).optional(),
 
-  guardianEmail: z.email("Invalid guardian email address").optional(),
+  guardianEmail: z
+    .email("Invalid guardian email address")
+    .optional()
+    .or(z.literal("")),
 });
 
 export type UpdateUserInfoData = z.infer<typeof updateUserInfoSchema>;

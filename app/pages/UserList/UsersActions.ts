@@ -1,5 +1,6 @@
 "use server";
 
+import ActionResult from "@/app/components/ActionResult";
 import { UserStatus, UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
@@ -52,87 +53,103 @@ export async function getUsers() {
   return usersWithStatus;
 }
 
-export async function updateUserType(data: UpdateUserTypeData) {
-  const session = await auth();
+export async function updateUserType(
+  data: UpdateUserTypeData
+): Promise<ActionResult<void>> {
+  try {
+    const session = await auth();
 
-  if (!session || !(session.user.type === UserType.Admin)) {
-    throw new Error("Unauthorized");
-  }
+    if (!session || !(session.user.type === UserType.Admin)) {
+      throw new Error("Unauthorized");
+    }
 
-  const validation = updateUserSchema.safeParse(data);
-  if (!validation.success) {
-    throw new Error("Invalid request data");
-  }
+    const validation = updateUserSchema.safeParse(data);
+    if (!validation.success) {
+      throw new Error("Invalid request data");
+    }
 
-  const { id, type } = validation.data;
+    const { id, type } = validation.data;
 
-  const user = await prisma.user.findUnique({
-    where: { id },
-    select: {
-      type: true,
-    },
-  });
+    if (id === session.user.id) {
+      throw new Error("Cannot change your own user type");
+    }
 
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  if (user.type === type) {
-    throw new Error("User is already of this type");
-  }
-
-  if (user.type === UserType.Admin) {
-    await prisma.admin.delete({ where: { adminId: id } });
-  } else if (user.type === UserType.Counselor) {
-    await prisma.counselor.delete({ where: { counselorId: id } });
-  } else if (user.type === UserType.Student) {
-    await prisma.student.delete({ where: { studentId: id } });
-  }
-
-  const updatedUser = await prisma.user.update({
-    where: { id },
-    data: { type },
-    select: {
-      id: true,
-      name: true,
-      type: true,
-    },
-  });
-
-  if (!updatedUser) {
-    throw new Error("Failed to update user type");
-  }
-
-  const deleted = await prisma.chat.deleteMany({
-    where: { members: { some: { userId: id } } },
-  });
-  console.log(`Deleted ${deleted.count} chats for user ${updatedUser.name}`);
-  if (updatedUser.type === UserType.Admin) {
-    await prisma.admin.create({
-      data: {
-        adminId: updatedUser.id,
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        type: true,
       },
     });
 
-    await createManyChatsWithOthers(UserType.Admin, updatedUser.id);
-    await createManyChatsWithOthers(UserType.Counselor, updatedUser.id);
-  } else if (updatedUser.type === UserType.Counselor) {
-    await prisma.counselor.create({
-      data: {
-        counselorId: updatedUser.id,
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.type === type) {
+      throw new Error("User is already of this type");
+    }
+
+    if (user.type === UserType.Admin) {
+      await prisma.admin.delete({ where: { adminId: id } });
+    } else if (user.type === UserType.Counselor) {
+      await prisma.counselor.delete({ where: { counselorId: id } });
+    } else if (user.type === UserType.Student) {
+      await prisma.student.delete({ where: { studentId: id } });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: { type },
+      select: {
+        id: true,
+        name: true,
+        type: true,
       },
     });
 
-    await createManyChatsWithOthers(UserType.Admin, updatedUser.id);
-    await createManyChatsWithOthers(UserType.Counselor, updatedUser.id);
-    await createManyChatsWithOthers(UserType.Student, updatedUser.id);
-  } else if (updatedUser.type === UserType.Student) {
-    await prisma.student.create({
-      data: {
-        studentId: updatedUser.id,
-      },
-    });
+    if (!updatedUser) {
+      throw new Error("Failed to update user type");
+    }
 
-    await createManyChatsWithOthers(UserType.Counselor, updatedUser.id);
+    const deleted = await prisma.chat.deleteMany({
+      where: { members: { some: { userId: id } } },
+    });
+    console.log(`Deleted ${deleted.count} chats for user ${updatedUser.name}`);
+    if (updatedUser.type === UserType.Admin) {
+      await prisma.admin.create({
+        data: {
+          adminId: updatedUser.id,
+        },
+      });
+
+      await createManyChatsWithOthers(UserType.Admin, updatedUser.id);
+      await createManyChatsWithOthers(UserType.Counselor, updatedUser.id);
+    } else if (updatedUser.type === UserType.Counselor) {
+      await prisma.counselor.create({
+        data: {
+          counselorId: updatedUser.id,
+        },
+      });
+
+      await createManyChatsWithOthers(UserType.Admin, updatedUser.id);
+      await createManyChatsWithOthers(UserType.Counselor, updatedUser.id);
+      await createManyChatsWithOthers(UserType.Student, updatedUser.id);
+    } else if (updatedUser.type === UserType.Student) {
+      await prisma.student.create({
+        data: {
+          studentId: updatedUser.id,
+        },
+      });
+
+      await createManyChatsWithOthers(UserType.Counselor, updatedUser.id);
+    }
+  } catch (error) {
+    console.error(
+      "Error updating user type: " + (error as Error).message,
+      error
+    );
+    return { success: false, message: (error as Error).message };
   }
+
+  return { success: true };
 }

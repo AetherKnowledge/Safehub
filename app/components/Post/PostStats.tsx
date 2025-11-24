@@ -1,4 +1,6 @@
 "use client";
+import { UserType } from "@/app/generated/prisma";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { FaRegComment, FaRegHeart } from "react-icons/fa6";
 import {
@@ -23,6 +25,7 @@ type PostStatsProps = {
 const PostStats = ({ post, showPopup, setShowPopup }: PostStatsProps) => {
   const [likeStats, setLikeStats] = useState<PostStat>(post.likeStats);
   const [dislikeStats, setDislikeStats] = useState<PostStat>(post.dislikeStats);
+  const session = useSession();
 
   const changeStatus = async (value: boolean, isLike: boolean) => {
     if (isLike) {
@@ -82,7 +85,9 @@ const PostStats = ({ post, showPopup, setShowPopup }: PostStatsProps) => {
           label="Saved"
           className=""
         /> */}
-        <PostDropdown post={post} />
+        {session?.data?.user.type === UserType.Admin && (
+          <PostDropdown post={post} />
+        )}
       </div>
     </div>
   );

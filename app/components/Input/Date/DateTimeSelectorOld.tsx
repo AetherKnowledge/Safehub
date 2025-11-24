@@ -1,20 +1,15 @@
 "use client";
-import { formatDateDisplay } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { FaChevronDown, FaRegClock } from "react-icons/fa";
-import { MdOutlineDateRange } from "react-icons/md";
 import InputInterface from "../InputInterface";
 import Legend from "../Legend";
-import DatePicker from "./DatePicker";
-import TimePicker from "./TimePicker";
+import DateSelector from "./DateSelector";
+import TimeSelector from "./TimeSelector";
 import {
   addDays,
   dateToString,
   getTimeFromDate,
   isDateTimeAfter,
   isDateToday,
-  isTimeAfter,
-  padTime,
   setTimeToDate,
   Time,
 } from "./utils";
@@ -30,7 +25,7 @@ export type DateTimeSelectorProps = InputInterface & {
   horizontal?: boolean;
 };
 
-const DateTimeSelector = ({
+const DateTimeSelectorOld = ({
   name,
   legend,
   className,
@@ -65,7 +60,6 @@ const DateTimeSelector = ({
 
     // Handle initial default value
     if (defaultValue) {
-      console.log("setting default value", defaultValue);
       const time = getTimeFromDate(defaultValue);
       setSelectedDate(defaultValue);
       setSelectedTime(time);
@@ -82,20 +76,14 @@ const DateTimeSelector = ({
       return;
     }
 
-    console.log("no default value");
-
     // If NO default value → apply min rules
     setMinDate(initialMinDate);
     if (
-      (initialMinDate === "now" ||
-        (initialMinDate && isDateToday(initialMinDate))) &&
-      initialMinTime &&
-      isTimeAfter(getTimeFromDate(new Date()), initialMinTime)
+      initialMinDate === "now" ||
+      (initialMinDate && isDateToday(initialMinDate))
     ) {
-      console.log("setting min time to now");
       setMinTime("now");
     } else {
-      console.log("setting min time to initial");
       setMinTime(initialMinTime ?? undefined);
     }
   }, [initialized, defaultValue, initialMinDate, initialMinTime, onChange]);
@@ -153,12 +141,6 @@ const DateTimeSelector = ({
   // RENDER
   // ---------------------------------------------------------------
 
-  const datePopoverName = name + "-date-popover";
-  const dateAnchorName = "--" + name + "-date-anchor";
-
-  const timePopoverName = name + "-time-popover";
-  const timeAnchorName = "--" + name + "-time-anchor";
-
   return (
     <>
       <fieldset className="fieldset w-full">
@@ -171,39 +153,15 @@ const DateTimeSelector = ({
             horizontal ? "flex-col gap-0" : "flex-row gap-2"
           } ${className}`}
         >
-          {/* Date */}
-          <fieldset className="fieldset w-full">
-            {legend && (
-              <Legend legend={legend} required={required} number={number} />
-            )}
-            <button
-              type="button"
-              className={`flex pr-2 justify-between items-center bg-neutral rounded-lg cursor-pointer border ${
-                hasError ? "border-error" : "border-base-300"
-              } ${className}`}
-              popoverTarget={readonly ? undefined : datePopoverName}
-              style={
-                readonly
-                  ? { pointerEvents: "none" }
-                  : ({ anchorName: dateAnchorName } as React.CSSProperties)
-              }
-            >
-              <div className="flex flex-row items-center text-center border border-transparent border-r-base-300 gap-1 p-0 px-2 h-full">
-                <MdOutlineDateRange className="w-5 h-5" />
-                <p>Date</p>
-              </div>
-
-              <p
-                className={`w-full p-2 text-left ${
-                  selectedDate ? "" : "text-base-content/50"
-                }`}
-              >
-                {selectedDate ? formatDateDisplay(selectedDate) : "Select Date"}
-              </p>
-
-              {!readonly && <FaChevronDown className="cursor-pointer" />}
-            </button>
-          </fieldset>
+          <DateSelector
+            name={`${name}-date`}
+            noFormOutput
+            value={selectedDate}
+            onChange={handleDateChange}
+            minDate={minDate}
+            maxDate={maxDate}
+            readonly={readonly}
+          />
 
           <input
             name={noFormOutput ? undefined : name}
@@ -223,43 +181,15 @@ const DateTimeSelector = ({
             style={{ caretColor: "transparent" }}
           />
 
-          {/* Time */}
-          <fieldset className={`fieldset ${className ? className : "w-full"}`}>
-            {legend && (
-              <Legend legend={legend} required={required} number={number} />
-            )}
-            <button
-              type="button"
-              className={`flex pr-2 justify-between items-center bg-neutral rounded-lg cursor-pointer border ${
-                hasError ? "border-error" : "border-base-300"
-              } ${className}`}
-              popoverTarget={readonly ? undefined : timePopoverName}
-              style={
-                readonly
-                  ? { pointerEvents: "none" }
-                  : ({ anchorName: timeAnchorName } as React.CSSProperties)
-              }
-            >
-              <div className="flex flex-row items-center text-center border border-transparent border-r-base-300 gap-1 p-0 px-2 h-full">
-                <FaRegClock className="w-5 h-5" />
-                <p>Time</p>
-              </div>
-
-              <p
-                className={`w-full p-2 text-left ${
-                  selectedTime ? "" : "text-base-content/50"
-                }`}
-              >
-                {selectedTime
-                  ? `${padTime(selectedTime.hour)}:${padTime(
-                      selectedTime.minute
-                    )} ${selectedTime.period}`
-                  : "Select Time"}
-              </p>
-
-              {!readonly && <FaChevronDown className="cursor-pointer" />}
-            </button>
-          </fieldset>
+          <TimeSelector
+            name={`${name}-time`}
+            noFormOutput
+            value={selectedTime}
+            onChange={handleTimeChange}
+            minTime={minTime}
+            maxTime={maxTime}
+            readonly={readonly}
+          />
         </div>
 
         <p
@@ -270,38 +200,8 @@ const DateTimeSelector = ({
           This field is required.
         </p>
       </fieldset>
-
-      <div
-        className={`dropdown dropdown-end menu rounded-box p-0 bg-neutral rounded-lg border-base-300 shadow-sm`}
-        popover="auto"
-        id={datePopoverName}
-        style={{ positionAnchor: dateAnchorName } as React.CSSProperties}
-      >
-        <DatePicker
-          value={selectedDate}
-          onChange={(date) => {
-            handleDateChange(date);
-          }}
-          minDate={minDate}
-          maxDate={maxDate}
-        />
-      </div>
-
-      <div
-        className={`dropdown dropdown-end menu rounded-box p-0 bg-neutral rounded-lg border-base-300 shadow-sm`}
-        popover="auto"
-        id={timePopoverName}
-        style={{ positionAnchor: timeAnchorName } as React.CSSProperties}
-      >
-        <TimePicker
-          value={selectedTime}
-          onChange={handleTimeChange}
-          minTime={minTime === "now" ? getTimeFromDate(new Date()) : minTime}
-          maxTime={maxTime}
-        />
-      </div>
     </>
   );
 };
 
-export default DateTimeSelector;
+export default DateTimeSelectorOld;

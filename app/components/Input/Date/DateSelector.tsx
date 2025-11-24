@@ -3,7 +3,6 @@ import { formatDateDisplay } from "@/lib/utils";
 import { useState } from "react";
 import { FaChevronDown } from "react-icons/fa6";
 import { MdOutlineDateRange } from "react-icons/md";
-import { size } from "zod";
 import InputInterface from "../InputInterface";
 import Legend from "../Legend";
 import DatePicker from "./DatePicker";
@@ -64,7 +63,7 @@ const DateSelector = ({
           type="button"
           className={`flex pr-2 justify-between items-center ${bgColor} rounded-lg cursor-pointer border ${
             hasError ? "border-error" : "border-base-300"
-          } ${className} ${size}`}
+          } ${className}`}
           popoverTarget={readonly ? undefined : popoverName}
           style={
             readonly
@@ -115,7 +114,7 @@ const DateSelector = ({
       </fieldset>
 
       <div
-        className={`dropdown dropdown-end menu rounded-box p-0 ${bgColor} rounded-lg border-base-300 shadow-sm ${size}`}
+        className={`dropdown dropdown-end menu rounded-box p-0 ${bgColor} rounded-lg border-base-300 shadow-sm`}
         popover="auto"
         id={popoverName}
         style={{ positionAnchor: anchorName } as React.CSSProperties}

@@ -1,8 +1,8 @@
 import { Fragment } from "react";
 import DateSelector, { DateSelectorProps } from "../Input/Date/DateSelector";
-import DateTimeSelector, {
+import DateTimeSelectorOld, {
   DateTimeSelectorProps,
-} from "../Input/Date/DateTimeSelector";
+} from "../Input/Date/DateTimeSelectorOld";
 import TimeSelector, { TimeSelectorProps } from "../Input/Date/TimeSelector";
 import { getTimeFromDate, stringToTime } from "../Input/Date/utils";
 import HorizontalItemsBox, {
@@ -242,7 +242,7 @@ export const FormComponentBuilder = ({
       return <LinkedSelector {...(component.props as LinkedSelectorProps)} />;
     case FormComponentType.DATETIME:
       return (
-        <DateTimeSelector
+        <DateTimeSelectorOld
           {...(component.props as DateTimeSelectorProps)}
           defaultValue={
             answer

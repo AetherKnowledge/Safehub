@@ -91,6 +91,12 @@ const SelectBox = ({
   }, [value, defaultValue, options]);
 
   useEffect(() => {
+    if (!extraOptions) {
+      setOptions(initialOptions);
+    }
+  }, [initialOptions, extraOptions]);
+
+  useEffect(() => {
     const element = sizeRef.current;
     if (!element) return;
 

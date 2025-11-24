@@ -66,6 +66,12 @@ const LinkedSelector = ({
   }, [linkedOptions]);
 
   const handleParentChange = (option: Option) => {
+    console.log("Parent option changed:", option);
+    console.log(
+      "Child options:",
+      linkedOptions.find((lo) => lo.parentOption.value === option.value)
+    );
+
     setChildOptions(
       linkedOptions.find((lo) => lo.parentOption.value === option.value)
         ?.childOptions || []

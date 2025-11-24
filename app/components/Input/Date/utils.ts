@@ -46,6 +46,16 @@ export function timeToMinutes(t: Time): number {
   return hour24 * 60 + t.minute;
 }
 
+export function isTimeAfter(
+  fromTime: Time | "now",
+  compareTo: Time | "now"
+): boolean {
+  if (fromTime === "now") fromTime = getTimeFromDate(new Date());
+  if (compareTo === "now") compareTo = getTimeFromDate(new Date());
+
+  return timeToMinutes(fromTime) > timeToMinutes(compareTo);
+}
+
 export function addDays(date: Date | "now", days: number): Date {
   const result = new Date(date === "now" ? new Date() : date);
   result.setDate(result.getDate() + days);

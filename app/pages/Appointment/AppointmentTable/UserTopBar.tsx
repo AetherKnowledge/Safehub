@@ -60,6 +60,7 @@ const UserTopBar = ({
                 <AiOutlineMessage className="h-5 w-5" />
               </Link>
               <button
+                type="button"
                 className="btn btn-primary rounded-full p-0 h-8 w-8"
                 onClick={handleInitiateCall}
               >

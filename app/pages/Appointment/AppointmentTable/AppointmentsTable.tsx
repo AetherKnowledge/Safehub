@@ -105,7 +105,7 @@ function AppointmentRow({
         </div>
       </td>
       <td className="px-3 py-4">
-        <div className="flex flex-wrap items-center justify-center gap-2">
+        <div className="flex flex-col items-center justify-center gap-2">
           {userType === UserType.Student ? (
             <StudentActionButton appointment={appointment} />
           ) : (

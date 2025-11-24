@@ -3,6 +3,7 @@
 import { getUserName } from "@/lib/socket/hooks/CallActions";
 import { PeerData } from "@/lib/socket/hooks/useCalling";
 import React, { useCallback } from "react";
+import { createPortal } from "react-dom";
 import {
   FaMicrophone,
   FaMicrophoneSlash,
@@ -48,7 +49,7 @@ const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
     }
   }, [stream]);
 
-  return (
+  return createPortal(
     <div
       className={`fixed inset-0 min-w-0 flex items-center justify-center bg-transparent bg-opacity-50 backdrop-brightness-50 z-[9999]`}
     >
@@ -136,7 +137,8 @@ const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

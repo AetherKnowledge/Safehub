@@ -8,6 +8,7 @@ import { TextBoxProps } from "@/app/components/Input/TextBox";
 import { UserType } from "@/app/generated/prisma";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FaEdit } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
 import { usePopup } from "../../components/Popup/PopupProvider";
@@ -24,6 +25,7 @@ import { changeUserInfo, SettingsUser } from "./SettingsActions";
 const Settings = ({ user }: { user: SettingsUser }) => {
   const session = useSession();
   const popup = usePopup();
+  const router = useRouter();
 
   async function handleSubmit(event: React.FormEvent) {
     popup.showLoading("Saving changes...");
@@ -31,11 +33,14 @@ const Settings = ({ user }: { user: SettingsUser }) => {
     const formData = new FormData(event.target as HTMLFormElement);
 
     const result = await changeUserInfo(formData);
-    popup.showSuccess("Changes saved successfully!");
 
     if (!result.success) {
       popup.showError(result.message || "Failed to save changes");
+      return;
     }
+
+    popup.showSuccess("Changes saved successfully!");
+    router.refresh();
   }
 
   return (

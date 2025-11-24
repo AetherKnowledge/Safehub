@@ -17,6 +17,7 @@ export type UserWithStatus = {
   createdAt: Date;
   updatedAt: Date;
   status: UserStatus;
+  deactivated: boolean;
 };
 
 export async function getUsers() {
@@ -35,7 +36,8 @@ export async function getUsers() {
       type: true,
       createdAt: true,
       updatedAt: true,
-      status: true, // Include status field
+      status: true,
+      deactivated: true,
     },
     orderBy: {
       name: "asc",
@@ -151,5 +153,75 @@ export async function updateUserType(
     return { success: false, message: (error as Error).message };
   }
 
+  return { success: true };
+}
+
+export async function changeUserDeactivationStatus(
+  userId: string,
+  deactivate: boolean
+): Promise<ActionResult<void>> {
+  try {
+    const session = await auth();
+    if (!session || session.user.type !== UserType.Admin) {
+      throw new Error("Unauthorized");
+    }
+
+    if (userId === session.user.id) {
+      throw new Error("Cannot change your own deactivation status");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.deactivated === deactivate) {
+      throw new Error(
+        `User is already ${deactivate ? "deactivated" : "activated"}`
+      );
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { deactivated: deactivate },
+    });
+  } catch (error) {
+    console.error(
+      "Error changing user deactivation status: " + (error as Error).message,
+      error
+    );
+    return { success: false, message: (error as Error).message };
+  }
+  return { success: true };
+}
+
+export async function deleteUser(userId: string): Promise<ActionResult<void>> {
+  try {
+    const session = await auth();
+    if (!session || session.user.type !== UserType.Admin) {
+      throw new Error("Unauthorized");
+    }
+
+    if (userId === session.user.id) {
+      throw new Error("Cannot delete your own account");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+  } catch (error) {
+    console.error("Error deleting user: " + (error as Error).message, error);
+    return { success: false, message: (error as Error).message };
+  }
   return { success: true };
 }

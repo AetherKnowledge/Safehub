@@ -104,6 +104,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  deactivated   Boolean   @default(false)
 
   completedOnboarding Boolean   @default(false)
   firstName           String?

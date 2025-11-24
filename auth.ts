@@ -84,6 +84,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       session.user.type = user?.type;
       session.user.darkMode = user?.darkMode || false;
       session.user.moodToday = user?.dailyMoods[0]?.mood || undefined;
+      session.user.deactivated = user?.deactivated || false;
 
       if (signingSecret) {
         const payload = {

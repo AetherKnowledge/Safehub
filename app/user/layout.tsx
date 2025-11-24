@@ -17,6 +17,11 @@ const Layout = async ({ children }: Props) => {
   if (!session) {
     redirect("/api/auth/signin");
   }
+
+  if (session.user?.deactivated) {
+    throw new Error("Account Deactivated. Please contact support.");
+  }
+
   if (
     session.user?.type === UserType.Student &&
     (await hasOnboarded()) === false

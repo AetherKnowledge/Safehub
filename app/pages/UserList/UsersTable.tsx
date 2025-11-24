@@ -9,7 +9,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getUsers, updateUserType, UserWithStatus } from "./UsersActions";
+import {
+  changeUserDeactivationStatus,
+  deleteUser,
+  getUsers,
+  updateUserType,
+  UserWithStatus,
+} from "./UsersActions";
 
 const statusColorMap = {
   Online: { bg: "#d1fae5", text: "#047857" }, // green
@@ -33,6 +39,53 @@ const UsersTable = ({ name }: { name?: string }) => {
   const [allUsers, setAllUsers] = useState<UserWithStatus[]>([]);
   const [users, setUsers] = useState<UserWithStatus[]>([]);
   const [loading, setLoading] = useState(true);
+
+  async function handleDeleteUser(userId: string) {
+    const confirmed = await statusPopup.showYesNo(
+      "Are you sure you want to delete this user?"
+    );
+    if (!confirmed) return;
+
+    statusPopup.showLoading("Deleting user...");
+    const result = await deleteUser(userId);
+    if (!result.success) {
+      statusPopup.showError(
+        `Failed to delete user. ${result.message ?? ""}`.trim()
+      );
+      return;
+    }
+
+    statusPopup.showSuccess("User deleted successfully!");
+
+    await refreshUsers();
+  }
+
+  async function handleChangeActivation(userId: string, deactivate: boolean) {
+    const confirmed = await statusPopup.showYesNo(
+      `Are you sure you want to ${
+        deactivate ? "deactivate" : "activate"
+      } this user?`
+    );
+    if (!confirmed) return;
+
+    statusPopup.showLoading(
+      `${deactivate ? "Deactivating" : "Activating"} user...`
+    );
+    const result = await changeUserDeactivationStatus(userId, deactivate);
+    if (!result.success) {
+      statusPopup.showError(
+        `Failed to ${deactivate ? "deactivate" : "activate"} user. ${
+          result.message ?? ""
+        }`.trim()
+      );
+      return;
+    }
+
+    statusPopup.showSuccess(
+      `User ${deactivate ? "deactivated" : "activated"} successfully!`
+    );
+    await refreshUsers();
+  }
 
   useEffect(() => {
     refreshUsers().then(() => setLoading(false));
@@ -90,6 +143,7 @@ const UsersTable = ({ name }: { name?: string }) => {
               <th>Role</th>
               <th>Email</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody className="text-base-content text-center">
@@ -149,6 +203,35 @@ const UsersTable = ({ name }: { name?: string }) => {
                         {user.status}
                       </motion.span>
                     }
+                  </td>
+                  <td>
+                    <div className="flex flex-col gap-2 w-full items-center justify-center">
+                      <button
+                        className={`text-error
+                        ${
+                          user.id === session.data?.user?.id
+                            ? "opacity-50 cursor-not-allowed"
+                            : "hover:underline cursor-pointer"
+                        }`}
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        Delete
+                      </button>
+                      <button
+                        className={`
+                        ${user.deactivated ? "text-primary" : "text-warning"}
+                        ${
+                          user.id === session.data?.user?.id
+                            ? "opacity-50 cursor-not-allowed"
+                            : "hover:underline cursor-pointer"
+                        }`}
+                        onClick={() =>
+                          handleChangeActivation(user.id, !user.deactivated)
+                        }
+                      >
+                        {user.deactivated ? "Activate" : "Deactivate"}
+                      </button>
+                    </div>
                   </td>
                 </motion.tr>
               ))}

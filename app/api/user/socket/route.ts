@@ -15,7 +15,7 @@ export async function UPGRADE(client: WebSocket, server: WebSocketServer) {
   const session = await auth();
   console.log(session);
 
-  if (!session || !session.user) {
+  if (!session || !session.user || session.user.deactivated) {
     client.close(1008, "Unauthorized");
     return;
   }

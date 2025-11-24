@@ -9,6 +9,7 @@ declare module "next-auth" {
       type?: UserType;
       darkMode?: boolean;
       moodToday?: MoodType; // Optional field for mood today
+      deactivated?: boolean;
     } & DefaultSession["user"];
   }
 
@@ -17,6 +18,7 @@ declare module "next-auth" {
     type?: UserType;
     darkMode?: boolean;
     moodToday?: MoodType; // Optional field for mood today
+    deactivated?: boolean;
   }
 }
 
@@ -26,6 +28,7 @@ declare module "next-auth/jwt" {
     type?: UserType;
     darkMode?: boolean;
     moodToday?: MoodType; // Optional field for mood today
+    deactivated?: boolean;
   }
 }
 

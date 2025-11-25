@@ -1,14 +1,8 @@
 "use client";
 import { UserType } from "@/app/generated/prisma";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
 import { FaRegComment, FaRegHeart } from "react-icons/fa6";
-import {
-  PostData,
-  PostStat,
-  dislikePost,
-  likePost,
-} from "../../pages/Post/PostActions";
+import { PostData, dislikePost, likePost } from "../../pages/Post/PostActions";
 import PostDropdown from "./PostDropdown";
 import StatButton from "./StatsButton";
 
@@ -20,36 +14,51 @@ type PostStatsProps = {
   post: PostData;
   showPopup: boolean;
   setShowPopup: (value: boolean) => void;
+  onUpdate?: (post: PostData) => void;
 };
 
-const PostStats = ({ post, showPopup, setShowPopup }: PostStatsProps) => {
-  const [likeStats, setLikeStats] = useState<PostStat>(post.likeStats);
-  const [dislikeStats, setDislikeStats] = useState<PostStat>(post.dislikeStats);
+const PostStats = ({
+  post,
+  showPopup,
+  setShowPopup,
+  onUpdate,
+}: PostStatsProps) => {
   const session = useSession();
 
   const changeStatus = async (value: boolean, isLike: boolean) => {
     if (isLike) {
-      setLikeStats({
-        count: likeStats.count + (value ? 1 : -1),
-        selected: value,
-      });
-      if (dislikeStats.selected) {
-        setDislikeStats({
-          count: dislikeStats.count - 1,
-          selected: !value,
-        });
-      }
       await likePost(post.id, value);
-    } else {
-      setDislikeStats({
-        count: dislikeStats.count + (value ? 1 : -1),
-        selected: value,
-      });
-      if (likeStats.selected) {
-        setLikeStats({
-          count: likeStats.count - 1,
-          selected: !value,
+
+      onUpdate &&
+        onUpdate({
+          ...post,
+          likeStats: {
+            count:
+              post.likeStats.count +
+              (value ? 1 : -1) +
+              (post.dislikeStats.selected ? 1 : 0),
+            selected: value,
+          },
+          dislikeStats: {
+            count:
+              post.dislikeStats.count - (post.dislikeStats.selected ? 1 : 0),
+            selected: post.dislikeStats.selected && !value,
+          },
         });
+    } else {
+      if (post.likeStats.selected) {
+        onUpdate &&
+          onUpdate({
+            ...post,
+            dislikeStats: {
+              count: post.dislikeStats.count + (value ? 1 : -1),
+              selected: value,
+            },
+            likeStats: {
+              count: post.likeStats.count - (post.likeStats.selected ? 1 : 0),
+              selected: post.likeStats.selected && !value,
+            },
+          });
       }
       await dislikePost(post.id, value);
     }
@@ -62,7 +71,7 @@ const PostStats = ({ post, showPopup, setShowPopup }: PostStatsProps) => {
             changeStatus(value, true);
           }}
           icon={FaRegHeart}
-          value={likeStats}
+          value={post.likeStats}
           label="Likes"
           color="text-error"
         />

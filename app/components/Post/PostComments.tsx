@@ -1,19 +1,20 @@
 import { CommentData } from "@/lib/schemas";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import MessageBubble from "../../pages/Chats/ChatBox/MessageBubble";
-import {
-  addComment,
-  PostComment,
-  PostData,
-} from "../../pages/Post/PostActions";
+import { addComment, PostData } from "../../pages/Post/PostActions";
 import Divider from "../Divider";
 import { usePopup } from "../Popup/PopupProvider";
 import UserImage from "../UserImage";
 
-const PostComments = ({ post }: { post: PostData }) => {
+const PostComments = ({
+  post,
+  onUpdate,
+}: {
+  post: PostData;
+  onUpdate?: (post: PostData) => void;
+}) => {
   const session = useSession();
-  const [comments, setComments] = useState<PostComment[]>(post.comments || []);
   const inputRef = useRef<HTMLInputElement>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const statusPopup = usePopup();
@@ -30,33 +31,41 @@ const PostComments = ({ post }: { post: PostData }) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [comments]);
+  }, [post.comments]);
 
   async function onCommentAdded(text: string) {
-    const prevComments = [...comments];
+    const prevComments = [...post.comments];
 
-    setComments([
-      ...comments,
-      {
-        id:
-          comments.length > 0
-            ? (parseInt(comments[comments.length - 1].id) + 1).toString()
-            : "1",
-        user: {
-          name: session.data?.user.name || session.data?.user.email || "You",
-          image: session.data?.user.image || undefined,
+    onUpdate?.({
+      ...post,
+      comments: [
+        ...prevComments,
+        {
+          id:
+            prevComments.length > 0
+              ? (
+                  parseInt(prevComments[prevComments.length - 1].id) + 1
+                ).toString()
+              : "1",
+          user: {
+            name: session.data?.user.name || session.data?.user.email || "You",
+            image: session.data?.user.image || undefined,
+          },
+          content: text,
+          createdAt: new Date(),
         },
-        content: text,
-        createdAt: new Date(),
-      },
-    ]);
+      ],
+    });
 
     await addComment({
       postId: post.id,
       content: text,
     } as CommentData).catch((error) => {
       statusPopup.showError("Failed to add comment" + (error?.message || ""));
-      setComments(prevComments);
+      onUpdate?.({
+        ...post,
+        comments: prevComments,
+      });
     });
   }
 
@@ -80,7 +89,7 @@ const PostComments = ({ post }: { post: PostData }) => {
             />
           </svg>
           <span className="text-sm font-semibold text-base-content/80">
-            Comments ({comments.length})
+            Comments ({post.comments.length})
           </span>
         </div>
         <div
@@ -88,8 +97,8 @@ const PostComments = ({ post }: { post: PostData }) => {
           ref={messageContainerRef}
         >
           <div className="flex flex-col h-full">
-            {comments.length > 0 ? (
-              comments.map((comment) => {
+            {post.comments.length > 0 ? (
+              post.comments.map((comment) => {
                 const isImageFromSelf =
                   session.data?.user.image === comment.user.image;
 

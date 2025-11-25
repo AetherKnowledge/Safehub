@@ -12,11 +12,13 @@ const PostBox = ({
   showPopup,
   setShowPopup,
   isPopup = false,
+  onUpdate,
 }: {
   post: PostData;
   showPopup: boolean;
   setShowPopup: (value: boolean) => void;
   isPopup?: boolean;
+  onUpdate?: (post: PostData) => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const toggleExpand = () => setExpanded(!expanded);
@@ -45,6 +47,7 @@ const PostBox = ({
             post={post}
             showPopup={showPopup}
             setShowPopup={setShowPopup}
+            onUpdate={onUpdate}
           />
         </div>
 
@@ -99,18 +102,24 @@ const PostBox = ({
         </div>
 
         {/* Comments */}
-        {isPopup && <PostComments post={post} />}
+        {isPopup && <PostComments post={post} onUpdate={onUpdate} />}
       </div>
     </div>
   );
 };
 
-export const PostBoxHandler = ({ post }: { post: PostData }) => {
+export const PostBoxHandler = ({ post: initialPost }: { post: PostData }) => {
   const [showPopup, setShowPopup] = useState(false);
+  const [post, setPost] = useState<PostData>(initialPost);
 
   return (
     <>
-      <PostBox post={post} showPopup={showPopup} setShowPopup={setShowPopup} />
+      <PostBox
+        post={post}
+        showPopup={showPopup}
+        setShowPopup={setShowPopup}
+        onUpdate={setPost}
+      />
       {showPopup && (
         <ModalBase className="px-20" onClose={() => setShowPopup(false)}>
           <div className="w-full" onClick={(e) => e.stopPropagation()}>
@@ -119,6 +128,7 @@ export const PostBoxHandler = ({ post }: { post: PostData }) => {
               showPopup={showPopup}
               setShowPopup={setShowPopup}
               isPopup
+              onUpdate={setPost}
             />
           </div>
         </ModalBase>

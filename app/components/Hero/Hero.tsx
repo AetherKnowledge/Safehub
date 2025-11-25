@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import SafehubIcon from "../Images/SafehubIcon";
 import LoginButton from "./LoginButton";
 
@@ -18,13 +19,15 @@ const Hero = () => {
   return (
     <section
       id="hero"
-      className="relative w-full h-[calc(100vh-3rem)] overflow-hidden mt-18 flex items-center justify-center"
+      className="relative w-full h-[calc(100vh-3rem)] overflow-hidden mt-15 flex items-center justify-center"
     >
       {/* Background overlay */}
       <div className="absolute inset-0">
-        <div
+        <Image
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url(/images/lcupBg.png)" }}
+          src="/images/lcupBg.png"
+          alt="LCUP Campus Background"
+          fill
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-slate-800/60" />
         <motion.div

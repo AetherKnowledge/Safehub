@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import FormsHeader, {
   BaseFormsHeader,
   FormsHeaderProps,
@@ -24,6 +27,8 @@ const EditableHeader = ({
   onAdd,
   onAddSeparator,
 }: EditableHeaderProps) => {
+  const [hasError, setHasError] = useState(false);
+
   return (
     <EditableFormComponentBG
       selected={selected}
@@ -40,9 +45,15 @@ const EditableHeader = ({
           <BaseFormsHeader className="gap-2">
             <input
               type="text"
-              className={`${headerTitleClass} bg-neutral border-b-1 border-primary no-outline h-12 rounded-sm`}
+              className={`${headerTitleClass} bg-neutral border-b-1 no-outline h-12 rounded-sm transition-colors duration-300 ${
+                hasError ? "border border-error" : "border-primary"
+              }`}
               value={component.title}
               onChange={(e) => {
+                if (e.target.value.trim() === "") {
+                  setHasError(true);
+                } else setHasError(false);
+
                 onChange?.({ ...component, title: e.target.value });
               }}
             />

@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import Legend from "../../Input/Legend";
 import { RadioBoxProps } from "../../Input/RadioBox";
 import SelectBox, { SelectBoxProps } from "../../Input/SelectBox";
@@ -71,6 +72,8 @@ const EditableFormComponent = ({
     );
   }
 
+  const [hasError, setHasError] = useState(false);
+
   return (
     <EditableFormComponentBG
       selected={selected}
@@ -90,9 +93,15 @@ const EditableFormComponent = ({
       {selected ? (
         <div className="flex flex-row w-full gap-2">
           <input
-            className="p-2 bg-neutral border-b-1 border-primary no-outline w-full rounded-sm h-10"
-            value={component.props?.legend || "Edit your question here"}
+            className={`p-2 bg-neutral border-b-1 no-outline w-full rounded-sm h-10 transition-colors duration-300 ${
+              hasError ? "border border-error" : "border-primary"
+            }`}
+            value={component.props?.legend}
             onChange={(e) => {
+              if (e.target.value.trim() === "") {
+                setHasError(true);
+              } else setHasError(false);
+
               // @ts-expect-error TypeScript cannot infer this type correctly
               onChange?.({
                 ...component,
@@ -103,6 +112,7 @@ const EditableFormComponent = ({
               });
             }}
             placeholder="Edit component name here"
+            required
           />
           {!requiredComponent && (
             <SelectBox

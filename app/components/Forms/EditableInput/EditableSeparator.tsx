@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { FormComponent, FormComponentType } from "../FormBuilder";
 import Separator, { BaseSeparator, SeparatorProps } from "../Separator";
 import BottomActionRow from "./BottomActionRow";
@@ -29,6 +32,8 @@ const EditableSeparator = ({
   onMoveUp,
   onMoveDown,
 }: EditableSeparatorProps) => {
+  const [hasError, setHasError] = useState(false);
+
   return (
     <EditableFormComponentBG
       selected={selected}
@@ -49,9 +54,15 @@ const EditableSeparator = ({
           <BaseSeparator {...component.props}>
             <input
               type="text"
-              className="p-2 bg-neutral border-b-1 border-primary no-outline w-full rounded-sm h-10 text-center"
+              className={`p-2 bg-neutral border-b-1 no-outline w-full rounded-sm h-10 text-center transition-colors duration-300 ${
+                hasError ? "border border-error" : "border-primary"
+              }`}
               value={component.props.legend}
               onChange={(e) => {
+                if (e.target.value.trim() === "") {
+                  setHasError(true);
+                } else setHasError(false);
+
                 onChange?.({ ...component.props, legend: e.target.value });
               }}
             />

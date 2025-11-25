@@ -164,8 +164,14 @@ const UsersTable = ({ name }: { name?: string }) => {
                 >
                   <td>
                     <div className="flex items-center gap-4">
-                      <UserImage name={user.name} src={user.image} width={10} />
-                      <div className="font-medium">{user.name}</div>
+                      <UserImage
+                        name={user.name || user.email.split("@")[0]}
+                        src={user.image}
+                        width={10}
+                      />
+                      <div className="font-medium">
+                        {user.name || user.email.split("@")[0]}
+                      </div>
                     </div>
                   </td>
                   <td>
@@ -213,7 +219,10 @@ const UsersTable = ({ name }: { name?: string }) => {
                             ? "opacity-50 cursor-not-allowed"
                             : "hover:underline cursor-pointer"
                         }`}
-                        onClick={() => handleDeleteUser(user.id)}
+                        onClick={() => {
+                          if (user.id === session.data?.user?.id) return;
+                          handleDeleteUser(user.id);
+                        }}
                       >
                         Delete
                       </button>
@@ -225,9 +234,10 @@ const UsersTable = ({ name }: { name?: string }) => {
                             ? "opacity-50 cursor-not-allowed"
                             : "hover:underline cursor-pointer"
                         }`}
-                        onClick={() =>
-                          handleChangeActivation(user.id, !user.deactivated)
-                        }
+                        onClick={() => {
+                          if (user.id === session.data?.user?.id) return;
+                          handleChangeActivation(user.id, !user.deactivated);
+                        }}
                       >
                         {user.deactivated ? "Activate" : "Deactivate"}
                       </button>

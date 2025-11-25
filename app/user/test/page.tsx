@@ -16,10 +16,10 @@ const Test = async () => {
       <DateTimeSelector
         name="startTime"
         horizontal
-        minDate="now"
         defaultValue={new Date()}
-        minTime={{ hour: 8, minute: 0, period: TimePeriod.AM }}
-        maxTime={{ hour: 7, minute: 0, period: TimePeriod.PM }}
+        minDate="now"
+        minTime={{ hour: 8, minute: 0, period: TimePeriod.PM }}
+        maxTime={{ hour: 10, minute: 0, period: TimePeriod.PM }}
       />
     </div>
   );

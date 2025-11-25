@@ -39,7 +39,12 @@ export type Time = {
   period: TimePeriod;
 };
 
-export function timeToMinutes(t: Time): number {
+export function timeToMinutes(t: Time | "now"): number {
+  if (t === "now") {
+    const now = new Date();
+    return now.getHours() * 60 + now.getMinutes();
+  }
+
   let hour24 = t.hour % 12;
   if (t.period === TimePeriod.PM) hour24 += 12;
   if (t.period === TimePeriod.AM && t.hour === 12) hour24 = 0;

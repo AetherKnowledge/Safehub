@@ -17,6 +17,7 @@ import {
   padTime,
   setTimeToDate,
   Time,
+  timeToMinutes,
 } from "./utils";
 
 export type DateTimeSelectorProps = InputInterface & {
@@ -50,11 +51,19 @@ const DateTimeSelector = ({
   const [hasError, setHasError] = useState(false);
   const [initialized, setInitialized] = useState(false);
 
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
-  const [selectedTime, setSelectedTime] = useState<Time | undefined>();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    defaultValue
+  );
+  const [selectedTime, setSelectedTime] = useState<Time | undefined>(
+    defaultValue ? getTimeFromDate(defaultValue) : undefined
+  );
 
-  const [minDate, setMinDate] = useState<Date | "now" | undefined>();
-  const [minTime, setMinTime] = useState<Time | "now" | undefined>();
+  const [minDate, setMinDate] = useState<Date | "now" | undefined>(
+    initialMinDate
+  );
+  const [minTime, setMinTime] = useState<Time | "now" | undefined>(
+    initialMinTime
+  );
 
   // ---------------------------------------------------------------
   // INITIALIZATION (Runs Only Once)
@@ -62,6 +71,12 @@ const DateTimeSelector = ({
   useEffect(() => {
     if (initialized) return;
     setInitialized(true);
+
+    if (readonly && defaultValue) {
+      setSelectedDate(defaultValue);
+      setSelectedTime(getTimeFromDate(defaultValue));
+      return;
+    }
 
     // Handle initial default value
     if (defaultValue) {
@@ -79,14 +94,11 @@ const DateTimeSelector = ({
         setMinTime(initialMinTime ?? undefined);
       }
 
-      setMinDate(initialMinDate);
-
       if (onChange) onChange(defaultValue);
       return;
     }
 
     // If NO default value → apply min rules
-    setMinDate(initialMinDate);
     const now = new Date();
     const currentTime = getTimeFromDate(now); // or however your helper returns time
 
@@ -95,6 +107,7 @@ const DateTimeSelector = ({
       (initialMinDate && isDateToday(initialMinDate));
 
     if (
+      initialMinDate &&
       isMinDateToday &&
       initialMinTime &&
       isTimeAfter(currentTime, initialMinTime)
@@ -125,6 +138,8 @@ const DateTimeSelector = ({
   }
 
   function handleDateChange(date: Date) {
+    if (readonly) return;
+
     if (date === selectedDate) return;
     setSelectedDate(date);
 
@@ -132,6 +147,7 @@ const DateTimeSelector = ({
     const now = new Date();
     const currentTime = getTimeFromDate(now);
     if (
+      initialMinDate &&
       isDateToday(date) &&
       initialMinTime &&
       isTimeAfter(currentTime, initialMinTime)
@@ -148,16 +164,27 @@ const DateTimeSelector = ({
   }
 
   function handleTimeChange(time: Time) {
+    if (readonly) return;
+
     if (time === selectedTime) return;
 
     setSelectedTime(time);
+    if (maxTime && timeToMinutes(time) > timeToMinutes(maxTime)) {
+      setSelectedTime(maxTime);
+    }
+
+    if (minTime && timeToMinutes(time) < timeToMinutes(minTime)) {
+      setSelectedTime(
+        minTime === "now" ? getTimeFromDate(new Date()) : minTime
+      );
+    }
 
     if (selectedDate && initialMinDate && initialMinDate !== "now") {
       const allowed =
         isDateTimeAfter(selectedDate, time, initialMinDate) ||
         selectedDate > initialMinDate;
 
-      setMinDate(allowed ? initialMinDate : addDays(initialMinDate, 1));
+      setSelectedDate(allowed ? selectedDate : addDays(initialMinDate, 1));
     }
 
     // Only emit if we have a valid date already selected
@@ -290,11 +317,10 @@ const DateTimeSelector = ({
       >
         <DatePicker
           value={selectedDate}
-          onChange={(date) => {
-            handleDateChange(date);
-          }}
-          minDate={minDate}
-          maxDate={maxDate}
+          onChange={handleDateChange}
+          minDate={readonly ? undefined : minDate}
+          maxDate={readonly ? undefined : maxDate}
+          readonly={readonly}
         />
       </div>
 
@@ -307,8 +333,14 @@ const DateTimeSelector = ({
         <TimePicker
           value={selectedTime}
           onChange={handleTimeChange}
-          minTime={minTime === "now" ? getTimeFromDate(new Date()) : minTime}
-          maxTime={maxTime}
+          minTime={
+            readonly
+              ? undefined
+              : minTime === "now"
+              ? getTimeFromDate(new Date())
+              : minTime
+          }
+          maxTime={readonly ? undefined : maxTime}
         />
       </div>
     </>

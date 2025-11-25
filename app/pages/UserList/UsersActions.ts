@@ -10,7 +10,7 @@ import { prisma } from "@/prisma/client";
 
 export type UserWithStatus = {
   id: string;
-  name: string;
+  name?: string;
   email: string;
   image: string | null;
   type: UserType;

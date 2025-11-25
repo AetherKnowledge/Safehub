@@ -1,29 +1,70 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 const staffMembers = [
   {
-    name: "Ms. Dela Cruz",
-    role: "Assistant Manager",
+    name: "Prof. Maria Isabel Guevara, RGC",
+    role: "Coordinator",
     description:
-      "Supports students in scheduling and coordinating counseling sessions, ensuring every booking is handled with care.",
+      "Oversees and manages the counseling schedule, ensuring students receive timely, organized, and compassionate support.",
+    src: "/images/staff/Ms_Maria_Isabel_Guevara.jpg",
   },
   {
-    name: "Mr. Manansala",
-    role: "Assistant Manager",
+    name: "Ms. Filomena De Jesus, RGC",
+    role: "Guidance Counselor",
     description:
-      "Helps manage student cases and availability so counselors can focus on meaningful, one-on-one conversations.",
+      "Provides expert guidance and manages student cases with care, helping ensure meaningful and focused one-on-one sessions.",
+    src: "/images/staff/Ms_Filomena_De_Jesus.jpg",
   },
   {
-    name: "Ms. Trinidad",
-    role: "Assistant Manager",
+    name: "Ms. Connie Magsino, RGC, RPm",
+    role: "Guidance Counselor",
     description:
-      "Provides guidance and assistance for students who need help navigating SafeHub and SWS services.",
+      "Supports students through personalized guidance and assists those navigating SafeHub and SWS services.",
+    src: "/images/staff/Ms_Connie_Magsino.jpg",
+  },
+  {
+    name: "Ms. Sciroan Torres, RPm, CHRA",
+    role: "Psychometrician/Career and Job Placement Officer",
+    description:
+      "Assists students with assessments, career guidance, and navigation of SafeHub and SWS resources for their personal and professional development.",
+    src: "/images/staff/Ms_Sciroan_Torres.jpg",
+  },
+  {
+    name: "Ms. Justine Fe Brusola",
+    role: "Psychometrician",
+    description:
+      "Facilitates assessments and offers supportive guidance while helping students access SafeHub and SWS services effectively.",
+    src: "/images/staff/Ms_Justine_Fe_Brusola.jpg",
   },
 ];
 
 const Staff = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleNext = () => {
+    setActiveIndex((prev) => (prev + 1) % staffMembers.length);
+  };
+
+  const handlePrev = () => {
+    setActiveIndex((prev) =>
+      (prev - 1 + staffMembers.length) % staffMembers.length
+    );
+  };
+
+  useEffect(() => {
+    if (isHovered) return;
+
+    const id = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % staffMembers.length);
+    }, 4500);
+
+    return () => clearInterval(id);
+  }, [isHovered]);
+
   return (
     <section
       id="staff"
@@ -49,40 +90,93 @@ const Staff = () => {
           </p>
         </motion.div>
 
-        <div className="grid gap-8 md:grid-cols-3">
-          {staffMembers.map((staff, index) => (
-            <motion.article
-              key={staff.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="card bg-base-100 text-base-content shadow-xl border border-white/10 hover:-translate-y-2 hover:shadow-2xl transition-transform duration-300"
-            >
-              <figure className="p-4 pb-0 flex justify-center">
-                <img
-                  src="/images/noUser.svg"
-                  alt={staff.name}
-                  className="w-32 h-32 rounded-full object-cover"
+        <div className="relative mt-6">
+          <div
+            className="relative overflow-hidden"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <div className="flex items-stretch justify-center gap-4 md:gap-6">
+              {/* Prev button beside first visible card */}
+              <button
+                type="button"
+                onClick={handlePrev}
+                className="btn btn-sm btn-ghost border border-primary/30 text-primary-content/80 hover:border-primary/60 self-center"
+              >
+                ◀
+              </button>
+
+              {[-1, 0, 1].map((offsetStep) => {
+                const index =
+                  (activeIndex + offsetStep + staffMembers.length) %
+                  staffMembers.length;
+                const staff = staffMembers[index];
+                const distance = Math.abs(offsetStep);
+                const scale = Math.max(0.75, 1 - distance * 0.15);
+                const opacity = Math.max(0.5, 1 - distance * 0.25);
+                const x = offsetStep * 120; // side cards slide in/out horizontally
+
+                return (
+                  <motion.article
+                    key={staff.name}
+                    initial={{ opacity: 0, x }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    animate={{ scale, opacity, x }}
+                    transition={{ type: "tween", duration: 0.6, ease: "easeInOut" }}
+                    className="card bg-base-100 text-base-content shadow-xl border border-white/10 origin-center w-52 md:w-60 lg:w-64"
+                  >
+                    <figure className="p-4 pb-0 flex justify-center">
+                      <img
+                        src={staff.src}
+                        alt={staff.name}
+                        className="w-24 h-24 md:w-28 md:h-28 rounded-full object-cover"
+                      />
+                    </figure>
+                    <div className="card-body items-center text-center px-5 pb-6">
+                      <h3 className="card-title flex flex-col gap-0 text-sm md:text-lg">
+                        {staff.name}
+                        <span className="text-xs md:text-sm text-primary font-medium">
+                          {staff.role}
+                        </span>
+                      </h3>
+                      <p className="text-xs md:text-sm text-base-content/80 mt-2">
+                        {staff.description}
+                      </p>
+                    </div>
+                  </motion.article>
+                );
+              })}
+
+              {/* Next button beside last visible card */}
+              <button
+                type="button"
+                onClick={handleNext}
+                className="btn btn-sm btn-ghost border border-primary/30 text-primary-content/80 hover:border-primary/60 self-center"
+              >
+                ▶
+              </button>
+            </div>
+            <div className="mt-4 flex justify-center gap-2">
+              {staffMembers.map((staff, index) => (
+                <button
+                  key={staff.name}
+                  type="button"
+                  onClick={() => setActiveIndex(index)}
+                  className={`h-2.5 w-2.5 rounded-full border transition-colors duration-200 ${
+                    index === activeIndex
+                      ? "bg-primary border-primary"
+                      : "bg-primary-content/20 border-primary-content/40 hover:bg-primary-content/40"
+                  }`}
+                  aria-label={`Go to ${staff.name}`}
                 />
-              </figure>
-              <div className="card-body items-center text-center">
-                <h3 className="card-title flex flex-col gap-0">
-                  {staff.name}
-                  <span className="text-sm text-primary font-medium">
-                    {staff.role}
-                  </span>
-                </h3>
-                <p className="text-sm text-base-content/80 mt-2">
-                  {staff.description}
-                </p>
-              </div>
-            </motion.article>
-          ))}
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
   );
-};
+}
 
 export default Staff;

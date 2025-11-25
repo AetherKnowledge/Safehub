@@ -42,7 +42,7 @@ const Hero = () => {
       </div>
 
       {/* Content layer */}
-      <div className="relative z-10 flex isolate items-center gap-10 text-white px-6 lg:px-20 flex-col-reverse lg:flex-row w-full max-w-6xl">
+      <div className="relative z-10 flex isolate items-center gap-10 text-white px-8 lg:px-20 flex-col-reverse lg:flex-row w-full max-w-8xl">
         <motion.div
           className="w-full lg:w-1/2 text-center lg:text-left flex flex-col items-center lg:items-start"
           variants={containerVariants}
@@ -51,7 +51,7 @@ const Hero = () => {
         >
           <motion.p
             variants={itemVariants}
-            className="mb-3 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-medium tracking-[0.2em] uppercase backdrop-blur-sm"
+            className="mb-3 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-6 py-1 text-xs font-medium tracking-[0.2em] uppercase backdrop-blur-sm"
           >
             LCUP · Social Welfare Services
           </motion.p>

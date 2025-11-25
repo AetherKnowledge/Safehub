@@ -6,76 +6,78 @@ import { formatDateDisplay, formatTime } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { AppointmentData } from "../AppointmentActions";
-import { ViewModal } from "./ViewAppointmentButton";
+import ViewModal from "./ViewModal";
 
 const UpcomingAppointmentRow = ({
   appointment,
 }: {
   appointment: AppointmentData;
 }) => {
-  const session = useSession();
   const [showModal, setShowModal] = useState(false);
-
-  const userData =
-    session?.data?.user.type === UserType.Student
-      ? appointment.counselor
-      : appointment.student;
+  const session = useSession();
+  const userType = session?.data?.user.type || UserType.Student;
+  const studentData = appointment.student;
+  const counselorData = appointment.counselor;
 
   return (
-    <tr
-      className={`flex flex-row border border-base-content/10 rounded p-2 mb-2 items-center gap-4 w-full ${
-        session.data?.user.type === UserType.Counselor
-          ? "cursor-pointer hover:bg-base-300/50 active:bg-base-300 transition-colors"
-          : ""
-      }`}
-      onClick={() => {
-        if (session.data?.user.type === UserType.Counselor) {
-          setShowModal(true);
-        }
-      }}
-    >
-      <td>
-        <UserImage
-          name={
-            userData.user.name ?? userData.user.email.split("@")[0] ?? "User"
-          }
-          width={10}
-          src={userData.user.image || undefined}
-        />
-        {showModal && (
-          <ViewModal
-            appointment={appointment}
-            onClose={() => {
-              setShowModal(false);
-            }}
+    <>
+      <tr
+        className={`flex flex-row border border-base-content/10 rounded p-2 mb-2 items-center gap-4 w-full cursor-pointer hover:bg-base-300/50 active:bg-base-300 transition-colors`}
+        onClick={() => setShowModal(true)}
+      >
+        <td>
+          <UserImage
+            name={
+              userType === UserType.Counselor
+                ? studentData.user.name ??
+                  studentData.user.email.split("@")[0] ??
+                  "User"
+                : counselorData.user.name ??
+                  counselorData.user.email.split("@")[0] ??
+                  "User"
+            }
+            width={10}
+            src={
+              userType === UserType.Counselor
+                ? studentData.user.image
+                : counselorData.user.image || undefined
+            }
           />
-        )}
-      </td>
-      <td className="flex flex-col w-full">
-        <p className="text-[10px]">
-          {session.data?.user.type === UserType.Counselor
-            ? "Student:"
-            : "Counselor:"}
-        </p>
-        <p className="font-semibold text-xs">{userData.user.name}</p>
-      </td>
-      <td className="flex flex-col w-full">
-        <p className="text-[10px]">Date:</p>
-        <p className="font-semibold text-xs">
-          {formatDateDisplay(appointment.startTime, false)}
-        </p>
-      </td>
-      <td className="flex flex-col w-full">
-        <p className="text-[10px]">Time:</p>
-        <p className="font-semibold text-xs">
-          {formatTime(appointment.startTime)}
-        </p>
-      </td>
-      {/* <td className="flex flex-col w-full">
-        <p className="text-[10px]">Room:</p>
-        <p className="font-semibold text-xs">MR 143</p>
-      </td> */}
-    </tr>
+        </td>
+        <td className="flex flex-col w-full">
+          <p className="text-[10px]">
+            {session.data?.user.type === UserType.Counselor
+              ? "Student:"
+              : "Counselor:"}
+          </p>
+          <p className="font-semibold text-xs">
+            {userType === UserType.Counselor
+              ? studentData.user.name
+              : counselorData.user.name}
+          </p>
+        </td>
+        <td className="flex flex-col w-full">
+          <p className="text-[10px]">Date:</p>
+          <p className="font-semibold text-xs">
+            {formatDateDisplay(appointment.startTime, false)}
+          </p>
+        </td>
+        <td className="flex flex-col w-full">
+          <p className="text-[10px]">Time:</p>
+          <p className="font-semibold text-xs">
+            {formatTime(appointment.startTime)}
+          </p>
+        </td>
+      </tr>
+      {showModal && (
+        <ViewModal
+          appointment={appointment}
+          onClose={() => {
+            setShowModal(false);
+          }}
+        />
+      )}
+    </>
   );
 };
 

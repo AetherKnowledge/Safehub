@@ -6,6 +6,7 @@ import HorizontalItemsBox from "@/app/components/Input/HorizontalItemsBox";
 import LinkedSelector from "@/app/components/Input/LinkedSelector";
 import { SelectBoxProps } from "@/app/components/Input/SelectBox";
 import ModalBase from "@/app/components/Popup/ModalBase";
+import { User } from "@/app/generated/prisma";
 import {
   departmentsWithPrograms,
   genderOptions,
@@ -13,30 +14,34 @@ import {
   yearOptions,
 } from "../../Onboarding/Questions";
 import { GuardianDetails } from "../../Settings/Settings";
-import { AppointmentData, StudentDetailsData } from "../AppointmentActions";
+import { StudentDetailsData } from "../AppointmentActions";
 import CloseButton from "./CloseButton";
 import UserTopBar from "./UserTopBar";
 
-const StudentDetailsPopup = ({
-  appointment,
+const UserDetailsPopup = ({
+  user,
   onClose,
+  chatId,
+  children,
 }: {
-  appointment: AppointmentData;
-  onClose: () => void;
+  user: Pick<User, "name" | "email" | "image">;
+  onClose?: () => void;
+  chatId?: string;
+  children?: React.ReactNode;
 }) => {
   return (
     <ModalBase onClose={onClose}>
       <div className="bg-base-100 p-0 rounded-lg shadow-lg text-base-content max-w-2xl flex-1 flex flex-col">
-        <CloseButton onClick={onClose} />
+        <CloseButton onClick={() => onClose && onClose()} />
         <div className="p-6 pt-0">
           <div className="flex flex-col gap-3">
             <UserTopBar
-              userName={appointment.student.user.name || undefined}
-              userEmail={appointment.student.user.email}
-              userImgSrc={appointment.student.user.image || undefined}
-              chatId={appointment.chatId}
+              userName={user.name || user.email.split("@")[0] || "User"}
+              userEmail={user.email}
+              userImgSrc={user.image || undefined}
+              chatId={chatId}
             />
-            <StudentDetails user={appointment.student.user} />
+            {children}
           </div>
         </div>
       </div>
@@ -173,4 +178,4 @@ export function StudentDetails({ user }: { user: StudentDetailsData }) {
   );
 }
 
-export default StudentDetailsPopup;
+export default UserDetailsPopup;

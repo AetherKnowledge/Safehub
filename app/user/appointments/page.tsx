@@ -7,7 +7,12 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
 type Props = {
-  searchParams: Promise<{ date?: string; view?: string; showAll?: string }>;
+  searchParams: Promise<{
+    date?: string;
+    view?: string;
+    showAll?: string;
+    appointmentId?: string;
+  }>;
 };
 
 const NewAppointmentsPage = async ({ searchParams }: Props) => {
@@ -25,12 +30,22 @@ const NewAppointmentsPage = async ({ searchParams }: Props) => {
     viewParam === ViewMode.CALENDAR ? ViewMode.CALENDAR : ViewMode.LIST;
 
   const showAll = params.showAll ? params.showAll === "true" : true;
+
+  const appointmentId = params.appointmentId;
+
   console.log("Show All:", showAll);
 
   if (session.user.type === UserType.Student)
-    return <StudentAppointmentPage date={date} />;
+    return <StudentAppointmentPage date={date} appointmentId={appointmentId} />;
   else if (session.user.type === UserType.Counselor)
-    return <AppointmentsPage date={date} viewMode={view} showAll={showAll} />;
+    return (
+      <AppointmentsPage
+        date={date}
+        viewMode={view}
+        showAll={showAll}
+        appointmentId={appointmentId}
+      />
+    );
 };
 
 function isValidDate(dateString: string): boolean {

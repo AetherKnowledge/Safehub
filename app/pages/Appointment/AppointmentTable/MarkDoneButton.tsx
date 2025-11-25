@@ -18,6 +18,13 @@ const MarkDoneButton = ({ appointment }: MarkDoneButtonProps) => {
   const statusPopup = usePopup();
 
   const handleUpdate = async (appointmentStatus: AppointmentStatus) => {
+    const confirm = await statusPopup.showYesNo(
+      `Are you sure you want to mark this appointment as done?`
+    );
+    if (!confirm) {
+      return;
+    }
+
     statusPopup.showLoading("Updating appointment...");
 
     const result = await updateAppointmentStatus({

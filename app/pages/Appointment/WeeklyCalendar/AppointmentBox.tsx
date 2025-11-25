@@ -2,7 +2,6 @@
 import { formatTime } from "@/lib/utils";
 import { useState } from "react";
 import { AppointmentData } from "../AppointmentActions";
-import { ViewModal } from "../AppointmentTable/ViewAppointmentButton";
 import {
   getAppointmentHeight,
   getAppointmentTopPosition,
@@ -10,6 +9,7 @@ import {
   getBorderStatusColor,
   getStatusTextColor,
 } from "./WeeklyCalendarUtils";
+import ViewModal from "../AppointmentTable/ViewModal";
 
 export interface AppointmentBoxProps {
   appointment: AppointmentData;

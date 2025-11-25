@@ -21,7 +21,9 @@ const UserImage = ({
         bordered
           ? `border-primary bg-primary`
           : "border-transparent bg-transparent"
-      }`}
+      } 
+          
+      `}
       style={{
         width: `calc(var(--spacing) * ${width})`,
         height: `calc(var(--spacing) * ${width})`,
@@ -33,14 +35,22 @@ const UserImage = ({
         <Image
           src={src}
           alt={name ?? "counselor Avatar"}
-          className={`rounded-full`}
+          className={`rounded-full transition duration-150 ${
+            onClick
+              ? "hover:brightness-90 active:brightness-75 cursor-pointer"
+              : ""
+          }`}
           fill
         />
       ) : (
         <div
           role="button"
           tabIndex={0}
-          className={`rounded-full w-full h-full bg-gray-500 text-white flex items-center justify-center font-bold hover:brightness-90 active:brightness-75 transition duration-150 select-none cursor-pointer`}
+          className={`rounded-full w-full h-full bg-gray-500 text-white flex items-center justify-center font-bold select-none transition duration-150 ${
+            onClick
+              ? "hover:brightness-90 active:brightness-75 cursor-pointer"
+              : ""
+          }`}
           style={{
             fontSize: `calc(var(--spacing) * ${width / 2})`,
           }}

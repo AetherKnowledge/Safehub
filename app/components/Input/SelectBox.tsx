@@ -45,7 +45,6 @@ const SelectBox = ({
   useEffect(() => {
     async function setOptionsToCounselors() {
       const counselors = await getCounselors();
-      console.log("Fetched counselors for SelectBox:", counselors);
 
       const counselorOptions: Option[] = counselors.map((counselor) => ({
         label: (counselor.name || counselor.email) + " - " + counselor.email,

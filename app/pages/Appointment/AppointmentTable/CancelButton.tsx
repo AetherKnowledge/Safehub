@@ -18,6 +18,14 @@ const CancelButton = ({ appointment }: { appointment: AppointmentData }) => {
   const statusPopup = usePopup();
 
   const handleCancel = async (formData: FormData) => {
+    const confirm = await statusPopup.showYesNo(
+      `Are you sure you want to cancel this appointment?`
+    );
+
+    if (!confirm) {
+      return;
+    }
+
     statusPopup.showLoading("Updating appointment...");
 
     const result = await cancelAppointmentStudent(formData);

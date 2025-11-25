@@ -22,6 +22,14 @@ const SessionSummaryButton = ({
   const statusPopup = usePopup();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    const confirm = await statusPopup.showYesNo(
+      `Are you sure you want to submit this session summary? This action cannot be undone.`
+    );
+
+    if (!confirm) {
+      return;
+    }
+
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
@@ -39,10 +47,7 @@ const SessionSummaryButton = ({
   }
 
   const canSubmit =
-    session?.data?.user.type === UserType.Counselor &&
-    !appointment.summary &&
-    !appointment.observations &&
-    !appointment.recommendations;
+    session?.data?.user.type === UserType.Counselor && !appointment.summary;
 
   return (
     <>

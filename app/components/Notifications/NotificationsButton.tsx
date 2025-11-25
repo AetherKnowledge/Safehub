@@ -1,6 +1,10 @@
 "use client";
 
-import { Notification, NotificationType } from "@/app/generated/prisma";
+import {
+  Notification,
+  NotificationType,
+  UserType,
+} from "@/app/generated/prisma";
 import { ReactNode, useEffect, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
@@ -19,6 +23,7 @@ import {
 import {
   AppointmentCreateNotification,
   AppointmentReminderNotification,
+  AppointmentUpdateScheduleNotification,
   AppointmentUpdateStatusNotification,
   PostNotification,
 } from "./schema";
@@ -36,6 +41,7 @@ const NotificationsButton = () => {
       const result = await fetchNotificationsForUser();
       if (result.success && result.data) {
         setNotifications(result.data);
+        console.log("Fetched notifications:", result.data);
       }
     }
 
@@ -240,7 +246,8 @@ export const NotificationBox = ({
           </p>
           <Link
             className="text-primary hover:underline w-fit"
-            href={notificationTypeToLink(notification.type)}
+            href={notificationTypeToLink(notification.type, notificationData)}
+            onCanPlay={onCloseAction}
           >
             View
           </Link>
@@ -287,8 +294,8 @@ function parseNotificationData(
   | PostNotification
   | null {
   switch (notification.type) {
-    case NotificationType.AppointmentCreated ||
-      NotificationType.AppointmentReminder:
+    case NotificationType.AppointmentCreated:
+    case NotificationType.AppointmentReminder:
       return JSON.parse(
         JSON.stringify(notification.data)
       ) as AppointmentCreateNotification;
@@ -296,6 +303,10 @@ function parseNotificationData(
       return JSON.parse(
         JSON.stringify(notification.data)
       ) as AppointmentUpdateStatusNotification;
+    case NotificationType.AppointmentUpdatedSchedule:
+      return JSON.parse(
+        JSON.stringify(notification.data)
+      ) as AppointmentUpdateScheduleNotification;
     case NotificationType.AppointmentReminder:
       return JSON.parse(
         JSON.stringify(notification.data)
@@ -309,21 +320,51 @@ function parseNotificationData(
 
 function notificationTypeToImage(type: NotificationType): ReactNode {
   switch (type) {
-    case NotificationType.AppointmentCreated ||
-      NotificationType.AppointmentReminder ||
-      NotificationType.AppointmentUpdatedStatus:
+    case NotificationType.AppointmentCreated:
+    case NotificationType.AppointmentReminder:
+    case NotificationType.AppointmentUpdatedSchedule:
+    case NotificationType.AppointmentUpdatedStatus:
       return <CiCalendarDate className="w-5 h-5" />;
     default:
       return <CiImageOn className="w-5 h-5" />;
   }
 }
 
-function notificationTypeToLink(type: NotificationType): string {
+function notificationTypeToLink(
+  type: NotificationType,
+  data:
+    | AppointmentCreateNotification
+    | AppointmentUpdateStatusNotification
+    | AppointmentReminderNotification
+    | AppointmentUpdateScheduleNotification
+    | PostNotification
+    | null,
+  userType?: UserType
+): string {
   switch (type) {
-    case NotificationType.AppointmentCreated ||
-      NotificationType.AppointmentReminder ||
-      NotificationType.AppointmentUpdatedStatus:
-      return "/user/appointments";
+    case NotificationType.AppointmentCreated:
+    case NotificationType.AppointmentReminder:
+    case NotificationType.AppointmentUpdatedSchedule:
+    case NotificationType.AppointmentUpdatedStatus:
+      const params = new URLSearchParams({
+        appointmentId: (
+          data as AppointmentCreateNotification
+        ).appointmentId.toString(),
+      });
+      const url = `/user/appointments?${params.toString()}`;
+
+      return url;
+
+    case NotificationType.NewPost:
+      const postParams = new URLSearchParams({
+        postId: (data as PostNotification).postId.toString(),
+      });
+      const postUrl = `/user/${
+        userType === UserType.Admin ? "events" : "dashboard"
+      }?${postParams.toString()}`;
+
+      return postUrl;
+
     default:
       return "/user/dashboard";
   }

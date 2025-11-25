@@ -1,5 +1,5 @@
 import StatusBadge, { FollowUpBadge } from "@/app/components/Table/StatusBadge";
-import { AppointmentStatus, UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma";
 import { formatDateDisplay, formatTime } from "@/lib/utils";
 import {
   FaRegCalendar,
@@ -8,11 +8,6 @@ import {
 } from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
 import { AppointmentData } from "../AppointmentActions";
-import ApproveButton from "./ApproveButton";
-import CancelButton from "./CancelButton";
-import EditButton from "./EditButton";
-import EvaluationButton from "./EvaluationButton";
-import SessionSummaryButton from "./SessionSummaryButton";
 import UserCell from "./UserCell";
 import ViewAppointmentButton from "./ViewAppointmentButton";
 
@@ -106,62 +101,11 @@ function AppointmentRow({
       </td>
       <td className="px-3 py-4">
         <div className="flex flex-col items-center justify-center gap-2">
-          {userType === UserType.Student ? (
-            <StudentActionButton appointment={appointment} />
-          ) : (
-            <>
-              <ViewAppointmentButton appointment={appointment} />
-              {appointment.evaluationData && (
-                <EvaluationButton
-                  appointment={appointment}
-                  userType={userType}
-                />
-              )}
-            </>
-          )}
+          <ViewAppointmentButton appointment={appointment} />
         </div>
       </td>
     </tr>
   );
-}
-
-function StudentActionButton({
-  appointment,
-}: {
-  appointment: AppointmentData;
-}) {
-  switch (appointment.status) {
-    case AppointmentStatus.Pending:
-      return (
-        <>
-          {appointment.parentId ? (
-            <ApproveButton appointment={appointment} />
-          ) : (
-            <EditButton appointment={appointment} />
-          )}
-          <CancelButton appointment={appointment} />
-        </>
-      );
-    case AppointmentStatus.Approved:
-      return (
-        <>
-          {!appointment.parentId && <EditButton appointment={appointment} />}
-          <CancelButton appointment={appointment} />
-        </>
-      );
-    case AppointmentStatus.Completed:
-      return (
-        <>
-          <EvaluationButton
-            appointment={appointment}
-            userType={UserType.Student}
-          />
-          <SessionSummaryButton appointment={appointment} />
-        </>
-      );
-    default:
-      return null;
-  }
 }
 
 export default AppointmentsTable;

@@ -14,6 +14,16 @@ const RejectButton = ({ appointment }: { appointment: AppointmentData }) => {
   const statusPopup = usePopup();
 
   const handleUpdate = async (appointmentStatus: AppointmentStatus) => {
+    const confirm = await statusPopup.showYesNo(
+      `Are you sure you want to ${
+        appointmentStatus === AppointmentStatus.Rejected ? "reject" : "cancel"
+      } this appointment?`
+    );
+
+    if (!confirm) {
+      return;
+    }
+
     statusPopup.showLoading("Updating appointment...");
 
     const result = await updateAppointmentStatus({

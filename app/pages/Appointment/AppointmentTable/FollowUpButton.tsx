@@ -55,7 +55,7 @@ const FollowUpButton = ({ appointment }: { appointment: AppointmentData }) => {
     );
 
     if (conflicts && conflicts.length > 0) {
-      const confirm = await statusPopup.showYesNo(
+      const confirm = await statusPopup.showWarning(
         `The selected time conflicts with ${conflicts.length} existing appointment(s). Do you still want to proceed?`
       );
       if (!confirm) return;

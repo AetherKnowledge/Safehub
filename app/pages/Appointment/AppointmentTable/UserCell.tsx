@@ -4,7 +4,7 @@ import UserImage from "@/app/components/UserImage";
 import { UserType } from "@/app/generated/prisma";
 import { useState } from "react";
 import { AppointmentData } from "../AppointmentActions";
-import StudentDetailsPopup from "./StudentDetailsPopup";
+import UserDetailsPopup, { StudentDetails } from "./UserDetailsPopup";
 
 const UserCell = ({
   userType,
@@ -33,7 +33,9 @@ const UserCell = ({
             ? appointment.counselor.user.image || undefined
             : appointment.student.user.image || undefined
         }
-        onClick={() => setShowModal(true)}
+        onClick={
+          userType === UserType.Counselor ? () => setShowModal(true) : undefined
+        }
       />
       <p className="font-semibold text-sm">
         {userType === UserType.Student
@@ -45,10 +47,18 @@ const UserCell = ({
             "Student"}
       </p>
       {showModal && (
-        <StudentDetailsPopup
-          appointment={appointment}
+        <UserDetailsPopup
+          user={
+            userType === UserType.Counselor
+              ? appointment.student.user
+              : appointment.counselor.user
+          }
           onClose={() => setShowModal(false)}
-        />
+        >
+          {userType === UserType.Counselor && (
+            <StudentDetails user={appointment.student.user} />
+          )}
+        </UserDetailsPopup>
       )}
     </>
   );

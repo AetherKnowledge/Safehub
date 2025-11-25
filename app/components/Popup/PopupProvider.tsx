@@ -22,6 +22,11 @@ interface PopupProviderContextType {
     onYesCallback?: () => void,
     onNoCallback?: () => void
   ) => Promise<boolean>;
+  showWarning: (
+    message: string,
+    onYesCallback?: () => void,
+    onNoCallback?: () => void
+  ) => Promise<boolean>;
   hidePopup: () => void;
 }
 
@@ -30,11 +35,12 @@ export const PopupProviderContext = createContext<
 >(undefined);
 
 enum PopupType {
-  NONE,
-  LOADING,
-  SUCCESS,
-  ERROR,
-  YESNO,
+  NONE = "NONE",
+  LOADING = "LOADING",
+  SUCCESS = "SUCCESS",
+  ERROR = "ERROR",
+  YESNO = "YESNO",
+  WARNING = "WARNING",
 }
 
 export function usePopup() {
@@ -55,6 +61,42 @@ const PopupProvider = ({ children }: { children: React.ReactNode }) => {
   const [onNo, setOnNo] = useState<(() => void) | null>(null);
   // Keep a resolver for pending Yes/No prompts so callers can await the result
   const pendingResolveRef = useRef<((result: boolean) => void) | null>(null);
+
+  function handleYesNo(
+    msg: string,
+    onYesCallback?: () => void,
+    onNoCallback?: () => void,
+    warning = false
+  ) {
+    setMessage(msg);
+    return new Promise<boolean>((resolve) => {
+      // store resolver for external dismissal (e.g., hidePopup)
+      pendingResolveRef.current = resolve;
+      // wire up click handlers
+      setOnYes(() => () => {
+        resolve(true);
+        if (onYesCallback) onYesCallback();
+        pendingResolveRef.current = null;
+        // cleanup
+        setPopupType(PopupType.NONE);
+        setMessage(null);
+        setOnYes(null);
+        setOnNo(null);
+      });
+      setOnNo(() => () => {
+        resolve(false);
+        if (onNoCallback) onNoCallback();
+        pendingResolveRef.current = null;
+
+        // cleanup
+        setPopupType(PopupType.NONE);
+        setMessage(null);
+        setOnYes(null);
+        setOnNo(null);
+      });
+      setPopupType(warning ? PopupType.WARNING : PopupType.YESNO);
+    });
+  }
 
   const popupContextValue: PopupProviderContextType = {
     showLoading: (msg?: string) => {
@@ -81,38 +123,21 @@ const PopupProvider = ({ children }: { children: React.ReactNode }) => {
       onYesCallback?: () => void,
       onNoCallback?: () => void
     ) => {
-      setMessage(msg);
-      return new Promise<boolean>((resolve) => {
-        // store resolver for external dismissal (e.g., hidePopup)
-        pendingResolveRef.current = resolve;
-        // wire up click handlers
-        setOnYes(() => () => {
-          resolve(true);
-          if (onYesCallback) onYesCallback();
-          pendingResolveRef.current = null;
-          // cleanup
-          setPopupType(PopupType.NONE);
-          setMessage(null);
-          setOnYes(null);
-          setOnNo(null);
-        });
-        setOnNo(() => () => {
-          resolve(false);
-          if (onNoCallback) onNoCallback();
-          pendingResolveRef.current = null;
-
-          // cleanup
-          setPopupType(PopupType.NONE);
-          setMessage(null);
-          setOnYes(null);
-          setOnNo(null);
-        });
-        setPopupType(PopupType.YESNO);
-      });
+      return handleYesNo(msg, onYesCallback, onNoCallback, false);
+    },
+    showWarning: (
+      msg: string,
+      onYesCallback?: () => void,
+      onNoCallback?: () => void
+    ) => {
+      return handleYesNo(msg, onYesCallback, onNoCallback, true);
     },
     hidePopup: () => {
       // If a Yes/No is pending and user programmatically hides the popup, resolve as false
-      if (popupType === PopupType.YESNO && pendingResolveRef.current) {
+      if (
+        (popupType === PopupType.YESNO || popupType === PopupType.WARNING) &&
+        pendingResolveRef.current
+      ) {
         pendingResolveRef.current(false);
         pendingResolveRef.current = null;
       }
@@ -145,6 +170,14 @@ const PopupProvider = ({ children }: { children: React.ReactNode }) => {
           message={message || undefined}
           onYes={onYes || undefined}
           onNo={onNo || undefined}
+        />
+      )}
+      {popupType === PopupType.WARNING && (
+        <YesNoPopup
+          message={message || undefined}
+          onYes={onYes || undefined}
+          onNo={onNo || undefined}
+          warning
         />
       )}
       {popupType === PopupType.ERROR && (

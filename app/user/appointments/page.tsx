@@ -12,6 +12,7 @@ type Props = {
     view?: string;
     showAll?: string;
     appointmentId?: string;
+    status?: string;
   }>;
 };
 
@@ -29,6 +30,8 @@ const NewAppointmentsPage = async ({ searchParams }: Props) => {
   const view =
     viewParam === ViewMode.CALENDAR ? ViewMode.CALENDAR : ViewMode.LIST;
 
+  const status = params.status;
+
   const showAll = params.showAll ? params.showAll === "true" : true;
 
   const appointmentId = params.appointmentId;
@@ -36,14 +39,16 @@ const NewAppointmentsPage = async ({ searchParams }: Props) => {
   console.log("Show All:", showAll);
 
   if (session.user.type === UserType.Student)
-    return <StudentAppointmentPage date={date} appointmentId={appointmentId} />;
+    return (
+      <StudentAppointmentPage appointmentId={appointmentId} status={status} />
+    );
   else if (session.user.type === UserType.Counselor)
     return (
       <AppointmentsPage
         date={date}
         viewMode={view}
-        showAll={showAll}
         appointmentId={appointmentId}
+        status={status}
       />
     );
 };

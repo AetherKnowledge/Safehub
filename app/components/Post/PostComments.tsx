@@ -65,7 +65,7 @@ const PostComments = ({ post }: { post: PostData }) => {
       {/* Comments */}
       <Divider />
       <div
-        className="flex-1 min-h-0 max-h-[30vh] overflow-y-auto px-5 flex flex-col "
+        className="flex-1 min-h-0 max-h-[60vh] overflow-y-auto px-5 flex flex-col "
         ref={messageContainerRef}
       >
         <div className="flex flex-col h-full">

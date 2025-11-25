@@ -85,7 +85,7 @@ export async function getAppointments(): Promise<AppointmentData[]> {
         ? { studentId: session.user.id }
         : { counselorId: session.user.id },
     orderBy: {
-      createdAt: "asc",
+      startTime: "desc",
     },
     include: {
       parent: {
@@ -815,7 +815,7 @@ export async function getAppointmentsForDateRange(
       },
     },
     orderBy: {
-      startTime: "asc",
+      startTime: "desc",
     },
   });
 
@@ -934,7 +934,7 @@ export async function getAppointmentsForDate(
       },
     },
     orderBy: {
-      startTime: "asc",
+      startTime: "desc",
     },
   });
 

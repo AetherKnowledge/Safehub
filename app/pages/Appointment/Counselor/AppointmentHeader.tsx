@@ -17,6 +17,16 @@ const AppointmentHeader = () => {
   const [todayAppointmentsCount, setTodayAppointmentsCount] = useState(0);
   const popup = usePopup();
 
+  const pathname = usePathname();
+
+  const status = searchParams.get("status") || "all";
+
+  const updateStatus = (newStatus: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("status", newStatus);
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   // Search params are also stored here for immediate UI updates
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.LIST);
   const [date, setDate] = useState<Date>(new Date());
@@ -126,12 +136,20 @@ const AppointmentHeader = () => {
           getDateRangeString={getDateRangeString}
         />
       ) : (
-        <ListFilter
-          navigateWeek={navigateWeek}
-          getDateRangeString={getDateRangeString}
-          showAll={showAll}
-          setShowAll={changeShowAll}
-        />
+        <>
+          <select
+            defaultValue={status}
+            className="select select-md rounded border border-base-300 whitespace-nowrap outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer max-w-30"
+            onChange={(e) => updateStatus(e.target.value)}
+          >
+            <option disabled={true}>Status</option>
+            <option value="all">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Approved">Approved</option>
+            <option value="Canceled">Canceled</option>
+          </select>
+        </>
       )}
     </div>
   );
@@ -190,7 +208,7 @@ export function ListFilter({
           </div>
         )}
         <select
-          className="select select-md rounded border border-base-content whitespace-nowrap w-50 text-center outline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer"
+          className="select select-md rounded border border-base-300 whitespace-nowrapoutline-none ring-0 focus:outline-none focus:ring-0 cursor-pointer max-w-30"
           onChange={(e) => setShowAll(e.target.value === "all")}
           defaultValue={showAll ? "all" : "week"}
         >
@@ -200,6 +218,7 @@ export function ListFilter({
           </option>
           <option value="all">All</option>
         </select>
+
         {!showAll && (
           <div
             className="px-3 h-[38px] border rounded items-center flex hover:bg-base-200 cursor-pointer transition-colors duration-200"

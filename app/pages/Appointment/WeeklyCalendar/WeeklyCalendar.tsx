@@ -89,24 +89,28 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
               );
             })}
           </div>
-          <Suspense
-            key={weekDates.map((date) => date.toDateString()).join(",")}
-            fallback={<DayContainerLoading weekDates={weekDates} />}
-          >
-            <Await
-              resolve={getAppointmentsForDateRange(
-                weekDates[0],
-                weekDates[weekDates.length - 1]
-              )}
+
+          {/* Day columns container - fills remaining space next to time column */}
+          <div className="flex-1 h-full">
+            <Suspense
+              key={weekDates.map((date) => date.toDateString()).join(",")}
+              fallback={<DayContainerLoading weekDates={weekDates} />}
             >
-              {(appointments) => (
-                <DayContainer
-                  weekDates={weekDates}
-                  appointments={filterAppointments(appointments)}
-                />
-              )}
-            </Await>
-          </Suspense>
+              <Await
+                resolve={getAppointmentsForDateRange(
+                  weekDates[0],
+                  weekDates[weekDates.length - 1]
+                )}
+              >
+                {(appointments) => (
+                  <DayContainer
+                    weekDates={weekDates}
+                    appointments={filterAppointments(appointments)}
+                  />
+                )}
+              </Await>
+            </Suspense>
+          </div>
         </div>
       </div>
     </div>

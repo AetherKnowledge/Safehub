@@ -5,6 +5,7 @@ import {
 } from "../AppointmentActions";
 import AppointmentsTable from "../AppointmentTable";
 import { ViewModalPopup } from "../AppointmentTable/ViewModal";
+import { filterAppointments } from "../Student/AppointmentPage";
 import WeeklyCalendar from "../WeeklyCalendar";
 import { getWeekDates } from "../WeeklyCalendar/WeeklyCalendarUtils";
 import AppointmentHeader from "./AppointmentHeader";
@@ -17,21 +18,22 @@ export enum ViewMode {
 const AppointmentsPage = async ({
   date,
   viewMode,
-  showAll,
   appointmentId,
+  status,
 }: {
   date: string;
   viewMode: ViewMode;
-  showAll: boolean;
   appointmentId?: string;
+  status?: string;
 }) => {
   const weekDates = getWeekDates(new Date(date));
-  const appointments = showAll
-    ? await getAppointments()
-    : await getAppointmentsForDateRange(
-        weekDates[0],
-        weekDates[weekDates.length - 1]
-      );
+  const appointments =
+    viewMode === ViewMode.LIST
+      ? filterAppointments(await getAppointments(), status)
+      : await getAppointmentsForDateRange(
+          weekDates[0],
+          weekDates[weekDates.length - 1]
+        );
 
   const selectedAppointment = appointmentId
     ? appointments.find((appt) => appt.id === appointmentId)

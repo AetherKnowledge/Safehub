@@ -5,17 +5,18 @@ import Link from "next/link";
 import { FaCalendar } from "react-icons/fa6";
 import { AppointmentData, getAppointments } from "../AppointmentActions";
 import AppointmentsTable from "../AppointmentTable";
+import AppointmentTableTop from "../AppointmentTable/AppointmentTableTop";
 import UpcomingAppointmentRow from "../AppointmentTable/UpcomingAppointmentsRow";
 import UpcomingAppointmentsTable from "../AppointmentTable/UpcomingAppointmentsTable";
 import { ViewModalPopup } from "../AppointmentTable/ViewModal";
 
 type Props = {
-  date?: string;
   appointmentId?: string;
+  status?: string;
 };
 
-const AppointmentPage = async ({ date, appointmentId }: Props) => {
-  const appointments = await getAppointments();
+const AppointmentPage = async ({ appointmentId, status = "all" }: Props) => {
+  const appointments = filterAppointments(await getAppointments(), status);
 
   const selectedAppointment = appointmentId
     ? appointments.find((appt) => appt.id === appointmentId)
@@ -45,7 +46,10 @@ const AppointmentPage = async ({ date, appointmentId }: Props) => {
           </div>
         </div>
         <div className="flex flex-col bg-base-100 rounded p-3 shadow-br gap-1 flex-1 min-h-0">
-          <h2 className="font-bold">Booking History</h2>
+          <div className="flex flex-row items-center justify-between pr-4">
+            <h2 className="font-bold text-xl">Booking History</h2>
+            <AppointmentTableTop />
+          </div>
           <AppointmentsTable
             userType={UserType.Student}
             appointments={appointments}
@@ -162,6 +166,17 @@ async function DatePickerWithAppointments({ date }: { date?: string }) {
         local={true}
       />
     </>
+  );
+}
+
+export function filterAppointments(
+  appointments: AppointmentData[],
+  status?: string
+) {
+  if (!status || status === "all") return appointments;
+
+  return appointments.filter(
+    (appointment) => appointment.status.toLowerCase() === status.toLowerCase()
   );
 }
 

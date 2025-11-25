@@ -1,8 +1,8 @@
 "use client";
 
+import ImageWithFallback from "@/app/components/Images/ImageWithFallback";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { Hotline, UserType } from "@/app/generated/prisma";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { MdImageNotSupported } from "react-icons/md";
 import { deleteHotline } from "./HotlineActions";
@@ -44,7 +44,7 @@ const HotlineCard = ({
     <div className="card rounded-lg bg-base-100 w-96 h-120 shadow-lg">
       <figure className="pt-5">
         {hotline.image ? (
-          <Image
+          <ImageWithFallback
             width={150}
             height={150}
             src={hotline.image}

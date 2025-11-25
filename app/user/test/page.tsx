@@ -1,5 +1,4 @@
-import DateTimeSelector from "@/app/components/Input/Date/DateTimeSelector";
-import { TimePeriod } from "@/app/components/Input/Date/utils";
+import ImageWithFallback from "@/app/components/Images/ImageWithFallback";
 import TermsAndConditions from "@/app/components/Input/TermsAndConditions";
 import { clearNotifications, testAction } from "./testActions";
 
@@ -13,13 +12,11 @@ const Test = async () => {
         Delete Action
       </button>
       <TermsAndConditions />
-      <DateTimeSelector
-        name="startTime"
-        horizontal
-        defaultValue={new Date()}
-        minDate="now"
-        minTime={{ hour: 9, minute: 0, period: TimePeriod.PM }}
-        maxTime={{ hour: 11, minute: 0, period: TimePeriod.PM }}
+      <ImageWithFallback
+        src="/images/nonexistent-image.jpg"
+        alt="Test Image"
+        width={200}
+        height={200}
       />
     </div>
   );

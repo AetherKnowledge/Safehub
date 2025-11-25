@@ -122,6 +122,10 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       createManyChatsWithOthers(UserType.Counselor, newUser.id);
     },
   },
+  pages: {
+    signIn: "/sign-in",
+    signOut: "/sign-out"
+  },
 });
 
 // export const { auth, handlers, signIn, signOut } = NextAuth({

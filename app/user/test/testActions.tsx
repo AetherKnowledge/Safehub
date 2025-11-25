@@ -29,25 +29,23 @@ export async function testAction(): Promise<ActionResult<void>> {
       };
     }
 
-    const n8nWebhookUrl = process.env.N8N_EMAIL_URL!;
+    // for (let i = 0; i < 100; i++) {
+    //   if (!appointment) {
+    //     throw new Error("Failed to create appointment");
+    //   }
 
-    // reminders are handled differently
-    // console.log(n8nWebhookUrl);
-    // console.log("Sending notification to n8n for appointment:", appointment.id);
-    // const result = await fetch(n8nWebhookUrl, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Authorization: `Bearer ${session.supabaseAccessToken}`,
-    //   },
-    //   body: JSON.stringify({
-    //     data: {
-    //       message: "tang ina mo gumana ka",
-    //     },
-    //   }),
-    // });
-
-    // console.log("Result from n8n:", result);
+    //   const result = await createAppointmentNotification(
+    //     appointment,
+    //     NotificationType.AppointmentCreated,
+    //     { appointmentId: appointment.id } as AppointmentCreateNotification
+    //   );
+    //   if (!result.success) {
+    //     console.error(
+    //       "Failed to create appointment notification:",
+    //       result.message
+    //     );
+    //   }
+    // }
 
     return { success: true };
   } catch (error) {

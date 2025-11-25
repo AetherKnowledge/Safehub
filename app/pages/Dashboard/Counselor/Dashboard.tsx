@@ -23,12 +23,16 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
 
   return (
     <div className="flex items-center justify-center h-full min-h-0 overflow-y-auto pb-1 pr-1">
-      <div className="flex flex-1 flex-row gap-3 h-full min-h-0 w-auto justify-center">
+      <div className="flex flex-1 flex-row gap-4 h-full min-h-0 w-auto justify-center">
         <DashboardPosts posts={posts} sortBy={sortBy} order={order} />
 
-        <div className="flex-col gap-3 hidden 2xl:flex">
-          <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 max-w-3xl w-full flex-1 min-h-30">
-            <h2 className="font-bold">Upcoming Appointments</h2>
+        <div className="flex-col gap-4 hidden 2xl:flex min-w-[420px]">
+          {/* Upcoming Appointments Card */}
+          <div className="flex flex-col bg-gradient-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl p-5 gap-3 w-full flex-1 min-h-30 border border-base-content/5">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-6 bg-primary rounded-full"></div>
+              <h2 className="font-bold text-lg">Upcoming Appointments</h2>
+            </div>
             <div className="flex flex-row min-w-150 gap-5 w-full flex-1 min-h-20">
               <Suspense>
                 <ThisWeeksAppointments />
@@ -36,16 +40,30 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
             </div>
           </div>
 
-          <div className="bg-base-100 rounded-lg p-4 w-full flex flex-col h-60 pb-12 2xl:flex-1 shadow-br">
-            <h3 className="text-sm font-semibold mb-4">
-              Total Mood of all students
-            </h3>
+          {/* Student Mood Tracker Card */}
+          <div className="bg-gradient-to-br from-base-100 to-base-200/50 rounded-xl p-5 w-full flex flex-col h-60 pb-21 2xl:flex-1 shadow-xl border border-base-content/5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-1 h-6 bg-primary rounded-full"></div>
+              <h3 className="font-bold text-lg">Student Mood Overview</h3>
+            </div>
+            <p className="text-sm text-base-content/70 mb-4">
+              Aggregate mood data from all students
+            </p>
             <MoodTracker />
           </div>
 
-          <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 w-full overflow-x-hidden h-[244px]">
-            <h2 className="font-semibold text-2xl">Satisfactory Rating</h2>
-            <p className="text-sm mb-2">
+          {/* Satisfactory Rating Card */}
+          <div className="flex flex-col bg-gradient-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl p-5 gap-3 w-full border border-base-content/5">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-6 bg-primary rounded-full"></div>
+              <div>
+                <h2 className="font-bold text-lg">Satisfactory Rating</h2>
+                <p className="text-xs text-base-content/60">
+                  Verified ratings from service users
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-base-content/70 mb-2">
               Rating and reviews are verified and are from people who use the
               service. Higher score, higher satisfaction.
             </p>

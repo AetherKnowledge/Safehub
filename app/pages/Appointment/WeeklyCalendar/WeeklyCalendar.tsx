@@ -12,9 +12,9 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
   const weekDates = getWeekDates(date);
 
   return (
-    <div className="bg-base-100 h-full rounded-lg flex flex-col">
+    <div className="bg-base-100 flex-1 min-h-0 rounded-lg flex flex-col">
       {/* Calendar Grid */}
-      <div className="flex border border-base-content/30 bg-base-100">
+      <div className="flex border border-base-content/30 bg-base-100 flex-shrink-0">
         <div className="w-25 flex-shrink-0 p-3"></div>{" "}
         {/* Empty cell for time column - matches body */}
         <div className="flex-1 flex">
@@ -50,8 +50,8 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
       </div>
 
       {/* Calendar Body */}
-      <div className="flex border border-t-0 border-base-content/30 rounded-b-lg h-full">
-        <div className="flex w-full relative min-h-[500px]">
+      <div className="flex flex-1 min-h-0 border border-t-0 border-base-content/30 rounded-b-lg overflow-hidden">
+        <div className="flex w-full relative h-full">
           {/* Time column */}
           <div className="w-25 flex-shrink-0 relative h-full">
             {/* Horizontal grid lines in the time column for perfect alignment */}

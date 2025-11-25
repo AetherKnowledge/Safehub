@@ -138,9 +138,9 @@ const ChatBotSettings = ({
   }
 
   return (
-    <section className="flex-1 flex flex-col min-h-0">
-      <div className="flex items-center justify-between p-4">
-        <h2 className="text-lg font-bold">AI Chatbot</h2>
+    <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/5 to-primary/10">
+        <h2 className="text-lg font-bold">AI Chatbot Settings</h2>
         <Toggle isChecked={aiOn} onToggle={onChangeAiToggle} />
       </div>
 
@@ -240,7 +240,7 @@ const ChatBotSettings = ({
           loadingText="Saving..."
         />
       </div>
-    </section>
+    </div>
   );
 };
 

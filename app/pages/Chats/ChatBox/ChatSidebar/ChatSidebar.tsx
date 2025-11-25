@@ -45,35 +45,37 @@ const ChatSidebar = ({
 
   return (
     <div
-      className={`flex w-full flex-col bg-base-100 shadow-br rounded-xl overflow-y-auto p-4 gap-2 min-w-80 ${
+      className={`flex w-full flex-col bg-gradient-to-br from-base-100 to-base-200 shadow-xl rounded-xl overflow-hidden border border-base-content/5 min-w-80 ${
         chatId ? "hidden xl:flex xl:max-w-80" : ""
       } `}
     >
-      <ChatSidebarHeader onChangeSearch={setSearchText} />
-      <div className="flex flex-row items-center gap-3">
-        <FilterButton
-          currentValue={filter}
-          value={ChatFilter.All}
-          onClick={() => setFilter(ChatFilter.All)}
-        >
-          All
-        </FilterButton>
-        <FilterButton
-          value={ChatFilter.Counselors}
-          currentValue={filter}
-          onClick={() => setFilter(ChatFilter.Counselors)}
-        >
-          Counselors
-        </FilterButton>
-        <FilterButton
-          value={ChatFilter.Unread}
-          currentValue={filter}
-          onClick={() => setFilter(ChatFilter.Unread)}
-        >
-          Unread
-        </FilterButton>
+      <div className="p-4 border-b border-base-content/5 bg-base-100/50">
+        <ChatSidebarHeader onChangeSearch={setSearchText} />
+        <div className="flex flex-row items-center gap-2 mt-3">
+          <FilterButton
+            currentValue={filter}
+            value={ChatFilter.All}
+            onClick={() => setFilter(ChatFilter.All)}
+          >
+            All
+          </FilterButton>
+          <FilterButton
+            value={ChatFilter.Counselors}
+            currentValue={filter}
+            onClick={() => setFilter(ChatFilter.Counselors)}
+          >
+            Counselors
+          </FilterButton>
+          <FilterButton
+            value={ChatFilter.Unread}
+            currentValue={filter}
+            onClick={() => setFilter(ChatFilter.Unread)}
+          >
+            Unread
+          </FilterButton>
+        </div>
       </div>
-      <div className="flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-200 h-full">
+      <div className="flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-200 flex-1 p-2">
         {loading
           ? Array.from({ length: 5 }).map((_, index) => (
               <SidebarUserBoxSkeleton key={index} />

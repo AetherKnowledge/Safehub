@@ -2,7 +2,9 @@ import DatePicker from "@/app/components/Input/Date/DatePicker";
 import { AppointmentStatus, UserType } from "@/app/generated/prisma";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
-import { FaCalendar } from "react-icons/fa6";
+import { FaCalendar, FaClock } from "react-icons/fa6";
+import { HiSparkles } from "react-icons/hi2";
+import { IoCalendarOutline } from "react-icons/io5";
 import { AppointmentData, getAppointments } from "../AppointmentActions";
 import AppointmentsTable from "../AppointmentTable";
 import AppointmentTableTop from "../AppointmentTable/AppointmentTableTop";
@@ -24,36 +26,68 @@ const AppointmentPage = async ({ appointmentId, status = "all" }: Props) => {
 
   return (
     <>
-      <div className="flex flex-col gap-3 flex-1 min-h-0">
-        <div className="flex flex-col xl:flex-row gap-3">
-          <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 w-full xl:w-1/2">
-            <h2 className="font-bold">Todays Appointments</h2>
-            <div className="flex flex-row gap-5 flex-1">
+      <div className="flex flex-col gap-4 flex-1 min-h-0 p-1">
+        {/* Top Cards Section */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          {/* Today's Appointments Card */}
+          <div className="relative overflow-hidden bg-gradient-to-br from-base-100 to-base-200 shadow-xl rounded-xl border border-base-content/5">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16"></div>
+            <div className="relative p-5">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 bg-primary/10 rounded-lg">
+                  <IoCalendarOutline className="w-5 h-5 text-primary" />
+                </div>
+                <h2 className="font-bold text-lg">{`Today's Appointments`}</h2>
+              </div>
               <TodayAppointments appointments={appointments} />
             </div>
           </div>
-          <div className="flex flex-col bg-base-100 shadow-br rounded p-3 gap-1 w-full xl:w-1/2">
-            <h2 className="font-bold">Book an Appointment</h2>
-            <div className="flex flex-col items-center justify-center w-full">
+
+          {/* Book Appointment Card */}
+          <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-base-100 to-secondary/5 shadow-xl rounded-xl border border-primary/10">
+            <div className="absolute bottom-0 right-0 w-40 h-40 bg-secondary/5 rounded-full -mr-20 -mb-20"></div>
+            <div className="relative p-5 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2.5 bg-primary/15 rounded-lg">
+                    <HiSparkles className="w-5 h-5 text-primary" />
+                  </div>
+                  <h2 className="font-bold text-lg">Book New Session</h2>
+                </div>
+                <p className="text-sm text-base-content/70 mb-4">
+                  Schedule a counseling session with our professional counselors
+                </p>
+              </div>
               <Link
                 href="/user/appointments/new"
-                className="btn btn-primary rounded-lg p-3 w-full max-w-100 h-12"
+                className="btn btn-primary rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group"
               >
-                <FaCalendar className="mr-2" />
-                BOOK NOW
+                <FaCalendar className="group-hover:rotate-12 transition-transform duration-300" />
+                Book Appointment
               </Link>
             </div>
           </div>
         </div>
-        <div className="flex flex-col bg-base-100 rounded p-3 shadow-br gap-1 flex-1 min-h-0">
-          <div className="flex flex-row items-center justify-between pr-4">
-            <h2 className="font-bold text-xl">Booking History</h2>
-            <AppointmentTableTop />
+
+        {/* Booking History Section */}
+        <div className="flex flex-col bg-gradient-to-br from-base-100 to-base-200 rounded-xl shadow-xl border border-base-content/5 flex-1 min-h-0">
+          <div className="p-5 border-b border-base-content/5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h2 className="font-bold text-xl mb-1">Appointment History</h2>
+                <p className="text-sm text-base-content/60">
+                  View and manage all your appointments
+                </p>
+              </div>
+              <AppointmentTableTop />
+            </div>
           </div>
-          <AppointmentsTable
-            userType={UserType.Student}
-            appointments={appointments}
-          />
+          <div className="overflow-auto flex-1 min-h-0">
+            <AppointmentsTable
+              userType={UserType.Student}
+              appointments={appointments}
+            />
+          </div>
         </div>
       </div>
       {selectedAppointment && (
@@ -85,17 +119,103 @@ export async function TodayAppointments({
 
   if (filteredAppointments.length === 0)
     return (
-      <div className="flex items-center justify-center text-center h-[66px] w-full">
-        No appointments today.
+      <div className="flex flex-col items-center justify-center text-center py-8 px-4">
+        <div className="p-4 bg-base-300/30 rounded-full mb-3">
+          <IoCalendarOutline className="w-8 h-8 text-base-content/30" />
+        </div>
+        <p className="text-base-content/60 font-medium">
+          No appointments scheduled for today
+        </p>
+        <p className="text-base-content/40 text-sm mt-1">
+          You&apos;re all free today!
+        </p>
       </div>
     );
 
+  const appointment = filteredAppointments[0];
+  const counselor = appointment.counselor;
+
   return (
-    <table className="w-full">
-      <tbody>
-        <UpcomingAppointmentRow appointment={filteredAppointments[0]} />
-      </tbody>
-    </table>
+    <div className="space-y-3">
+      <div className="bg-base-100 rounded-lg p-4 border border-base-content/10 hover:border-primary/30 transition-colors">
+        <div className="flex items-start gap-4">
+          {/* Avatar */}
+          <div className="avatar">
+            <div className="w-12 h-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+              <img
+                src={
+                  counselor.user.image ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    counselor.user.name || counselor.user.email
+                  )}&background=random`
+                }
+                alt={counselor.user.name || "Counselor"}
+              />
+            </div>
+          </div>
+
+          {/* Details */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div>
+                <p className="font-semibold text-base truncate">
+                  {counselor.user.name || counselor.user.email.split("@")[0]}
+                </p>
+                <p className="text-xs text-base-content/60">Counselor</p>
+              </div>
+              <div
+                className={`badge ${
+                  appointment.status === AppointmentStatus.Approved
+                    ? "badge-success"
+                    : "badge-warning"
+                } badge-sm`}
+              >
+                {appointment.status}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-2 text-sm">
+              <div className="flex items-center gap-2 text-base-content/70">
+                <FaClock className="w-3.5 h-3.5 text-primary" />
+                <span>
+                  {new Date(appointment.startTime).toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+                {appointment.endTime && (
+                  <>
+                    <span>-</span>
+                    <span>
+                      {new Date(appointment.endTime).toLocaleTimeString(
+                        "en-US",
+                        { hour: "2-digit", minute: "2-digit" }
+                      )}
+                    </span>
+                  </>
+                )}
+              </div>
+              {appointment.sessionPreference && (
+                <div className="flex items-center gap-2 text-base-content/60 text-xs">
+                  <span className="badge badge-sm badge-ghost">
+                    {appointment.sessionPreference}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {filteredAppointments.length > 1 && (
+        <div className="text-center">
+          <p className="text-xs text-base-content/60">
+            +{filteredAppointments.length - 1} more appointment
+            {filteredAppointments.length - 1 > 1 ? "s" : ""} today
+          </p>
+        </div>
+      )}
+    </div>
   );
 }
 

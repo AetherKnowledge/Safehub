@@ -32,25 +32,40 @@ export const EvaluationRow = ({ data }: { data: EvaluationTableData }) => {
   return (
     <>
       <Cell isFirst>
-        <div className="flex flex-wrap items-center justify-start gap-2">
-          <UserImage
-            name={data.studentName ?? data.studentEmail.split("@")[0]}
-            width={10}
-            src={data.studentImageUrl}
-          />
+        <div className="flex flex-wrap items-center justify-start gap-3">
+          <div className="ring-2 ring-primary/20 ring-offset-2 ring-offset-base-100 rounded-full">
+            <UserImage
+              name={data.studentName ?? data.studentEmail.split("@")[0]}
+              width={10}
+              src={data.studentImageUrl}
+            />
+          </div>
           <p className="font-semibold text-sm">
             {data.studentName ?? data.studentEmail.split("@")[0]}
           </p>
         </div>
       </Cell>
-      <Cell>{formatDateDisplay(data.startTime)}</Cell>
       <Cell>
-        {`${formatTime(data.startTime)} ${
-          data.endTime && ` - ${formatTime(data.endTime)}`
-        }`}
+        <span className="text-sm font-medium">
+          {formatDateDisplay(data.startTime)}
+        </span>
       </Cell>
       <Cell>
-        <StarRating rating={data.rating || 0} />
+        <span className="text-sm text-base-content/80">
+          {`${formatTime(data.startTime)} ${
+            data.endTime && ` - ${formatTime(data.endTime)}`
+          }`}
+        </span>
+      </Cell>
+      <Cell>
+        <div className="flex items-center gap-2">
+          <StarRating rating={data.rating || 0} />
+          {data.rating && (
+            <span className="text-xs font-semibold text-primary">
+              {data.rating.toFixed(1)}
+            </span>
+          )}
+        </div>
       </Cell>
       <Cell>
         <EvaluationButton

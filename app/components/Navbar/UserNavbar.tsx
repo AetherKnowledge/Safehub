@@ -4,8 +4,8 @@ import UserButton from "./UserButton";
 
 const UserNavbar = () => {
   return (
-    <div className="flex flex-row bg-base-200 top-0 gap-3 sticky z-10 items-center justify-center ">
-      <div className="flex bg-base-100 shadow-br rounded-lg w-full items-center h-full px-4 py-3 gap-5">
+    <div className="flex flex-row bg-base-200 top-0 gap-3 sticky z-10 items-center justify-center">
+      <div className="flex bg-gradient-to-r from-base-100 to-base-200/50 shadow-xl rounded-xl border border-base-content/5 w-full items-center h-full px-5 py-3.5 gap-5 backdrop-blur-sm">
         <PageTitle />
         <NotificationsButton />
         {/* <label className="flex-1 input text-base-content focus-within:outline-none focus-within:ring-0 input-sm ">

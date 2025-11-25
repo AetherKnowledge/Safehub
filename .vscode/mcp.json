@@ -1,0 +1,13 @@
+{
+	"servers": {
+		"sequentialthinking": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-sequential-thinking"
+			],
+			"type": "stdio"
+		}
+	},
+	"inputs": []
+}

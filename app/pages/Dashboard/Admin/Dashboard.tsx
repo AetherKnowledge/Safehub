@@ -38,14 +38,33 @@ const Dashboard = () => {
   }, [searchParams]);
 
   return (
-    <div className="flex flex-col gap-3 flex-1 min-h-0 overflow-auto">
+    <div className="flex flex-col gap-4 flex-1 min-h-0 overflow-auto">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 rounded-xl shadow-md border border-base-content/5">
+        <div className="flex items-center gap-3">
+          <div className="w-1 h-8 bg-primary rounded-full"></div>
+          <div>
+            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+            <p className="text-sm text-base-content/70">
+              Monitor system overview and student wellness metrics
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Top Grid - Charts */}
       <div className="grid grid-cols-1 gap-4 min-h-0">
         {/* Mood Chart */}
-        <div className="bg-base-100 rounded-lg p-4 w-full flex h-100 flex-col shadow-br pb-12">
-          <h3 className="text-sm font-semibold mb-4">
-            Total Mood of all students
-          </h3>
+        <div className="bg-gradient-to-br from-base-100 to-base-200/50 rounded-xl p-6 w-full flex h-100 flex-col shadow-xl pb-20 border border-base-content/5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-1 h-6 bg-primary rounded-full"></div>
+            <div>
+              <h3 className="font-bold text-lg">Student Mood Analytics</h3>
+              <p className="text-xs text-base-content/60">
+                Aggregate wellness data across all students
+              </p>
+            </div>
+          </div>
           <MoodTracker />
         </div>
         {/* <div className="flex flex-col gap-4">
@@ -71,7 +90,22 @@ const Dashboard = () => {
       </div>
 
       {/* Latest Appointments Table */}
-      <LogsTable logs={logs} isLoading={logsLoading} />
+      <div className="bg-gradient-to-br from-base-100 to-base-200/50 rounded-xl shadow-xl border border-base-content/5 overflow-hidden flex-1 flex flex-col min-h-0">
+        <div className="p-5 border-b border-base-content/5">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-6 bg-primary rounded-full"></div>
+            <div>
+              <h2 className="font-bold text-xl">Appointment Logs</h2>
+              <p className="text-sm text-base-content/60">
+                Recent appointment status changes and history
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 min-h-0">
+          <LogsTable logs={logs} isLoading={logsLoading} />
+        </div>
+      </div>
     </div>
   );
 };

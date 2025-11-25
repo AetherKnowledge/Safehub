@@ -138,9 +138,9 @@ const MCPSettings = ({
   }
 
   return (
-    <section className="flex-1 flex flex-col min-h-0">
-      <div className="flex items-center justify-between p-4">
-        <h2 className="text-lg font-bold">MCP Server</h2>
+    <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/5 to-primary/10">
+        <h2 className="text-lg font-bold">MCP Server Settings</h2>
         <Toggle isChecked={mcpOn} onToggle={onToggleMcp} />
       </div>
 
@@ -310,7 +310,7 @@ const MCPSettings = ({
           </button>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

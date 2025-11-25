@@ -39,22 +39,22 @@ const Sidebar = () => {
   return (
     <motion.div
       animate={{
-        minWidth: isLarge ? "200px" : "60px",
-        width: isLarge ? "200px" : "60px",
+        minWidth: isLarge ? "220px" : "70px",
+        width: isLarge ? "220px" : "70px",
       }}
       initial={{
-        minWidth: isLarge ? "200px" : "60px",
-        width: isLarge ? "200px" : "60px",
+        minWidth: isLarge ? "220px" : "70px",
+        width: isLarge ? "220px" : "70px",
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="hidden lg:flex flex-col justify-between sticky pt-1 top-0 h-[calc(100vh-3rem)] min-w-[60px] max-w-[200px] bg-base-100 shadow-br rounded-lg z-10 overflow-x-hidden overflow-y-auto"
+      className="hidden lg:flex flex-col justify-between sticky pt-1 top-0 h-[calc(100vh-3rem)] min-w-[70px] max-w-[220px] bg-gradient-to-b from-base-100 to-base-200/50 shadow-xl rounded-xl border border-base-content/5 z-10 overflow-x-hidden overflow-y-auto backdrop-blur-sm"
     >
       {/* Top Section */}
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col items-center space-y-3 p-2">
         <SidebarLogo isLarge={isLarge} />
 
-        <div className="w-full px-3">
-          <Divider className="w-full" />
+        <div className="w-full px-2">
+          <Divider className="w-full opacity-50" />
         </div>
 
         {session.data?.user.type === UserType.Student
@@ -65,8 +65,8 @@ const Sidebar = () => {
           ? counselorSidebar(isLarge)
           : studentSidebar(isLarge)}
 
-        <div className="w-full px-3">
-          <Divider className="w-full" />
+        <div className="w-full px-2">
+          <Divider className="w-full opacity-50" />
         </div>
 
         <SidebarButton
@@ -79,7 +79,7 @@ const Sidebar = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="pb-2">
+      <div className="pb-3 px-2">
         <CollapseButton
           isLarge={isLarge}
           onClick={() => setIsLarge(!isLarge)}

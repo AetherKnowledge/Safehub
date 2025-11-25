@@ -26,8 +26,10 @@ const ChatbotSandbox = () => {
   }, [chatBot.messages]);
 
   return (
-    <section className="flex-1 flex flex-col gap-4 min-h-0 border-x border-base-300">
-      <h2 className="text-center text-lg font-bold pt-4">ChatBot Sand Box</h2>
+    <div className="flex-1 flex flex-col gap-4 min-h-0">
+      <div className="p-4 bg-gradient-to-r from-primary/5 to-primary/10">
+        <h2 className="text-center text-lg font-bold">ChatBot Sandbox</h2>
+      </div>
       <Divider />
       <div
         className="p-4 group flex-1 flex flex-col gap-2 overflow-y-auto scrollbar-gutter:stable"
@@ -42,7 +44,7 @@ const ChatbotSandbox = () => {
 
       {/* Fixed input bar */}
       <ChatBoxInput className="p-4 pt-0" asyncOnsend={chatBot.sendMessage} />
-    </section>
+    </div>
   );
 };
 

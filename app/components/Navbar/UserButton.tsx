@@ -24,12 +24,12 @@ const UserButton = async () => {
 
 const LoadingUserButton = () => {
   return (
-    <div className="flex items-center gap-2 hover:cursor-pointer bg-base-100 shadow-br rounded-lg p-2">
+    <div className="flex items-center gap-2 hover:cursor-pointer bg-gradient-to-r from-base-100 to-base-200/50 shadow-xl rounded-xl border border-base-content/5 p-3 backdrop-blur-sm">
       <div className="animate-pulse flex items-center gap-2">
-        <div className="w-10 h-10 rounded-full bg-gray-500"></div>
-        <div className="flex flex-col">
-          <div className="h-4 w-24 bg-gray-500 rounded"></div>
-          <div className="h-4 w-16 bg-gray-500 rounded"></div>
+        <div className="w-10 h-10 rounded-full bg-base-300"></div>
+        <div className="flex flex-col gap-1">
+          <div className="h-3 w-24 bg-base-300 rounded"></div>
+          <div className="h-3 w-16 bg-base-300 rounded"></div>
         </div>
       </div>
     </div>
@@ -44,9 +44,9 @@ const AuthenticatedUserButton = (session: Session) => {
   }
 
   return (
-    <div className="flex flex-row bg-base-100 shadow-br rounded-lg items-center justify-center gap-y-2">
+    <div className="flex flex-row bg-gradient-to-r from-base-100 to-base-200/50 shadow-xl rounded-xl border border-base-content/5 items-center justify-center backdrop-blur-sm">
       <div className="relative dropdown" role="button" tabIndex={0}>
-        <div className="flex flex-row gap-2 items-center justify-center p-2 min-w-max">
+        <div className="flex flex-row gap-3 items-center justify-center p-3 min-w-max">
           <UserImage
             name={
               session.user?.name || session.user?.email?.split("@")[0] || "User"
@@ -58,23 +58,28 @@ const AuthenticatedUserButton = (session: Session) => {
 
           <div className="flex flex-row gap-3 items-center justify-center">
             <div className="flex flex-col text-base-content">
-              <p className="text-sm">Hello,</p>
+              <p className="text-xs text-base-content/60">Hello,</p>
               <p className="font-semibold text-sm whitespace-nowrap">
                 {getFirstName() || session.user?.email?.split("@")[0] || "User"}
               </p>
             </div>
-            <div className="rounded-md p-1 hover:brightness-90 hover:bg-base-200 active:brightness-75 transition object-cover duration-150 ease-in-out hover:scale-105 cursor-pointer">
-              <FaChevronDown className="text-base-content text-2xl" />
+            <div className="rounded-lg p-2 hover:bg-base-200 active:bg-base-300 transition-all duration-200 cursor-pointer">
+              <FaChevronDown className="text-base-content/70 text-lg" />
             </div>
           </div>
         </div>
 
-        <ul className="absolute right-0 mt-2 w-52 menu dropdown-content bg-base-100 text-base-content rounded-md z-10 p-2 shadow-br">
+        <ul className="absolute right-0 mt-2 w-52 menu dropdown-content bg-base-100 text-base-content rounded-xl z-10 p-2 shadow-xl border border-base-content/5">
           <li>
             <DarkModeToggle defaultChecked={session.user?.darkMode || false} />
           </li>
           <li>
-            <Link href="/api/auth/signout">Sign Out</Link>
+            <Link
+              href="/api/auth/signout"
+              className="hover:bg-error/10 hover:text-error rounded-lg"
+            >
+              Sign Out
+            </Link>
           </li>
         </ul>
       </div>

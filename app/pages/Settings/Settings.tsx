@@ -47,20 +47,35 @@ const Settings = ({ user }: { user: SettingsUser }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col w-full h-full gap-3 bg-base-100 shadow-br rounded-xl overflow-y-auto"
+      className="flex flex-col w-full h-full gap-0 bg-gradient-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl overflow-y-auto"
     >
-      <div className="flex flex-col p-4 gap-0">
-        <div className="flex flex-row items-center">
-          <UserImage
-            name={user.name || user.email.split("@")[0] || "User"}
-            width={16}
-            src={user.image || undefined}
-            bordered
-          />
-          <div className="flex flex-col ml-4 w-full">
-            <span className="font-bold">{user.name}</span>
-            <span className="text-sm text-base-content/50">{user.email}</span>
+      {/* Profile Header */}
+      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 border-b border-base-content/5">
+        <div className="flex flex-row items-center gap-4">
+          <div className="relative">
+            <UserImage
+              name={user.name || user.email.split("@")[0] || "User"}
+              width={20}
+              src={user.image || undefined}
+              bordered
+            />
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-success rounded-full border-4 border-base-100"></div>
           </div>
+          <div className="flex flex-col flex-1">
+            <span className="font-bold text-xl">{user.name}</span>
+            <span className="text-sm text-base-content/60">{user.email}</span>
+            <span className="text-xs text-primary font-medium mt-1 uppercase tracking-wide">
+              {session.data?.user.type}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Personal Information Section */}
+      <div className="flex flex-col p-6 gap-4">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-1 h-6 bg-primary rounded-full"></div>
+          <h3 className="font-bold text-lg">Personal Information</h3>
         </div>
 
         <HorizontalItemsBox
@@ -106,50 +121,52 @@ const Settings = ({ user }: { user: SettingsUser }) => {
         />
         {session.data?.user.type === UserType.Student && (
           <>
-            <LinkedSelector
-              name="department-and-program"
-              horizontal={true}
-              parent={{
-                type: FormComponentType.SELECT,
-                props: {
-                  name: "department",
-                  legend: "Department",
-                  defaultValue: user.department,
-                } as SelectBoxProps,
-              }}
-              child={{
-                type: FormComponentType.SELECT,
-                props: {
-                  name: "program",
-                  legend: "Program",
-                  defaultValue: user.program,
-                } as SelectBoxProps,
-              }}
-              linkedOptions={departmentsWithPrograms}
-            />
-            <HorizontalItemsBox
-              name="year-and-section"
-              items={[
-                {
+            <div className="bg-base-200/30 rounded-xl p-4 space-y-4">
+              <LinkedSelector
+                name="department-and-program"
+                horizontal={true}
+                parent={{
                   type: FormComponentType.SELECT,
                   props: {
-                    name: "year",
-                    legend: "Year",
-                    options: yearOptions,
-                    defaultValue: user.year?.toString(),
+                    name: "department",
+                    legend: "Department",
+                    defaultValue: user.department,
                   } as SelectBoxProps,
-                },
-                {
+                }}
+                child={{
                   type: FormComponentType.SELECT,
                   props: {
-                    name: "section",
-                    legend: "Section",
-                    options: sectionOptions,
-                    defaultValue: user.section,
+                    name: "program",
+                    legend: "Program",
+                    defaultValue: user.program,
                   } as SelectBoxProps,
-                },
-              ]}
-            />
+                }}
+                linkedOptions={departmentsWithPrograms}
+              />
+              <HorizontalItemsBox
+                name="year-and-section"
+                items={[
+                  {
+                    type: FormComponentType.SELECT,
+                    props: {
+                      name: "year",
+                      legend: "Year",
+                      options: yearOptions,
+                      defaultValue: user.year?.toString(),
+                    } as SelectBoxProps,
+                  },
+                  {
+                    type: FormComponentType.SELECT,
+                    props: {
+                      name: "section",
+                      legend: "Section",
+                      options: sectionOptions,
+                      defaultValue: user.section,
+                    } as SelectBoxProps,
+                  },
+                ]}
+              />
+            </div>
           </>
         )}
         <HorizontalItemsBox
@@ -180,33 +197,42 @@ const Settings = ({ user }: { user: SettingsUser }) => {
         {session.data?.user.type === UserType.Student && (
           <>
             <Divider />
-            <div className="flex flex-col mt-2">
-              <span className="font-bold text-xs">Guardian Information</span>
-              <span className="text-xs text-base-content/50">
-                {"Set your guardian's email and phone number"}
-              </span>
+
+            {/* Guardian Information Section */}
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-1 h-6 bg-primary rounded-full"></div>
+              <div className="flex flex-col">
+                <h3 className="font-bold text-lg">Guardian Information</h3>
+                <span className="text-xs text-base-content/60">
+                  {"Set your guardian's contact details for emergencies"}
+                </span>
+              </div>
             </div>
 
-            <GuardianDetails user={user} />
+            <div className="bg-base-200/30 rounded-xl p-4">
+              <GuardianDetails user={user} />
+            </div>
           </>
         )}
 
         <Divider />
       </div>
-      <div className="flex flex-row items-center justify-between p-4 pt-0">
+
+      {/* Action Buttons */}
+      <div className="flex flex-row items-center justify-between gap-4 p-6 pt-0 bg-gradient-to-t from-base-200/30 to-transparent">
         <Link
           type="button"
-          className="btn btn-primary text-white p-2 w-40 text-sm"
+          className="btn btn-outline btn-error hover:btn-error gap-2 flex-1 shadow-md hover:shadow-lg transition-all max-w-50"
           href="/api/auth/signout"
         >
-          <IoLogOut className="text-lg mr-2" />
+          <IoLogOut className="text-lg" />
           Log Out
         </Link>
         <button
           type="submit"
-          className="btn btn-primary text-white p-2 w-40 text-sm"
+          className="btn btn-primary gap-2 flex-1 shadow-md hover:shadow-lg transition-all max-w-50"
         >
-          <FaEdit className="text-lg mr-2" />
+          <FaEdit className="text-lg" />
           Save Changes
         </button>
       </div>

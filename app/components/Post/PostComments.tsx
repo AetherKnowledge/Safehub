@@ -64,36 +64,60 @@ const PostComments = ({ post }: { post: PostData }) => {
     <div className="flex flex-col h-full">
       {/* Comments */}
       <Divider />
-      <div
-        className="flex-1 min-h-0 max-h-[60vh] overflow-y-auto px-5 flex flex-col "
-        ref={messageContainerRef}
-      >
-        <div className="flex flex-col h-full">
-          {comments.map((comment) => {
-            const isImageFromSelf =
-              session.data?.user.image === comment.user.image;
+      <div className="bg-base-200/20 rounded-lg my-2 border border-base-content/5">
+        <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/5 to-transparent border-b border-base-content/5">
+          <svg
+            className="w-4 h-4 text-primary"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            />
+          </svg>
+          <span className="text-sm font-semibold text-base-content/80">
+            Comments ({comments.length})
+          </span>
+        </div>
+        <div
+          className="flex-1 min-h-0 max-h-[30vh] overflow-y-auto px-4 py-2 flex flex-col scrollbar-thin"
+          ref={messageContainerRef}
+        >
+          <div className="flex flex-col h-full">
+            {comments.length > 0 ? (
+              comments.map((comment) => {
+                const isImageFromSelf =
+                  session.data?.user.image === comment.user.image;
 
-            return (
-              <MessageBubble
-                key={comment.id}
-                name={comment.user.name}
-                image={comment.user.image}
-                content={comment.content}
-                createdAt={comment.createdAt}
-                showStatus={false}
-                anonymous={!isImageFromSelf}
-                self={isImageFromSelf}
-              />
-            );
-          })}
+                return (
+                  <MessageBubble
+                    key={comment.id}
+                    name={comment.user.name}
+                    image={comment.user.image}
+                    content={comment.content}
+                    createdAt={comment.createdAt}
+                    showStatus={false}
+                    anonymous={!isImageFromSelf}
+                    self={isImageFromSelf}
+                  />
+                );
+              })
+            ) : (
+              <div className="flex items-center justify-center h-20 text-base-content/40 text-sm">
+                No comments yet. Be the first to comment!
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      <Divider />
 
       {/* COMMENT INPUT */}
-
-      <div className="flex items-center gap-2 mt-2">
-        <div className="avatar">
+      <div className="flex items-center gap-3 mt-2 bg-base-200/30 rounded-lg p-2 border border-base-content/5">
+        <div className="avatar ring-2 ring-primary/20 ring-offset-2 ring-offset-base-100 rounded-full">
           <UserImage
             name={session.data?.user.name || session.data?.user.email || "You"}
             width={10}
@@ -103,8 +127,8 @@ const PostComments = ({ post }: { post: PostData }) => {
         <input
           ref={inputRef}
           type="text"
-          placeholder="Write your comment"
-          className="input input-bordered input-sm w-full outline-none ring-0 text-base-content focus-within:outline-none focus-within:ring-0"
+          placeholder="Write your comment..."
+          className="input input-bordered input-sm w-full outline-none ring-0 text-base-content focus:border-primary transition-colors bg-base-100"
           onKeyDown={async (e) => {
             if (
               e.key === "Enter" &&

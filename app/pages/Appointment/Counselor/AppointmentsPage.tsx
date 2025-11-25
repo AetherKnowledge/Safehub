@@ -41,17 +41,24 @@ const AppointmentsPage = async ({
 
   return (
     <>
-      <div className="flex flex-col bg-base-100 shadow-br rounded-lg gap-3 flex-1 min-h-0">
-        <AppointmentHeader />
-        {viewMode === ViewMode.CALENDAR && (
-          <WeeklyCalendar date={new Date(date)} />
-        )}
-        {viewMode === ViewMode.LIST && (
-          <AppointmentsTable
-            userType={UserType.Counselor}
-            appointments={appointments}
-          />
-        )}
+      <div className="flex flex-col gap-4 flex-1 min-h-0 p-1">
+        {/* Main Content Card */}
+        <div className="flex flex-col bg-gradient-to-br from-base-100 to-base-200 shadow-xl rounded-xl border border-base-content/5 flex-1 min-h-0 overflow-hidden">
+          <AppointmentHeader />
+          <div className="flex-1 min-h-0 overflow-auto flex flex-col">
+            {viewMode === ViewMode.CALENDAR && (
+              <div className="p-5 flex-1 min-h-0 flex flex-col">
+                <WeeklyCalendar date={new Date(date)} />
+              </div>
+            )}
+            {viewMode === ViewMode.LIST && (
+              <AppointmentsTable
+                userType={UserType.Counselor}
+                appointments={appointments}
+              />
+            )}
+          </div>
+        </div>
       </div>
       {selectedAppointment && (
         <ViewModalPopup appointment={selectedAppointment} />

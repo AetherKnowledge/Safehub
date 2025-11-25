@@ -6,6 +6,7 @@ import {
   UserType,
 } from "@/app/generated/prisma";
 import { ReactNode, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { createClient } from "@/lib/supabase/client";
 import { getRelativeTime } from "@/lib/utils";
@@ -33,8 +34,13 @@ const NotificationsButton = () => {
   const session = useSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [mounted, setMounted] = useState(false);
 
   const hasUnread = notifications.some((n) => !n.isRead);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function fetchNotifications() {
@@ -125,93 +131,108 @@ const NotificationsButton = () => {
   }
 
   return (
-    <div className="drawer drawer-end w-full">
-      <input
-        id={drawerId}
-        type="checkbox"
-        className="drawer-toggle"
-        onChange={(e) => {
-          if (e.target.checked) {
-            handleReadAll();
-          }
-        }}
-      />
-      <div className="drawer-content">
-        {/* Page content here */}
-        <label htmlFor={drawerId} className="drawer-button w-full">
-          <div className="flex flex-row items-center justify-end w-full gap-2">
-            <div className="btn btn-ghost p-1">
-              <motion.div
-                key={hasUnread ? "unread" : "read"}
-                animate={
-                  hasUnread
-                    ? { rotate: [0, -15, 15, -10, 10, 0, 0, 0, 0, 0, 0, 0, 0] }
-                    : { rotate: 0 }
-                }
-                transition={
-                  hasUnread
-                    ? { duration: 2, repeat: Infinity, ease: "easeInOut" }
-                    : { duration: 0.3 }
-                }
-              >
-                <MdNotificationsNone
-                  className={`w-7 h-7 transition-colors duration-300 ${
-                    hasUnread ? "text-primary" : ""
-                  }`}
-                />
-              </motion.div>
-            </div>
-          </div>
-        </label>
-      </div>
-      <div className="drawer-side">
-        <label
-          htmlFor={drawerId}
-          aria-label="close sidebar"
-          className="drawer-overlay"
-        />
-
-        <div className="menu bg-base-200 min-h-full w-100 p-0">
-          {/* Sidebar content here */}
-          <div className="flex flex-row">
-            <h2 className="text-xl font-bold p-4 pb-0 w-full">Notifications</h2>
-            <label
-              htmlFor={drawerId}
-              className="btn btn-ghost p-0 h-8 w-8 m-2 cursor-pointer"
-            >
-              <IoMdClose className="w-5 h-5" />
-            </label>
-          </div>
-          <button
-            className="text-error hover:underline p-4 pt-0 text-left cursor-pointer"
-            onClick={handleDeleteAll}
+    <>
+      {/* Button only - no drawer wrapper */}
+      <label htmlFor={drawerId} className="drawer-button">
+        <div className="btn btn-ghost btn-circle hover:bg-base-200/50 relative">
+          <motion.div
+            key={hasUnread ? "unread" : "read"}
+            animate={
+              hasUnread
+                ? { rotate: [0, -15, 15, -10, 10, 0, 0, 0, 0, 0, 0, 0, 0] }
+                : { rotate: 0 }
+            }
+            transition={
+              hasUnread
+                ? { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                : { duration: 0.3 }
+            }
           >
-            Clear All
-          </button>
-          {notifications.map((notification) => (
-            <NotificationBox
-              key={notification.id}
-              notification={notification}
-              isFirst={notifications[0].id === notification.id}
-              onCloseAction={() => handleDeleteNotification(notification.id)}
+            <MdNotificationsNone
+              className={`w-6 h-6 transition-colors duration-300 ${
+                hasUnread ? "text-primary" : "text-base-content/70"
+              }`}
             />
-          ))}
-          {loading && (
-            <>
-              <NotificationBoxSkeleton />
-              <NotificationBoxSkeleton />
-              <NotificationBoxSkeleton />
-            </>
+          </motion.div>
+          {hasUnread && (
+            <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-pulse"></span>
           )}
         </div>
-      </div>
-    </div>
+      </label>
+
+      {/* Drawer - portalled to document body */}
+      {mounted &&
+        createPortal(
+          <div className="drawer drawer-end fixed inset-0 z-50 pointer-events-none">
+            <input
+              id={drawerId}
+              type="checkbox"
+              className="drawer-toggle"
+              onChange={(e) => {
+                if (e.target.checked) {
+                  handleReadAll();
+                }
+              }}
+            />
+            <div className="drawer-side pointer-events-auto">
+              <label
+                htmlFor={drawerId}
+                aria-label="close sidebar"
+                className="drawer-overlay"
+              />
+
+              <div className="menu bg-gradient-to-b from-base-100 to-base-200 min-h-full w-100 p-0 shadow-xl border-l border-base-content/5">
+                {/* Sidebar content here */}
+                <div className="flex flex-row items-center bg-base-100/50 border-b border-base-content/5 backdrop-blur-sm sticky top-0 z-10 text-base-content">
+                  <h2 className="text-xl font-bold p-4 pb-3 w-full">
+                    Notifications
+                  </h2>
+                  <label
+                    htmlFor={drawerId}
+                    className="btn btn-ghost btn-sm btn-circle m-2 cursor-pointer hover:bg-base-200"
+                  >
+                    <IoMdClose className="w-5 h-5" />
+                  </label>
+                </div>
+                <div className="px-4 pb-3">
+                  <button
+                    className="text-error hover:underline text-sm cursor-pointer transition-all hover:text-error/80"
+                    onClick={handleDeleteAll}
+                  >
+                    Clear All
+                  </button>
+                </div>
+                <div className="overflow-y-auto flex-1">
+                  {notifications.map((notification) => (
+                    <NotificationBox
+                      key={notification.id}
+                      notification={notification}
+                      isFirst={notifications[0].id === notification.id}
+                      onCloseAction={() =>
+                        handleDeleteNotification(notification.id)
+                      }
+                    />
+                  ))}
+                  {loading && (
+                    <>
+                      <NotificationBoxSkeleton />
+                      <NotificationBoxSkeleton />
+                      <NotificationBoxSkeleton />
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+    </>
   );
 };
 
 export const NotificationBoxSkeleton = () => {
   return (
-    <div className="skeleton h-[87px] rounded-none border-l-2 border-primary" />
+    <div className="skeleton h-[87px] border-l-4 border-primary/50 mx-2 my-1 rounded-lg" />
   );
 };
 
@@ -231,30 +252,35 @@ export const NotificationBox = ({
 
   return (
     <div
-      className={`border border-b border-base-300 text-left
-        ${isFirst ? "border-t" : ""}
-        ${notification.isRead ? "" : "border-l-primary border-l-2"}`}
+      className={`border-l-4 mx-2 my-1 rounded-lg bg-base-100/80 hover:bg-base-100 transition-all duration-200 text-base-content ${
+        notification.isRead ? "border-base-300" : "border-primary shadow-sm"
+      }`}
     >
-      <div className="flex flex-row p-2 gap-2">
-        <div className={`flex items-center justify-center m-2`}>
+      <div className="flex flex-row p-3 gap-3">
+        <div className={`flex items-center justify-center flex-shrink-0`}>
           {notificationTypeToImage(notification.type)}
         </div>
-        <div className="flex flex-col gap-1 w-full items-start">
-          <p>{notificationTypeToMessage(notification, notificationData)}</p>
-          <p className="font-light">
+        <div className="flex flex-col gap-1.5 w-full items-start">
+          <p className="text-sm font-medium text-base-content">
+            {notificationTypeToMessage(notification, notificationData)}
+          </p>
+          <p className="text-xs text-base-content/60">
             {getRelativeTime(new Date(notification.createdAt))}
           </p>
           <Link
-            className="text-primary hover:underline w-fit"
+            className="text-primary hover:underline w-fit text-sm font-medium transition-colors"
             href={notificationTypeToLink(notification.type, notificationData)}
             onCanPlay={onCloseAction}
           >
-            View
+            View Details →
           </Link>
         </div>
-        <div>
-          <button className="btn btn-ghost p-0 h-5 w-5" onClick={onCloseAction}>
-            <IoMdClose />
+        <div className="flex-shrink-0">
+          <button
+            className="btn btn-ghost btn-sm btn-circle hover:bg-error/10 hover:text-error"
+            onClick={onCloseAction}
+          >
+            <IoMdClose className="w-4 h-4" />
           </button>
         </div>
       </div>

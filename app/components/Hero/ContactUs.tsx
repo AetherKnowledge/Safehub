@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { FaFacebook } from "react-icons/fa";
+import { FaPhone } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import SafehubIcon from "../Images/SafehubIcon";
 
@@ -29,8 +28,8 @@ const ContactUs = () => {
           </h2>
           <p className="mt-3 text-sm md:text-base text-base-content/70 max-w-2xl mx-auto">
             Reach out to LCUP Social Welfare Services online. Message us on
-            Facebook or send us an email and we&apos;ll get back to you as soon as
-            possible.
+            Facebook or send us an email and we&apos;ll get back to you as soon
+            as possible.
           </p>
         </motion.div>
 
@@ -59,18 +58,17 @@ const ContactUs = () => {
           >
             {/* Facebook */}
             <div className="flex flex-col items-center text-center gap-3 rounded-2xl border border-base-300 bg-base-100 p-6 shadow-sm">
-              <FaFacebook className="text-4xl text-blue-600" />
-              <p className="font-semibold text-base-content">
-                Message us on Facebook
+              <FaPhone className="text-4xl text-primary" />
+              <p className="font-semibold text-base-content">Contact us</p>
+              <p className="text-sm opacity-80">
+                BED: (044) 931-8638 Local 138 Local 112
               </p>
-              <Link
-                className="text-sm opacity-80 break-all hover:text-primary transition-colors"
-                href="https://facebook.com/sws.lcup.college"
-                target="_blank"
-                rel="noreferrer"
-              >
-                https://facebook.com/sws.lcup.college
-              </Link>
+              <p className="text-sm opacity-80">
+                College/Career: (044) 931-8615 Local 115
+              </p>
+              <p className="text-sm opacity-80">
+                Extension Office: (044) 931-8659 Local 119
+              </p>
             </div>
 
             {/* OR Separator */}
@@ -83,11 +81,20 @@ const ContactUs = () => {
             </div>
 
             {/* Email */}
-            <button className="flex flex-col items-center text-center gap-1 rounded-2xl border border-base-300 bg-base-100 p-6 shadow-sm cursor-default">
+            <button className="flex flex-col items-center text-center gap-1 rounded-2xl border border-base-300 bg-base-100 p-6 shadow-sm">
               <MdEmail className="text-4xl text-primary" />
               <p className="text font-semibold text-base-content">Email us</p>
               <p className="text-sm opacity-80">
+                lcupguidance.kto10@email.lcup.edu.ph
+              </p>
+              <p className="text-sm opacity-80">
+                lcupguidance.shs@email.lcup.edu.ph
+              </p>
+              <p className="text-sm opacity-80">
                 lcupguidance.college@email.lcup.edu.ph
+              </p>
+              <p className="text-sm opacity-80">
+                lcupguidance.gs@email.lcup.edu.ph
               </p>
             </button>
           </motion.div>

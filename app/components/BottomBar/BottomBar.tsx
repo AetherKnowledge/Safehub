@@ -54,22 +54,28 @@ const BottomBar = () => {
   const items = getItemsForRole(data?.user?.type ?? null);
 
   return (
-    <nav className="lg:hidden bg-base-100 rounded-lg shadow-br z-20">
-      <ul className="flex items-center justify-center gap-1 overflow-x-auto px-2 py-1">
+    <nav className="lg:hidden bg-gradient-to-r from-base-100 to-base-200/50 rounded-xl shadow-xl border border-base-content/5 z-20 backdrop-blur-sm">
+      <ul className="flex items-center justify-center gap-1 overflow-x-auto px-2 py-2">
         {items.map(({ href, Icon, label }) => {
           const active = pathname?.startsWith(href);
           return (
             <li key={href} className="flex-1">
               <Link
                 href={href}
-                className={`flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-md min-w-[64px] transition-colors ${
+                className={`flex flex-col items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl min-w-[64px] transition-all duration-200 ${
                   active
-                    ? "text-primary"
-                    : "text-base-content/70 hover:text-base-content"
+                    ? "text-primary-content bg-primary shadow-md scale-105"
+                    : "text-base-content/70 hover:text-base-content hover:bg-base-200/50"
                 }`}
               >
-                <Icon size={20} />
-                <span className="text-[11px] leading-none">{label}</span>
+                <Icon size={22} />
+                <span
+                  className={`text-[10px] leading-none font-medium ${
+                    active ? "font-semibold" : ""
+                  }`}
+                >
+                  {label}
+                </span>
               </Link>
             </li>
           );

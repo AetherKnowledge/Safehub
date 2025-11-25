@@ -48,20 +48,40 @@ const CounselorList = ({ name }: { name?: string }) => {
       {loading ? (
         <div className="flex flex-col items-center justify-center space-y-4 w-full h-full">
           <div className="loading loading-spinner loading-lg text-primary"></div>
-          <p className="text-base-content">Loading registered counselors...</p>
+          <p className="text-base-content/70 font-medium">
+            Loading registered counselors...
+          </p>
         </div>
       ) : counselors.length === 0 ? (
-        <p className="flex text-center text-base-content/70 w-full h-full justify-center items-center">
-          No registered counselors available.
-        </p>
+        <div className="flex flex-col items-center justify-center w-full h-full text-center p-8">
+          <svg
+            className="w-24 h-24 text-base-content/30 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
+          <p className="text-lg font-semibold text-base-content/70 mb-2">
+            No counselors found
+          </p>
+          <p className="text-sm text-base-content/50">
+            Try adjusting your search or filter criteria
+          </p>
+        </div>
       ) : (
         <table className="table w-full">
-          <thead className="text-center text-base-content">
+          <thead className="text-center text-base-content bg-base-300/50 border-b-2 border-base-content/10">
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Rating</th>
-              <th>Status</th>
+              <th className="font-semibold">Name</th>
+              <th className="font-semibold">Email</th>
+              <th className="font-semibold">Rating</th>
+              <th className="font-semibold">Status</th>
             </tr>
           </thead>
           <tbody className="text-base-content text-center">
@@ -78,21 +98,34 @@ const CounselorList = ({ name }: { name?: string }) => {
                     transition: { duration: 0.3 },
                   }}
                   transition={{ duration: 0.3 }}
-                  className="origin-top"
+                  className="origin-top hover:bg-primary/5 transition-colors border-b border-base-content/5"
                 >
                   <td>
                     <div className="flex items-center gap-4">
-                      <UserImage
-                        src={counselor.image}
-                        name={counselor.name ?? "User"}
-                        width={10}
-                      />
-                      <div className="font-medium">{counselor.name}</div>
+                      <div className="ring-2 ring-primary/20 ring-offset-2 ring-offset-base-100 rounded-full">
+                        <UserImage
+                          src={counselor.image}
+                          name={counselor.name ?? "User"}
+                          width={10}
+                        />
+                      </div>
+                      <div className="font-semibold text-sm">
+                        {counselor.name}
+                      </div>
                     </div>
                   </td>
-                  <td>{counselor.email}</td>
+                  <td className="text-sm text-base-content/80">
+                    {counselor.email}
+                  </td>
                   <td>
-                    <StarRating rating={counselor.rating} />
+                    <div className="flex items-center justify-center gap-2">
+                      <StarRating rating={counselor.rating} />
+                      {counselor.rating > 0 && (
+                        <span className="text-xs font-semibold text-primary">
+                          {counselor.rating.toFixed(1)}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td>
                     {

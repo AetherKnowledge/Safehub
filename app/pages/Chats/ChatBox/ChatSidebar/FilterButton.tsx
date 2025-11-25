@@ -13,10 +13,16 @@ const FilterButton = ({
   defaultState?: boolean;
   onClick?: (value: string) => void;
 }) => {
+  const isActive = value.toLowerCase() === currentValue.toLowerCase();
+
   return (
     <button
-      className="btn btn-ghost shadow-none bg-base-100 disabled:bg-base-300 disabled:text-base-content hover:bg-base-200 active:bg-base-300 p-2 h-8"
-      disabled={value.toLowerCase() === currentValue.toLowerCase()}
+      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+        isActive
+          ? "bg-primary text-primary-content shadow-md"
+          : "bg-base-200/50 text-base-content/70 hover:bg-base-200 hover:text-base-content"
+      }`}
+      disabled={isActive}
       onClick={() => onClick?.(value)}
     >
       {children}

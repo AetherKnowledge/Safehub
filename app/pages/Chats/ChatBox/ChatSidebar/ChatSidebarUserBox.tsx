@@ -38,16 +38,23 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
   return (
     <Link
       href={`/user/chats/${chat.id}`}
-      className={`flex flex-row border-b-1 rounded rounded-b-none border-base-content/20 p-2 gap-2 ${
-        selected ? "bg-base-300" : "hover:bg-base-200 cursor-pointer"
-      } transition-opacity`}
+      className={`flex flex-row rounded-lg p-3 gap-3 mb-1 transition-all duration-200 ${
+        selected
+          ? "bg-primary/10 border border-primary/20 shadow-sm"
+          : "hover:bg-base-100 border border-transparent hover:shadow-sm"
+      }`}
     >
-      <UserImage
-        name={chat.name}
-        width={10}
-        src={chat.src || undefined}
-        bordered={chat.status === UserStatus.Online}
-      />
+      <div className="relative">
+        <UserImage
+          name={chat.name}
+          width={10}
+          src={chat.src || undefined}
+          bordered={chat.status === UserStatus.Online}
+        />
+        {chat.status === UserStatus.Online && (
+          <div className="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border-2 border-base-100"></div>
+        )}
+      </div>
       <div className="flex flex-col justify-center overflow-hidden flex-1 min-w-0">
         <h2 className="font-semibold text-sm overflow-hidden text-ellipsis whitespace-nowrap">
           {chat.name}
@@ -57,8 +64,8 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
           {latestMessage?.content || "No messages yet"}
         </p>
       </div>
-      <div className="flex flex-col justify-end items-end">
-        <p className="text-xs text-base-content/60">
+      <div className="flex flex-col justify-center items-end flex-shrink-0">
+        <p className="text-xs text-base-content/50 whitespace-nowrap">
           {latestMessage ? getRelativeTime(latestMessage.createdAt) : ""}
         </p>
       </div>

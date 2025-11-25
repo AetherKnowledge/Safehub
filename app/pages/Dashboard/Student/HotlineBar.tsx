@@ -13,12 +13,17 @@ type HotlineBarProps = {
 const HotlineBar = ({ className }: HotlineBarProps) => {
   return (
     <div
-      className={`${className} bg-base-100 p-2 rounded-lg shadow-br text-left text-base-content`}
+      className={`${className} bg-gradient-to-br from-base-100 to-base-200/50 p-5 rounded-xl shadow-xl text-left text-base-content border border-base-content/5`}
     >
-      <h2 className="font-semibold text-lg text-base-content px-2">Hotlines</h2>
-      <div className="flex flex-row min-h-20">
-        <div className="flex flex-col items-center justify-center text-center max-h-70 max-w-80">
-          <p className="italic p-4">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-1 h-6 bg-primary rounded-full"></div>
+        <h2 className="font-bold text-lg text-base-content">
+          Emergency Hotlines
+        </h2>
+      </div>
+      <div className="flex flex-col lg:flex-row gap-4 min-h-20">
+        <div className="flex flex-col items-center justify-center text-center max-h-70 lg:max-w-80 bg-base-200/30 rounded-lg p-4">
+          <p className="text-sm text-base-content/70 mb-3">
             Need emergency help? Call a hotline, we might be able to help ❤️
           </p>
           <HotlineSVG />
@@ -56,16 +61,18 @@ const HotlineTable = async ({ hotlines }: { hotlines: Hotline[] }) => {
           {hotlines.map((hotline) => (
             <Link
               key={hotline.id}
-              className="flex flex-row border border-base-300 rounded-lg p-2 items-center justify-center gap-2
-              hover:bg-base-300/50 active:bg-base-300 transition-colors
+              className="flex flex-row border border-base-content/10 rounded-lg p-3 items-center justify-center gap-3
+              hover:bg-primary/5 hover:border-primary/30 active:bg-primary/10 transition-all duration-200 hover:shadow-md group
               "
               href={hotline.website || `/user/hotline`}
               target="_blank"
             >
-              <div className="btn btn-primary rounded-full p-2">
-                <SlCallIn className="w-5 h-5" />
+              <div className="btn btn-primary btn-sm rounded-full p-2 group-hover:scale-110 transition-transform">
+                <SlCallIn className="w-4 h-4" />
               </div>
-              <p className="font-semibold w-full">{hotline.name}</p>
+              <p className="font-semibold w-full text-sm group-hover:text-primary transition-colors">
+                {hotline.name}
+              </p>
             </Link>
           ))}
         </div>

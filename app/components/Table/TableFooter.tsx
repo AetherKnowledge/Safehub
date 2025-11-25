@@ -21,10 +21,10 @@ const TableFooter = ({
   const bottomItem = Math.min(currentPage * perPage, itemCount);
 
   return (
-    <div className="mt-auto border-t border-base-300/70">
+    <div className="mt-auto border-t border-base-content/10 bg-gradient-to-r from-base-100 to-base-200/30">
       <div className="flex flex-row justify-between items-center p-4">
         <div className="w-full">
-          <p>
+          <p className="text-sm text-base-content/70 font-medium">
             {pageCount > 1
               ? `Showing ${topItem} to ${bottomItem} of ${itemCount} results`
               : `Showing all ${itemCount} results`}

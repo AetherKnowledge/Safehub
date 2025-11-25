@@ -34,11 +34,13 @@ export function ChatBox({ chat }: { chat: ChatData }) {
   };
 
   return (
-    <div className="flex flex-col rounded-lg w-full h-full bg-base-100 overflow-y-auto shadow-br p-4">
-      <ChatHeader chat={chat} />
+    <div className="flex flex-col rounded-xl w-full h-full bg-gradient-to-br from-base-100 to-base-200 overflow-hidden shadow-xl border border-base-content/5">
+      <div className="bg-base-100/50 border-b border-base-content/5">
+        <ChatHeader chat={chat} />
+      </div>
       {/* Scrollable chat history */}
       <div
-        className="group flex-1 flex flex-col gap-2 overflow-y-auto scrollbar-gutter:stable"
+        className="group flex-1 flex flex-col gap-2 overflow-y-auto scrollbar-gutter:stable p-4"
         ref={chatContainerRef}
       >
         <ChatHistory
@@ -49,7 +51,9 @@ export function ChatBox({ chat }: { chat: ChatData }) {
       </div>
 
       {/* Fixed input bar */}
-      <ChatBoxInput asyncOnsend={messaging.sendMessage} />
+      <div className="p-4 bg-base-100/50 border-t border-base-content/5">
+        <ChatBoxInput asyncOnsend={messaging.sendMessage} />
+      </div>
     </div>
   );
 }

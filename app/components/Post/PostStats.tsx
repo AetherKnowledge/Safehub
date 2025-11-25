@@ -55,8 +55,8 @@ const PostStats = ({ post, showPopup, setShowPopup }: PostStatsProps) => {
     }
   };
   return (
-    <div className="flex justify-between items-center text-sm text-base-content/80">
-      <div className="flex items-start gap-2 w-full">
+    <div className="flex justify-between items-center text-sm text-base-content/80 bg-base-200/30 rounded-lg p-3 border border-base-content/5">
+      <div className="flex items-start gap-3 w-full">
         <StatButton
           onChange={async (value: boolean) => {
             changeStatus(value, true);
@@ -64,7 +64,7 @@ const PostStats = ({ post, showPopup, setShowPopup }: PostStatsProps) => {
           icon={FaRegHeart}
           value={likeStats}
           label="Likes"
-          color="text-blue-500"
+          color="text-error"
         />
         <StatButton
           onChange={async (value: boolean) => {
@@ -73,7 +73,7 @@ const PostStats = ({ post, showPopup, setShowPopup }: PostStatsProps) => {
           icon={FaRegComment}
           value={{ count: post.comments.length, selected: showPopup }}
           label="Comments"
-          color="text-yellow-500"
+          color="text-primary"
           commentBtn
         />
       </div>

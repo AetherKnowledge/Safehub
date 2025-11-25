@@ -12,7 +12,7 @@ const EvaluationButton = ({
 }) => {
   return (
     <Link
-      className="flex flex-row btn bg-blue-500 hover:bg-blue-600 active:bg-blue-800 text-white gap-1 justify-center items-center btn-sm h-8"
+      className="flex flex-row btn bg-blue-500 hover:bg-blue-600 active:bg-blue-800 text-white gap-1 justify-center items-center btn-sm h-8 py-1"
       href={`/user/appointments/${appointment.id}/evaluation`}
     >
       <MdMessage className="w-3 h-3" />

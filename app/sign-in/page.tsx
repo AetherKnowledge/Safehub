@@ -14,6 +14,12 @@ const containerVariants = {
 
 export default function SignInPage() {
   const session = useSession();
+  const searchParams = useSearchParams();
+  const callbackUrl = "/user/dashboard";
+  const error = searchParams.get("error");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   if (session.data) {
     return (
@@ -25,14 +31,6 @@ export default function SignInPage() {
       />
     );
   }
-
-  const searchParams = useSearchParams();
-  const callbackUrl = "/user/dashboard";
-  const error = searchParams.get("error");
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();

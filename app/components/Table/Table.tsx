@@ -55,19 +55,19 @@ const Table = ({
   }, [rows.length, perPage, currentPage, containerRef.current]);
 
   return (
-    <div className="flex-1 flex flex-col bg-base-100 shadow-br rounded-lg min-h-0 overflow-x-hidden">
+    <div className="flex-1 flex h-full flex-col bg-gradient-to-br from-base-100 to-base-200/30 shadow-xl rounded-xl rounded-t-none min-h-0 overflow-hidden border border-base-content/5">
       {topActions && <TableTopActions />}
 
       <div className="flex-1 flex flex-col text-center overflow-x-auto min-h-0">
         {header}
 
         {isLoading ? (
-          <div className="flex-1 border-b border-base-300/70 overflow-y-auto min-h-0 items-center justify-center flex">
+          <div className="flex-1 border-b border-base-content/5 overflow-y-auto min-h-0 items-center justify-center flex">
             <DefaultLoading size="loading-lg" message="Loading table data..." />
           </div>
         ) : (
           <div
-            className="flex-1 border-b border-base-300/70 overflow-y-auto min-h-0"
+            className="flex-1 border-b border-base-content/5 overflow-y-auto min-h-0"
             ref={containerRef}
           >
             {visibleRows.map((row, index) => {
@@ -77,7 +77,7 @@ const Table = ({
                 <div
                   key={`row${index}`}
                   ref={index === 0 ? rowRef : null} // measure only first row
-                  className={`flex flex-row flex-1 border-b border-base-300/70 text-center items-center justify-center ${
+                  className={`flex flex-row flex-1 border-b border-base-content/5 text-center items-center justify-center transition-all duration-200 hover:bg-primary/5 ${
                     isLast ? "border-b-0" : ""
                   }`}
                 >

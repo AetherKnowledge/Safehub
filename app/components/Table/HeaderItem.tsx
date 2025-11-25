@@ -30,11 +30,11 @@ const HeaderItem = ({
   }, [searchParams]);
 
   return (
-    <div className="flex flex-row items-center justify-center w-full p-4 text-sm font-semibold">
+    <div className="flex flex-row items-center justify-center w-full p-4 text-sm">
       {children}
       {sortKey && (
         <span
-          className="ml-2 cursor-pointer text-base-content/70 hover:text-base-content"
+          className="ml-2 cursor-pointer text-base-content/60 hover:text-primary transition-colors"
           onClick={() => {
             if (!sortKey) return;
             const newOrder =
@@ -47,12 +47,12 @@ const HeaderItem = ({
             router.push(`${pathName}?${params.toString()}`);
           }}
         >
-          <button className="btn btn-ghost p-1 h-6">
+          <button className="btn btn-ghost btn-sm p-1 h-7 min-h-7 hover:bg-primary/10">
             {sortKey ? (
               currentOrder === Order.Asc ? (
-                <FaChevronUp />
+                <FaChevronUp className="text-xs" />
               ) : (
-                <FaChevronDown />
+                <FaChevronDown className="text-xs" />
               )
             ) : null}
           </button>

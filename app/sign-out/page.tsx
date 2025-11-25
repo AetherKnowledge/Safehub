@@ -46,7 +46,7 @@ export default function SignOutPage() {
           <div className="space-y-3 mt-4">
             <button
               type="button"
-              onClick={() => signOut({ callbackUrl: "/sign-in" })}
+              onClick={() => signOut({ callbackUrl: "/" })}
               className="btn btn-error w-full flex items-center justify-center gap-2 text-sm"
             >
               <LogOut size={18} />

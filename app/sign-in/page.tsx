@@ -19,7 +19,7 @@ export default function SignInPage() {
   }
 
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const callbackUrl = searchParams.get("callbackUrl") || "/user/dashboard";
   const error = searchParams.get("error");
 
   const [email, setEmail] = useState("");
@@ -34,7 +34,7 @@ export default function SignInPage() {
       await signIn("credentials", {
         email,
         password,
-        callbackUrl,
+        redirectTo: "/user/dashboard",
       });
     } finally {
       setLoading(false);

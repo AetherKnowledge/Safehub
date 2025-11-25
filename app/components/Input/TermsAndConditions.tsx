@@ -42,9 +42,32 @@ const TermsAndConditions = ({ readOnly = false }: { readOnly?: boolean }) => {
 const TermsAndConditionsModal = ({ onClose }: { onClose?: () => void }) => {
   return (
     <ModalBase onClose={onClose}>
-      <div className="bg-base-200 p-4 rounded shadow-md text-base-content">
-        <div className="flex flex-col max-w-200 min-h-0 max-h-150 overflow-y-auto py-2">
-          <div className={`prose max-w-none text-base-content`}>
+      <div className="bg-base-100 text-base-content shadow-2xl rounded-2xl border border-base-300 max-w-3xl w-[90vw] sm:w-[80vw] max-h-[80vh] flex flex-col">
+        <div className="px-5 pt-4 pb-3 border-b border-base-300 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.25em] uppercase text-primary mb-1">
+              SafeHub · LCUP
+            </p>
+            <h2 className="text-lg sm:text-xl font-semibold leading-snug">
+              Terms & Conditions
+            </h2>
+            <p className="mt-1 text-xs sm:text-sm text-base-content/70 max-w-xl">
+              Please review how SafeHub works, what it can and cannot do, and your
+              responsibilities as a user.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn btn-xs btn-ghost text-base-content/80"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="px-5 py-3 overflow-y-auto flex-1">
+          <div className={`prose prose-sm max-w-none text-base-content`}
+          >
             <ReactMarkdown>
               {`# SafeHub – Terms and Conditions
 
@@ -140,9 +163,9 @@ Continued use of the platform constitutes acceptance of the updated terms.
             </ReactMarkdown>
           </div>
         </div>
-        <div className="flex flex-row justify-end">
-          <button onClick={onClose} className="btn mt-2">
-            Close
+        <div className="px-5 pb-4 pt-2 border-t border-base-300 flex justify-end">
+          <button onClick={onClose} className="btn btn-primary btn-sm">
+            I understand
           </button>
         </div>
       </div>

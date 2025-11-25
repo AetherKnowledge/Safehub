@@ -5,6 +5,7 @@ import { Chrome, Lock, LogIn, Mail } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
+import ErrorPopup from "../components/Popup/ErrorPopup";
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -15,7 +16,14 @@ export default function SignInPage() {
   const session = useSession();
 
   if (session.data) {
-    throw new Error("You are already signed in.");
+    return (
+      <ErrorPopup
+        message="You are already signed in."
+        retry
+        redirectTo="/"
+        notTransparent
+      />
+    );
   }
 
   const searchParams = useSearchParams();

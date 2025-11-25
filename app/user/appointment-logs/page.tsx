@@ -1,3 +1,4 @@
+import ErrorPopup from "@/app/components/Popup/ErrorPopup";
 import { UserType } from "@/app/generated/prisma";
 import LogsTable from "@/app/pages/Appointment/LogsTable";
 import { getLogs } from "@/app/pages/Appointment/LogsTable/LogActions";
@@ -17,7 +18,9 @@ type Props = {
 const AppointmentLogsPage = async ({ searchParams }: Props) => {
   const session = await auth();
   if (!session?.user || session.user.type !== UserType.Admin) {
-    throw new Error("Unauthorized");
+    return (
+      <ErrorPopup message="You do not have permission to view this page." />
+    );
   }
 
   const awaitedSearchParams = await searchParams;
@@ -28,7 +31,7 @@ const AppointmentLogsPage = async ({ searchParams }: Props) => {
 
   const result = await getLogs({ sortBy, order });
   if (!result.success) {
-    throw new Error("Failed to fetch logs");
+    return <ErrorPopup message={result.message} />;
   }
 
   return <LogsTable logs={result.data || []} />;

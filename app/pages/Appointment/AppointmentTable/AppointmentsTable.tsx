@@ -84,7 +84,7 @@ function AppointmentRow({
   return (
     <tr className="border-b border-base-content/30 text-center">
       <td className="px-3 py-4">
-        <div className="flex flex-wrap items-center justify-center gap-2">
+        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
           <UserCell userType={userType} appointment={appointment} />
         </div>
       </td>

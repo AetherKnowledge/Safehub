@@ -52,7 +52,11 @@ const UpcomingAppointmentRow = ({
         )}
       </td>
       <td className="flex flex-col w-full">
-        <p className="text-[10px]">Counselor:</p>
+        <p className="text-[10px]">
+          {session.data?.user.type === UserType.Counselor
+            ? "Student:"
+            : "Counselor:"}
+        </p>
         <p className="font-semibold text-xs">{userData.user.name}</p>
       </td>
       <td className="flex flex-col w-full">

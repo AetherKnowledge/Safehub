@@ -1,4 +1,5 @@
 import { BuiltFormDataWithAnswers } from "@/app/components/Forms/EditableFormBuilder";
+import ErrorPopup from "@/app/components/Popup/ErrorPopup";
 import { FormType, UserType } from "@/app/generated/prisma";
 import { getAppointmentById } from "@/app/pages/Appointment/AppointmentActions";
 import EvaluationForm from "@/app/pages/Appointment/Evaluation/EvaluationForm";
@@ -39,11 +40,11 @@ const page = async ({
   const latestForms = await fetchForms(FormType.EVALUATION);
 
   if (!latestForms.success || !latestForms.data) {
-    throw new Error("Evaluation form is not set up...");
+    return <ErrorPopup message="Evaluation form is not set up..." />;
   }
 
   if (session?.user.type === UserType.Counselor) {
-    throw new Error("Students hasn't submitted evaluation yet.");
+    return <ErrorPopup message="Students hasn't submitted evaluation yet." />;
   }
 
   return (

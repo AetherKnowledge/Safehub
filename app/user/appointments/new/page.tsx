@@ -1,3 +1,4 @@
+import ErrorPopup from "@/app/components/Popup/ErrorPopup";
 import { FormType, UserType } from "@/app/generated/prisma";
 import Booking from "@/app/pages/Booking";
 import { fetchForms } from "@/app/pages/Forms/formsActions";
@@ -11,10 +12,10 @@ const AppointmentPage = async () => {
 
   const result = await fetchForms(FormType.BOOKING);
   if (!result.success) {
-    throw new Error(result.message);
+    return <ErrorPopup message={result.message} />;
   }
   if (!result.data) {
-    throw new Error("Booking form not found");
+    return <ErrorPopup message="Booking form not found" />;
   }
 
   return <Booking form={result.data} />;

@@ -1,3 +1,4 @@
+import ErrorPopup from "@/app/components/Popup/ErrorPopup";
 import RatingSummary from "@/app/components/RatingSummary";
 import { getEvaluationTableData } from "./EvaluationActions";
 import EvaluationTable from "./EvaluationTable";
@@ -6,7 +7,7 @@ const Evaluation = async () => {
   const result = await getEvaluationTableData();
 
   if (!result.success) {
-    throw new Error("Failed to fetch evaluation data");
+    return <ErrorPopup message={result.message} />;
   }
 
   return (

@@ -1,4 +1,7 @@
-import { createManyChatsWithOthers } from "@/lib/utils";
+import {
+  createManyChatsWithOthers,
+  removeManyChatsWithOthers,
+} from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcrypt";
@@ -117,12 +120,28 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       if (!newUser) return;
 
-      await prisma.student.create({
-        data: {
-          studentId: newUser.id,
-        },
-      });
-      createManyChatsWithOthers(UserType.Counselor, newUser.id);
+      const maamEdzEmail = "edna.dayao@email.lcup.edu.ph";
+
+      if (newUser.email === maamEdzEmail) {
+        await prisma.admin.create({
+          data: {
+            adminId: newUser.id,
+          },
+        });
+        await prisma.user.update({
+          where: { id: newUser.id },
+          data: { type: UserType.Admin },
+        });
+        removeManyChatsWithOthers(UserType.Counselor, newUser.id);
+        createManyChatsWithOthers(UserType.Counselor, newUser.id);
+      } else {
+        await prisma.student.create({
+          data: {
+            studentId: newUser.id,
+          },
+        });
+        createManyChatsWithOthers(UserType.Counselor, newUser.id);
+      }
     },
   },
   pages: {

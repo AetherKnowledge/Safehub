@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import BottomBar from "../components/BottomBar/BottomBar";
 import MoodTrackerPopup from "../components/MoodTracker";
 import UserNavbar from "../components/Navbar/UserNavbar";
+import ErrorPopup from "../components/Popup/ErrorPopup";
 import { UserType } from "../generated/prisma";
 import { hasOnboarded } from "../pages/Onboarding/OnboardingActions";
 
@@ -19,7 +20,14 @@ const Layout = async ({ children }: Props) => {
   }
 
   if (session.user?.deactivated) {
-    throw new Error("Account Deactivated. Please contact support.");
+    return (
+      <ErrorPopup
+        message="Your account has been deactivated. Please contact support for more information."
+        retry
+        redirectTo="/"
+        notTransparent
+      />
+    );
   }
 
   if (

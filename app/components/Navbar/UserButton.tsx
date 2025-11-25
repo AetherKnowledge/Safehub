@@ -6,6 +6,7 @@ import { FaChevronDown } from "react-icons/fa6";
 import { Await } from "react-router";
 import DarkModeToggle from "../DarkModeToggle/DarkModeToggle";
 import UserImage from "../UserImage";
+import SignInButton from "./SignInButton";
 
 const UserButton = async () => {
   return (
@@ -32,17 +33,6 @@ const LoadingUserButton = () => {
         </div>
       </div>
     </div>
-  );
-};
-
-const SignInButton = () => {
-  return (
-    <Link
-      className="btn btn-primary w-25 font-semibold duration-150 ease-in-out hover:scale-105"
-      href="/api/auth/signin"
-    >
-      Sign in
-    </Link>
   );
 };
 

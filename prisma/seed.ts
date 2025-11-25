@@ -307,6 +307,9 @@ async function main() {
   const counselorHashedPassword = await hash("test", 10);
   const counselorUUID = "52866741-dc71-4ced-b5ad-993419a730bc";
 
+  const studentHashedPassword = await hash("user", 10);
+  const studentUUID = "52866741-dc71-4ced-b5ad-993419a730bd";
+
   await client.query(`
     GRANT USAGE ON schema public TO authenticated;
   `);
@@ -781,6 +784,33 @@ async function main() {
 
   // Enable pgcrypto extension for gen_random_uuid()
   await client.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
+
+  // Create User user
+  await client.query(
+    `
+    INSERT INTO public."User" (id, email, name, password, image, "createdAt", "updatedAt")
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    ON CONFLICT (email) DO NOTHING
+    `,
+    [
+      studentUUID,
+      "admin@admin.com",
+      "Admin",
+      studentHashedPassword,
+      null,
+      now,
+      now,
+    ]
+  );
+
+  await client.query(
+    `
+    INSERT INTO public."Student" ("studentId")
+    VALUES ($1)
+    ON CONFLICT DO NOTHING
+    `,
+    [studentUUID]
+  );
 
   // Create Admin user
   await client.query(

@@ -13,7 +13,7 @@ const ModalBase = ({
   className,
   onClose,
   notTransparent = false,
-  bgColor = "bg-transparent",
+  bgColor = "bg-base-100",
 }: {
   children: React.ReactNode;
   className?: string;

@@ -12,6 +12,7 @@ import TextArea from "@/app/components/Input/TextArea";
 import ModalBase from "@/app/components/Popup/ModalBase";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { addMinutes } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegCheckCircle, FaRegClipboard } from "react-icons/fa";
 import {
@@ -28,25 +29,28 @@ const FollowUpButton = ({ appointment }: { appointment: AppointmentData }) => {
   const [reason, setReason] = useState<string>("");
 
   const statusPopup = usePopup();
+  const router = useRouter();
 
   async function handleSubmit() {
     statusPopup.showLoading("Creating follow up appointment...");
 
     if (!startTime) {
-      statusPopup.hidePopup();
       statusPopup.showError("Please select a valid start time.");
       return;
     }
 
     if (!endTime) {
-      statusPopup.hidePopup();
       statusPopup.showError("Please select a valid end time.");
       return;
     }
 
+    const endDateTime = new Date(startTime);
+    endDateTime.setHours(endTime.getHours());
+    endDateTime.setMinutes(endTime.getMinutes());
+
     const conflicts = await checkForConflictingDate(
       startTime,
-      endTime || addMinutes(startTime, 60),
+      endDateTime,
       appointment.id
     );
 
@@ -54,16 +58,15 @@ const FollowUpButton = ({ appointment }: { appointment: AppointmentData }) => {
       const confirm = await statusPopup.showYesNo(
         `The selected time conflicts with ${conflicts.length} existing appointment(s). Do you still want to proceed?`
       );
-      if (!confirm) {
-        statusPopup.hidePopup();
-        return;
-      }
+      if (!confirm) return;
+
+      statusPopup.showLoading("Creating follow up appointment...");
     }
 
     const result = await createFollowUpAppointment({
       appointmentId: appointment.id,
       startTime,
-      endTime: endTime || addMinutes(startTime, 60),
+      endTime: endDateTime,
       reason,
     });
 
@@ -75,6 +78,8 @@ const FollowUpButton = ({ appointment }: { appointment: AppointmentData }) => {
     }
 
     statusPopup.showSuccess("Follow up appointment created successfully.");
+    setShowModal(false);
+    router.refresh();
   }
 
   return (
@@ -138,10 +143,7 @@ const FollowUpButton = ({ appointment }: { appointment: AppointmentData }) => {
                   }
                   maxTime={{ hour: 8, minute: 0, period: TimePeriod.PM }}
                   onChange={(time: Time) => {
-                    setEndTime((prev) => {
-                      if (!prev) return prev;
-                      return setTimeToDate(new Date(prev), time);
-                    });
+                    setEndTime(setTimeToDate(new Date(), time));
                   }}
                   required
                 />

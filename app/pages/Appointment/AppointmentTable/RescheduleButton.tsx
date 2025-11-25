@@ -38,14 +38,25 @@ const RescheduleButton = ({
   async function confirmReschedule() {
     if (!startTime) return;
 
-    console.log(startTime, endTime);
-
-    setShowModal(false);
     statusPopup.showLoading("Updating appointment...");
+
+    if (!startTime) {
+      statusPopup.showError("Please select a valid start time.");
+      return;
+    }
+
+    if (!endTime) {
+      statusPopup.showError("Please select a valid end time.");
+      return;
+    }
+
+    const endDateTime = new Date(startTime);
+    endDateTime.setHours(endTime.getHours());
+    endDateTime.setMinutes(endTime.getMinutes());
 
     const conflicts = await checkForConflictingDate(
       startTime,
-      endTime || addMinutes(startTime, 60),
+      endDateTime,
       appointment.id
     );
 
@@ -53,16 +64,15 @@ const RescheduleButton = ({
       const confirm = await statusPopup.showYesNo(
         `The selected time conflicts with ${conflicts.length} existing appointment(s). Do you still want to proceed?`
       );
-      if (!confirm) {
-        statusPopup.hidePopup();
-        return;
-      }
+      if (!confirm) return;
+
+      statusPopup.showLoading("Updating appointment...");
     }
 
     const result = await rescheduleAppointment(
       appointment.id,
       startTime,
-      endTime || addMinutes(startTime, 60)
+      endDateTime
     );
 
     if (!result.success) {
@@ -71,6 +81,7 @@ const RescheduleButton = ({
     }
 
     statusPopup.showSuccess("Appointment updated successfully!");
+    setShowModal(false);
     router.refresh();
   }
 
@@ -90,7 +101,7 @@ const RescheduleButton = ({
               <p className="font-semibold text-2xl">Pick a new schedule</p>
               <div className="flex flex-col gap-3 items-center text-center">
                 <DateTimeSelector
-                  name="test"
+                  name={`startTime-reschedule-${appointment.id}`}
                   horizontal
                   minDate="now"
                   minTime={{ hour: 8, minute: 0, period: TimePeriod.AM }}
@@ -102,7 +113,7 @@ const RescheduleButton = ({
                   required
                 />
                 <TimeSelector
-                  name="endTime"
+                  name={`endTime-reschedule-${appointment.id}`}
                   value={endTime ? getTimeFromDate(endTime) : undefined}
                   minTime={
                     startTime
@@ -111,10 +122,7 @@ const RescheduleButton = ({
                   }
                   maxTime={{ hour: 8, minute: 0, period: TimePeriod.PM }}
                   onChange={(time: Time) => {
-                    setEndTime((prev) => {
-                      if (!prev) return prev;
-                      return setTimeToDate(new Date(prev), time);
-                    });
+                    setEndTime(setTimeToDate(new Date(), time));
                   }}
                 />
               </div>

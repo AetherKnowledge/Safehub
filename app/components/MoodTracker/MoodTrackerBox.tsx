@@ -1,6 +1,7 @@
 "use client";
 
 import { MoodType } from "@/app/generated/prisma";
+import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import {
   getCurrentUserMoodThisWeek,
@@ -21,9 +22,9 @@ const MoodTrackerBox = ({
 }) => {
   const [showWeekly, setShowWeekly] = useState(defaultWeekly);
   const [weeklyMoods, setWeeklyMoods] = useState<MoodWithDate[]>([]);
+  const session = useSession();
 
-  async function handleMoodClick(mood: MoodType) {
-    await upsertMood(mood);
+  function setCurrentMood(mood: MoodType) {
     setWeeklyMoods((prevMoods) => {
       const today = new Date();
       const updatedMoods = [...prevMoods];
@@ -46,8 +47,21 @@ const MoodTrackerBox = ({
 
       return updatedMoods;
     });
+  }
+
+  async function handleMoodClick(mood: MoodType) {
+    await upsertMood(mood);
+    setCurrentMood(mood);
+
+    await session.update();
     onClose?.();
   }
+
+  useEffect(() => {
+    if (session.data?.user.moodToday) {
+      setCurrentMood(session.data.user.moodToday);
+    }
+  }, [session.data?.user.moodToday]);
 
   useEffect(() => {
     async function fetchWeeklyMoods() {

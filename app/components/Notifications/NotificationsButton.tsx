@@ -111,6 +111,13 @@ const NotificationsButton = () => {
     };
   }, [session.data?.supabaseAccessToken]);
 
+  async function handleDeleteNotification(notificationId: string) {
+    await deleteNotification(notificationId);
+    setNotifications((prevNotifications) =>
+      prevNotifications.filter((n) => n.id !== notificationId)
+    );
+  }
+
   return (
     <div className="drawer drawer-end w-full">
       <input
@@ -180,9 +187,7 @@ const NotificationsButton = () => {
               key={notification.id}
               notification={notification}
               isFirst={notifications[0].id === notification.id}
-              onCloseAction={() => {
-                deleteNotification(notification.id);
-              }}
+              onCloseAction={() => handleDeleteNotification(notification.id)}
             />
           ))}
           {loading && (

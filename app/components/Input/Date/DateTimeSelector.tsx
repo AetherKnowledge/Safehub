@@ -65,6 +65,47 @@ const DateTimeSelector = ({
     initialMinTime
   );
 
+  // time must be "now" if picking today and minTime passed
+  function updateMinTime(date: Date | undefined) {
+    if (!initialMinDate) {
+      return;
+    }
+
+    const currentTime = getTimeFromDate(new Date());
+    const dateToCheck =
+      date || (initialMinDate === "now" ? new Date() : initialMinDate);
+
+    if (
+      isDateToday(dateToCheck) &&
+      initialMinTime &&
+      isTimeAfter(currentTime, initialMinTime)
+    ) {
+      setMinTime("now");
+    } else {
+      setMinTime(initialMinTime ?? undefined);
+    }
+  }
+
+  function validateDate(date: Date): Date {
+    if (minDate && date < minDate) {
+      return minDate === "now" ? new Date() : minDate;
+    }
+    if (maxDate && date > maxDate) {
+      return maxDate;
+    }
+    return date;
+  }
+
+  function validateTime(time: Time) {
+    if (minTime && timeToMinutes(time) < timeToMinutes(minTime)) {
+      return minTime === "now" ? getTimeFromDate(new Date()) : minTime;
+    }
+    if (maxTime && timeToMinutes(time) > timeToMinutes(maxTime)) {
+      return maxTime;
+    }
+    return time;
+  }
+
   // ---------------------------------------------------------------
   // INITIALIZATION (Runs Only Once)
   // ---------------------------------------------------------------
@@ -78,43 +119,37 @@ const DateTimeSelector = ({
       return;
     }
 
-    // Handle initial default value
-    if (defaultValue) {
-      const time = getTimeFromDate(defaultValue);
-      setSelectedDate(defaultValue);
-      setSelectedTime(time);
-
-      if (
-        isDateToday(defaultValue) &&
-        initialMinTime &&
-        isTimeAfter(getTimeFromDate(new Date()), initialMinTime)
-      ) {
-        setMinTime("now");
-      } else {
-        setMinTime(initialMinTime ?? undefined);
-      }
-
-      if (onChange) onChange(defaultValue);
-      return;
-    }
-
-    // If NO default value → apply min rules
-    const now = new Date();
-    const currentTime = getTimeFromDate(now); // or however your helper returns time
-
     const isMinDateToday =
       initialMinDate === "now" ||
       (initialMinDate && isDateToday(initialMinDate));
+    const currentTime = getTimeFromDate(new Date());
 
     if (
       initialMinDate &&
       isMinDateToday &&
-      initialMinTime &&
-      isTimeAfter(currentTime, initialMinTime)
+      maxTime &&
+      isTimeAfter(currentTime, maxTime)
     ) {
-      setMinTime("now");
-    } else {
-      setMinTime(initialMinTime ?? undefined);
+      setMinDate(
+        addDays(initialMinDate === "now" ? new Date() : initialMinDate, 1)
+      );
+      setSelectedTime((prev) =>
+        minTime === "now" ? getTimeFromDate(new Date()) : minTime ?? prev
+      );
+    }
+
+    updateMinTime(defaultValue);
+
+    // Handle initial default value
+    if (defaultValue) {
+      const time = getTimeFromDate(defaultValue);
+      const validDate = validateDate(defaultValue);
+      const validTime = validateTime(time);
+      setSelectedDate(validDate);
+      setSelectedTime(validTime);
+
+      if (onChange) onChange(setTimeToDate(validDate, validTime));
+      return;
     }
   }, [initialized, defaultValue, initialMinDate, initialMinTime, onChange]);
 
@@ -141,21 +176,9 @@ const DateTimeSelector = ({
     if (readonly) return;
 
     if (date === selectedDate) return;
-    setSelectedDate(date);
 
-    // time must be "now" if picking today and minTime passed
-    const now = new Date();
-    const currentTime = getTimeFromDate(now);
-    if (
-      initialMinDate &&
-      isDateToday(date) &&
-      initialMinTime &&
-      isTimeAfter(currentTime, initialMinTime)
-    ) {
-      setMinTime("now");
-    } else {
-      setMinTime(initialMinTime);
-    }
+    setSelectedDate(validateDate(date));
+    updateMinTime(date);
 
     // Only emit if we have a valid time already selected
     if (selectedTime) {
@@ -167,17 +190,7 @@ const DateTimeSelector = ({
     if (readonly) return;
 
     if (time === selectedTime) return;
-
-    setSelectedTime(time);
-    if (maxTime && timeToMinutes(time) > timeToMinutes(maxTime)) {
-      setSelectedTime(maxTime);
-    }
-
-    if (minTime && timeToMinutes(time) < timeToMinutes(minTime)) {
-      setSelectedTime(
-        minTime === "now" ? getTimeFromDate(new Date()) : minTime
-      );
-    }
+    setSelectedTime(validateTime(time));
 
     if (selectedDate && initialMinDate && initialMinDate !== "now") {
       const allowed =

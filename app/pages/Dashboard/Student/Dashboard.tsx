@@ -32,7 +32,10 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
               <ThisWeeksAppointments />
             </div>
           </div>
-          <MoodTrackerBox className="text-left max-w-3xl w-full" />
+          <MoodTrackerBox
+            className="text-left max-w-3xl w-full"
+            defaultWeekly
+          />
           <HotlineBar />
         </div>
       </div>

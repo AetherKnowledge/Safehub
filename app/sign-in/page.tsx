@@ -19,7 +19,7 @@ export default function SignInPage() {
   }
 
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/user/dashboard";
+  const callbackUrl = "/user/dashboard";
   const error = searchParams.get("error");
 
   const [email, setEmail] = useState("");
@@ -138,7 +138,7 @@ export default function SignInPage() {
 
           <button
             type="button"
-            onClick={() => signIn("google", { callbackUrl })}
+            onClick={() => signIn("google", { redirectTo: callbackUrl })}
             className="mt-4 btn btn-outline w-full flex items-center justify-center gap-2 text-sm"
           >
             <Chrome size={18} />

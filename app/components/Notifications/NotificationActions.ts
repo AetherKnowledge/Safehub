@@ -75,6 +75,7 @@ export async function createAppointmentNotification(
       include: {
         student: { include: { user: true } },
         counselor: { include: { user: true } },
+        parent: { select: { id: true } },
       },
     });
     const n8nWebhookUrl = process.env.N8N_EMAIL_URL!;
@@ -96,6 +97,31 @@ export async function createAppointmentNotification(
       }
     }
 
+    function notificationTypeToTitle(type: NotificationType) {
+      if (appointmentData?.parent) {
+        return `Appointment Follow-up for Student`;
+      }
+
+      switch (type) {
+        case NotificationType.AppointmentCreated:
+          return "New Appointment Created";
+        case NotificationType.AppointmentUpdatedSchedule:
+          return "Appointment Rescheduled";
+        case NotificationType.AppointmentUpdatedStatus:
+          return `Appointment "${
+            appointmentData
+              ? appointmentStatusToTitle(appointmentData.status)
+              : "Updated"
+          }"`;
+        case NotificationType.AppointmentReminder:
+          return "Appointment Reminder";
+        case NotificationType.NewPost:
+          return "New Post Created";
+        default:
+          return "Appointment Notification";
+      }
+    }
+
     // reminders are handled differently
     console.log(n8nWebhookUrl);
     if (type !== NotificationType.AppointmentReminder && appointmentData) {
@@ -113,9 +139,7 @@ export async function createAppointmentNotification(
           data: {
             type: type,
             url: env("NEXT_PUBLIC_URL")!,
-            title: `Appointment ${appointmentStatusToTitle(
-              appointmentData.status
-            )}`,
+            title: notificationTypeToTitle(type),
             cancelText:
               appointmentData.status === AppointmentStatus.Rejected
                 ? "Rejected"

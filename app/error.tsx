@@ -14,7 +14,7 @@ export default function Error({
   const router = useRouter();
 
   return (
-    <ModalBase onClose={reset}>
+    <ModalBase notTransparent bgColor="bg-base-100" onClose={reset}>
       <div className="bg-base-100 border border-error/30 shadow-xl rounded-2xl px-6 py-5 max-w-sm w-full text-base-content">
         <div className="flex flex-col items-center text-center gap-4">
           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-error/10 text-error">

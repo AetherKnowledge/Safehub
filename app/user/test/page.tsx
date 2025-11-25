@@ -18,8 +18,8 @@ const Test = async () => {
         horizontal
         defaultValue={new Date()}
         minDate="now"
-        minTime={{ hour: 8, minute: 0, period: TimePeriod.PM }}
-        maxTime={{ hour: 10, minute: 0, period: TimePeriod.PM }}
+        minTime={{ hour: 9, minute: 0, period: TimePeriod.PM }}
+        maxTime={{ hour: 11, minute: 0, period: TimePeriod.PM }}
       />
     </div>
   );

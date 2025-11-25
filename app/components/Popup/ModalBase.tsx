@@ -12,10 +12,14 @@ const ModalBase = ({
   children,
   className,
   onClose,
+  notTransparent = false,
+  bgColor = "bg-transparent",
 }: {
   children: React.ReactNode;
   className?: string;
   onClose?: () => void;
+  notTransparent?: boolean;
+  bgColor?: string;
 }) => {
   const [mounted, setMounted] = useState(false);
 
@@ -41,7 +45,11 @@ const ModalBase = ({
 
   return createPortal(
     <div
-      className={`fixed inset-0 min-w-0 flex items-center justify-center bg-transparent bg-opacity-50 backdrop-brightness-50 z-[9999] ${className}`}
+      className={`fixed inset-0 min-w-0 flex items-center justify-center backdrop-brightness-50 z-[9999] ${
+        notTransparent
+          ? `bg-opacity-100 ${bgColor}`
+          : "bg-opacity-50 bg-transparent"
+      } ${className}`}
       onClick={onClose}
     >
       <div className="max-h-[100vh] overflow-y-auto w-full items-center justify-center scrollbar-gutter-stable">

@@ -85,6 +85,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       session.user.darkMode = user?.darkMode || false;
       session.user.moodToday = user?.dailyMoods[0]?.mood || undefined;
       session.user.deactivated = user?.deactivated || false;
+      session.user.image = user?.image || null;
+      session.user.name = user?.name || session.user.name;
+      session.user.email = user?.email || session.user.email;
 
       if (signingSecret) {
         const payload = {
@@ -124,7 +127,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: "/sign-in",
-    signOut: "/sign-out"
+    signOut: "/sign-out",
   },
 });
 

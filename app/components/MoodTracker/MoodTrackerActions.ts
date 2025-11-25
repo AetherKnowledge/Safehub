@@ -34,32 +34,6 @@ export async function upsertMood(mood: MoodType): Promise<ActionResult<void>> {
       },
     });
 
-    // const supabase = createClient(session.supabaseAccessToken);
-    // const channel = supabase.channel("daily-mood-events");
-
-    // if (existing) {
-    //   const event: MoodEventUpdatedPayload = {
-    //     type: "broadcast",
-    //     event: MoodEventType.MoodUpdated,
-    //     payload: {
-    //       oldMood: existing.mood || MoodType.Skip,
-    //       newMood: mood,
-    //     },
-    //   };
-
-    //   await channel.send(event);
-    // } else {
-    //   const event: MoodEventUpdatedPayload = {
-    //     type: "broadcast",
-    //     event: MoodEventType.MoodAdded,
-    //     payload: {
-    //       mood,
-    //     },
-    //   };
-    //   await channel.send(event);
-    // }
-    // await channel.unsubscribe();
-
     return {
       success: true,
     };

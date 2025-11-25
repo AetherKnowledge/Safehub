@@ -40,6 +40,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
     }
 
     popup.showSuccess("Changes saved successfully!");
+    await session.update();
     router.refresh();
   }
 

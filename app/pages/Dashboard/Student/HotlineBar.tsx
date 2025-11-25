@@ -60,6 +60,7 @@ const HotlineTable = async ({ hotlines }: { hotlines: Hotline[] }) => {
               hover:bg-base-300/50 active:bg-base-300 transition-colors
               "
               href={hotline.website || `/user/hotline`}
+              target="_blank"
             >
               <div className="btn btn-primary rounded-full p-2">
                 <SlCallIn className="w-5 h-5" />

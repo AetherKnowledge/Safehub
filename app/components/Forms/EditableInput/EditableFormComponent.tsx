@@ -47,6 +47,8 @@ const EditableFormComponent = ({
   onMoveDown,
   requiredComponent = false,
 }: EditableFormComponentProps) => {
+  const [hasError, setHasError] = useState(false);
+
   if (component.type === FormComponentType.SEPARATOR) {
     return (
       <EditableSeparator
@@ -71,8 +73,6 @@ const EditableFormComponent = ({
       />
     );
   }
-
-  const [hasError, setHasError] = useState(false);
 
   return (
     <EditableFormComponentBG

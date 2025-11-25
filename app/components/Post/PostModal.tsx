@@ -57,48 +57,74 @@ const PostModal = ({ post, onClose }: Props) => {
   }
 
   return (
-    <ModalBase>
+    <ModalBase onClose={onClose}>
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col w-130 rounded-lg bg-base-100 py-3"
+        className="flex flex-col bg-base-100 text-base-content shadow-2xl rounded-2xl border border-base-300 w-[90vw] max-w-2xl max-h-[85vh]"
       >
-        <h2 className="text-2xl font-bold text-center text-primary">
-          {post ? "Edit Post" : "Add Post"}
-        </h2>
-        <div className="flex flex-col flex-1 bg-base-200 px-3 pb-2 w-full">
-          <TextBox
-            legend="Title"
-            name="title"
-            placeholder="Title here..."
-            defaultValue={post?.title}
-            bgColor="bg-base-100"
-          />
-          <ImageInput
-            legend="Images"
-            name="images"
-            defaultValue={initialImageList}
-            onChange={handleImageChange}
-            multiple
-          />
-          <TextArea
-            legend="Content"
-            name="content"
-            placeholder="Text here..."
-            defaultValue={post?.content}
-            bgColor="bg-base-100"
-          />
-        </div>
-        <div className="flex flex-row justify-between items-center px-3 mt-3">
-          <button type="submit" className="btn btn-primary">
-            {post ? "Save Changes" : "Add Post"}
+        <div className="px-5 pt-4 pb-3 border-b border-base-300 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.25em] uppercase text-primary mb-1">
+              SafeHub · LCUP
+            </p>
+            <h2 className="text-lg sm:text-xl font-semibold leading-snug">
+              {post ? "Edit post" : "Create a new post"}
+            </h2>
+            <p className="mt-1 text-xs sm:text-sm text-base-content/70 max-w-xl">
+              Share updates, announcements, or helpful information with LCUP
+              students.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn btn-xs btn-ghost text-base-content/80"
+          >
+            ✕
           </button>
-          <button className="btn btn-error" onClick={onClose}>
+        </div>
+
+        <div className="px-5 py-4 bg-base-200/60 flex-1 overflow-y-auto">
+          <div className="rounded-xl bg-base-200 px-3 py-3 space-y-3">
+            <TextBox
+              legend="Title"
+              name="title"
+              placeholder="Title here..."
+              defaultValue={post?.title}
+              bgColor="bg-base-100"
+            />
+            <ImageInput
+              legend="Images"
+              name="images"
+              defaultValue={initialImageList}
+              onChange={handleImageChange}
+              multiple
+            />
+            <TextArea
+              legend="Content"
+              name="content"
+              placeholder="Text here..."
+              defaultValue={post?.content}
+              bgColor="bg-base-100"
+            />
+          </div>
+        </div>
+
+        <div className="px-5 pb-4 pt-2 border-t border-base-300 flex justify-end gap-3">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={onClose}
+          >
             Cancel
+          </button>
+          <button type="submit" className="btn btn-primary btn-sm">
+            {post ? "Save changes" : "Publish post"}
           </button>
         </div>
       </form>
     </ModalBase>
   );
-};
+}
 
 export default PostModal;

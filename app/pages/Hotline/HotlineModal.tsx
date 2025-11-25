@@ -69,66 +69,92 @@ const HotlineModal = ({
   }
 
   return (
-    <ModalBase>
+    <ModalBase onClose={onClose}>
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col w-130 rounded-lg bg-base-100 py-3"
+        className="flex flex-col bg-base-100 text-base-content shadow-2xl rounded-2xl border border-base-300 w-[90vw] max-w-2xl max-h-[85vh]"
       >
-        <h2 className="text-2xl font-bold text-center text-primary">
-          {hotline ? "Edit Hotline" : "Add Hotline"}
-        </h2>
-        <div className="flex flex-col flex-1 bg-base-200 px-3 pb-2 w-full">
-          <TextBox
-            legend="Hotline Name"
-            name="name"
-            placeholder="Name"
-            defaultValue={hotline?.name}
-            bgColor="bg-base-100"
-            icon={GrEmergency}
-          />
-          <TextBox
-            legend="Hotline Number"
-            name="phone"
-            type="tel"
-            placeholder="Phone Number"
-            defaultValue={hotline?.phone}
-            bgColor="bg-base-100"
-            icon={FaPhone}
-          />
-          <TextBox
-            legend="Website"
-            name="website"
-            placeholder="https://"
-            defaultValue={hotline?.website || ""}
-            bgColor="bg-base-100"
-            type="url"
-            icon={FaLink}
-          />
-          <ImageInput
-            legend="Image"
-            name="image"
-            defaultValue={initialImageList}
-            onChange={handleImageChange}
-          />
-          <TextArea
-            legend="Description"
-            name="description"
-            placeholder="Text here..."
-            defaultValue={hotline?.description || ""}
-            bgColor="bg-base-100"
-          />
-        </div>
-        <div className="flex flex-row justify-between items-center px-3 mt-3">
-          <button type="submit" className="btn btn-primary">
-            {hotline ? "Save Changes" : "Add Hotline"}
+        <div className="px-5 pt-4 pb-3 border-b border-base-300 flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.25em] uppercase text-primary mb-1">
+              SafeHub · LCUP
+            </p>
+            <h2 className="text-lg sm:text-xl font-semibold leading-snug">
+              {hotline ? "Edit hotline" : "Add a hotline"}
+            </h2>
+            <p className="mt-1 text-xs sm:text-sm text-base-content/70 max-w-xl">
+              Manage important support hotlines so students can quickly reach
+              the right services.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn btn-xs btn-ghost text-base-content/80"
+          >
+            ✕
           </button>
-          <button className="btn btn-error" onClick={onClose}>
+        </div>
+
+        <div className="px-5 py-4 bg-base-200/60 flex-1 overflow-y-auto">
+          <div className="rounded-xl bg-base-200 px-3 py-3 space-y-3">
+            <TextBox
+              legend="Hotline Name"
+              name="name"
+              placeholder="Name"
+              defaultValue={hotline?.name}
+              bgColor="bg-base-100"
+              icon={GrEmergency}
+            />
+            <TextBox
+              legend="Hotline Number"
+              name="phone"
+              type="tel"
+              placeholder="Phone Number"
+              defaultValue={hotline?.phone}
+              bgColor="bg-base-100"
+              icon={FaPhone}
+            />
+            <TextBox
+              legend="Website"
+              name="website"
+              placeholder="https://"
+              defaultValue={hotline?.website || ""}
+              bgColor="bg-base-100"
+              type="url"
+              icon={FaLink}
+            />
+            <ImageInput
+              legend="Image"
+              name="image"
+              defaultValue={initialImageList}
+              onChange={handleImageChange}
+            />
+            <TextArea
+              legend="Description"
+              name="description"
+              placeholder="Text here..."
+              defaultValue={hotline?.description || ""}
+              bgColor="bg-base-100"
+            />
+          </div>
+        </div>
+
+        <div className="px-5 pb-4 pt-2 border-t border-base-300 flex justify-end gap-3">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={onClose}
+          >
             Cancel
+          </button>
+          <button type="submit" className="btn btn-primary btn-sm">
+            {hotline ? "Save changes" : "Add hotline"}
           </button>
         </div>
       </form>
     </ModalBase>
   );
-};
+}
 
 export default HotlineModal;

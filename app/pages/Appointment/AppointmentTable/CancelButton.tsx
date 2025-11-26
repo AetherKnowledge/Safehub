@@ -17,7 +17,9 @@ const CancelButton = ({ appointment }: { appointment: AppointmentData }) => {
   const router = useRouter();
   const statusPopup = usePopup();
 
-  const handleCancel = async (formData: FormData) => {
+  const handleCancel = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     const confirm = await statusPopup.showYesNo(
       `Are you sure you want to cancel this appointment?`
     );
@@ -52,7 +54,7 @@ const CancelButton = ({ appointment }: { appointment: AppointmentData }) => {
       {showPopup && (
         <ModalBase className="p-4" onClose={() => setShowPopup(false)}>
           <div className="bg-base-100 p-8 rounded-lg shadow-lg text-center text-base-content w-full max-w-2xl">
-            <form className="flex flex-col gap-4" action={handleCancel}>
+            <form className="flex flex-col gap-4" onSubmit={handleCancel}>
               <div className="flex flex-col text-center gap-2">
                 <h2 className="text-error text-2xl font-semibold">
                   Cancellation Form

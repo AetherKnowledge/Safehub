@@ -37,7 +37,7 @@ const Submit = ({
       {readOnly ? (
         <div></div>
       ) : (
-        <button className="btn btn-primary">
+        <button type="submit" className="btn btn-primary">
           <FaRegCheckCircle className="h-4 w-4" />
           Submit
         </button>

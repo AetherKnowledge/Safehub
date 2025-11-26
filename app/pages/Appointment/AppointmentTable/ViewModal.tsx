@@ -50,7 +50,7 @@ const ViewModal = ({
           <div className="flex flex-col gap-3">
             <UserTopBar
               userName={
-                userType === UserType.Counselor
+                userType === UserType.Student
                   ? counselorData.user.name ||
                     counselorData.user.email.split("@")[0] ||
                     "Counselor"
@@ -59,12 +59,12 @@ const ViewModal = ({
                     "Student"
               }
               userEmail={
-                userType === UserType.Counselor
+                userType === UserType.Student
                   ? counselorData.user.email
                   : studentData.user.email
               }
               userImgSrc={
-                userType === UserType.Counselor
+                userType === UserType.Student
                   ? counselorData.user.image || undefined
                   : studentData.user.image || undefined
               }
@@ -75,13 +75,13 @@ const ViewModal = ({
             {showUserDetails && (
               <UserDetailsPopup
                 user={
-                  userType === UserType.Counselor
+                  userType === UserType.Student
                     ? studentData.user
                     : counselorData.user
                 }
                 onClose={() => setShowUserDetails(false)}
               >
-                {userType === UserType.Counselor && (
+                {userType === UserType.Student && (
                   <StudentDetails user={studentData.user} />
                 )}
               </UserDetailsPopup>

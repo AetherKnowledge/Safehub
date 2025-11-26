@@ -43,7 +43,7 @@ It cannot be changed once submitted.`);
     <FormBuilder
       form={form}
       defaultValues={defaultValues}
-      readOnly={readOnly}
+      answerOnly={readOnly}
       onSubmit={handleSubmit}
       backHref="/user/appointments"
     />

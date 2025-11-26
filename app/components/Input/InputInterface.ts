@@ -10,6 +10,7 @@ type InputInterface = {
   disabled?: boolean;
   noFormOutput?: boolean;
   readonly?: boolean;
+  answerOnly?: boolean;
 };
 
 export type Option = {

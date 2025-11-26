@@ -1,12 +1,12 @@
 import { AppointmentStatus } from "@/app/generated/prisma";
 import { AppointmentData } from "../AppointmentActions";
 
-// Calendar configuration: 8:00 AM to 8:00 PM
+// Calendar configuration: 8:00 AM to 5:00 PM
 export const START_HOUR = 8; // 8 AM
-export const END_HOUR = 20; // 8 PM (24-hour format)
-export const TOTAL_MINUTES = (END_HOUR - START_HOUR) * 60; // 720 minutes
+export const END_HOUR = 17; // 5 PM (24-hour format)
+export const TOTAL_MINUTES = (END_HOUR - START_HOUR) * 60; // 540 minutes
 
-// Generate 30-minute time slots from 8:00 AM to 8:00 PM (inclusive)
+// Generate 30-minute time slots from 8:00 AM to 5:00 PM (inclusive)
 export const TIME_SLOTS = (() => {
   const labels: string[] = [];
   for (let m = 0; m <= TOTAL_MINUTES; m += 30) {
@@ -43,7 +43,6 @@ export const getBgStatusColor = (status: AppointmentStatus) => {
       return "bg-warning/20";
     case AppointmentStatus.Approved:
       return "bg-success/20";
-    case AppointmentStatus.Rejected:
     case AppointmentStatus.Cancelled:
       return "bg-error/20";
     default:
@@ -59,7 +58,6 @@ export const getStatusTextColor = (status: AppointmentStatus) => {
       return "text-warning";
     case AppointmentStatus.Approved:
       return "text-success";
-    case AppointmentStatus.Rejected:
     case AppointmentStatus.Cancelled:
       return "text-error";
     default:
@@ -75,7 +73,6 @@ export const getBorderStatusColor = (status: AppointmentStatus) => {
       return "border-l-warning";
     case AppointmentStatus.Approved:
       return "border-l-success";
-    case AppointmentStatus.Rejected:
     case AppointmentStatus.Cancelled:
       return "border-l-error";
     default:

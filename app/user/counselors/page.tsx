@@ -11,8 +11,6 @@ const CounselorsPage = async () => {
     <>
       {session.user.type === UserType.Student ? (
         <CounselorList />
-      ) : session.user.type === UserType.Counselor ? (
-        <div>Not built</div>
       ) : (
         redirect("/user/dashboard")
       )}

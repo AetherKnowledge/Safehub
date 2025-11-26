@@ -105,7 +105,7 @@ const RescheduleButton = ({
                   horizontal
                   minDate="now"
                   minTime={{ hour: 8, minute: 0, period: TimePeriod.AM }}
-                  maxTime={{ hour: 7, minute: 0, period: TimePeriod.PM }}
+                  maxTime={{ hour: 4, minute: 0, period: TimePeriod.PM }}
                   defaultValue={appointment?.startTime}
                   onChange={(date) => {
                     setStartTime(date);
@@ -120,7 +120,7 @@ const RescheduleButton = ({
                       ? getTimeFromDate(addMinutes(startTime, 60))
                       : { hour: 8, minute: 0, period: TimePeriod.AM }
                   }
-                  maxTime={{ hour: 8, minute: 0, period: TimePeriod.PM }}
+                  maxTime={{ hour: 5, minute: 0, period: TimePeriod.PM }}
                   onChange={(time: Time) => {
                     setEndTime(setTimeToDate(new Date(), time));
                   }}

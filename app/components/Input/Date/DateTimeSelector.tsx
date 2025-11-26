@@ -47,6 +47,7 @@ const DateTimeSelector = ({
   horizontal = false,
   onInvalid,
   readonly = false,
+  answerOnly = false,
 }: DateTimeSelectorProps) => {
   const [hasError, setHasError] = useState(false);
   const [initialized, setInitialized] = useState(false);
@@ -220,7 +221,11 @@ const DateTimeSelector = ({
     <>
       <fieldset className="fieldset w-full">
         {legend && (
-          <Legend legend={legend} required={required} number={number} />
+          <Legend
+            legend={legend}
+            required={answerOnly ? undefined : required}
+            number={number}
+          />
         )}
 
         <div

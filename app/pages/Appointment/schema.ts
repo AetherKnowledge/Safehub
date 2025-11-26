@@ -20,11 +20,11 @@ export type UpdateAppointmentStatusData = z.infer<
   typeof updateAppointmentStatusSchema
 >;
 
-export const submitSessionSummarySchema = z.object({
+export const actionsTakenSchema = z.object({
   appointmentId: z.uuid(),
-  summary: z.string().min(2, "Summary must be at least 2 characters long."),
-  observations: z.string().optional(),
-  recommendations: z.string().optional(),
+  actionsTaken: z
+    .string()
+    .min(2, "Actions taken must be at least 2 characters long."),
 });
 
 export const followUpAppointmentSchema = z.object({

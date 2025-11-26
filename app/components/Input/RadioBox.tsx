@@ -25,6 +25,7 @@ const RadioBox = ({
   onInvalid,
   noFormOutput = false,
   readonly = false,
+  answerOnly = false,
 }: RadioBoxProps) => {
   const [currentValue, setCurrentValue] = useState<Option | undefined>(() => {
     if (!defaultValue) return undefined;
@@ -53,70 +54,73 @@ const RadioBox = ({
       {legend && (
         <Legend
           legend={legend}
-          required={required}
+          required={answerOnly ? undefined : required}
           number={number}
           size={size}
         />
       )}
       <div className={`flex flex-col gap-2 rounded-lg ${className || ""}`}>
-        {options.map((option) => (
-          <label
-            key={option.value}
-            className={`flex flex-row items-center cursor-pointer ${bgColor} p-2 rounded-lg border ${
-              hasError || (option.other && otherError)
-                ? "border-error"
-                : currentValue?.value === option.value
-                ? "border-base-content hover:border-base-content/50"
-                : "border-base-300"
-            } ${readonly ? "pointer-events-none" : ""}`}
-            onClick={() => {
-              if (readonly) return;
+        {options.map((option) => {
+          if (answerOnly && currentValue?.value !== option.value) return null;
+          return (
+            <label
+              key={option.value}
+              className={`flex flex-row items-center cursor-pointer ${bgColor} p-2 rounded-lg border ${
+                hasError || (option.other && otherError)
+                  ? "border-error"
+                  : currentValue?.value === option.value
+                  ? "border-base-content hover:border-base-content/50"
+                  : "border-base-300"
+              } ${readonly ? "pointer-events-none" : ""}`}
+              onClick={() => {
+                if (readonly) return;
 
-              setHasError(false);
-              setOtherError(false);
-              setCurrentValue(option);
-              setHasError(false);
-            }}
-          >
-            <input
-              type="radio"
-              className={`radio ${size}`}
-              name={noFormOutput ? undefined : name}
-              value={option.other ? otherText : option.value}
-              required={required}
-              checked={currentValue?.value === option.value}
-              onInvalid={(e) => {
-                setHasError(true);
-                onInvalid?.();
+                setHasError(false);
+                setOtherError(false);
+                setCurrentValue(option);
+                setHasError(false);
               }}
-              onChange={() => {}}
-              readOnly={readonly}
-            />
-            <span className="ml-2">
-              {option.label}
-              {option.other && ": "}
-            </span>
-            {option.other && (
+            >
               <input
-                type="text"
-                className={`no-outline border-b-1 border-dotted w-full ml-2`}
-                value={otherText || ""}
-                required={required && option.value === currentValue?.value}
+                type="radio"
+                className={`radio ${size}`}
+                name={noFormOutput ? undefined : name}
+                value={option.other ? otherText : option.value}
+                required={required}
+                checked={currentValue?.value === option.value}
                 onInvalid={(e) => {
-                  setOtherError(true);
-                  if (onInvalid) onInvalid();
+                  setHasError(true);
+                  onInvalid?.();
                 }}
-                onChange={(e) => {
-                  setHasError(false);
-                  setOtherError(false);
-                  setOtherText(e.target.value);
-                  onChange?.({ label: option.label, value: e.target.value });
-                }}
+                onChange={() => {}}
                 readOnly={readonly}
               />
-            )}
-          </label>
-        ))}
+              <span className="ml-2">
+                {option.label}
+                {option.other && ": "}
+              </span>
+              {option.other && (
+                <input
+                  type="text"
+                  className={`no-outline border-b-1 border-dotted w-full ml-2`}
+                  value={otherText || ""}
+                  required={required && option.value === currentValue?.value}
+                  onInvalid={(e) => {
+                    setOtherError(true);
+                    if (onInvalid) onInvalid();
+                  }}
+                  onChange={(e) => {
+                    setHasError(false);
+                    setOtherError(false);
+                    setOtherText(e.target.value);
+                    onChange?.({ label: option.label, value: e.target.value });
+                  }}
+                  readOnly={readonly}
+                />
+              )}
+            </label>
+          );
+        })}
         <div className="flex flex-col">
           <p
             className={`text-xs text-error ml-1 mt-[-5px] ${

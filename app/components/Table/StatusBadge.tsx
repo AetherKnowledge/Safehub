@@ -8,8 +8,6 @@ const StatusBadge = ({
   className?: string;
 }) => {
   switch (status) {
-    case AppointmentStatus.Rejected:
-      return <div className={`badge badge-error ${className}`}>Rejected</div>;
     case AppointmentStatus.Cancelled:
       return <div className={`badge badge-error ${className}`}>Cancelled</div>;
     case AppointmentStatus.Pending:
@@ -17,7 +15,7 @@ const StatusBadge = ({
     case AppointmentStatus.Approved:
       return <div className={`badge badge-success ${className}`}>Approved</div>;
     case AppointmentStatus.Completed:
-      return <div className={`badge badge-info ${className}`}>Completed</div>;
+      return <div className={`badge badge-info ${className}`}>Counseled</div>;
     default:
       return null;
   }

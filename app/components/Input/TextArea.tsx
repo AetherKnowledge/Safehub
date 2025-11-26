@@ -29,6 +29,7 @@ const TextArea = ({
   onInvalid,
   noFormOutput = false,
   readonly = false,
+  answerOnly = false,
 }: TextAreaProps) => {
   const [hasError, setHasError] = useState(false);
 
@@ -37,7 +38,7 @@ const TextArea = ({
       {legend && (
         <Legend
           legend={legend}
-          required={required}
+          required={answerOnly ? undefined : required}
           number={number}
           size={size}
         />

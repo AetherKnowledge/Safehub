@@ -61,12 +61,11 @@ const Hero = () => {
 
           <motion.h1
             variants={itemVariants}
-            className="heading-step-1 font-extrabold leading-tight drop-shadow-lg"
+            className="heading-step-1 font-extrabold leading-tight drop-shadow-lg bg-gradient-to-r from-sky-300 to-emerald-300 bg-clip-text text-transparent"
           >
-            Need guidance or
-            <span className="block bg-gradient-to-r from-sky-300 to-emerald-300 bg-clip-text text-transparent">
-              someone to talk to?
-            </span>
+            Need someone
+            <br />
+            to talk to?
           </motion.h1>
 
           <motion.p

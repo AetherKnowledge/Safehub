@@ -48,7 +48,7 @@ const AppointmentTableTop = () => {
         >
           <option value="all">All Status</option>
           <option value="Pending">Pending</option>
-          <option value="Completed">Completed</option>
+          <option value="Completed">Counseled</option>
           <option value="Approved">Approved</option>
           <option value="Canceled">Canceled</option>
         </select>

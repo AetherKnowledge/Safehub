@@ -33,6 +33,7 @@ const DateSelector = ({
   maxDate,
   noFormOutput = false,
   readonly = false,
+  answerOnly = false,
 }: DateSelectorProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(() => {
     if (value) return value;
@@ -57,7 +58,11 @@ const DateSelector = ({
     <>
       <fieldset className="fieldset w-full">
         {legend && (
-          <Legend legend={legend} required={required} number={number} />
+          <Legend
+            legend={legend}
+            required={answerOnly ? undefined : required}
+            number={number}
+          />
         )}
         <button
           type="button"

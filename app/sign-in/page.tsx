@@ -25,8 +25,9 @@ export default function SignInPage() {
     return (
       <ErrorPopup
         message="You are already signed in."
-        retry
-        redirectTo="/"
+        closeText="Go to Dashboard"
+        buttonColor="btn-primary"
+        redirectTo={callbackUrl}
         notTransparent
       />
     );

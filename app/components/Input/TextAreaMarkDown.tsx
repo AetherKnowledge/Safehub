@@ -26,6 +26,7 @@ const TextAreaMarkdown = ({
   onChange,
   onInvalid,
   noFormOutput = false,
+  answerOnly = false,
 }: TextAreaMarkdownProps) => {
   const [focused, setFocused] = useState(false);
   const [textAreaSize, setTextAreaSize] = useState(`textarea-${size}`);
@@ -45,7 +46,7 @@ const TextAreaMarkdown = ({
       {legend && (
         <Legend
           legend={legend}
-          required={required}
+          required={answerOnly ? undefined : required}
           number={number}
           size={size}
         />

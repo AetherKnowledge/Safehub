@@ -28,6 +28,7 @@ const TimeSelector = ({
   maxTime,
   noFormOutput = false,
   readonly = false,
+  answerOnly = false,
 }: TimeSelectorProps) => {
   const [hasError, setHasError] = useState(false);
 
@@ -48,7 +49,11 @@ const TimeSelector = ({
     <>
       <fieldset className={`fieldset ${className ? className : "w-full"}`}>
         {legend && (
-          <Legend legend={legend} required={required} number={number} />
+          <Legend
+            legend={legend}
+            required={answerOnly ? undefined : required}
+            number={number}
+          />
         )}
         <button
           type="button"

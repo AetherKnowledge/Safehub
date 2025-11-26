@@ -12,6 +12,8 @@ type ErrorScreenProps = {
   retry?: boolean;
   notTransparent?: boolean;
   bgColor?: string;
+  closeText?: string;
+  buttonColor?: string;
 };
 
 const ErrorPopup = ({
@@ -21,6 +23,8 @@ const ErrorPopup = ({
   retry = false,
   notTransparent,
   bgColor,
+  closeText = "Close",
+  buttonColor = "btn-error",
 }: ErrorScreenProps) => {
   const router = useRouter();
 
@@ -39,7 +43,11 @@ const ErrorPopup = ({
               {message}
             </p>
           </div>
-          <div className="flex flex-col justify-between sm:flex-row gap-2 w-full mt-2">
+          <div
+            className={`flex flex-col sm:flex-row gap-2 w-full mt-2 ${
+              retry ? "justify-between" : "justify-center"
+            }`}
+          >
             {retry && (
               <button
                 className="btn btn-primary"
@@ -51,14 +59,14 @@ const ErrorPopup = ({
             {redirectTo ? (
               <Link
                 href={redirectTo}
-                className="btn btn-error"
+                className={`btn ${buttonColor}`}
                 onClick={onClose}
               >
-                Close
+                {closeText}
               </Link>
             ) : onClose ? (
-              <button className="btn btn-error" onClick={onClose}>
-                Close
+              <button className={`btn ${buttonColor}`} onClick={onClose}>
+                {closeText}
               </button>
             ) : null}
           </div>

@@ -46,6 +46,7 @@ const TextBox = ({
   noFormOutput,
   readonly = false,
   onEnter,
+  answerOnly = false,
 }: TextBoxProps) => {
   const [hasError, setHasError] = useState(false);
 
@@ -74,7 +75,7 @@ const TextBox = ({
             type={type}
             placeholder={placeholder}
             defaultValue={defaultValue}
-            required={required}
+            required={answerOnly ? undefined : required}
             onInvalid={(e) => {
               setHasError(true);
               onInvalid && onInvalid();

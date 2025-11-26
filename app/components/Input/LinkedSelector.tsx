@@ -41,6 +41,7 @@ const LinkedSelector = ({
   number,
   readonly = false,
   noFormOutput = false,
+  answerOnly = false,
 }: LinkedSelectorProps) => {
   const [parentOptions, setParentOptions] = useState<Option[]>(
     linkedOptions.map((lo) => lo.parentOption)
@@ -92,12 +93,14 @@ const LinkedSelector = ({
               onChange={handleParentChange}
               readonly={readonly}
               noFormOutput={noFormOutput}
+              answerOnly={answerOnly}
             />
             <LinkedComponentBuilder
               linkedComponent={child}
               options={childOptions}
               readonly={readonly}
               noFormOutput={noFormOutput}
+              answerOnly={answerOnly}
             />
           </div>
         </fieldset>
@@ -110,6 +113,7 @@ const LinkedSelector = ({
               onChange={handleParentChange}
               readonly={readonly}
               noFormOutput={noFormOutput}
+              answerOnly={answerOnly}
             />
           </FormComponentBG>
           <FormComponentBG>
@@ -118,6 +122,7 @@ const LinkedSelector = ({
               options={childOptions}
               readonly={readonly}
               noFormOutput={noFormOutput}
+              answerOnly={answerOnly}
             />
           </FormComponentBG>{" "}
         </>
@@ -132,12 +137,14 @@ const LinkedComponentBuilder = ({
   onChange,
   noFormOutput,
   readonly = false,
+  answerOnly = false,
 }: {
   linkedComponent: LinkedComponent;
   options: Option[];
   onChange?: (value: Option) => void;
   noFormOutput?: boolean;
   readonly?: boolean;
+  answerOnly?: boolean;
 }) => {
   switch (linkedComponent.type) {
     case FormComponentType.SELECT:
@@ -148,6 +155,7 @@ const LinkedComponentBuilder = ({
           onChange={onChange}
           noFormOutput={noFormOutput}
           readonly={readonly}
+          answerOnly={answerOnly}
         />
       );
     case FormComponentType.RADIO:

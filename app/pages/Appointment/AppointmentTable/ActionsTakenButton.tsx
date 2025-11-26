@@ -8,11 +8,11 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { LuClipboardList } from "react-icons/lu";
-import { AppointmentData, createSessionSummary } from "../AppointmentActions";
+import { AppointmentData, createActionsTaken } from "../AppointmentActions";
 import CloseButton from "./CloseButton";
 import UserTopBar from "./UserTopBar";
 
-const SessionSummaryButton = ({
+const ActionsTakenButton = ({
   appointment,
 }: {
   appointment: AppointmentData;
@@ -34,7 +34,7 @@ const SessionSummaryButton = ({
     const formData = new FormData(event.currentTarget);
 
     statusPopup.showLoading("Submitting session summary...");
-    const result = await createSessionSummary(formData);
+    const result = await createActionsTaken(formData);
 
     if (!result.success) {
       statusPopup.showError(
@@ -47,7 +47,8 @@ const SessionSummaryButton = ({
   }
 
   const canSubmit =
-    session?.data?.user.type === UserType.Counselor && !appointment.summary;
+    session?.data?.user.type === UserType.Counselor &&
+    !appointment.actionsTaken;
 
   return (
     <>
@@ -69,12 +70,12 @@ const SessionSummaryButton = ({
               {session?.data?.user.type === UserType.Counselor ? (
                 <div className="flex flex-col gap-2">
                   <h2 className="text-2xl font-semibold text-primary">
-                    Session Summary
+                    Actions Taken
                   </h2>
                   <p className="font-light">
                     {session?.data?.user.type === UserType.Counselor
                       ? "Answer the form based on your findings about the student you counseled."
-                      : "Review the session summary provided by your counselor."}
+                      : "Review the actions taken during your session."}
                   </p>
                 </div>
               ) : (
@@ -94,32 +95,18 @@ const SessionSummaryButton = ({
                   readOnly
                 />
                 <TextArea
-                  name="summary"
-                  legend="Summary:"
-                  placeholder="Enter session summary here..."
-                  defaultValue={appointment.summary || ""}
+                  name="actionsTaken"
+                  legend="Actions Taken:"
+                  placeholder="Enter session actions here..."
+                  defaultValue={appointment.actionsTaken || ""}
                   required
-                  readonly={!canSubmit}
-                />
-                <TextArea
-                  name="observations"
-                  legend="Observations:"
-                  placeholder="Enter observations here..."
-                  defaultValue={appointment.observations || ""}
-                  readonly={!canSubmit}
-                />
-                <TextArea
-                  name="recommendations"
-                  legend="Recommendations:"
-                  placeholder="Enter recommendations here..."
-                  defaultValue={appointment.recommendations || ""}
                   readonly={!canSubmit}
                 />
               </div>
               {canSubmit && (
                 <button className="flex flex-row btn btn-primary gap-2 justify-center items-center text-center">
                   <FaRegCheckCircle className="w-4 h-4" />
-                  Submit
+                  Create Report
                 </button>
               )}
             </form>
@@ -130,4 +117,4 @@ const SessionSummaryButton = ({
   );
 };
 
-export default SessionSummaryButton;
+export default ActionsTakenButton;

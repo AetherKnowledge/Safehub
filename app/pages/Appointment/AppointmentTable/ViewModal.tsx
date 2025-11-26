@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AppointmentData } from "../AppointmentActions";
+import ActionsTakenButton from "./ActionsTakenButton";
 import ApproveButton from "./ApproveButton";
 import CancelButton from "./CancelButton";
 import CloseButton from "./CloseButton";
@@ -18,9 +19,7 @@ import EditButton from "./EditButton";
 import EvaluationButton from "./EvaluationButton";
 import FollowUpButton from "./FollowUpButton";
 import MarkDoneButton from "./MarkDoneButton";
-import RejectButton from "./RejectButton";
 import RescheduleButton from "./RescheduleButton";
-import SessionSummaryButton from "./SessionSummaryButton";
 import UserDetailsPopup, { StudentDetails } from "./UserDetailsPopup";
 import UserTopBar from "./UserTopBar";
 import { PreferenceBadge } from "./ViewAppointmentButton";
@@ -117,7 +116,7 @@ const ViewModal = ({
                       key={component.props.name}
                       component={component}
                       answer={formDataWithAnswers.answers[component.props.name]}
-                      readOnly
+                      answerOnly
                     />
                   ))}
                 </div>
@@ -151,10 +150,7 @@ const CounselorButtons = ({
 
   switch (appointment.status) {
     case AppointmentStatus.Pending:
-      buttons = [
-        <RejectButton key="reject" appointment={appointment} />,
-        <RescheduleButton key="resched" appointment={appointment} />,
-      ];
+      buttons = [<RescheduleButton key="resched" appointment={appointment} />];
 
       if (!appointment.parentId) {
         buttons.push(<ApproveButton key="approve" appointment={appointment} />);
@@ -163,15 +159,12 @@ const CounselorButtons = ({
       break;
 
     case AppointmentStatus.Approved:
-      buttons = [
-        <RejectButton key="reject" appointment={appointment} />,
-        <MarkDoneButton key="done" appointment={appointment} />,
-      ];
+      buttons = [<MarkDoneButton key="done" appointment={appointment} />];
       break;
 
     case AppointmentStatus.Completed:
       buttons = [
-        <SessionSummaryButton key="summary" appointment={appointment} />,
+        <ActionsTakenButton key="summary" appointment={appointment} />,
       ];
 
       if (!appointment.followUpId) {
@@ -237,7 +230,7 @@ const StudentButtons = ({ appointment }: { appointment: AppointmentData }) => {
           appointment={appointment}
           userType={UserType.Student}
         />,
-        <SessionSummaryButton key="summary" appointment={appointment} />,
+        <ActionsTakenButton key="summary" appointment={appointment} />,
       ];
       break;
 

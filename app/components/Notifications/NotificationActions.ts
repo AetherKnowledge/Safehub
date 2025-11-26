@@ -84,8 +84,6 @@ export async function createAppointmentNotification(
       switch (status) {
         case AppointmentStatus.Approved:
           return "Approved";
-        case AppointmentStatus.Rejected:
-          return "Rejected";
         case AppointmentStatus.Completed:
           return "Completed";
         case AppointmentStatus.Cancelled:
@@ -140,10 +138,7 @@ export async function createAppointmentNotification(
             type: type,
             url: env("NEXT_PUBLIC_URL")!,
             title: notificationTypeToTitle(type),
-            cancelText:
-              appointmentData.status === AppointmentStatus.Rejected
-                ? "Rejected"
-                : "Cancelled",
+            cancelText: "Cancelled",
             schedDate: formatDateDisplay(appointmentData.startTime),
             schedTime: formatTimeDisplay(appointmentData.startTime),
             studentEmail: appointmentData.student.user.email!,

@@ -21,11 +21,11 @@ import { addMinutes, prettifyZodErrorMessage } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { buildZodSchema } from "../Forms/schema";
 import {
+  actionsTakenSchema,
   AppointmentFormData,
   cancelAppointmentSchema,
   FollowUpAppointmentData,
   followUpAppointmentSchema,
-  submitSessionSummarySchema,
   UpdateAppointmentStatusData,
   updateAppointmentStatusSchema,
 } from "./schema";
@@ -678,11 +678,8 @@ export async function updateAppointmentStatus(
       throw new Error("Counselors cannot approve follow-up appointment");
     }
 
-    if (
-      appointment.status === AppointmentStatus.Rejected ||
-      appointment.status === AppointmentStatus.Cancelled
-    ) {
-      throw new Error("Cannot update rejected or cancelled appointment");
+    if (appointment.status === AppointmentStatus.Cancelled) {
+      throw new Error("Cannot update cancelled appointment");
     }
 
     if (appointment.status === AppointmentStatus.Completed) {
@@ -1061,7 +1058,7 @@ export async function cancelAppointmentStudent(
   }
 }
 
-export async function createSessionSummary(
+export async function createActionsTaken(
   formData: FormData
 ): Promise<ActionResult<void>> {
   const data = Object.fromEntries(formData.entries());
@@ -1071,14 +1068,13 @@ export async function createSessionSummary(
       throw new Error("Unauthorized");
     }
 
-    const validation = submitSessionSummarySchema.safeParse(data);
+    const validation = actionsTakenSchema.safeParse(data);
     if (!validation.success) {
       throw new Error(
         "Invalid data: " + prettifyZodErrorMessage(validation.error)
       );
     }
-    const { appointmentId, summary, observations, recommendations } =
-      validation.data;
+    const { appointmentId, actionsTaken } = validation.data;
 
     // Verify the appointment belongs to this counselor
     const appointment = await prisma.appointment.findFirst({
@@ -1088,20 +1084,14 @@ export async function createSessionSummary(
       throw new Error("Appointment not found");
     }
 
-    if (
-      appointment.summary ||
-      appointment.observations ||
-      appointment.recommendations
-    ) {
-      throw new Error("Session summary has already been submitted");
+    if (appointment.actionsTaken) {
+      throw new Error("Session actions have already been submitted");
     }
 
     await prisma.appointment.update({
       where: { id: String(appointmentId) },
       data: {
-        summary: String(summary),
-        observations: String(observations),
-        recommendations: String(recommendations),
+        actionsTaken: String(actionsTaken),
       },
     });
 

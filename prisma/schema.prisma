@@ -28,7 +28,6 @@ enum AppointmentStatus {
   Approved
   Pending
   Completed
-  Rejected
   Cancelled
 }
 
@@ -331,9 +330,7 @@ model Appointment {
   evaluationData Json?
   rating         Int?
 
-  summary         String?
-  observations    String?
-  recommendations String?
+  actionsTaken String?
 
   // Foreign key for the 1→1 self relation
   followUpId     String? @unique @db.Uuid

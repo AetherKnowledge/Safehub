@@ -97,20 +97,20 @@ const FormBuilder = ({
   form,
   defaultValues,
   onSubmit,
-  readOnly = false,
+  answerOnly = false,
   backHref,
 }: {
   form: BuiltFormData;
   onSubmit?: (formData: FormData) => void;
   defaultValues?: Record<string, any>;
-  readOnly?: boolean;
+  answerOnly?: boolean;
   backHref?: string;
 }) => {
   const { header, components } = form;
 
   return (
     <FormBG onSubmit={onSubmit}>
-      {!readOnly && (
+      {!answerOnly && (
         <FormComponentBG>
           <FormsHeader {...header} />
         </FormComponentBG>
@@ -127,7 +127,7 @@ const FormBuilder = ({
                     ? defaultValues[component.props.name]
                     : undefined
                 }
-                readOnly={readOnly}
+                answerOnly={answerOnly}
               />
             ) : (
               <FormComponentBG>
@@ -138,7 +138,7 @@ const FormBuilder = ({
                       ? defaultValues[component.props.name]
                       : undefined
                   }
-                  readOnly={readOnly}
+                  answerOnly={answerOnly}
                 />
               </FormComponentBG>
             )}
@@ -148,12 +148,12 @@ const FormBuilder = ({
 
       {form.termsAndConditions && (
         <FormComponentBG className="py-5">
-          <TermsAndConditions readOnly={readOnly} />
+          <TermsAndConditions readOnly={answerOnly} />
         </FormComponentBG>
       )}
 
       <FormComponentBG className="py-5 px-5">
-        <Submit readOnly={readOnly} backHref={backHref} />
+        <Submit readOnly={answerOnly} backHref={backHref} />
       </FormComponentBG>
     </FormBG>
   );
@@ -162,11 +162,11 @@ const FormBuilder = ({
 export const FormComponentBuilder = ({
   component,
   answer,
-  readOnly,
+  answerOnly,
 }: {
   component: FormComponent;
   answer?: any;
-  readOnly?: boolean;
+  answerOnly?: boolean;
 }) => {
   switch (component.type) {
     case FormComponentType.SEPARATOR:
@@ -176,14 +176,16 @@ export const FormComponentBuilder = ({
         <TextBox
           {...(component.props as TextBoxProps)}
           defaultValue={answer}
-          readonly={readOnly}
+          readonly={answerOnly}
+          answerOnly={answerOnly}
         />
       );
     case FormComponentType.HORIZONTAL_ITEMS:
       return (
         <HorizontalItemsBox
           {...(component.props as HorizontalItemsBoxProps)}
-          readonly={readOnly}
+          readonly={answerOnly}
+          answerOnly={answerOnly}
         />
       );
     case FormComponentType.TEXTAREA:
@@ -191,7 +193,8 @@ export const FormComponentBuilder = ({
         <TextArea
           {...(component.props as TextAreaProps)}
           defaultValue={answer}
-          readonly={readOnly}
+          readonly={answerOnly}
+          answerOnly={answerOnly}
         />
       );
     case FormComponentType.RADIO:
@@ -199,7 +202,8 @@ export const FormComponentBuilder = ({
         <RadioBox
           {...(component.props as RadioBoxProps)}
           defaultValue={answer ? (answer as object).toString() : undefined}
-          readonly={readOnly}
+          readonly={answerOnly}
+          answerOnly={answerOnly}
         />
       );
     case FormComponentType.SELECT:
@@ -207,7 +211,8 @@ export const FormComponentBuilder = ({
         <SelectBox
           {...(component.props as SelectBoxProps)}
           defaultValue={answer ? (answer as object).toString() : undefined}
-          readonly={readOnly}
+          readonly={answerOnly}
+          answerOnly={answerOnly}
         />
       );
     case FormComponentType.DATE:
@@ -221,7 +226,8 @@ export const FormComponentBuilder = ({
                 : new Date(answer)
               : undefined
           }
-          readonly={readOnly}
+          readonly={answerOnly}
+          answerOnly={answerOnly}
         />
       );
     case FormComponentType.TIME:
@@ -235,7 +241,8 @@ export const FormComponentBuilder = ({
                 : stringToTime(answer)
               : undefined
           }
-          readonly={readOnly}
+          readonly={answerOnly}
+          answerOnly={answerOnly}
         />
       );
     case FormComponentType.LINKED_SELECTOR:
@@ -251,7 +258,8 @@ export const FormComponentBuilder = ({
                 : new Date(answer)
               : undefined
           }
-          readonly={readOnly}
+          readonly={answerOnly}
+          answerOnly={answerOnly}
         />
       );
     case FormComponentType.LINEAR_SCALE:
@@ -259,7 +267,8 @@ export const FormComponentBuilder = ({
         <LinearScale
           {...(component.props as LinearScaleProps)}
           defaultValue={answer}
-          readonly={readOnly}
+          readonly={answerOnly}
+          answerOnly={answerOnly}
         />
       );
 

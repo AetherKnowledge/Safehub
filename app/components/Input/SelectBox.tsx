@@ -35,6 +35,7 @@ const SelectBox = ({
   noFormOutput = false,
   readonly = false,
   extraOptions,
+  answerOnly = false,
 }: SelectBoxProps) => {
   const [options, setOptions] = useState<Option[]>(initialOptions);
 
@@ -120,7 +121,7 @@ const SelectBox = ({
         {legend && (
           <Legend
             legend={legend}
-            required={required}
+            required={answerOnly ? undefined : required}
             number={number}
             size={size}
           />

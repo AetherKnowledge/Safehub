@@ -67,7 +67,7 @@ const ContactUs = () => {
                 College/Career: (044) 931-8615 Local 115
               </p>
               <p className="text-sm opacity-80">
-                Extension Office: (044) 931-8659 Local 119
+                Guidance Extension Office: (044) 931-8659 Local 119
               </p>
             </div>
 
@@ -92,9 +92,6 @@ const ContactUs = () => {
               </p>
               <p className="text-sm opacity-80">
                 lcupguidance.college@email.lcup.edu.ph
-              </p>
-              <p className="text-sm opacity-80">
-                lcupguidance.gs@email.lcup.edu.ph
               </p>
             </button>
           </motion.div>

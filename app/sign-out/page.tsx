@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, LogOut } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import ErrorPopup from "../components/Popup/ErrorPopup";
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -15,8 +16,15 @@ export default function SignOutPage() {
   const session = useSession();
 
   if (!session.data) {
-    router.replace("/sign-in");
-    return null;
+    return (
+      <ErrorPopup
+        message="You are not signed in."
+        closeText="Go Back"
+        buttonColor="btn-primary"
+        redirectTo={"/"}
+        notTransparent
+      />
+    );
   }
 
   return (

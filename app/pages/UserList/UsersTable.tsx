@@ -125,129 +125,157 @@ const UsersTable = ({ name }: { name?: string }) => {
   }
 
   return (
-    <div className="flex w-full h-full overflow-x-auto items-start justify-start">
+    <div className="flex w-full h-full items-start justify-start">
       {loading ? (
-        <div className="flex flex-col items-center justify-center space-y-4 w-full h-full">
+        <div className="flex flex-col items-center justify-center space-y-4 w-full h-full min-h-[400px]">
           <div className="loading loading-spinner loading-lg text-primary"></div>
-          <p className="text-base-content">Loading registered users...</p>
+          <p className="text-base-content/70">Loading registered users...</p>
         </div>
       ) : users.length === 0 ? (
-        <p className="flex text-center text-base-content/70 w-full h-full justify-center items-center">
-          No registered users available.
-        </p>
+        <div className="flex flex-col items-center justify-center w-full h-full min-h-[400px] gap-3">
+          <div className="text-6xl text-base-content/20">👥</div>
+          <p className="text-center text-base-content/70 text-lg font-medium">
+            No registered users found
+          </p>
+          <p className="text-center text-base-content/50 text-sm">
+            Try adjusting your search filters
+          </p>
+        </div>
       ) : (
-        <table className="table w-full">
-          <thead className="text-center text-base-content">
-            <tr>
-              <th>Name</th>
-              <th>Role</th>
-              <th>Email</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody className="text-base-content text-center">
-            <AnimatePresence mode="sync">
-              {users.map((user) => (
-                <motion.tr
-                  key={user.id}
-                  layout
-                  initial={{ opacity: 0, scaleY: 0 }}
-                  animate={{ opacity: 1, scaleY: 1 }}
-                  exit={{
-                    opacity: 0,
-                    scaleY: 0,
-                    transition: { duration: 0.3 },
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className="origin-top"
-                >
-                  <td>
-                    <div className="flex items-center gap-4">
-                      <UserImage
-                        name={user.name || user.email.split("@")[0]}
-                        src={user.image}
-                        width={10}
-                      />
-                      <div className="font-medium">
-                        {user.name || user.email.split("@")[0]}
+        <div className="overflow-x-auto w-full">
+          <table className="table w-full">
+            <thead className="sticky top-0 z-10 bg-base-200/80 backdrop-blur-sm">
+              <tr className="text-base-content border-b border-base-content/10">
+                <th className="font-semibold text-left">User</th>
+                <th className="font-semibold text-center">Role</th>
+                <th className="font-semibold text-left">Email</th>
+                <th className="font-semibold text-center">Status</th>
+                <th className="font-semibold text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="text-base-content">
+              <AnimatePresence mode="sync">
+                {users.map((user) => (
+                  <motion.tr
+                    key={user.id}
+                    layout
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{
+                      opacity: 0,
+                      x: -10,
+                      transition: { duration: 0.2 },
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="hover:bg-base-200/50 transition-colors border-b border-base-content/5"
+                  >
+                    <td className="py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <UserImage
+                            name={user.name || user.email.split("@")[0]}
+                            src={user.image}
+                            width={12}
+                          />
+                          {user.status === "Online" && (
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-base-100"></div>
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-base">
+                            {user.name || user.email.split("@")[0]}
+                          </div>
+                          {user.deactivated && (
+                            <span className="text-xs text-warning font-medium">
+                              Deactivated
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex justify-center">
-                      <SelectBoxOld
-                        items={Object.keys(UserType).sort()}
-                        placeholder={user.type}
-                        className="w-30 font-medium"
-                        defaultValue={user.type}
-                        colorMap={roleColorMap}
-                        borderColor="border-transparent"
-                        padding="pl-1 pr-2 py-1 w-full"
-                        onSelect={(item) => {
-                          changeRole(user.id, item as UserType);
-                        }}
-                        disabled={user.id === session.data?.user?.id}
-                      />
-                    </div>
-                  </td>
-                  <td>{user.email}</td>
-                  <td>
-                    {
-                      <motion.span
-                        key={`${user.id}-${user.status}`}
-                        initial={{ opacity: 0 }}
-                        animate={{
-                          opacity: 1,
-                          backgroundColor: statusColorMap[user.status].bg,
-                          color: statusColorMap[user.status].text,
-                        }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="px-3 py-1 rounded-full text-sm font-medium"
-                      >
-                        {user.status}
-                      </motion.span>
-                    }
-                  </td>
-                  <td>
-                    <div className="flex flex-col gap-2 w-full items-center justify-center">
-                      <button
-                        className={`text-error
-                        ${
-                          user.id === session.data?.user?.id
-                            ? "opacity-50 cursor-not-allowed"
-                            : "hover:underline cursor-pointer"
-                        }`}
-                        onClick={() => {
-                          if (user.id === session.data?.user?.id) return;
-                          handleDeleteUser(user.id);
-                        }}
-                      >
-                        Delete
-                      </button>
-                      <button
-                        className={`
-                        ${user.deactivated ? "text-primary" : "text-warning"}
-                        ${
-                          user.id === session.data?.user?.id
-                            ? "opacity-50 cursor-not-allowed"
-                            : "hover:underline cursor-pointer"
-                        }`}
-                        onClick={() => {
-                          if (user.id === session.data?.user?.id) return;
-                          handleChangeActivation(user.id, !user.deactivated);
-                        }}
-                      >
-                        {user.deactivated ? "Activate" : "Deactivate"}
-                      </button>
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
-            </AnimatePresence>
-          </tbody>
-        </table>
+                    </td>
+                    <td className="py-4">
+                      <div className="flex justify-center">
+                        <SelectBoxOld
+                          items={Object.keys(UserType).sort()}
+                          placeholder={user.type}
+                          className="w-32 font-medium"
+                          defaultValue={user.type}
+                          colorMap={roleColorMap}
+                          borderColor="border-transparent"
+                          padding="pl-2 pr-2 py-1.5 w-full"
+                          onSelect={(item) => {
+                            changeRole(user.id, item as UserType);
+                          }}
+                          disabled={user.id === session.data?.user?.id}
+                        />
+                      </div>
+                    </td>
+                    <td className="py-4">
+                      <span className="text-base-content/80">{user.email}</span>
+                    </td>
+                    <td className="py-4">
+                      <div className="flex justify-center">
+                        <motion.span
+                          key={`${user.id}-${user.status}`}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{
+                            opacity: 1,
+                            scale: 1,
+                            backgroundColor: statusColorMap[user.status].bg,
+                            color: statusColorMap[user.status].text,
+                          }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          transition={{ duration: 0.3 }}
+                          className="px-3 py-1.5 rounded-full text-xs font-semibold inline-block"
+                        >
+                          {user.status}
+                        </motion.span>
+                      </div>
+                    </td>
+                    <td className="py-4">
+                      <div className="flex gap-2 items-center justify-center">
+                        <button
+                          className={`btn btn-sm ${
+                            user.deactivated
+                              ? "btn-primary btn-outline"
+                              : "btn-warning btn-outline"
+                          }
+                          ${
+                            user.id === session.data?.user?.id
+                              ? "btn-disabled opacity-50"
+                              : ""
+                          }`}
+                          onClick={() => {
+                            if (user.id === session.data?.user?.id) return;
+                            handleChangeActivation(user.id, !user.deactivated);
+                          }}
+                          disabled={user.id === session.data?.user?.id}
+                        >
+                          {user.deactivated ? "Activate" : "Deactivate"}
+                        </button>
+                        <button
+                          className={`btn btn-sm btn-error btn-outline
+                          ${
+                            user.id === session.data?.user?.id
+                              ? "btn-disabled opacity-50"
+                              : ""
+                          }`}
+                          onClick={() => {
+                            if (user.id === session.data?.user?.id) return;
+                            handleDeleteUser(user.id);
+                          }}
+                          disabled={user.id === session.data?.user?.id}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

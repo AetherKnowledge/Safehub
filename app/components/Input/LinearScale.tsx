@@ -30,6 +30,7 @@ const LinearScale = ({
   readonly = false,
   minText,
   maxText,
+  answerOnly = false,
 }: LinearScaleProps) => {
   const [currentValue, setCurrentValue] = useState<number | undefined>(
     defaultValue
@@ -53,7 +54,7 @@ const LinearScale = ({
       {legend && (
         <Legend
           legend={legend}
-          required={required}
+          required={answerOnly ? undefined : required}
           number={number}
           size={size}
         />

@@ -14,8 +14,8 @@ interface Props {
 
 export const viewport = {
   width: "device-width",
-  initialScale: 0.5,
-  maximumScale: 1,
+  maximumScale: 0.5,
+  userScalable: false,
 };
 
 const Layout = async ({ children }: Props) => {

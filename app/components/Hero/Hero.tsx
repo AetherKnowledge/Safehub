@@ -19,7 +19,7 @@ const Hero = () => {
   return (
     <section
       id="hero"
-      className="relative w-full h-[calc(100vh-3rem)] overflow-hidden mt-15 flex items-center justify-center"
+      className="relative w-full py-10 overflow-hidden mt-15 flex items-center justify-center"
     >
       {/* Background overlay */}
       <div className="absolute inset-0">

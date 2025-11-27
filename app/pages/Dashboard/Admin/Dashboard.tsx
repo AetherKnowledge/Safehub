@@ -41,13 +41,13 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<"mood" | "appointments">("mood");
 
   return (
-    <div className="flex flex-col gap-4 flex-1 min-h-0 overflow-auto">
+    <div className="flex flex-col gap-4 flex-1 min-h-0">
       {/* Main Content - Desktop: Side by Side, Mobile: Stacked */}
       <div className="flex flex-col xl:flex-row gap-4 flex-1 min-h-0">
         {/* Left Side - Charts (50% on desktop) */}
         <div className="flex flex-col gap-4 xl:w-1/2 min-h-0">
           {/* Mobile Tabs */}
-          <div className="flex xl:hidden gap-2 bg-base-100/50 rounded-lg p-1">
+          <div className="flex xl:hidden gap-2 bg-base-100/50 rounded-lg p-1 min-h-0">
             <button
               className={`btn btn-sm flex-1 ${
                 activeTab === "mood" ? "btn-primary" : "btn-ghost"

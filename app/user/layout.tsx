@@ -12,6 +12,12 @@ interface Props {
   children?: React.ReactNode;
 }
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 0.5,
+  maximumScale: 1,
+};
+
 const Layout = async ({ children }: Props) => {
   // move this to middleware later
   const session = await auth();
@@ -38,12 +44,12 @@ const Layout = async ({ children }: Props) => {
   }
 
   return (
-    <div className="flex bg-base-200 h-full w-full p-6 gap-3 overflow-y-hidden min-h-0">
+    <div className="flex bg-base-200 h-full w-full p-2 md:p-6 gap-2 md:gap-3 overflow-y-hidden min-h-0">
       {/* Resizable Floating Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex flex-col flex-1 gap-3 h-full">
+      <div className="flex flex-col flex-1 gap-2 md:gap-3 h-full">
         <UserNavbar />
         {children}
         <BottomBar />

@@ -21,7 +21,7 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
   const posts = sortPosts(await getPosts(), sortBy, order);
 
   return (
-    <div className="flex items-center justify-center h-full min-h-0 overflow-y-auto pb-1 pr-1">
+    <div className="flex items-center justify-center h-full min-h-0 pb-1 pr-1">
       <div className="flex flex-1 flex-row gap-4 h-full min-h-0 w-auto justify-center">
         <DashboardPosts posts={posts} sortBy={sortBy} order={order} />
 

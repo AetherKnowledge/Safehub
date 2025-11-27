@@ -87,7 +87,7 @@ export type UpdateUserInfoData = z.infer<typeof updateUserInfoSchema>;
 
 export async function getUser() {
   const session = await auth();
-  if (!session) {
+  if (!session || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -109,7 +109,7 @@ export async function changeUserInfo(
 ): Promise<ActionResult<void>> {
   try {
     const session = await auth();
-    if (!session?.user) {
+    if (!session?.user || session.user.deactivated) {
       throw new Error("Unauthorized");
     }
 

@@ -23,7 +23,11 @@ export type UserWithStatus = {
 export async function getUsers() {
   const session = await auth();
 
-  if (!session || !(session.user.type === UserType.Admin)) {
+  if (
+    !session ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 
@@ -61,7 +65,11 @@ export async function updateUserType(
   try {
     const session = await auth();
 
-    if (!session || !(session.user.type === UserType.Admin)) {
+    if (
+      !session ||
+      session.user.type !== UserType.Admin ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
 
@@ -162,7 +170,11 @@ export async function changeUserDeactivationStatus(
 ): Promise<ActionResult<void>> {
   try {
     const session = await auth();
-    if (!session || session.user.type !== UserType.Admin) {
+    if (
+      !session ||
+      session.user.type !== UserType.Admin ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
 
@@ -200,7 +212,11 @@ export async function changeUserDeactivationStatus(
 export async function deleteUser(userId: string): Promise<ActionResult<void>> {
   try {
     const session = await auth();
-    if (!session || session.user.type !== UserType.Admin) {
+    if (
+      !session ||
+      session.user.type !== UserType.Admin ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
 

@@ -50,7 +50,7 @@ export function useCalling() {
         return;
       }
 
-      if (!session.data?.user.id) {
+      if (!session.data?.user.id || session.data?.user.deactivated) {
         console.warn("User not authenticated. Cannot create peer for member.");
         return;
       }
@@ -386,7 +386,7 @@ export function useCalling() {
         return;
       }
 
-      if (!session.data?.user.id) {
+      if (!session.data?.user.id || session.data?.user.deactivated) {
         console.warn("User not authenticated. Cannot initiate call.");
         return;
       }
@@ -433,7 +433,7 @@ export function useCalling() {
       }
     }
 
-    if (!session.data?.user.id) {
+    if (!session.data?.user.id || session.data?.user.deactivated) {
       console.warn("User not authenticated. Cannot answer call.");
       return;
     }

@@ -93,18 +93,24 @@ const FollowUpButton = ({ appointment }: { appointment: AppointmentData }) => {
       </button>
       {showModal && (
         <ModalBase onClose={() => setShowModal(false)}>
-          <div className="bg-base-100 p-0 rounded-lg shadow-lg text-base-content max-w-2xl flex-1 flex flex-col">
+          <div className="bg-base-100 p-0 rounded-2xl shadow-2xl text-base-content max-w-2xl flex-1 flex flex-col overflow-hidden">
             <CloseButton onClick={() => setShowModal(false)} />
-            <div className="flex flex-col items-center justify-center text-center p-6 pt-0 gap-6">
+
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/5 p-6 pb-4">
               <div className="flex flex-col gap-2">
-                <h2 className="text-2xl font-semibold text-primary">
+                <h2 className="text-2xl font-bold text-primary">
                   Follow Up Appointment
                 </h2>
-                <p className="font-light">
-                  Answer the form to schedule a follow-up appointment for the
-                  student you counseled.
+                <p className="text-sm text-base-content/70">
+                  Schedule a follow-up appointment for the student you
+                  counseled.
                 </p>
               </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="flex flex-col w-full gap-4">
                 <input
                   type="hidden"
@@ -148,16 +154,22 @@ const FollowUpButton = ({ appointment }: { appointment: AppointmentData }) => {
                   required
                 />
               </div>
-              {!appointment.followUpId && (
-                <button
-                  className="flex flex-row btn btn-primary gap-2 justify-center items-center text-center"
-                  onClick={handleSubmit}
-                >
-                  <FaRegCheckCircle className="w-4 h-4" />
-                  Submit
-                </button>
-              )}
             </div>
+
+            {/* Footer */}
+            {!appointment.followUpId && (
+              <div className="bg-base-200 border-t border-base-300 px-6 py-4">
+                <div className="flex justify-end">
+                  <button
+                    className="btn btn-primary gap-2"
+                    onClick={handleSubmit}
+                  >
+                    <FaRegCheckCircle className="w-4 h-4" />
+                    Submit
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </ModalBase>
       )}

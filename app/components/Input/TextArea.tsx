@@ -13,6 +13,7 @@ export type TextAreaProps = InputInterface & {
     | "textarea-lg"
     | "textarea-xl";
   onChange?: (value: string) => void;
+  value?: string;
 };
 
 const TextArea = ({
@@ -22,6 +23,7 @@ const TextArea = ({
   required = false,
   number,
   defaultValue,
+  value,
   placeholder,
   bgColor = "bg-neutral",
   size = "textarea-md",
@@ -51,6 +53,7 @@ const TextArea = ({
         } ${readonly && "pointer-events-none"}`}
         defaultValue={defaultValue}
         required={required}
+        value={value}
         onInvalid={(e) => {
           setHasError(true);
           if (onInvalid) onInvalid();

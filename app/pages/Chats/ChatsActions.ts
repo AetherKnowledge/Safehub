@@ -17,7 +17,7 @@ export async function getChats(): Promise<ChatData[]> {
   console.log("Fetching chats...");
   const session = await auth();
 
-  if (!session) {
+  if (!session || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -105,7 +105,7 @@ export async function getDirectChatId(
 ): Promise<ActionResult<string>> {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
+    if (!session?.user?.id || session.user.deactivated) {
       throw new Error("Unauthorized");
     }
 
@@ -143,7 +143,7 @@ export type ChatInfo = {
 
 export async function getChatInfo(id: string): Promise<ChatInfo | null> {
   const session = await auth();
-  if (!session) {
+  if (!session || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -183,7 +183,7 @@ export async function getChatInfo(id: string): Promise<ChatInfo | null> {
 
 export async function getChatById(id: string): Promise<Message[]> {
   const session = await auth();
-  if (!session) {
+  if (!session || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 

@@ -12,7 +12,7 @@ export async function fetchForms(
 ): Promise<ActionResult<BuiltFormData | undefined>> {
   try {
     const session = await auth();
-    if (!session?.user) {
+    if (!session?.user || session.user.deactivated) {
       return { success: false, message: "Unauthorized" };
     }
     const validation = formTypeSchema.safeParse(formType);
@@ -44,7 +44,11 @@ export async function saveForms(
 ): Promise<ActionResult<void>> {
   try {
     const session = await auth();
-    if (!session?.user || session.user.type !== UserType.Admin) {
+    if (
+      !session?.user ||
+      session.user.type !== UserType.Admin ||
+      session.user.deactivated
+    ) {
       return { success: false, message: "Unauthorized" };
     }
     const validation = formTypeSchema.safeParse(formType);

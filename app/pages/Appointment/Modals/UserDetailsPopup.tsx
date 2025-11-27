@@ -31,18 +31,19 @@ const UserDetailsPopup = ({
 }) => {
   return (
     <ModalBase onClose={onClose}>
-      <div className="bg-base-100 p-0 rounded-lg shadow-lg text-base-content max-w-2xl flex-1 flex flex-col">
+      <div className="bg-base-100 p-0 rounded-2xl shadow-2xl text-base-content max-w-3xl flex-1 flex flex-col overflow-hidden">
         <CloseButton onClick={() => onClose && onClose()} />
-        <div className="p-6 pt-0">
-          <div className="flex flex-col gap-3">
-            <UserTopBar
-              userName={user.name || user.email.split("@")[0] || "User"}
-              userEmail={user.email}
-              userImgSrc={user.image || undefined}
-              chatId={chatId}
-            />
-            {children}
-          </div>
+
+        <UserTopBar
+          userName={user.name || user.email.split("@")[0] || "User"}
+          userEmail={user.email}
+          userImgSrc={user.image || undefined}
+          chatId={chatId}
+        />
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div className="flex flex-col gap-4">{children}</div>
         </div>
       </div>
     </ModalBase>

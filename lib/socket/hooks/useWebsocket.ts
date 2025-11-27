@@ -48,6 +48,11 @@ export function useWebSocket(
       return;
     }
 
+    if (session.user.deactivated) {
+      console.log("[WebSocket] Skipping connect: user is deactivated");
+      return;
+    }
+
     const socket = new WebSocket(urlFn());
     socket.onopen = () => {
       setIsConnected(true);

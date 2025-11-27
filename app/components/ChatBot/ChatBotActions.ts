@@ -20,7 +20,7 @@ type ChatBotMessage = {
 export async function getChatBotChat(): Promise<ChatData> {
   const session = await auth();
 
-  if (!session) {
+  if (!session || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -44,7 +44,7 @@ export async function getChatBotChat(): Promise<ChatData> {
 export async function getChatBotHistory(): Promise<Message[]> {
   const session = await auth();
 
-  if (!session) {
+  if (!session || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 

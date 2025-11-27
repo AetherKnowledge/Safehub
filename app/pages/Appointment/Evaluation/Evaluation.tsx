@@ -12,14 +12,6 @@ const Evaluation = async () => {
 
   return (
     <div className="flex flex-col gap-4 flex-1 min-h-0">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 rounded-xl shadow-md">
-        <h1 className="text-2xl font-bold mb-2">Evaluation & Feedback</h1>
-        <p className="text-sm text-base-content/70">
-          Monitor and analyze student satisfaction ratings
-        </p>
-      </div>
-
       {/* Rating Summary Card */}
       <div className="flex flex-col xl:flex-row gap-4">
         <div className="flex flex-col bg-gradient-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl p-6 gap-3 w-full border border-base-content/5">

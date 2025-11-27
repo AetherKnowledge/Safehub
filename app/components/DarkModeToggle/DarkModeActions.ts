@@ -5,7 +5,7 @@ import { prisma } from "@/prisma/client";
 
 export async function changeDarkMode(darkMode: boolean) {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session?.user?.id || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 

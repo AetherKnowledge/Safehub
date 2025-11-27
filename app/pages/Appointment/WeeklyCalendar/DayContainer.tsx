@@ -62,8 +62,8 @@ export const DayContainerLoading = ({ weekDates }: { weekDates: Date[] }) => {
         return (
           <div
             key={dayIndex}
-            className={`flex-1 relative h-full border-l border-base-content/30 ${
-              isToday ? "bg-primary/20" : ""
+            className={`flex-1 relative h-full border-l border-base-300 transition-colors ${
+              isToday ? "bg-primary/5" : ""
             }`}
           >
             {/* Hour and half-hour grid lines using percentages */}
@@ -74,10 +74,10 @@ export const DayContainerLoading = ({ weekDates }: { weekDates: Date[] }) => {
               return (
                 <div
                   key={timeIndex}
-                  className={`absolute left-0 right-0 border-transparent ${
+                  className={`absolute left-0 right-0 ${
                     isHalfHour
-                      ? "border-base-content/10" // lighter for half-hour
-                      : "border-base-content/20" // slightly darker for full hour
+                      ? "border-t border-base-300/30" // lighter for half-hour
+                      : "border-t border-base-300/50" // slightly darker for full hour
                   }`}
                   style={{ top: `${topPercent}%` }}
                 />
@@ -94,8 +94,11 @@ export const DayContainerLoading = ({ weekDates }: { weekDates: Date[] }) => {
 
 export const AppointmentBoxLoading = () => {
   return (
-    <div className="absolute top-2 left-2 text-xs text-base-content/70">
-      Loading...
+    <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+      <span className="loading loading-spinner loading-sm text-primary"></span>
+      <span className="text-xs text-base-content/50">
+        Loading appointments...
+      </span>
     </div>
   );
 };

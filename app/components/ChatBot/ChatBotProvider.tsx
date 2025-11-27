@@ -30,7 +30,7 @@ const ChatBotProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const loadData = async () => {
-      if (!session) return;
+      if (!session || session.data?.user.deactivated) return;
 
       setLoading(true);
       const history = await getChatBotHistory();
@@ -42,7 +42,7 @@ const ChatBotProvider = ({ children }: { children: ReactNode }) => {
 
   const sendMessage = useCallback(
     async (content: string) => {
-      if (!session) return;
+      if (!session || session.data?.user.deactivated) return;
 
       // Add the user's message immediately
       setMessages((prevMessages) => [

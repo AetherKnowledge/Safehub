@@ -27,6 +27,12 @@ export const actionsTakenSchema = z.object({
     .min(2, "Actions taken must be at least 2 characters long."),
 });
 
+export const notesSchema = z.object({
+  appointmentId: z.uuid(),
+  notes: z.string().optional(),
+});
+export type NotesData = z.infer<typeof notesSchema>;
+
 export const followUpAppointmentSchema = z.object({
   appointmentId: z.uuid(),
   startTime: z.coerce.date(),
@@ -34,3 +40,9 @@ export const followUpAppointmentSchema = z.object({
   reason: z.string().min(2, "Please provide a valid reason for follow-up."),
 });
 export type FollowUpAppointmentData = z.infer<typeof followUpAppointmentSchema>;
+
+export const didNotAttendReasonSchema = z.object({
+  appointmentId: z.uuid(),
+  reason: z.string().min(2, "Please provide a valid reason for not attending."),
+});
+export type DidNotAttendReasonData = z.infer<typeof didNotAttendReasonSchema>;

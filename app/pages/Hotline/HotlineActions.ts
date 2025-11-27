@@ -12,7 +12,7 @@ import { prisma } from "@/prisma/client";
 
 export async function getAllHotline() {
   const session = await auth();
-  if (!session) {
+  if (!session || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -21,7 +21,7 @@ export async function getAllHotline() {
 
 export async function getThreeHotlines() {
   const session = await auth();
-  if (!session) {
+  if (!session || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -30,7 +30,11 @@ export async function getThreeHotlines() {
 
 export async function upsertHotline(data: UploadHotlineData) {
   const session = await auth();
-  if (!session || session.user.type !== UserType.Admin) {
+  if (
+    !session ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 
@@ -115,7 +119,11 @@ export async function upsertHotline(data: UploadHotlineData) {
 
 export async function deleteHotline(id: string) {
   const session = await auth();
-  if (!session || session.user.type !== UserType.Admin) {
+  if (
+    !session ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 

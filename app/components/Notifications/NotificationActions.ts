@@ -14,6 +14,7 @@ import ActionResult from "../ActionResult";
 import { formatTimeDisplay } from "../Input/Date/utils";
 import {
   AppointmentCreateNotification,
+  AppointmentDidNotAttendNotification,
   AppointmentUpdateScheduleNotification,
   AppointmentUpdateStatusNotification,
 } from "./schema";
@@ -25,11 +26,12 @@ export async function createAppointmentNotification(
     | AppointmentCreateNotification
     | AppointmentUpdateStatusNotification
     | AppointmentUpdateScheduleNotification
+    | AppointmentDidNotAttendNotification
 ): Promise<ActionResult<void>> {
   try {
     console.log("Creating notification of type:", type, "with data:", data);
     const session = await auth();
-    if (!session?.user?.id) {
+    if (!session?.user?.id || session.user.deactivated) {
       return {
         success: false,
         message: "User is not authenticated.",
@@ -63,7 +65,7 @@ export async function createAppointmentNotification(
       },
     });
 
-    if (!session.supabaseAccessToken) {
+    if (!session.supabaseAccessToken || session.user.deactivated) {
       return {
         success: false,
         message: "Supabase access token is missing.",
@@ -90,6 +92,8 @@ export async function createAppointmentNotification(
           return "Cancelled";
         case AppointmentStatus.Pending:
           return "Pending";
+        case AppointmentStatus.DidNotAttend:
+          return "Did Not Attend";
         default:
           return "Updated";
       }
@@ -113,12 +117,22 @@ export async function createAppointmentNotification(
           }"`;
         case NotificationType.AppointmentReminder:
           return "Appointment Reminder";
+        case NotificationType.AppointmentDidNotAttend:
+          return "You Did Not Attend the Appointment";
         case NotificationType.NewPost:
           return "New Post Created";
         default:
           return "Appointment Notification";
       }
     }
+
+    const params = new URLSearchParams({
+      appointmentId: appointment.id,
+    });
+
+    const appointmentUrl = `${env(
+      "NEXT_PUBLIC_URL"
+    )}/user/appointments?${params.toString()}`;
 
     // reminders are handled differently
     console.log(n8nWebhookUrl);
@@ -136,7 +150,7 @@ export async function createAppointmentNotification(
         body: JSON.stringify({
           data: {
             type: type,
-            url: env("NEXT_PUBLIC_URL")!,
+            url: appointmentUrl,
             title: notificationTypeToTitle(type),
             cancelText: "Cancelled",
             schedDate: formatDateDisplay(appointmentData.startTime),
@@ -169,7 +183,7 @@ export async function fetchNotificationsForUser(): Promise<
 > {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
+    if (!session?.user?.id || session.user.deactivated) {
       return {
         success: false,
         message: "User is not authenticated.",
@@ -179,6 +193,9 @@ export async function fetchNotificationsForUser(): Promise<
     const notifications = await prisma.notification.findMany({
       where: {
         userId: session.user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
@@ -200,7 +217,7 @@ export async function markNotificationAsRead(
 ): Promise<ActionResult<null>> {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
+    if (!session?.user?.id || session.user.deactivated) {
       return {
         success: false,
         message: "User is not authenticated.",
@@ -239,7 +256,7 @@ export async function deleteNotification(
 ): Promise<ActionResult<null>> {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
+    if (!session?.user?.id || session.user.deactivated) {
       return {
         success: false,
         message: "User is not authenticated.",

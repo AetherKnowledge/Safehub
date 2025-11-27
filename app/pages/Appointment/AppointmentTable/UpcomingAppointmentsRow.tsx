@@ -6,7 +6,7 @@ import { formatDateDisplay, formatTime } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { AppointmentData } from "../AppointmentActions";
-import ViewModal from "./ViewModal";
+import ViewModal from "../Modals/ViewModal";
 
 const UpcomingAppointmentRow = ({
   appointment,

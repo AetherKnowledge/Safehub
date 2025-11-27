@@ -1,5 +1,6 @@
 "use client";
 
+import VideoContainer from "@/app/components/Video/VideoContainer";
 import { CallStatus } from "@/app/generated/prisma";
 import { useSession } from "next-auth/react";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -7,7 +8,6 @@ import { useCalling } from "../../../../lib/socket/hooks/useCalling";
 import { getChatInfo } from "../ChatsActions";
 import InitiateCallPopup from "./InitiateCallPopup";
 import RingingPopup from "./RingingPopup";
-import VideoContainer from "@/app/components/Video/VideoContainer";
 
 // #TODO: Fix bug when rejecting call videoPopup shows up for a split second
 
@@ -58,7 +58,7 @@ const CallPopup = ({ children }: Props) => {
         return;
       }
 
-      if (!session?.data?.user) {
+      if (!session?.data?.user || session.data?.user.deactivated) {
         console.error("No user information found");
         return;
       }

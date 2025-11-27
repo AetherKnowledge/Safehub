@@ -168,6 +168,7 @@ const AppointmentHeader = () => {
               <option value="Confirmed">Confirmed</option>
               <option value="Approved">Approved</option>
               <option value="Canceled">Canceled</option>
+              <option value="DidNotAttend">Did Not Attend</option>
             </select>
           </div>
         )}

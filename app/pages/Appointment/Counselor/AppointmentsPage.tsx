@@ -4,7 +4,7 @@ import {
   getAppointmentsForDateRange,
 } from "../AppointmentActions";
 import AppointmentsTable from "../AppointmentTable";
-import { ViewModalPopup } from "../AppointmentTable/ViewModal";
+import { ViewModalPopup } from "../Modals/ViewModal";
 import { filterAppointments } from "../Student/AppointmentPage";
 import WeeklyCalendar from "../WeeklyCalendar";
 import { getWeekDates } from "../WeeklyCalendar/WeeklyCalendarUtils";
@@ -47,9 +47,7 @@ const AppointmentsPage = async ({
           <AppointmentHeader />
           <div className="flex-1 min-h-0 overflow-auto flex flex-col">
             {viewMode === ViewMode.CALENDAR && (
-              <div className="p-5 flex-1 min-h-0 flex flex-col">
-                <WeeklyCalendar date={new Date(date)} />
-              </div>
+              <WeeklyCalendar date={new Date(date)} />
             )}
             {viewMode === ViewMode.LIST && (
               <AppointmentsTable

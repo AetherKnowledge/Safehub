@@ -29,6 +29,7 @@ enum AppointmentStatus {
   Pending
   Completed
   Cancelled
+  DidNotAttend
 }
 
 enum Days {
@@ -84,6 +85,7 @@ enum NotificationType {
   AppointmentUpdatedStatus
   AppointmentUpdatedSchedule
   AppointmentReminder
+  AppointmentDidNotAttend
   NewPost
 }
 
@@ -330,7 +332,10 @@ model Appointment {
   evaluationData Json?
   rating         Int?
 
-  actionsTaken String?
+  actionsTaken       String?
+  didNotAttendReason String?
+
+  notes String?
 
   // Foreign key for the 1→1 self relation
   followUpId     String? @unique @db.Uuid

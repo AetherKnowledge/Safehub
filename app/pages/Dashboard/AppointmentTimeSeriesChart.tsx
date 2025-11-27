@@ -46,6 +46,10 @@ const STATUS_COLORS = {
     background: "rgba(239, 68, 68, 0.2)",
     border: "rgba(239, 68, 68, 1)",
   },
+  DidNotAttend: {
+    background: "rgba(168, 85, 247, 0.2)",
+    border: "rgba(168, 85, 247, 1)",
+  },
 };
 
 const AppointmentTimeSeriesChart = () => {
@@ -66,6 +70,7 @@ const AppointmentTimeSeriesChart = () => {
     "Pending",
     "Completed",
     "Cancelled",
+    "DidNotAttend",
   ]);
 
   useEffect(() => {
@@ -108,6 +113,8 @@ const AppointmentTimeSeriesChart = () => {
           if (selectedStatuses.includes("Pending")) total += dp.Pending;
           if (selectedStatuses.includes("Completed")) total += dp.Completed;
           if (selectedStatuses.includes("Cancelled")) total += dp.Cancelled;
+          if (selectedStatuses.includes("DidNotAttend"))
+            total += dp.DidNotAttend;
           return total;
         });
 
@@ -314,7 +321,7 @@ const AppointmentTimeSeriesChart = () => {
                   STATUS_COLORS[status as keyof typeof STATUS_COLORS].border,
               }}
             >
-              {status}
+              {status === "DidNotAttend" ? "Did Not Attend" : status}
             </span>
           </label>
         ))}

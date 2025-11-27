@@ -2,6 +2,7 @@
 import { formatTime } from "@/lib/utils";
 import { useState } from "react";
 import { AppointmentData } from "../AppointmentActions";
+import ViewModal from "../Modals/ViewModal";
 import {
   getAppointmentHeight,
   getAppointmentTopPosition,
@@ -9,7 +10,6 @@ import {
   getBorderStatusColor,
   getStatusTextColor,
 } from "./WeeklyCalendarUtils";
-import ViewModal from "../AppointmentTable/ViewModal";
 
 export interface AppointmentBoxProps {
   appointment: AppointmentData;
@@ -30,9 +30,9 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
   return (
     <>
       <div
-        className={`absolute left-1 right-1 rounded p-2 cursor-pointer min-h-0 overflow-y-auto hover:scale-101 active:scale-99 transition-all ${getBgStatusColor(
+        className={`absolute left-1 right-1 rounded-lg p-1.5 cursor-pointer min-h-0 overflow-hidden hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 ${getBgStatusColor(
           appointment.status
-        )} bg-opacity-10 border-l-4 shadow-br ${getBorderStatusColor(
+        )} bg-opacity-10 border-l-4 shadow-md hover:shadow-lg ${getBorderStatusColor(
           appointment.status
         )}`}
         style={{
@@ -42,16 +42,16 @@ const AppointmentBox = ({ appointment, onUpdate }: AppointmentBoxProps) => {
         onClick={() => setShowPopup(true)}
       >
         <div
-          className={`text-xs font-medium ${getStatusTextColor(
+          className={`text-[9px] font-bold uppercase tracking-wide mb-0.5 ${getStatusTextColor(
             appointment.status
           )}`}
         >
           {appointment.status}
         </div>
-        <div className="text-xs truncate">
+        <div className="text-[10px] font-semibold truncate text-base-content">
           {appointment.student.user.name || appointment.student.user.email}
         </div>
-        <div className="text-[10px] truncate pb-">
+        <div className="text-[8px] truncate text-base-content/70 mt-0.5">
           {formatTime(appointment.startTime)} -{" "}
           {formatTime(appointment.endTime!)}
         </div>

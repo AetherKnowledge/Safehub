@@ -25,7 +25,7 @@ export type CounselorData = Pick<
 export async function getCounselors() {
   const session = await auth();
 
-  if (!session) {
+  if (!session || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 

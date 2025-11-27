@@ -31,19 +31,19 @@ const ApproveButton = ({ appointment }: ApproveButton) => {
       return;
     }
 
-    const conflicts = await checkForConflictingDate(
-      appointment.startTime,
-      appointment.endTime || addMinutes(appointment.startTime, 60),
-      appointment.id
-    );
-
-    if (conflicts && conflicts.length > 0) {
-      const confirm = await statusPopup.showWarning(
-        `The selected appointment conflicts with ${conflicts.length} existing appointment(s). Do you still want to proceed?`
+    if (session?.data?.user?.type === UserType.Counselor) {
+      const conflicts = await checkForConflictingDate(
+        appointment.startTime,
+        appointment.endTime || addMinutes(appointment.startTime, 60),
+        appointment.id
       );
-      if (!confirm) return;
 
-      statusPopup.showLoading("Updating appointment...");
+      if (conflicts && conflicts.length > 0) {
+        const confirm = await statusPopup.showWarning(
+          `The selected appointment conflicts with ${conflicts.length} existing appointment(s). Do you still want to proceed?`
+        );
+        if (!confirm) return;
+      }
     }
 
     statusPopup.showLoading("Updating appointment...");

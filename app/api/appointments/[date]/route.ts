@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ date: string }> }
 ) {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session?.user?.id || session.user.deactivated) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
   const date = new Date((await params).date);

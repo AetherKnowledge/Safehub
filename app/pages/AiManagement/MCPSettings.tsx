@@ -128,7 +128,10 @@ const MCPSettings = ({
   function handleDownload(files: MCPFile[]) {
     files.map((card) => {
       console.log("Download URL " + card.url);
-      if (!session.data?.supabaseAccessToken) {
+      if (
+        !session.data?.supabaseAccessToken ||
+        session.data?.user.deactivated
+      ) {
         statusPopup.showError("You must be logged in to download files.");
         return;
       }

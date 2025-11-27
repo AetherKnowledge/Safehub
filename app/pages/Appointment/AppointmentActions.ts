@@ -4,6 +4,7 @@ import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
 import { createAppointmentNotification } from "@/app/components/Notifications/NotificationActions";
 import {
   AppointmentCreateNotification,
+  AppointmentDidNotAttendNotification,
   AppointmentUpdateScheduleNotification,
   AppointmentUpdateStatusNotification,
 } from "@/app/components/Notifications/schema";
@@ -24,8 +25,11 @@ import {
   actionsTakenSchema,
   AppointmentFormData,
   cancelAppointmentSchema,
+  didNotAttendReasonSchema,
   FollowUpAppointmentData,
   followUpAppointmentSchema,
+  NotesData,
+  notesSchema,
   UpdateAppointmentStatusData,
   updateAppointmentStatusSchema,
 } from "./schema";
@@ -39,6 +43,7 @@ export type AppointmentData = Appointment & {
     user: Pick<User, "id" | "name" | "email" | "image">;
   };
   parentId?: string;
+  followUpId?: string | null;
 };
 
 export interface StudentDetailsData {
@@ -73,24 +78,13 @@ export interface StudentDetailsData {
   relationToGuardian: string | null;
 }
 
-export async function getAppointments(): Promise<AppointmentData[]> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
-  const appointments = await prisma.appointment.findMany({
-    where:
-      session.user.type === UserType.Student
-        ? { studentId: session.user.id }
-        : { counselorId: session.user.id },
-    orderBy: {
-      startTime: "desc",
-    },
+const appointmentInclude = (userType: UserType) => {
+  return {
     include: {
       parent: {
         select: { id: true },
       },
+      followUp: { select: { id: true } },
       student: {
         include: {
           user: {
@@ -141,6 +135,27 @@ export async function getAppointments(): Promise<AppointmentData[]> {
         },
       },
     },
+    omit: {
+      notes: userType === UserType.Student,
+    },
+  };
+};
+
+export async function getAppointments(): Promise<AppointmentData[]> {
+  const session = await auth();
+  if (!session?.user?.id || !session.user.type || session.user.deactivated) {
+    throw new Error("Unauthorized");
+  }
+
+  const appointments = await prisma.appointment.findMany({
+    where:
+      session.user.type === UserType.Student
+        ? { studentId: session.user.id }
+        : { counselorId: session.user.id },
+    orderBy: {
+      startTime: "desc" as const,
+    },
+    ...appointmentInclude(session.user.type),
   });
 
   const chats = await prisma.chat.findMany({
@@ -169,15 +184,121 @@ export async function getAppointments(): Promise<AppointmentData[]> {
       ...appointment,
       chatId: chat ? chat.id : "",
       parentId: appointment.parent ? appointment.parent.id : undefined,
+      followUpId: appointment.followUp?.id || null,
     };
   });
+}
+
+export async function getAppointmentHistory(
+  appointmentId: string
+): Promise<ActionResult<AppointmentData[]>> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id || !session.user.type || session.user.deactivated) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    const appointment = await prisma.appointment.findUnique({
+      where: {
+        id: appointmentId,
+        OR: [{ studentId: session.user.id }, { counselorId: session.user.id }],
+      },
+    });
+
+    if (!appointment) {
+      return { success: false, message: "Appointment not found" };
+    }
+
+    // Find the root appointment (the one without a parent)
+    let rootAppointment = appointment;
+    let currentId = appointment.followUpId;
+
+    while (currentId) {
+      const parent = await prisma.appointment.findUnique({
+        where: { id: currentId },
+        select: { id: true, followUpId: true },
+      });
+
+      if (!parent) break;
+      rootAppointment = {
+        ...appointment,
+        id: parent.id,
+        followUpId: parent.followUpId,
+      };
+      currentId = parent.followUpId;
+    }
+
+    // Now traverse from root to get all appointments in the chain
+    const appointmentChain: string[] = [];
+    const queue: string[] = [rootAppointment.id];
+
+    while (queue.length > 0) {
+      const currentAppointmentId = queue.shift()!;
+      appointmentChain.push(currentAppointmentId);
+
+      // Find all follow-ups of the current appointment
+      const followUps = await prisma.appointment.findMany({
+        where: { followUpId: currentAppointmentId },
+        select: { id: true },
+      });
+
+      queue.push(...followUps.map((f) => f.id));
+    }
+
+    // Fetch full appointment data for all appointments in the chain
+    const appointments = await prisma.appointment.findMany({
+      where: {
+        id: { in: appointmentChain },
+        OR: [{ studentId: session.user.id }, { counselorId: session.user.id }],
+      },
+      orderBy: {
+        startTime: "asc",
+      },
+      ...appointmentInclude(session.user.type),
+    });
+
+    const chats = await prisma.chat.findMany({
+      where: {
+        members: {
+          some: {
+            userId: session.user.id,
+          },
+        },
+      },
+      select: {
+        id: true,
+        members: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+    });
+
+    const appointmentsWithChat = appointments.map((appointment) => {
+      const chat = chats.find((chat) =>
+        chat.members.some((member) => member.userId === appointment.studentId)
+      );
+      return {
+        ...appointment,
+        chatId: chat ? chat.id : "",
+        parentId: appointment.parent ? appointment.parent.id : undefined,
+        followUpId: appointment.followUp?.id || null,
+      };
+    });
+
+    return { success: true, data: appointmentsWithChat };
+  } catch (error) {
+    console.error((error as Error).message);
+    return { success: false, message: (error as Error).message };
+  }
 }
 
 export async function getAppointmentById(
   appointmentId: string
 ): Promise<AppointmentData | null> {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session?.user?.id || !session.user.type || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -187,60 +308,7 @@ export async function getAppointmentById(
         session.user.type === UserType.Student
           ? { studentId: session.user.id, id: appointmentId }
           : { counselorId: session.user.id, id: appointmentId },
-      include: {
-        parent: {
-          select: { id: true },
-        },
-        student: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                image: true,
-
-                firstName: true,
-                middleName: true,
-                lastName: true,
-                suffix: true,
-
-                birthDate: true,
-                gender: true,
-
-                department: true,
-                program: true,
-                year: true,
-                section: true,
-
-                phoneNumber: true,
-
-                guardianName: true,
-                guardianFirstName: true,
-                guardianMiddleName: true,
-                guardianLastName: true,
-                guardianSuffix: true,
-
-                guardianContact: true,
-                guardianEmail: true,
-                relationToGuardian: true,
-              },
-            },
-          },
-        },
-        counselor: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                image: true,
-              },
-            },
-          },
-        },
-      },
+      ...appointmentInclude(session.user.type),
     })
     .catch(() => {
       return null;
@@ -267,6 +335,7 @@ export async function getAppointmentById(
         ...appointment,
         chatId: chat ? chat.id : "",
         parentId: appointment.parent ? appointment.parent.id : undefined,
+        followUpId: appointment.followUp?.id || null,
       }
     : null;
 }
@@ -283,7 +352,8 @@ export async function createNewAppointment(
     if (
       !session ||
       !(session.user.type === UserType.Student) ||
-      !session.user?.id
+      !session.user?.id ||
+      session.user.deactivated
     ) {
       throw new Error("Unauthorized");
     }
@@ -413,15 +483,6 @@ export async function createNewAppointment(
   return { success: true };
 }
 
-async function getCounselorBasedOnSchedule() {
-  // TODO: Implement logic to find an available counselor based on the schedule
-  // Find a counselor who is available at the given schedule
-  // for now just get the first counselor
-  const counselor = await prisma.counselor.findFirst({});
-
-  return counselor;
-}
-
 export async function updateAppointment(
   appointmentId: string,
   formData: FormData
@@ -429,7 +490,11 @@ export async function updateAppointment(
   const data = Object.fromEntries(formData.entries());
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.type !== UserType.Student) {
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Student ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
 
@@ -572,7 +637,11 @@ export async function rescheduleAppointment(
 ): Promise<ActionResult<void>> {
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.type !== UserType.Counselor) {
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Counselor ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
 
@@ -625,7 +694,11 @@ export async function checkForConflictingDate(
   appointmentId: string
 ) {
   const session = await auth();
-  if (!session?.user?.id || session.user.type !== UserType.Counselor) {
+  if (
+    !session?.user?.id ||
+    session.user.type !== UserType.Counselor ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 
@@ -634,6 +707,10 @@ export async function checkForConflictingDate(
       id: {
         not: appointmentId,
       },
+      status: {
+        in: [AppointmentStatus.Pending, AppointmentStatus.Approved],
+      },
+      counselorId: session.user.id,
       startTime: {
         lte: endTime,
       },
@@ -654,7 +731,11 @@ export async function updateAppointmentStatus(
 ): Promise<ActionResult<void>> {
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.type !== UserType.Counselor) {
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Counselor ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
 
@@ -680,6 +761,10 @@ export async function updateAppointmentStatus(
 
     if (appointment.status === AppointmentStatus.Cancelled) {
       throw new Error("Cannot update cancelled appointment");
+    }
+
+    if (appointment.status === AppointmentStatus.DidNotAttend) {
+      throw new Error("Cannot update 'Did Not Attend' appointment");
     }
 
     if (appointment.status === AppointmentStatus.Completed) {
@@ -735,7 +820,7 @@ export async function getAppointmentsForDateRange(
   endDate: Date
 ): Promise<AppointmentData[]> {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session?.user?.id || !session.user.type || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -757,63 +842,7 @@ export async function getAppointmentsForDateRange(
             },
           },
 
-    include: {
-      parent: {
-        select: { id: true },
-      },
-      student: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
-
-              firstName: true,
-              middleName: true,
-              lastName: true,
-              suffix: true,
-
-              birthDate: true,
-              gender: true,
-
-              department: true,
-              program: true,
-              year: true,
-              section: true,
-
-              phoneNumber: true,
-
-              guardianName: true,
-              guardianFirstName: true,
-              guardianMiddleName: true,
-              guardianLastName: true,
-              guardianSuffix: true,
-
-              guardianContact: true,
-              guardianEmail: true,
-              relationToGuardian: true,
-            },
-          },
-        },
-      },
-      counselor: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
-            },
-          },
-        },
-      },
-    },
-    orderBy: {
-      startTime: "desc",
-    },
+    ...appointmentInclude(session.user.type),
   });
 
   const chats = await prisma.chat.findMany({
@@ -842,6 +871,7 @@ export async function getAppointmentsForDateRange(
       ...appointment,
       chatId: chat ? chat.id : "",
       parentId: appointment.parent ? appointment.parent.id : undefined,
+      followUpId: appointment.followUp?.id || null,
     };
   });
 }
@@ -850,7 +880,7 @@ export async function getAppointmentsForDate(
   date: Date
 ): Promise<AppointmentData[]> {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session?.user?.id || !session.user.type || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -876,63 +906,7 @@ export async function getAppointmentsForDate(
               lte: endDate,
             },
           },
-    include: {
-      parent: {
-        select: { id: true },
-      },
-      student: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
-
-              firstName: true,
-              middleName: true,
-              lastName: true,
-              suffix: true,
-
-              birthDate: true,
-              gender: true,
-
-              department: true,
-              program: true,
-              year: true,
-              section: true,
-
-              phoneNumber: true,
-
-              guardianName: true,
-              guardianFirstName: true,
-              guardianMiddleName: true,
-              guardianLastName: true,
-              guardianSuffix: true,
-
-              guardianContact: true,
-              guardianEmail: true,
-              relationToGuardian: true,
-            },
-          },
-        },
-      },
-      counselor: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
-            },
-          },
-        },
-      },
-    },
-    orderBy: {
-      startTime: "desc",
-    },
+    ...appointmentInclude(session.user.type),
   });
 
   const chats = await prisma.chat.findMany({
@@ -961,13 +935,14 @@ export async function getAppointmentsForDate(
       ...appointment,
       chatId: chat ? chat.id : "",
       parentId: appointment.parent ? appointment.parent.id : undefined,
+      followUpId: appointment.followUp?.id || null,
     };
   });
 }
 
 export async function getTodayAppointmentsCount(date: Date): Promise<number> {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session?.user?.id || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -998,7 +973,11 @@ export async function cancelAppointmentStudent(
   const data = Object.fromEntries(formData.entries());
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.type !== UserType.Student) {
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Student ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
     console.log("Cancel Data:", data);
@@ -1064,7 +1043,11 @@ export async function createActionsTaken(
   const data = Object.fromEntries(formData.entries());
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.type !== UserType.Counselor) {
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Counselor ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
 
@@ -1107,7 +1090,11 @@ export async function createFollowUpAppointment(
 ): Promise<ActionResult<void>> {
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.type !== UserType.Counselor) {
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Counselor ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
     const validation = followUpAppointmentSchema.safeParse(data);
@@ -1137,6 +1124,20 @@ export async function createFollowUpAppointment(
       throw new Error("Follow-up appointment already exists for this session");
     }
 
+    if (startTime < new Date()) {
+      throw new Error("Cannot schedule follow-up in the past");
+    }
+
+    if (startTime >= endTime) {
+      throw new Error("End time must be after start time");
+    }
+
+    if (startTime <= (appointment.endTime || appointment.startTime)) {
+      throw new Error(
+        "Follow-up appointment must be scheduled after the original appointment"
+      );
+    }
+
     const followUp = await prisma.appointment.create({
       data: {
         appointmentData: JSON.parse(
@@ -1162,7 +1163,7 @@ export async function createFollowUpAppointment(
     const result = await createAppointmentNotification(
       appointment,
       NotificationType.AppointmentCreated,
-      { appointmentId: appointment.id } as AppointmentCreateNotification
+      { appointmentId: followUp.id } as AppointmentCreateNotification
     );
     if (!result.success) {
       console.error(
@@ -1183,7 +1184,11 @@ export async function approveFollowUpAppointment(
 ): Promise<ActionResult<void>> {
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.type !== UserType.Student) {
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Student ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
 
@@ -1223,6 +1228,201 @@ export async function approveFollowUpAppointment(
     }
 
     return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: (error as Error).message };
+  }
+}
+
+export async function updateToDidNotAttend(
+  appointmentId: string
+): Promise<ActionResult<void>> {
+  try {
+    const session = await auth();
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Counselor ||
+      session.user.deactivated
+    ) {
+      throw new Error("Unauthorized");
+    }
+
+    const appointment = await prisma.appointment.findFirst({
+      where: { counselorId: session.user.id, id: appointmentId },
+    });
+
+    if (!appointment) {
+      throw new Error("Appointment not found");
+    }
+
+    if (appointment.status !== AppointmentStatus.Approved) {
+      throw new Error("Only approved appointments can be marked as D.N.A.");
+    }
+
+    const updatedAppointment = await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        status: AppointmentStatus.DidNotAttend,
+      },
+    });
+
+    const result = await createAppointmentNotification(
+      updatedAppointment,
+      NotificationType.AppointmentDidNotAttend,
+      {
+        appointmentId: updatedAppointment.id,
+        date: appointment.startTime,
+      } as AppointmentDidNotAttendNotification
+    );
+
+    if (!result.success) {
+      console.error(
+        "Failed to create appointment notification:",
+        result.message
+      );
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: (error as Error).message };
+  }
+}
+
+export async function submitDidNotAttendReason(
+  formData: FormData
+): Promise<ActionResult<void>> {
+  try {
+    const session = await auth();
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Student ||
+      session.user.deactivated
+    ) {
+      throw new Error("Unauthorized");
+    }
+
+    const validation = didNotAttendReasonSchema.safeParse(
+      Object.fromEntries(formData)
+    );
+    if (!validation.success) {
+      throw new Error(
+        "Invalid reason: " + prettifyZodErrorMessage(validation.error)
+      );
+    }
+    const { appointmentId, reason } = validation.data;
+
+    const appointment = await prisma.appointment.findFirst({
+      where: { studentId: session.user.id, id: appointmentId },
+    });
+    if (!appointment) {
+      throw new Error("Appointment not found");
+    }
+
+    if (appointment.status !== AppointmentStatus.DidNotAttend) {
+      throw new Error("Appointment is not marked as Did Not Attend");
+    }
+
+    if (appointment.didNotAttendReason) {
+      throw new Error("Did Not Attend reason has already been submitted");
+    }
+
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        didNotAttendReason: reason,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: (error as Error).message };
+  }
+}
+
+export async function updateNotes(
+  data: NotesData
+): Promise<ActionResult<void>> {
+  try {
+    const session = await auth();
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Counselor ||
+      session.user.deactivated
+    ) {
+      throw new Error("Unauthorized");
+    }
+
+    const validation = notesSchema.safeParse(data);
+    if (!validation.success) {
+      throw new Error(
+        "Invalid data: " + prettifyZodErrorMessage(validation.error)
+      );
+    }
+
+    const { appointmentId, notes } = validation.data;
+
+    const appointment = await prisma.appointment.findFirst({
+      where: { counselorId: session.user.id, id: appointmentId },
+    });
+
+    if (!appointment) {
+      throw new Error("Appointment not found");
+    }
+
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        notes,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: (error as Error).message };
+  }
+}
+
+export async function getAppointmentForCall(
+  userId: string
+): Promise<ActionResult<Appointment | null>> {
+  try {
+    const session = await auth();
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Counselor ||
+      session.user.deactivated
+    ) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+
+    const appointment = await prisma.appointment.findFirst({
+      where: {
+        studentId: userId,
+        counselorId: session.user.id,
+        status: AppointmentStatus.Approved,
+        startTime: {
+          gte: startOfToday,
+          lte: endOfToday,
+        },
+      },
+      orderBy: {
+        startTime: "asc",
+      },
+    });
+
+    if (!appointment) {
+      return { success: false, message: "No approved appointment found" };
+    }
+
+    return { success: true, data: appointment };
   } catch (error) {
     console.error(error);
     return { success: false, message: (error as Error).message };

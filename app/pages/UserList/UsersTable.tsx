@@ -143,14 +143,24 @@ const UsersTable = ({ name }: { name?: string }) => {
         </div>
       ) : (
         <div className="overflow-x-auto w-full">
-          <table className="table w-full">
+          <table className="table w-full table-xs sm:table-sm md:table-md">
             <thead className="sticky top-0 z-10 bg-base-200/80 backdrop-blur-sm">
               <tr className="text-base-content border-b border-base-content/10">
-                <th className="font-semibold text-left">User</th>
-                <th className="font-semibold text-center">Role</th>
-                <th className="font-semibold text-left">Email</th>
-                <th className="font-semibold text-center">Status</th>
-                <th className="font-semibold text-center">Actions</th>
+                <th className="font-semibold text-left text-xs md:text-sm">
+                  User
+                </th>
+                <th className="font-semibold text-center text-xs md:text-sm">
+                  Role
+                </th>
+                <th className="font-semibold text-left text-xs md:text-sm hidden lg:table-cell">
+                  Email
+                </th>
+                <th className="font-semibold text-center text-xs md:text-sm">
+                  Status
+                </th>
+                <th className="font-semibold text-center text-xs md:text-sm">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="text-base-content">
@@ -169,31 +179,31 @@ const UsersTable = ({ name }: { name?: string }) => {
                     transition={{ duration: 0.3 }}
                     className="hover:bg-base-200/50 transition-colors border-b border-base-content/5"
                   >
-                    <td className="py-4">
-                      <div className="flex items-center gap-4">
+                    <td className="py-2 md:py-4">
+                      <div className="flex items-center gap-2 md:gap-4">
                         <div className="relative">
                           <UserImage
                             name={user.name || user.email.split("@")[0]}
                             src={user.image}
-                            width={12}
+                            width={10}
                           />
                           {user.status === "Online" && (
-                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-base-100"></div>
+                            <div className="absolute bottom-0 right-0 w-2 h-2 md:w-3 md:h-3 bg-success rounded-full border-2 border-base-100"></div>
                           )}
                         </div>
-                        <div>
-                          <div className="font-semibold text-base">
+                        <div className="min-w-0">
+                          <div className="font-semibold text-xs md:text-base truncate text-wrap">
                             {user.name || user.email.split("@")[0]}
                           </div>
                           {user.deactivated && (
-                            <span className="text-xs text-warning font-medium">
+                            <span className="text-[10px] md:text-xs text-warning font-medium">
                               Deactivated
                             </span>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="py-4">
+                    <td className="py-2 md:py-4">
                       <div className="flex justify-center">
                         <SelectBoxOld
                           items={Object.keys(UserType).sort()}
@@ -211,7 +221,9 @@ const UsersTable = ({ name }: { name?: string }) => {
                       </div>
                     </td>
                     <td className="py-4">
-                      <span className="text-base-content/80">{user.email}</span>
+                      <span className="text-base-content/80 text-wrap">
+                        {user.email}
+                      </span>
                     </td>
                     <td className="py-4">
                       <div className="flex justify-center">
@@ -226,16 +238,16 @@ const UsersTable = ({ name }: { name?: string }) => {
                           }}
                           exit={{ opacity: 0, scale: 0.8 }}
                           transition={{ duration: 0.3 }}
-                          className="px-3 py-1.5 rounded-full text-xs font-semibold inline-block"
+                          className="px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-semibold inline-block"
                         >
                           {user.status}
                         </motion.span>
                       </div>
                     </td>
-                    <td className="py-4">
-                      <div className="flex gap-2 items-center justify-center">
+                    <td className="py-2 md:py-4">
+                      <div className="flex gap-1 md:gap-2 items-center justify-center flex-wrap">
                         <button
-                          className={`btn btn-sm ${
+                          className={`btn btn-xs md:btn-sm text-[10px] md:text-xs ${
                             user.deactivated
                               ? "btn-primary btn-outline"
                               : "btn-warning btn-outline"
@@ -254,7 +266,7 @@ const UsersTable = ({ name }: { name?: string }) => {
                           {user.deactivated ? "Activate" : "Deactivate"}
                         </button>
                         <button
-                          className={`btn btn-sm btn-error btn-outline
+                          className={`btn btn-xs md:btn-sm text-[10px] md:text-xs btn-error btn-outline
                           ${
                             user.id === session.data?.user?.id
                               ? "btn-disabled opacity-50"

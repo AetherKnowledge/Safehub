@@ -38,13 +38,13 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
   return (
     <Link
       href={`/user/chats/${chat.id}`}
-      className={`flex flex-row rounded-lg p-3 gap-3 mb-1 transition-all duration-200 ${
+      className={`flex flex-row rounded-lg p-3 gap-3 mb-1 transition-all duration-200 min-w-0 ${
         selected
           ? "bg-primary/10 border border-primary/20 shadow-sm"
           : "hover:bg-base-100 border border-transparent hover:shadow-sm"
       }`}
     >
-      <div className="relative">
+      <div className="relative flex-shrink-0">
         <UserImage
           name={chat.name}
           width={10}
@@ -55,13 +55,13 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
           <div className="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border-2 border-base-100"></div>
         )}
       </div>
-      <div className="flex flex-col justify-center overflow-hidden flex-1 min-w-0">
-        <h2 className="font-semibold text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-          {chat.name}
-        </h2>
-        <p className="text-xs text-base-content/60 overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="flex flex-col justify-center flex-1 min-w-0">
+        <h2 className="font-semibold text-sm truncate">{chat.name}</h2>
+        <p className="text-xs text-base-content/60 truncate">
           {latestMessage?.userId === session.data?.user.id ? "You: " : ""}
-          {latestMessage?.content || "No messages yet"}
+          {latestMessage?.content && latestMessage.content.length > 20
+            ? `${latestMessage.content.substring(0, 50)}...`
+            : latestMessage?.content || "No messages yet"}
         </p>
       </div>
       <div className="flex flex-col justify-center items-end flex-shrink-0">

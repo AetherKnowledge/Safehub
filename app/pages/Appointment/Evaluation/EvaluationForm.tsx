@@ -36,7 +36,7 @@ It cannot be changed once submitted.`);
       return;
     }
     statusPopup.showSuccess("Evaluation submitted successfully.");
-    router.push("/user/appointments");
+    router.back();
   }
 
   return (

@@ -14,6 +14,7 @@ import {
   deleteFolder,
 } from "@/lib/supabase/bucketUtils";
 import { Buckets, getBucket } from "@/lib/supabase/client";
+import { prettifyZodErrorMessage } from "@/lib/utils";
 
 import { prisma } from "@/prisma/client";
 
@@ -126,7 +127,7 @@ export async function upsertPost(data: UploadPostData) {
   const validation = uploadPostSchema.safeParse(data);
 
   if (!validation.success) {
-    throw new Error("Invalid data", { cause: validation.error });
+    throw new Error(prettifyZodErrorMessage(validation.error));
   }
 
   const { id, title, content, images } = validation.data;

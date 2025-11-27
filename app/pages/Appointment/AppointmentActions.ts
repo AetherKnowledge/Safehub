@@ -581,6 +581,13 @@ export async function updateAppointment(
       endTime = addMinutes(startTime, 60);
     }
 
+    if (
+      validation.data.counselorId &&
+      validation.data.counselorId !== appointment.counselorId
+    ) {
+      status = AppointmentStatus.Pending;
+    }
+
     const updatedAppointmentFormData: AppointmentFormData = {
       questions: oldAppointmentFormData.questions,
       answers: {
@@ -1114,7 +1121,10 @@ export async function createFollowUpAppointment(
       throw new Error("Appointment not found");
     }
 
-    if (appointment.status !== AppointmentStatus.Completed) {
+    if (
+      appointment.status !== AppointmentStatus.Completed &&
+      appointment.status !== AppointmentStatus.DidNotAttend
+    ) {
       throw new Error(
         "Can only create follow-up appointment for completed sessions"
       );

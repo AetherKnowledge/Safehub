@@ -4,6 +4,7 @@ import ActionResult from "@/app/components/ActionResult";
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
 import { FormType, UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
+import { prettifyZodErrorMessage } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { formTypeSchema } from "./schema";
 
@@ -17,7 +18,10 @@ export async function fetchForms(
     }
     const validation = formTypeSchema.safeParse(formType);
     if (!validation.success) {
-      return { success: false, message: "Invalid form type" };
+      return {
+        success: false,
+        message: prettifyZodErrorMessage(validation.error),
+      };
     }
 
     const formData = await prisma.formSchema.findUnique({
@@ -53,7 +57,10 @@ export async function saveForms(
     }
     const validation = formTypeSchema.safeParse(formType);
     if (!validation.success) {
-      return { success: false, message: "Invalid form type" };
+      return {
+        success: false,
+        message: prettifyZodErrorMessage(validation.error),
+      };
     }
 
     const jsonFormData = JSON.parse(JSON.stringify(builtFormData));

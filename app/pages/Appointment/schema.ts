@@ -26,6 +26,7 @@ export const actionsTakenSchema = z.object({
     .string()
     .min(2, "Actions taken must be at least 2 characters long."),
 });
+export type ActionsTakenData = z.infer<typeof actionsTakenSchema>;
 
 export const notesSchema = z.object({
   appointmentId: z.uuid(),

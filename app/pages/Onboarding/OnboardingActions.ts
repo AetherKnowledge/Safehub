@@ -3,6 +3,7 @@ import ActionResult from "@/app/components/ActionResult";
 import { auth } from "@/auth";
 import { prisma } from "@/prisma/client";
 import { onboardingSchema } from "./schema";
+import { prettifyZodErrorMessage } from "@/lib/utils";
 
 export async function hasOnboarded() {
   const session = await auth();
@@ -32,7 +33,7 @@ export async function completeOnboarding(
     const validation = onboardingSchema.safeParse(Object.fromEntries(data));
 
     if (!validation.success) {
-      throw new Error("Invalid form data" + validation.error.message);
+      throw new Error(prettifyZodErrorMessage(validation.error));
     }
 
     const {

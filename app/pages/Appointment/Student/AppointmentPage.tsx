@@ -1,4 +1,5 @@
 import DatePicker from "@/app/components/Input/Date/DatePicker";
+import UserImage from "@/app/components/UserImage";
 import { AppointmentStatus, UserType } from "@/app/generated/prisma";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
@@ -141,17 +142,12 @@ export async function TodayAppointments({
         <div className="flex items-start gap-4">
           {/* Avatar */}
           <div className="avatar">
-            <div className="w-12 h-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-              <img
-                src={
-                  counselor.user.image ||
-                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    counselor.user.name || counselor.user.email
-                  )}&background=random`
-                }
-                alt={counselor.user.name || "Counselor"}
-              />
-            </div>
+            <UserImage
+              name={counselor.user.name || counselor.user.email.split("@")[0]}
+              width={12}
+              src={counselor.user.image}
+              bordered
+            />
           </div>
 
           {/* Details */}

@@ -8,6 +8,7 @@ import {
   deleteFolder,
 } from "@/lib/supabase/bucketUtils";
 import { Buckets, getBucket } from "@/lib/supabase/client";
+import { prettifyZodErrorMessage } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 
 export async function getAllHotline() {
@@ -41,7 +42,7 @@ export async function upsertHotline(data: UploadHotlineData) {
   const validation = uploadHotlineSchema.safeParse(data);
 
   if (!validation.success) {
-    throw new Error("Invalid data", { cause: validation.error });
+    throw new Error(prettifyZodErrorMessage(validation.error));
   }
 
   const { id, name, phone, description, website, image } = validation.data;

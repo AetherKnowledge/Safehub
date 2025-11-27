@@ -43,7 +43,7 @@ const MessageBubble = ({
             ? formatDateDisplay(createdAt, false)
             : formatTime(createdAt)}
         </time>
-        {self && name}
+        {self && "You"}
       </div>
       <div
         className={`chat-bubble prose max-w-[800px] ${

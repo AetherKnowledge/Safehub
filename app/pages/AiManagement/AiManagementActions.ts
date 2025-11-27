@@ -8,6 +8,7 @@ import {
 import { auth } from "@/auth";
 import { createFile, deleteFile } from "@/lib/supabase/bucketUtils";
 import { Buckets, getBucket } from "@/lib/supabase/client";
+import { prettifyZodErrorMessage } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import {
   UpdateToggleableAiSettingsData,
@@ -68,7 +69,7 @@ export async function addPreset(data: unknown): Promise<AiPreset> {
 
   const validation = uploadAiPresetSchema.safeParse(data);
   if (!validation.success) {
-    throw new Error("Invalid preset data");
+    throw new Error(prettifyZodErrorMessage(validation.error));
   }
   const presetData = validation.data;
   const presetCount = await prisma.aiPreset.count();
@@ -101,7 +102,7 @@ export async function updatePreset(
 
   const validation = uploadAiPresetSchema.safeParse(data);
   if (!validation.success) {
-    throw new Error("Invalid preset data");
+    throw new Error(prettifyZodErrorMessage(validation.error));
   }
   const presetData = validation.data;
 
@@ -163,7 +164,7 @@ export async function toggleAiSetting(data: UpdateToggleableAiSettingsData) {
   const validation = updateToggleableAiSettingsSchema.safeParse(data);
 
   if (!validation.success) {
-    throw new Error("Invalid settings data");
+    throw new Error(prettifyZodErrorMessage(validation.error));
   }
 
   await prisma.aiSettings.update({
@@ -207,7 +208,7 @@ export async function updateToolSettings(data: unknown) {
   }
   const validation = updateToolSettingsSchema.safeParse(data);
   if (!validation.success) {
-    throw new Error("Invalid tool settings data");
+    throw new Error(prettifyZodErrorMessage(validation.error));
   }
 
   const currentSettings = await prisma.aiSettings.findUnique({
@@ -269,7 +270,7 @@ export async function uploadFileToMCP(
 
   const validation = uploadMCPFileSchema.safeParse(data);
   if (!validation.success) {
-    throw new Error("Invalid tool settings data");
+    throw new Error(prettifyZodErrorMessage(validation.error));
   }
   const fileData = validation.data;
   // Remove spaces from file name

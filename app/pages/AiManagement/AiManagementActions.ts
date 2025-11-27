@@ -25,7 +25,11 @@ export type AiSettingsWithPreset = AiSettings & {
 
 export async function getPresets(): Promise<Array<AiPreset>> {
   const session = await auth();
-  if (!session?.user || session.user.type !== UserType.Admin) {
+  if (
+    !session?.user ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 
@@ -34,7 +38,7 @@ export async function getPresets(): Promise<Array<AiPreset>> {
 
 export async function getSettings(): Promise<AiSettingsWithPreset> {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -54,7 +58,11 @@ export async function getSettings(): Promise<AiSettingsWithPreset> {
 
 export async function addPreset(data: unknown): Promise<AiPreset> {
   const session = await auth();
-  if (!session?.user || session.user.type !== UserType.Admin) {
+  if (
+    !session?.user ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 
@@ -83,7 +91,11 @@ export async function updatePreset(
   data: UploadAiPresetData
 ): Promise<AiPreset> {
   const session = await auth();
-  if (!session?.user || session.user.type !== UserType.Admin) {
+  if (
+    !session?.user ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 
@@ -107,7 +119,11 @@ export async function updatePreset(
 
 export async function deletePreset(presetId: number): Promise<void> {
   const session = await auth();
-  if (!session?.user || session.user.type !== UserType.Admin) {
+  if (
+    !session?.user ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 
@@ -137,7 +153,11 @@ export async function deletePreset(presetId: number): Promise<void> {
 
 export async function toggleAiSetting(data: UpdateToggleableAiSettingsData) {
   const session = await auth();
-  if (!session?.user || session.user.type !== UserType.Admin) {
+  if (
+    !session?.user ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
   const validation = updateToggleableAiSettingsSchema.safeParse(data);
@@ -154,7 +174,11 @@ export async function toggleAiSetting(data: UpdateToggleableAiSettingsData) {
 
 export async function setAiPreset(presetId: number) {
   const session = await auth();
-  if (!session?.user || session.user.type !== UserType.Admin) {
+  if (
+    !session?.user ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 
@@ -174,7 +198,11 @@ export async function setAiPreset(presetId: number) {
 
 export async function updateToolSettings(data: unknown) {
   const session = await auth();
-  if (!session?.user || session.user.type !== UserType.Admin) {
+  if (
+    !session?.user ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
   const validation = updateToolSettingsSchema.safeParse(data);
@@ -217,7 +245,8 @@ export async function getMCPFiles(): Promise<Array<MCPFile>> {
   if (
     !session?.user ||
     session.user.type !== UserType.Admin ||
-    !session.supabaseAccessToken
+    !session.supabaseAccessToken ||
+    session.user.deactivated
   ) {
     throw new Error("Unauthorized");
   }
@@ -232,7 +261,8 @@ export async function uploadFileToMCP(
   if (
     !session?.user ||
     session.user.type !== UserType.Admin ||
-    !session.supabaseAccessToken
+    !session.supabaseAccessToken ||
+    session.user.deactivated
   ) {
     throw new Error("Unauthorized");
   }
@@ -270,7 +300,8 @@ export async function deleteFileFromMCP(fileId: string) {
   if (
     !session?.user ||
     session.user.type !== UserType.Admin ||
-    !session.supabaseAccessToken
+    !session.supabaseAccessToken ||
+    session.user.deactivated
   ) {
     throw new Error("Unauthorized");
   }

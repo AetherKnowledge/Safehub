@@ -7,7 +7,7 @@ import { prisma } from "@/prisma/client";
 
 export async function getUserName(userId: string): Promise<string> {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user || session.user.deactivated) {
     throw new Error("User not authenticated");
   }
 

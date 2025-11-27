@@ -78,7 +78,7 @@ export async function getIceServers(
   callId: string
 ): Promise<RTCIceServer[] | null> {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 

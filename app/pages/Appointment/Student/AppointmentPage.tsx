@@ -10,7 +10,7 @@ import AppointmentsTable from "../AppointmentTable";
 import AppointmentTableTop from "../AppointmentTable/AppointmentTableTop";
 import UpcomingAppointmentRow from "../AppointmentTable/UpcomingAppointmentsRow";
 import UpcomingAppointmentsTable from "../AppointmentTable/UpcomingAppointmentsTable";
-import { ViewModalPopup } from "../AppointmentTable/ViewModal";
+import { ViewModalPopup } from "../Modals/ViewModal";
 
 type Props = {
   appointmentId?: string;

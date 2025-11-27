@@ -6,7 +6,7 @@ import TableHeader from "@/app/components/Table/TableHeader";
 import UserImage from "@/app/components/UserImage";
 import { UserType } from "@/app/generated/prisma";
 import { formatDateDisplay, formatTime } from "@/lib/utils";
-import EvaluationButton from "../AppointmentTable/EvaluationButton";
+import EvaluationButton from "../Modals/EvaluationButton";
 import { EvaluationTableData } from "./EvaluationActions";
 import { EvaluationSortBy } from "./sort";
 

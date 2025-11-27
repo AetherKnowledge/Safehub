@@ -44,6 +44,7 @@ export const getBgStatusColor = (status: AppointmentStatus) => {
     case AppointmentStatus.Approved:
       return "bg-success/20";
     case AppointmentStatus.Cancelled:
+    case AppointmentStatus.DidNotAttend:
       return "bg-error/20";
     default:
       return "bg-base-content/20";
@@ -59,6 +60,7 @@ export const getStatusTextColor = (status: AppointmentStatus) => {
     case AppointmentStatus.Approved:
       return "text-success";
     case AppointmentStatus.Cancelled:
+    case AppointmentStatus.DidNotAttend:
       return "text-error";
     default:
       return "text-base-content";
@@ -74,6 +76,7 @@ export const getBorderStatusColor = (status: AppointmentStatus) => {
     case AppointmentStatus.Approved:
       return "border-l-success";
     case AppointmentStatus.Cancelled:
+    case AppointmentStatus.DidNotAttend:
       return "border-l-error";
     default:
       return "border-l-base-content";

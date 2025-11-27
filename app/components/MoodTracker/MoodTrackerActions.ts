@@ -23,7 +23,11 @@ export type MoodTimeSeriesData = {
 export async function upsertMood(mood: MoodType): Promise<ActionResult<void>> {
   try {
     const session = await auth();
-    if (!session?.user?.id || !session.supabaseAccessToken) {
+    if (
+      !session?.user?.id ||
+      !session.supabaseAccessToken ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
 
@@ -72,7 +76,7 @@ export async function getCurrentUserMoodThisWeek(): Promise<
 > {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
+    if (!session?.user?.id || session.user.deactivated) {
       throw new Error("Unauthorized");
     }
     const today = new Date();
@@ -110,7 +114,11 @@ export async function getCurrentUserMoodThisWeek(): Promise<
 export async function getMoodsThisWeek(): Promise<ActionResult<DailyMood[]>> {
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.type === UserType.Student) {
+    if (
+      !session?.user?.id ||
+      session.user.type === UserType.Student ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
     const today = new Date(new Date().setHours(0, 0, 0, 0));
@@ -150,7 +158,11 @@ export async function getMoodTimeSeries(
   department?: string
 ): Promise<MoodTimeSeriesData> {
   const session = await auth();
-  if (!session?.user?.id || session.user.type === UserType.Student) {
+  if (
+    !session?.user?.id ||
+    session.user.type === UserType.Student ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 
@@ -177,9 +189,9 @@ export async function getMoodTimeSeries(
       break;
 
     case "week":
-      // Last 7 days
+      // Last 7 days including today
       startDate = new Date(now);
-      startDate.setDate(now.getDate() - 7);
+      startDate.setDate(now.getDate() - 6);
       startDate.setHours(0, 0, 0, 0);
       groupByFormat = "day";
       dateLabels = Array.from({ length: 7 }, (_, i) => {
@@ -190,9 +202,9 @@ export async function getMoodTimeSeries(
       break;
 
     case "month":
-      // Last 30 days
+      // Last 30 days including today
       startDate = new Date(now);
-      startDate.setDate(now.getDate() - 30);
+      startDate.setDate(now.getDate() - 29);
       startDate.setHours(0, 0, 0, 0);
       groupByFormat = "day";
       dateLabels = Array.from({ length: 30 }, (_, i) => {
@@ -219,7 +231,7 @@ export async function getMoodTimeSeries(
       startDate = new Date(earliest.createdAt);
       startDate.setHours(0, 0, 0, 0);
 
-      // Calculate months between earliest and now
+      // Calculate months between earliest and now (inclusive)
       const monthsDiff =
         (now.getFullYear() - startDate.getFullYear()) * 12 +
         (now.getMonth() - startDate.getMonth()) +

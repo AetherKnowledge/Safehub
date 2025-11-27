@@ -96,10 +96,20 @@ const RescheduleButton = ({
       </button>
       {showModal && (
         <ModalBase onClose={() => setShowModal(false)}>
-          <div className="flex flex-col bg-base-100 rounded-lg p-4 gap-4 text-base-content">
-            <div className="flex flex-col gap-4">
-              <p className="font-semibold text-2xl">Pick a new schedule</p>
-              <div className="flex flex-col gap-3 items-center text-center">
+          <div className="flex flex-col bg-base-100 rounded-2xl shadow-2xl text-base-content max-w-lg overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/5 p-6">
+              <h2 className="font-bold text-2xl text-primary">
+                Reschedule Appointment
+              </h2>
+              <p className="text-sm text-base-content/70 mt-1">
+                Select a new date and time
+              </p>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <div className="flex flex-col gap-4">
                 <DateTimeSelector
                   name={`startTime-reschedule-${appointment.id}`}
                   horizontal
@@ -127,19 +137,20 @@ const RescheduleButton = ({
                 />
               </div>
             </div>
-            <div className="flex flex-row items-center justify-between">
-              <button
-                className="btn btn-error mt-4"
-                onClick={() => setShowModal(false)}
-              >
-                Close
-              </button>
-              <button
-                className="btn btn-primary mt-4"
-                onClick={confirmReschedule}
-              >
-                Confirm
-              </button>
+
+            {/* Footer */}
+            <div className="bg-base-200 border-t border-base-300 px-6 py-4">
+              <div className="flex flex-row items-center justify-between gap-3">
+                <button
+                  className="btn btn-ghost"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
+                <button className="btn btn-primary" onClick={confirmReschedule}>
+                  Confirm Reschedule
+                </button>
+              </div>
             </div>
           </div>
         </ModalBase>

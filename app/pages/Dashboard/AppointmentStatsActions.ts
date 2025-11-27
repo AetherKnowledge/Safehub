@@ -18,6 +18,7 @@ export type StatusDataPoint = {
   Pending: number;
   Completed: number;
   Cancelled: number;
+  DidNotAttend: number;
 };
 
 export type TimeSeriesData = {
@@ -26,7 +27,7 @@ export type TimeSeriesData = {
 
 export async function getAppointmentStats(): Promise<AppointmentStatsData> {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session?.user?.id || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -77,7 +78,7 @@ export async function getAppointmentTimeSeries(
   department?: string
 ): Promise<TimeSeriesData> {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session?.user?.id || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -104,9 +105,9 @@ export async function getAppointmentTimeSeries(
       break;
 
     case "week":
-      // Last 7 days
+      // Last 7 days including today
       startDate = new Date(now);
-      startDate.setDate(now.getDate() - 7);
+      startDate.setDate(now.getDate() - 6);
       startDate.setHours(0, 0, 0, 0);
       groupByFormat = "day";
       dateLabels = Array.from({ length: 7 }, (_, i) => {
@@ -117,9 +118,9 @@ export async function getAppointmentTimeSeries(
       break;
 
     case "month":
-      // Last 30 days
+      // Last 30 days including today
       startDate = new Date(now);
-      startDate.setDate(now.getDate() - 30);
+      startDate.setDate(now.getDate() - 29);
       startDate.setHours(0, 0, 0, 0);
       groupByFormat = "day";
       dateLabels = Array.from({ length: 30 }, (_, i) => {
@@ -146,7 +147,7 @@ export async function getAppointmentTimeSeries(
       startDate = new Date(earliest.createdAt);
       startDate.setHours(0, 0, 0, 0);
 
-      // Calculate months between earliest and now
+      // Calculate months between earliest and now (inclusive)
       const monthsDiff =
         (now.getFullYear() - startDate.getFullYear()) * 12 +
         (now.getMonth() - startDate.getMonth()) +
@@ -228,6 +229,7 @@ export async function getAppointmentTimeSeries(
       Pending: 0,
       Completed: 0,
       Cancelled: 0,
+      DidNotAttend: 0,
     };
 
     periodAppointments.forEach((apt) => {

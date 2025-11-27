@@ -5,6 +5,7 @@ import ModalBase from "@/app/components/Popup/ModalBase";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { UserType } from "@/app/generated/prisma";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { LuClipboardList } from "react-icons/lu";
@@ -20,6 +21,7 @@ const ActionsTakenButton = ({
   const session = useSession();
   const [showModal, setShowModal] = useState(false);
   const statusPopup = usePopup();
+  const router = useRouter();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     const confirm = await statusPopup.showYesNo(
@@ -44,6 +46,8 @@ const ActionsTakenButton = ({
     }
 
     statusPopup.showSuccess("Session summary submitted successfully.");
+
+    router.refresh();
   }
 
   const canSubmit =
@@ -61,33 +65,33 @@ const ActionsTakenButton = ({
       </button>
       {showModal && (
         <ModalBase onClose={() => setShowModal(false)}>
-          <div className="bg-base-100 p-0 rounded-lg shadow-lg text-base-content max-w-2xl w-full flex flex-col">
+          <div className="bg-base-100 p-0 rounded-2xl shadow-2xl text-base-content max-w-2xl w-full flex flex-col overflow-hidden">
             <CloseButton onClick={() => setShowModal(false)} />
-            <form
-              onSubmit={handleSubmit}
-              className="flex flex-col items-center justify-center text-center p-6 pt-0 gap-6"
-            >
-              {session?.data?.user.type === UserType.Counselor ? (
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-2xl font-semibold text-primary">
-                    Actions Taken
-                  </h2>
-                  <p className="font-light">
-                    {session?.data?.user.type === UserType.Counselor
-                      ? "Answer the form based on your findings about the student you counseled."
-                      : "Review the actions taken during your session."}
-                  </p>
-                </div>
-              ) : (
-                <UserTopBar
-                  userEmail={appointment.counselor.user.email}
-                  userName={appointment.counselor.user.name || undefined}
-                  userImgSrc={appointment.counselor.user.image || undefined}
-                  appointmentStatus={appointment.status}
-                  chatId={appointment.chatId}
-                />
-              )}
-              <div className="flex flex-col w-full gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col h-full">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/5 p-6 pb-4">
+                {session?.data?.user.type === UserType.Counselor ? (
+                  <div className="flex flex-col gap-2">
+                    <h2 className="text-2xl font-bold text-primary">
+                      Session Summary
+                    </h2>
+                    <p className="text-sm text-base-content/70">
+                      Document the actions taken during the counseling session.
+                    </p>
+                  </div>
+                ) : (
+                  <UserTopBar
+                    userEmail={appointment.counselor.user.email}
+                    userName={appointment.counselor.user.name || undefined}
+                    userImgSrc={appointment.counselor.user.image || undefined}
+                    appointmentStatus={appointment.status}
+                    chatId={appointment.chatId}
+                  />
+                )}
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto px-6 py-4">
                 <input
                   type="hidden"
                   name="appointmentId"
@@ -101,13 +105,20 @@ const ActionsTakenButton = ({
                   defaultValue={appointment.actionsTaken || ""}
                   required
                   readonly={!canSubmit}
+                  answerOnly={!canSubmit}
                 />
               </div>
+
+              {/* Footer */}
               {canSubmit && (
-                <button className="flex flex-row btn btn-primary gap-2 justify-center items-center text-center">
-                  <FaRegCheckCircle className="w-4 h-4" />
-                  Create Report
-                </button>
+                <div className="bg-base-200 border-t border-base-300 px-6 py-4">
+                  <div className="flex justify-end">
+                    <button className="btn btn-primary gap-2">
+                      <FaRegCheckCircle className="w-4 h-4" />
+                      Create Report
+                    </button>
+                  </div>
+                </div>
               )}
             </form>
           </div>

@@ -9,13 +9,14 @@ import { ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { createClient } from "@/lib/supabase/client";
-import { getRelativeTime } from "@/lib/utils";
+import { formatDateDisplay, getRelativeTime } from "@/lib/utils";
 import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { CiCalendarDate, CiImageOn } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
 import { MdNotificationsNone } from "react-icons/md";
+import { formatTimeDisplay } from "../Input/Date/utils";
 import {
   deleteNotification,
   fetchNotificationsForUser,
@@ -23,6 +24,7 @@ import {
 } from "./NotificationActions";
 import {
   AppointmentCreateNotification,
+  AppointmentDidNotAttendNotification,
   AppointmentReminderNotification,
   AppointmentUpdateScheduleNotification,
   AppointmentUpdateStatusNotification,
@@ -74,7 +76,8 @@ const NotificationsButton = () => {
   }
 
   useEffect(() => {
-    if (!session.data?.supabaseAccessToken) return;
+    if (!session.data?.supabaseAccessToken || session.data?.user.deactivated)
+      return;
     let supabase = null;
 
     // sometimes creating the client fails
@@ -95,8 +98,8 @@ const NotificationsButton = () => {
           console.log("Notification payload:", payload);
           if (payload.eventType === "INSERT") {
             setNotifications((prevNotifications) => [
-              ...prevNotifications,
               payload.new as Notification,
+              ...prevNotifications,
             ]);
           } else if (payload.eventType === "UPDATE") {
             setNotifications((prevNotifications) =>
@@ -290,7 +293,10 @@ export const NotificationBox = ({
 
 function notificationTypeToMessage(
   notification: Notification,
-  data: AppointmentCreateNotification | PostNotification
+  data:
+    | AppointmentCreateNotification
+    | AppointmentDidNotAttendNotification
+    | PostNotification
 ): string {
   switch (notification.type) {
     case NotificationType.AppointmentCreated:
@@ -305,6 +311,16 @@ function notificationTypeToMessage(
       return `This is a reminder for your upcoming appointment in ${reminderTypeToMessage(
         (data as AppointmentReminderNotification).type
       )}.`;
+    case NotificationType.AppointmentDidNotAttend:
+      const notificationData = data as AppointmentDidNotAttendNotification;
+      if (!notificationData.date) {
+        return "You did not attend your appointment.";
+      }
+      const date = new Date(notificationData.date);
+      return `You did not attend your appointment on ${formatDateDisplay(
+        date
+      )} at ${formatTimeDisplay(date)}.`;
+
     case NotificationType.NewPost:
       return "A new post has been published.";
     default:
@@ -337,6 +353,10 @@ function parseNotificationData(
       return JSON.parse(
         JSON.stringify(notification.data)
       ) as AppointmentReminderNotification;
+    case NotificationType.AppointmentDidNotAttend:
+      return JSON.parse(
+        JSON.stringify(notification.data)
+      ) as AppointmentDidNotAttendNotification;
     case NotificationType.NewPost:
       return JSON.parse(JSON.stringify(notification.data)) as PostNotification;
     default:
@@ -350,6 +370,7 @@ function notificationTypeToImage(type: NotificationType): ReactNode {
     case NotificationType.AppointmentReminder:
     case NotificationType.AppointmentUpdatedSchedule:
     case NotificationType.AppointmentUpdatedStatus:
+    case NotificationType.AppointmentDidNotAttend:
       return <CiCalendarDate className="w-5 h-5" />;
     default:
       return <CiImageOn className="w-5 h-5" />;
@@ -372,6 +393,7 @@ function notificationTypeToLink(
     case NotificationType.AppointmentReminder:
     case NotificationType.AppointmentUpdatedSchedule:
     case NotificationType.AppointmentUpdatedStatus:
+    case NotificationType.AppointmentDidNotAttend:
       const params = new URLSearchParams({
         appointmentId: (
           data as AppointmentCreateNotification

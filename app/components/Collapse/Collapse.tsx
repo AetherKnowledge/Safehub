@@ -17,7 +17,7 @@ const Collapse = ({
       {/* clicking the title toggles the checkbox so peer-checked styles apply */}
       <label
         htmlFor={inputId}
-        className="collapse-title font-semibold p-0 flex items-center justify-between pr-2 cursor-pointer select-none peer-checked:[&_svg]:rotate-180"
+        className="collapse-title font-semibold flex items-center justify-between pr-4 cursor-pointer select-none peer-checked:[&_svg]:rotate-180"
       >
         <p>{title}</p>
         <FaAngleDown className="transition-transform duration-300 ease-in-out" />

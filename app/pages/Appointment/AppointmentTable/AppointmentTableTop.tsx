@@ -51,6 +51,7 @@ const AppointmentTableTop = () => {
           <option value="Completed">Counseled</option>
           <option value="Approved">Approved</option>
           <option value="Canceled">Canceled</option>
+          <option value="DidNotAttend">Did Not Attend</option>
         </select>
       </div>
     </div>

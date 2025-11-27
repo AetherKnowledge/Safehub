@@ -14,7 +14,7 @@ export async function testAction(): Promise<ActionResult<void>> {
     }
 
     const session = await auth();
-    if (!session?.user || !session.user.id) {
+    if (!session?.user || !session.user.id || session.user.deactivated) {
       return {
         success: false,
         message: "You must be logged in to perform this action.",
@@ -60,7 +60,7 @@ export async function testAction(): Promise<ActionResult<void>> {
 export async function clearNotifications(): Promise<ActionResult<void>> {
   try {
     const session = await auth();
-    if (!session?.user || !session.user.id) {
+    if (!session?.user || !session.user.id || session.user.deactivated) {
       return {
         success: false,
         message: "You must be logged in to perform this action.",
@@ -86,7 +86,7 @@ export async function clearNotifications(): Promise<ActionResult<void>> {
 export async function updateFirstNotification(): Promise<ActionResult<void>> {
   try {
     const session = await auth();
-    if (!session?.user || !session.user.id) {
+    if (!session?.user || !session.user.id || session.user.deactivated) {
       return {
         success: false,
         message: "You must be logged in to perform this action.",

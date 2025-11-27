@@ -25,7 +25,11 @@ export async function createEvaluation(
   const data = Object.fromEntries(formData.entries());
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.type !== UserType.Student) {
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Student ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
 
@@ -97,7 +101,11 @@ export async function getEvaluationTableData(): Promise<
 > {
   try {
     const session = await auth();
-    if (!session?.user?.id || session.user.type !== UserType.Counselor) {
+    if (
+      !session?.user?.id ||
+      session.user.type !== UserType.Counselor ||
+      session.user.deactivated
+    ) {
       throw new Error("Unauthorized");
     }
     const appointments = await prisma.appointment.findMany({

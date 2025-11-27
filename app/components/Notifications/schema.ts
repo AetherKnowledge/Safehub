@@ -31,3 +31,8 @@ export type AppointmentUpdateScheduleNotification = {
 export type PostNotification = {
   postId: string;
 };
+
+export type AppointmentDidNotAttendNotification = {
+  appointmentId: string;
+  date: Date;
+};

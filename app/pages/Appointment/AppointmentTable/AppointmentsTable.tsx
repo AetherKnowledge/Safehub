@@ -8,8 +8,8 @@ import {
 } from "react-icons/fa";
 import { IoMdTime } from "react-icons/io";
 import { AppointmentData } from "../AppointmentActions";
+import ViewAppointmentButton from "../Modals/ViewAppointmentButton";
 import UserCell from "./UserCell";
-import ViewAppointmentButton from "./ViewAppointmentButton";
 
 const AppointmentsTable = async ({
   userType,

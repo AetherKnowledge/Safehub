@@ -32,7 +32,7 @@ const UserTopBar = ({
   };
 
   return (
-    <div className="flex flex-row gap-5 items-center text-left w-full">
+    <div className="flex flex-row gap-5 items-center text-left w-full bg-gradient-to-r from-primary/10 via-primary/5 to-primary/5 p-6 pb-4">
       <UserImage
         src={userImgSrc || undefined}
         name={userName || userEmail.split("@")[0] || "Unknown"}
@@ -71,7 +71,10 @@ const UserTopBar = ({
         </div>
       </div>
       {appointmentStatus && (
-        <StatusBadge className="rounded-sm p-4" status={appointmentStatus} />
+        <StatusBadge
+          className="rounded-sm p-4 max-w-35 w-full text-center"
+          status={appointmentStatus}
+        />
       )}
     </div>
   );

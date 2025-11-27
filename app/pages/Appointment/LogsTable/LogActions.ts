@@ -17,7 +17,11 @@ export async function getLogs({
 }): Promise<ActionResult<ParsedAppointmentLog[]>> {
   try {
     const session = await auth();
-    if (!session?.user || session.user.type !== UserType.Admin) {
+    if (
+      !session?.user ||
+      session.user.type !== UserType.Admin ||
+      session.user.deactivated
+    ) {
       return { success: false, message: "Unauthorized access." };
     }
 

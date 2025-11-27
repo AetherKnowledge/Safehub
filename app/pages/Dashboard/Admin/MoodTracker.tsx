@@ -108,7 +108,8 @@ const MoodTracker = () => {
 
   // Real-time updates via Supabase
   useEffect(() => {
-    if (!session.data?.supabaseAccessToken) return;
+    if (!session.data?.supabaseAccessToken || session.data?.user.deactivated)
+      return;
     const supabase = createClient(session.data?.supabaseAccessToken);
 
     const testChannel = supabase

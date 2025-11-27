@@ -47,7 +47,7 @@ export type PostComment = {
 
 export async function getPosts(): Promise<PostData[]> {
   const session = await auth();
-  if (!session) {
+  if (!session || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -114,7 +114,12 @@ export async function getPosts(): Promise<PostData[]> {
 
 export async function upsertPost(data: UploadPostData) {
   const session = await auth();
-  if (!session || !session.user.id || session.user.type !== UserType.Admin) {
+  if (
+    !session ||
+    !session.user.id ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 
@@ -206,7 +211,7 @@ export async function upsertPost(data: UploadPostData) {
 
 export async function likePost(postId: string, like: boolean) {
   const session = await auth();
-  if (!session || !session.user?.id) {
+  if (!session || !session.user?.id || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -248,7 +253,12 @@ export async function likePost(postId: string, like: boolean) {
 
 export async function deletePost(postId: string) {
   const session = await auth();
-  if (!session || !session.user?.id || session.user.type !== UserType.Admin) {
+  if (
+    !session ||
+    !session.user?.id ||
+    session.user.type !== UserType.Admin ||
+    session.user.deactivated
+  ) {
     throw new Error("Unauthorized");
   }
 
@@ -260,7 +270,7 @@ export async function deletePost(postId: string) {
 
 export async function dislikePost(postId: string, dislike: boolean) {
   const session = await auth();
-  if (!session || !session.user?.id) {
+  if (!session || !session.user?.id || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 
@@ -302,7 +312,7 @@ export async function dislikePost(postId: string, dislike: boolean) {
 
 export async function addComment(data: CommentData): Promise<void> {
   const session = await auth();
-  if (!session || !session.user?.id) {
+  if (!session || !session.user?.id || session.user.deactivated) {
     throw new Error("Unauthorized");
   }
 

@@ -45,15 +45,17 @@ export async function createAppointmentNotification(
       };
     }
 
-    await prisma.notification.create({
-      data: {
-        userId: appointment.counselorId,
-        type: type,
+    if (type !== NotificationType.AppointmentDidNotAttend) {
+      await prisma.notification.create({
         data: {
-          ...data,
+          userId: appointment.counselorId,
+          type: type,
+          data: {
+            ...data,
+          },
         },
-      },
-    });
+      });
+    }
 
     await prisma.notification.create({
       data: {

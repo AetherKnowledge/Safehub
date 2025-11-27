@@ -11,7 +11,6 @@ import { FaRegCheckCircle } from "react-icons/fa";
 import { LuClipboardList } from "react-icons/lu";
 import { AppointmentData, createActionsTaken } from "../AppointmentActions";
 import CloseButton from "./CloseButton";
-import UserTopBar from "./UserTopBar";
 
 const ActionsTakenButton = ({
   appointment,
@@ -24,6 +23,9 @@ const ActionsTakenButton = ({
   const router = useRouter();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
     const confirm = await statusPopup.showYesNo(
       `Are you sure you want to submit this session summary? This action cannot be undone.`
     );
@@ -31,9 +33,6 @@ const ActionsTakenButton = ({
     if (!confirm) {
       return;
     }
-
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
 
     statusPopup.showLoading("Submitting session summary...");
     const result = await createActionsTaken(formData);
@@ -70,24 +69,16 @@ const ActionsTakenButton = ({
             <form onSubmit={handleSubmit} className="flex flex-col h-full">
               {/* Header */}
               <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/5 p-6 pb-4">
-                {session?.data?.user.type === UserType.Counselor ? (
-                  <div className="flex flex-col gap-2">
-                    <h2 className="text-2xl font-bold text-primary">
-                      Session Summary
-                    </h2>
-                    <p className="text-sm text-base-content/70">
-                      Document the actions taken during the counseling session.
-                    </p>
-                  </div>
-                ) : (
-                  <UserTopBar
-                    userEmail={appointment.counselor.user.email}
-                    userName={appointment.counselor.user.name || undefined}
-                    userImgSrc={appointment.counselor.user.image || undefined}
-                    appointmentStatus={appointment.status}
-                    chatId={appointment.chatId}
-                  />
-                )}
+                <div className="flex flex-col gap-2">
+                  <h2 className="text-2xl font-bold text-primary">
+                    Session Summary
+                  </h2>
+                  <p className="text-sm text-base-content/70">
+                    {session?.data?.user.type === UserType.Counselor
+                      ? "Document the summary of the counseling session."
+                      : "View the summary of this counseling session."}
+                  </p>
+                </div>
               </div>
 
               {/* Content */}
@@ -101,8 +92,14 @@ const ActionsTakenButton = ({
                 <TextArea
                   name="actionsTaken"
                   legend="Actions Taken:"
-                  placeholder="Enter session actions here..."
-                  defaultValue={appointment.actionsTaken || ""}
+                  placeholder="Enter summary here..."
+                  defaultValue={
+                    appointment.actionsTaken
+                      ? appointment.actionsTaken
+                      : session?.data?.user.type === UserType.Counselor
+                      ? ""
+                      : "No session summary available."
+                  }
                   required
                   readonly={!canSubmit}
                   answerOnly={!canSubmit}

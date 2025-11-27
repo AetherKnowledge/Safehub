@@ -62,6 +62,19 @@ const ViewModal = ({
     fetchHistory();
   }, []);
 
+  // Update appointment if initialAppointment changes
+  useEffect(() => {
+    setHistory((prevHistory) => {
+      const updatedHistory = prevHistory.map((appt) =>
+        appt.id === initialAppointment.id ? initialAppointment : appt
+      );
+      return updatedHistory;
+    });
+    if (initialAppointment.id === appointment.id) {
+      setAppointment(initialAppointment);
+    }
+  }, [initialAppointment]);
+
   return (
     <ModalBase onClose={onClose}>
       <div className="bg-base-100 p-0 rounded-2xl shadow-2xl text-base-content max-w-3xl flex-1 flex flex-col overflow-hidden">
@@ -292,7 +305,10 @@ const CounselorButtons = ({
       break;
 
     case AppointmentStatus.Approved:
-      buttons = [<MarkDoneButton key="done" appointment={appointment} />];
+      buttons = [
+        <RescheduleButton key="resched" appointment={appointment} />,
+        <MarkDoneButton key="done" appointment={appointment} />,
+      ];
 
       buttons.push(<DidNotAttendButton key="dna" appointment={appointment} />);
 

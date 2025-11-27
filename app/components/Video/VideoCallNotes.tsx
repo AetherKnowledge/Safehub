@@ -29,11 +29,6 @@ const VideoCallNotes = ({
     lastSavedNotes.current = notes;
     setSaving(false);
     setSaved(true);
-
-    // Reset to "Save Notes" after 2 seconds
-    setTimeout(() => {
-      setSaved(false);
-    }, 2000);
   }
 
   // Auto-save every 15 seconds
@@ -46,6 +41,15 @@ const VideoCallNotes = ({
 
     return () => clearInterval(autoSaveInterval);
   }, [notes, saving]);
+
+  // Update saved state based on whether notes match last saved
+  useEffect(() => {
+    if (notes === lastSavedNotes.current && notes !== "") {
+      setSaved(true);
+    } else {
+      setSaved(false);
+    }
+  }, [notes]);
 
   if (!isOpen) return null;
 

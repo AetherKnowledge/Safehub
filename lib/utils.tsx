@@ -191,15 +191,7 @@ export function sortPosts(
 }
 
 export function prettifyZodErrorMessage(error: ZodError<any>): string {
-  return error.issues
-    .map((issue) => {
-      const path = issue.path.length ? issue.path.join(".") : "root";
-      const expected = (issue as any).expected
-        ? `, Expected: ${(issue as any).expected}`
-        : "";
-      return `Field: ${path}, Error: ${issue.message}${expected}`;
-    })
-    .join("\n---\n");
+  return error.issues.map((issue) => issue.message).join(", ");
 }
 
 export function getRelativeTime(date: Date): string {

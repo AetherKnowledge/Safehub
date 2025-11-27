@@ -2,6 +2,7 @@
 import ActionResult from "@/app/components/ActionResult";
 import { User } from "@/app/generated/prisma";
 import { auth } from "@/auth";
+import { prettifyZodErrorMessage } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import z from "zod";
 import {
@@ -80,7 +81,7 @@ const updateUserInfoSchema = z.object({
 
   guardianRelationship: z.enum(GuardianRelationship).optional(),
 
-  guardianEmail: z.email("Invalid guardian email address"),
+  guardianEmail: z.email("Invalid guardian email address").optional(),
 });
 
 export type UpdateUserInfoData = z.infer<typeof updateUserInfoSchema>;
@@ -118,7 +119,7 @@ export async function changeUserInfo(
     const validation = updateUserInfoSchema.safeParse(Object.fromEntries(data));
 
     if (!validation.success) {
-      throw new Error("Invalid form data" + validation.error.message);
+      throw new Error(prettifyZodErrorMessage(validation.error));
     }
 
     const {

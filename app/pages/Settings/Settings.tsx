@@ -121,52 +121,50 @@ const Settings = ({ user }: { user: SettingsUser }) => {
         />
         {session.data?.user.type === UserType.Student && (
           <>
-            <div className="bg-base-200/30 rounded-xl p-4 space-y-4">
-              <LinkedSelector
-                name="department-and-program"
-                horizontal={true}
-                parent={{
+            <LinkedSelector
+              name="department-and-program"
+              horizontal={true}
+              parent={{
+                type: FormComponentType.SELECT,
+                props: {
+                  name: "department",
+                  legend: "Department",
+                  defaultValue: user.department,
+                } as SelectBoxProps,
+              }}
+              child={{
+                type: FormComponentType.SELECT,
+                props: {
+                  name: "program",
+                  legend: "Program",
+                  defaultValue: user.program,
+                } as SelectBoxProps,
+              }}
+              linkedOptions={departmentsWithPrograms}
+            />
+            <HorizontalItemsBox
+              name="year-and-section"
+              items={[
+                {
                   type: FormComponentType.SELECT,
                   props: {
-                    name: "department",
-                    legend: "Department",
-                    defaultValue: user.department,
+                    name: "year",
+                    legend: "Year",
+                    options: yearOptions,
+                    defaultValue: user.year?.toString(),
                   } as SelectBoxProps,
-                }}
-                child={{
+                },
+                {
                   type: FormComponentType.SELECT,
                   props: {
-                    name: "program",
-                    legend: "Program",
-                    defaultValue: user.program,
+                    name: "section",
+                    legend: "Section",
+                    options: sectionOptions,
+                    defaultValue: user.section,
                   } as SelectBoxProps,
-                }}
-                linkedOptions={departmentsWithPrograms}
-              />
-              <HorizontalItemsBox
-                name="year-and-section"
-                items={[
-                  {
-                    type: FormComponentType.SELECT,
-                    props: {
-                      name: "year",
-                      legend: "Year",
-                      options: yearOptions,
-                      defaultValue: user.year?.toString(),
-                    } as SelectBoxProps,
-                  },
-                  {
-                    type: FormComponentType.SELECT,
-                    props: {
-                      name: "section",
-                      legend: "Section",
-                      options: sectionOptions,
-                      defaultValue: user.section,
-                    } as SelectBoxProps,
-                  },
-                ]}
-              />
-            </div>
+                },
+              ]}
+            />
           </>
         )}
         <HorizontalItemsBox
@@ -209,9 +207,7 @@ const Settings = ({ user }: { user: SettingsUser }) => {
               </div>
             </div>
 
-            <div className="bg-base-200/30 rounded-xl p-4">
-              <GuardianDetails user={user} />
-            </div>
+            <GuardianDetails user={user} />
           </>
         )}
 

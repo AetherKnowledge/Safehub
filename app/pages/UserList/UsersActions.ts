@@ -5,7 +5,10 @@ import { UserStatus, UserType } from "@/app/generated/prisma";
 import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
 import { UpdateUserTypeData, updateUserSchema } from "@/lib/schemas";
-import { createManyChatsWithOthers } from "@/lib/utils";
+import {
+  createManyChatsWithOthers,
+  prettifyZodErrorMessage,
+} from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 
 export type UserWithStatus = {
@@ -75,7 +78,7 @@ export async function updateUserType(
 
     const validation = updateUserSchema.safeParse(data);
     if (!validation.success) {
-      throw new Error("Invalid request data");
+      throw new Error(prettifyZodErrorMessage(validation.error));
     }
 
     const { id, type } = validation.data;
@@ -234,6 +237,10 @@ export async function deleteUser(userId: string): Promise<ActionResult<void>> {
 
     await prisma.user.delete({
       where: { id: userId },
+    });
+
+    await prisma.chat.deleteMany({
+      where: { members: { some: { userId: userId } } },
     });
   } catch (error) {
     console.error("Error deleting user: " + (error as Error).message, error);

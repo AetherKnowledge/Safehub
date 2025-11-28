@@ -668,6 +668,18 @@ export async function rescheduleAppointment(
       throw new Error("End time must be after start time");
     }
 
+    if (startTime.getHours() < 8) {
+      throw new Error("Cannot reschedule before working hours (8 AM)");
+    }
+
+    if (endTime.getHours() >= 17) {
+      throw new Error("Cannot reschedule beyond working hours (5 PM)");
+    }
+
+    if (startTime.getDay() === 0) {
+      throw new Error("Cannot reschedule to a Sunday");
+    }
+
     const updatedAppointment = await prisma.appointment.update({
       where: { id: appointmentId },
       data: { startTime, endTime },

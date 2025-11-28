@@ -29,6 +29,7 @@ export type DateTimeSelectorProps = InputInterface & {
   maxTime?: Time;
   noFormOutput?: boolean;
   horizontal?: boolean;
+  disableSunday?: boolean;
 };
 
 const DateTimeSelector = ({
@@ -48,6 +49,7 @@ const DateTimeSelector = ({
   onInvalid,
   readonly = false,
   answerOnly = false,
+  disableSunday = false,
 }: DateTimeSelectorProps) => {
   const [hasError, setHasError] = useState(false);
   const [initialized, setInitialized] = useState(false);
@@ -339,6 +341,7 @@ const DateTimeSelector = ({
           minDate={readonly ? undefined : minDate}
           maxDate={readonly ? undefined : maxDate}
           readonly={readonly}
+          disableSunday={disableSunday}
         />
       </div>
 

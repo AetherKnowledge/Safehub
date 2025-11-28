@@ -16,6 +16,7 @@ export type DateSelectorProps = InputInterface & {
 
   minDate?: Date | "now"; // inclusive lower bound
   maxDate?: Date; // inclusive upper bound
+  disableSunday?: boolean;
 };
 
 const DateSelector = ({
@@ -34,6 +35,7 @@ const DateSelector = ({
   noFormOutput = false,
   readonly = false,
   answerOnly = false,
+  disableSunday = false,
 }: DateSelectorProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(() => {
     if (value) return value;
@@ -132,6 +134,8 @@ const DateSelector = ({
           }}
           minDate={minDate}
           maxDate={maxDate}
+          readonly={readonly}
+          disableSunday={disableSunday}
         />
       </div>
     </>

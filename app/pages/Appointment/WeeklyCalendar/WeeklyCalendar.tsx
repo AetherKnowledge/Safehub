@@ -133,12 +133,12 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
 function filterAppointments(appointments: AppointmentData[]) {
   const filteredAppointments = appointments.filter((appointment) => {
     if (
-      appointment.status === AppointmentStatus.Pending ||
-      appointment.status === AppointmentStatus.Cancelled
+      appointment.status === AppointmentStatus.Approved ||
+      appointment.status === AppointmentStatus.Completed
     ) {
-      return false;
+      return true;
     }
-    return true;
+    return false;
   });
   return filteredAppointments;
 }

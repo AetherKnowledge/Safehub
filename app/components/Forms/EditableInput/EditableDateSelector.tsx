@@ -4,6 +4,7 @@ import ExtraOptionsBG from "./ExtraOptionsBG";
 
 export type DateSettings = {
   minDate?: Date | "now";
+  disableSunday?: boolean;
 };
 
 export type EditableTimeSelectorProps = {
@@ -43,6 +44,15 @@ export const EditableDateSettings = ({
         fontWeight="font-normal"
         onText="Allow past dates"
         offText="Allow past dates"
+      />
+      <Toggle
+        isChecked={settings?.disableSunday || false}
+        onToggle={(val) => onChange?.({ disableSunday: val })}
+        leftText
+        size="toggle-sm"
+        fontWeight="font-normal"
+        onText="Disable Sunday"
+        offText="Disable Sunday"
       />
     </>
   );

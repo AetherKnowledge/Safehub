@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   description: "A safe space for your conversations",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     startupImage: [
       {
         url: "/apple-splash-2048-2732.jpg",

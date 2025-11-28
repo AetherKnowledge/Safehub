@@ -22,6 +22,7 @@ interface DatePickerProps {
   maxDate?: Date; // inclusive upper bound
   defaultValue?: Date;
   readonly?: boolean;
+  disableSunday?: boolean;
 }
 
 const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
@@ -35,6 +36,7 @@ export default function DatePicker({
   local = false,
   minDate: min,
   maxDate: max,
+  disableSunday = false,
 }: DatePickerProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(value || null);
   const router = useRouter();
@@ -97,24 +99,24 @@ export default function DatePicker({
   }, [min]);
 
   const isDisabled = (day: number) => {
+    const selectedDate = new Date(
+      currentMonthAndYear.getFullYear(),
+      currentMonthAndYear.getMonth(),
+      day
+    );
+
+    if (disableSunday && selectedDate.getDay() === 0) {
+      return true;
+    }
+
     if (min) {
       const minDate = min === "now" ? new Date() : min;
       minDate.setHours(0, 0, 0, 0);
 
-      const selectedDate = new Date(
-        currentMonthAndYear.getFullYear(),
-        currentMonthAndYear.getMonth(),
-        day
-      );
-      return selectedDate < minDate;
+      if (selectedDate < minDate) return true;
     }
     if (max) {
-      const selectedDate = new Date(
-        currentMonthAndYear.getFullYear(),
-        currentMonthAndYear.getMonth(),
-        day
-      );
-      return selectedDate > max;
+      if (selectedDate > max) return true;
     }
     return false;
   };

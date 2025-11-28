@@ -120,6 +120,7 @@ const RescheduleButton = ({
                   onChange={(date) => {
                     setStartTime(date);
                   }}
+                  disableSunday
                   required
                 />
                 <TimeSelector

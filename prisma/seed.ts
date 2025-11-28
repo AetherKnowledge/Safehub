@@ -76,6 +76,7 @@ const bookingForm = {
         minTime: { hour: 8, minute: 0, period: "AM" },
         maxTime: { hour: 4, minute: 0, period: "PM" },
         required: true,
+        disableSunday: true,
       },
       version: "1",
     },

@@ -19,7 +19,7 @@ const Hero = () => {
   return (
     <section
       id="hero"
-      className="relative w-full py-10 overflow-hidden mt-15 flex items-center justify-center"
+      className="relative w-full min-h-[calc(100vh-3rem)] py-10 overflow-hidden mt-15 flex items-center justify-center"
     >
       {/* Background overlay */}
       <div className="absolute inset-0">
@@ -27,6 +27,7 @@ const Hero = () => {
           className="absolute inset-0 bg-cover bg-center"
           src="/images/lcupBg.png"
           alt="LCUP Campus Background"
+          objectFit="cover"
           fill
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-slate-800/60" />

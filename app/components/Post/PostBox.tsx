@@ -2,7 +2,6 @@
 import { formatDatetime } from "@/lib/utils";
 import { useState } from "react";
 import { PostData } from "../../pages/Post/PostActions";
-import ModalBase from "../Popup/ModalBase";
 import ImageGrid from "./ImageGrid";
 import PostComments from "./PostComments";
 import PostStats from "./PostStats";
@@ -29,18 +28,26 @@ const PostBox = ({
     <div
       className={`card ${
         isPopup
-          ? "bg-base-100"
-          : "bg-gradient-to-br from-base-100 to-base-200/20"
-      } min-w-[400px] w-full ${maxHeight} overflow-hidden hover:shadow-lg transition-all duration-300 ${
+          ? "bg-base-100 w-full h-full flex flex-col"
+          : "bg-gradient-to-br from-base-100 to-base-200/20 min-w-[400px]"
+      } w-full ${
+        isPopup ? "" : maxHeight
+      } overflow-hidden hover:shadow-lg transition-all duration-300 ${
         isPopup ? "shadow-2xl" : ""
       }`}
     >
       {/* IMAGE GRID */}
-      <div className="px-6 pt-4">
-        <ImageGrid images={post.images} />
+      <div className={isPopup ? "flex-1 min-h-0 p-6 pb-0" : "px-6 pt-4"}>
+        <ImageGrid images={post.images} isPopup={isPopup} />
       </div>
 
-      <div className="card-body flex flex-col p-6 pt-4">
+      <div
+        className={`card-body flex flex-col ${
+          isPopup
+            ? "flex-shrink-0 max-h-[40vh] overflow-y-auto p-6"
+            : "p-6 pt-4"
+        }`}
+      >
         {/* STATS */}
         <div className="pt-2">
           <PostStats
@@ -121,17 +128,33 @@ export const PostBoxHandler = ({ post: initialPost }: { post: PostData }) => {
         onUpdate={setPost}
       />
       {showPopup && (
-        <ModalBase className="px-20" onClose={() => setShowPopup(false)}>
-          <div className="w-full" onClick={(e) => e.stopPropagation()}>
-            <PostBox
-              post={post}
-              showPopup={showPopup}
-              setShowPopup={setShowPopup}
-              isPopup
-              onUpdate={setPost}
-            />
+        <>
+          createPortal(
+          <div
+            className={`fixed inset-0 min-w-0 flex items-center justify-center backdrop-brightness-50 z-[9999] bg-opacity-50 bg-transparent px-4 md:px-10 lg:px-20 py-4 md:py-8`}
+            onClick={() => setShowPopup(false)}
+          >
+            <div className="max-h-[100vh] overflow-y-auto w-full items-center justify-center scrollbar-gutter-stable">
+              <div className="flex-1 flex p-5 items-center justify-center">
+                <div className="w-full" onClick={(e) => e.stopPropagation()}>
+                  <div
+                    className="w-full mx-auto h-[90vh] flex items-center"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <PostBox
+                      post={post}
+                      showPopup={showPopup}
+                      setShowPopup={setShowPopup}
+                      isPopup
+                      onUpdate={setPost}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </ModalBase>
+          , document.body )
+        </>
       )}
     </>
   );

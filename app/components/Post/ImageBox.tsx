@@ -4,7 +4,15 @@ import Image from "next/image";
 import { useState } from "react";
 import NoImage from "../Images/NoImage";
 
-const ImageBox = ({ src, alt }: { src: string; alt?: string }) => {
+const ImageBox = ({
+  src,
+  alt,
+  isPopup = false,
+}: {
+  src: string;
+  alt?: string;
+  isPopup?: boolean;
+}) => {
   const [hasError, setHasError] = useState(false);
 
   if (hasError) {
@@ -16,7 +24,7 @@ const ImageBox = ({ src, alt }: { src: string; alt?: string }) => {
       src={src}
       alt={alt || "Image"}
       fill
-      className="object-cover"
+      className={isPopup ? "object-contain" : "object-cover"}
       onError={() => setHasError(true)}
     />
   );

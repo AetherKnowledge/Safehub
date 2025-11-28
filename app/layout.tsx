@@ -24,10 +24,6 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_URL || "http://localhost:3000"),
   title: "Safehub",
   description: "A safe space for your conversations",
-  icons: {
-    icon: [{ url: "/favicon-196.png", sizes: "196x196", type: "image/png" }],
-    apple: [{ url: "/apple-icon-180.png" }],
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

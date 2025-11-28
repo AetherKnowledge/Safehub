@@ -70,10 +70,10 @@ const PostComments = ({
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full flex-1">
       {/* Comments */}
       <Divider />
-      <div className="bg-base-200/20 rounded-lg my-2 border border-base-content/5">
+      <div className="bg-base-200/20 rounded-lg my-2 border border-base-content/5 h-full">
         <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/5 to-transparent border-b border-base-content/5">
           <svg
             className="w-4 h-4 text-primary"
@@ -93,7 +93,7 @@ const PostComments = ({
           </span>
         </div>
         <div
-          className="flex-1 min-h-0 max-h-[30vh] overflow-y-auto px-4 py-2 flex flex-col scrollbar-thin"
+          className="flex-1 min-h-0 h-full overflow-y-auto px-4 py-2 flex flex-col scrollbar-thin"
           ref={messageContainerRef}
         >
           <div className="flex flex-col h-full">

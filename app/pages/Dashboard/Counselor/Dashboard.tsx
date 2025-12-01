@@ -6,6 +6,7 @@ import MoodTracker from "../Admin/MoodTracker";
 import AppointmentTimeSeriesChart from "../AppointmentTimeSeriesChart";
 import DashboardPosts from "../DashboardPosts";
 import { Order, SortBy } from "../Student/Dashboard";
+import { UserType } from "@/app/generated/prisma";
 
 type Props = { searchParams: { sortBy?: SortBy; order?: Order } };
 
@@ -15,7 +16,12 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
   return (
     <div className="flex items-center justify-center h-full min-h-0 pb-1 pr-1">
       <div className="flex flex-1 flex-row gap-4 h-full min-h-0 w-auto justify-center">
-        <DashboardPosts posts={posts} sortBy={sortBy} order={order} />
+        <DashboardPosts
+          posts={posts}
+          sortBy={sortBy}
+          order={order}
+          userType={UserType.Counselor}
+        />
 
         <div className="flex-col gap-4 hidden 2xl:flex min-w-[420px]">
           {/* Upcoming Appointments Card */}

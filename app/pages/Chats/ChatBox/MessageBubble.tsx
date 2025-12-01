@@ -1,6 +1,5 @@
+import UserImage from "@/app/components/UserImage";
 import { formatDateDisplay, formatTime } from "@/lib/utils";
-import Image from "next/image";
-import { ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 
 interface Props {
@@ -31,9 +30,11 @@ const MessageBubble = ({
     <div className={defaultPosition}>
       <div className="chat-image avatar">
         <div className={`w-${imageSize} rounded-full`}>
-          {anonymous
-            ? avatarGenerator("Anonymous", imageSize)
-            : avatarGenerator(name, imageSize, image)}
+          <UserImage
+            name={anonymous ? "Anonymous" : name}
+            width={imageSize}
+            src={anonymous ? undefined : image}
+          />
         </div>
       </div>
       <div className="chat-header text-base-content text-xs/normal flex items-center ml-1 mr-1">
@@ -66,29 +67,4 @@ const MessageBubble = ({
     </div>
   );
 };
-
-function avatarGenerator(name: string, width: number, src?: string): ReactNode {
-  // if human and with src image, return the image
-  if (src) {
-    return (
-      <Image
-        alt="Tailwind CSS chat bubble component"
-        src={src}
-        width={width * 2}
-        height={width * 2}
-      />
-    );
-  }
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      className={`w-${width} h-${width} rounded-full bg-gray-500 text-white flex items-center justify-center font-bold hover:brightness-90 active:brightness-75 transition duration-150 select-none cursor-pointer`}
-    >
-      {name!.charAt(0).toUpperCase()}
-    </div>
-  );
-}
-
 export default MessageBubble;

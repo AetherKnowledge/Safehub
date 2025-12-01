@@ -26,7 +26,7 @@ const DashboardPosts = async ({
         </div>
         <div className="flex flex-row gap-2 items-center">
           {/* <Sorter sortBy={sortBy} order={order} /> */}
-          {userType === UserType.Admin && <AddPostButton />}
+          {userType !== UserType.Student && <AddPostButton />}
         </div>
       </div>
 

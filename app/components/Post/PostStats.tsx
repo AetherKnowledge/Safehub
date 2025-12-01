@@ -94,7 +94,7 @@ const PostStats = ({
           label="Saved"
           className=""
         /> */}
-        {session?.data?.user.type === UserType.Admin && (
+        {session?.data?.user.type !== UserType.Student && (
           <PostDropdown post={post} />
         )}
       </div>

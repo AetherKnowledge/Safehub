@@ -527,8 +527,6 @@ async function main() {
   // Storage Bucket Setup
   // ================================
   // Post bucket setup
-  await client.query(`DELETE FROM storage.objects WHERE bucket_id = 'posts';`);
-  await client.query(`DELETE FROM storage.buckets WHERE id = 'posts';`);
   await client.query(`
     INSERT INTO storage.buckets (id, name, public)
     VALUES ('posts', 'posts', true)
@@ -544,13 +542,13 @@ async function main() {
     `DROP POLICY IF EXISTS "Authenticated users can read posts bucket" ON storage.objects;`
   );
   await client.query(
-    `DROP POLICY IF EXISTS "Only Admins can insert into post bucket" ON storage.objects;`
+    `DROP POLICY IF EXISTS "Only Admins and Counselors can insert into post bucket" ON storage.objects;`
   );
   await client.query(
-    `DROP POLICY IF EXISTS "Only Admins can update post objects" ON storage.objects;`
+    `DROP POLICY IF EXISTS "Only Admins and Counselors can update post objects" ON storage.objects;`
   );
   await client.query(
-    `DROP POLICY IF EXISTS "Only Admins can delete post objects" ON storage.objects;`
+    `DROP POLICY IF EXISTS "Only Admins and Counselors can delete post objects" ON storage.objects;`
   );
 
   // Post bucket policies
@@ -564,40 +562,39 @@ async function main() {
   `);
 
   await client.query(`
-    CREATE POLICY "Only Admins can insert into post bucket"
+    CREATE POLICY "Only Admins and Counselors can insert into post bucket"
     ON storage.objects FOR INSERT
     WITH CHECK (
       bucket_id = 'posts'
-      AND public.role() = 'Admin'
+      AND public.role() IN ('Admin', 'Counselor')
     );
   `);
 
   await client.query(`
-    CREATE POLICY "Only Admins can update post objects"
+    CREATE POLICY "Only Admins and Counselors can update post objects"
     ON storage.objects FOR UPDATE
     USING (
       bucket_id = 'posts'
-      AND public.role() = 'Admin'
+      AND public.role() IN ('Admin', 'Counselor')
     )
     WITH CHECK (
       bucket_id = 'posts'
-      AND public.role() = 'Admin'
+      AND public.role() IN ('Admin', 'Counselor')
     );
   `);
 
   await client.query(`
-    CREATE POLICY "Only Admins can delete post objects"
+    CREATE POLICY "Only Admins and Counselors can delete post objects"
     ON storage.objects FOR DELETE
     USING (
       bucket_id = 'posts'
-      AND public.role() = 'Admin'
+      AND public.role() IN ('Admin', 'Counselor')
     );
   `);
 
   console.log("✅ Posts bucket setup complete");
 
   // Hotline bucket setup
-  await client.query(`DELETE FROM storage.buckets WHERE id = 'hotline';`);
   await client.query(`
     INSERT INTO storage.buckets (id, name, public)
     VALUES ('hotline', 'hotline', true)
@@ -714,9 +711,6 @@ async function main() {
   console.log("✅ Hotline bucket setup complete");
 
   // Documents bucket setup
-  await client.query(
-    `DELETE FROM storage.objects WHERE bucket_id = 'documents';`
-  );
   await client.query(`DELETE FROM storage.buckets WHERE id = 'documents';`);
   await client.query(`
     INSERT INTO storage.buckets (id, name, public)

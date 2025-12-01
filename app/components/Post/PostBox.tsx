@@ -32,7 +32,7 @@ const PostBox = ({
           : "bg-gradient-to-br from-base-100 to-base-200/20 min-w-[400px]"
       } w-full ${
         isPopup ? "" : maxHeight
-      } overflow-hidden hover:shadow-lg transition-all duration-300 ${
+      } overflow-hidden transition-all duration-300 ${
         isPopup ? "shadow-2xl" : ""
       }`}
     >

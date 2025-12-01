@@ -39,10 +39,7 @@ export type PostStat = {
 export type PostComment = {
   id: string;
   createdAt: Date;
-  user: {
-    name: string;
-    image?: string;
-  };
+  fromSelf: boolean;
   content: string;
 };
 
@@ -105,10 +102,7 @@ export async function getPosts(): Promise<PostData[]> {
     },
     comments: post.comments.map((comment) => ({
       ...comment,
-      user: {
-        name: comment.user.name || "Unknown",
-        image: comment.user.image || undefined,
-      },
+      fromSelf: comment.userId === userId,
     })),
   }));
 }
@@ -118,7 +112,7 @@ export async function upsertPost(data: UploadPostData) {
   if (
     !session ||
     !session.user.id ||
-    session.user.type !== UserType.Admin ||
+    session.user.type === UserType.Student ||
     session.user.deactivated
   ) {
     throw new Error("Unauthorized");
@@ -257,7 +251,7 @@ export async function deletePost(postId: string) {
   if (
     !session ||
     !session.user?.id ||
-    session.user.type !== UserType.Admin ||
+    session.user.type === UserType.Student ||
     session.user.deactivated
   ) {
     throw new Error("Unauthorized");

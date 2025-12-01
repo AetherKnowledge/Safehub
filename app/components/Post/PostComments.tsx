@@ -47,10 +47,7 @@ const PostComments = ({
                   parseInt(prevComments[prevComments.length - 1].id) + 1
                 ).toString()
               : "1",
-          user: {
-            name: session.data?.user.name || session.data?.user.email || "You",
-            image: session.data?.user.image || undefined,
-          },
+          fromSelf: true,
           content: text,
           createdAt: new Date(),
         },
@@ -99,19 +96,24 @@ const PostComments = ({
           <div className="flex flex-col h-full">
             {post.comments.length > 0 ? (
               post.comments.map((comment) => {
-                const isImageFromSelf =
-                  session.data?.user.image === comment.user.image;
-
                 return (
                   <MessageBubble
                     key={comment.id}
-                    name={comment.user.name}
-                    image={comment.user.image}
+                    name={
+                      comment.fromSelf
+                        ? session.data?.user.name || "You"
+                        : "Anonymous"
+                    }
+                    image={
+                      comment.fromSelf
+                        ? session.data?.user.image || undefined
+                        : undefined
+                    }
                     content={comment.content}
                     createdAt={comment.createdAt}
                     showStatus={false}
-                    anonymous={!isImageFromSelf}
-                    self={isImageFromSelf}
+                    anonymous={!comment.fromSelf}
+                    self={comment.fromSelf}
                   />
                 );
               })

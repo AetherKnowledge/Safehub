@@ -1,4 +1,4 @@
-import { MoodType } from "@/app/generated/prisma";
+import { MoodType } from "@/app/generated/prisma/browser";
 
 export enum MoodEventType {
   MoodUpdated = "mood-updated",

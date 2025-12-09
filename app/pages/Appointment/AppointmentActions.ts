@@ -16,9 +16,9 @@ import {
   SessionPreference,
   User,
   UserType,
-} from "@/app/generated/prisma";
+} from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
-import { addMinutes, prettifyZodErrorMessage } from "@/lib/utils";
+import { addMinutes, prettifyZodErrorMessage } from "@/lib/client-utils";
 import { prisma } from "@/prisma/client";
 import { buildZodSchema } from "../Forms/schema";
 import {

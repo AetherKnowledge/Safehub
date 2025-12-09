@@ -11,7 +11,7 @@ import {
 import TextArea from "@/app/components/Input/TextArea";
 import ModalBase from "@/app/components/Popup/ModalBase";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { addMinutes } from "@/lib/utils";
+import { addMinutes } from "@/lib/client-utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegCheckCircle, FaRegClipboard } from "react-icons/fa";

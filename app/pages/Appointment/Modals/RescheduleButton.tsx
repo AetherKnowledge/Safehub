@@ -10,7 +10,7 @@ import {
 } from "@/app/components/Input/Date/utils";
 import ModalBase from "@/app/components/Popup/ModalBase";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { addMinutes } from "@/lib/utils";
+import { addMinutes } from "@/lib/client-utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegEdit } from "react-icons/fa";

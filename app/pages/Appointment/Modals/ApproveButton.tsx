@@ -1,8 +1,8 @@
 "use client";
 
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { AppointmentStatus, UserType } from "@/app/generated/prisma";
-import { addMinutes } from "@/lib/utils";
+import { AppointmentStatus, UserType } from "@/app/generated/prisma/browser";
+import { addMinutes } from "@/lib/client-utils";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FaCheckCircle } from "react-icons/fa";

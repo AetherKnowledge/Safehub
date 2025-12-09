@@ -2,7 +2,7 @@
 import Divider from "@/app/components/Divider";
 import Toggle from "@/app/components/Input/Toggle";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { AiSettings, MCPFile, Tools } from "@/app/generated/prisma";
+import { AiSettings, MCPFile, Tools } from "@/app/generated/prisma/browser";
 import { useSession } from "next-auth/react";
 import { useMemo, useRef, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -59,7 +59,7 @@ const MCPSettings = ({
         ({
           name: file.name,
           file,
-        }) as UploadMCPFileData
+        } as UploadMCPFileData)
     );
 
     let mcpFiles: MCPFile[] = [];

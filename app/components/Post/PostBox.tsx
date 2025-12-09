@@ -1,5 +1,5 @@
 "use client";
-import { formatDatetime } from "@/lib/utils";
+import { formatDatetime } from "@/lib/client-utils";
 import { useState } from "react";
 import { PostData } from "../../pages/Post/PostActions";
 import ImageGrid from "./ImageGrid";

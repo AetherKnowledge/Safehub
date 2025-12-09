@@ -1,6 +1,6 @@
 import { BuiltFormDataWithAnswers } from "@/app/components/Forms/EditableFormBuilder";
 import ErrorPopup from "@/app/components/Popup/ErrorPopup";
-import { FormType, UserType } from "@/app/generated/prisma";
+import { FormType, UserType } from "@/app/generated/prisma/browser";
 import { getAppointmentById } from "@/app/pages/Appointment/AppointmentActions";
 import EvaluationForm from "@/app/pages/Appointment/Evaluation/EvaluationForm";
 import { fetchForms } from "@/app/pages/Forms/formsActions";

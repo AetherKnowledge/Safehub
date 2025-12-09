@@ -1,5 +1,5 @@
 import { ChatData } from "@/@types/network";
-import { ChatType, UserStatus } from "@/app/generated/prisma";
+import { ChatType, UserStatus } from "@/app/generated/prisma/browser";
 
 export const ChatBotChat: ChatData = {
   id: "chatbot",

@@ -2,7 +2,7 @@
 
 import ImageWithFallback from "@/app/components/Images/ImageWithFallback";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { Hotline, UserType } from "@/app/generated/prisma";
+import { Hotline, UserType } from "@/app/generated/prisma/browser";
 import { useRouter } from "next/navigation";
 import { MdImageNotSupported } from "react-icons/md";
 import { deleteHotline } from "./HotlineActions";

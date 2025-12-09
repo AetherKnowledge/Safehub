@@ -1,6 +1,6 @@
 import StatusBadge, { FollowUpBadge } from "@/app/components/Table/StatusBadge";
-import { UserType } from "@/app/generated/prisma";
-import { formatDateDisplay, formatTime } from "@/lib/utils";
+import { UserType } from "@/app/generated/prisma/browser";
+import { formatDateDisplay, formatTime } from "@/lib/client-utils";
 import {
   FaRegCalendar,
   FaRegQuestionCircle,

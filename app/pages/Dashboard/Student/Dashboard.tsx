@@ -1,6 +1,6 @@
 import MoodTrackerBox from "@/app/components/MoodTracker/MoodTrackerBox";
 import { getPosts } from "@/app/pages/Post/PostActions";
-import { sortPosts } from "@/lib/utils";
+import { sortPosts } from "@/lib/client-utils";
 import { ThisWeeksAppointments } from "../../Appointment/Student/AppointmentPage";
 import DashboardPosts from "../DashboardPosts";
 import HotlineBar from "./HotlineBar";

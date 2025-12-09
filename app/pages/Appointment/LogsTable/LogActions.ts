@@ -1,7 +1,7 @@
 "use server";
 
 import ActionResult from "@/app/components/ActionResult";
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
 import { prisma } from "@/prisma/client";
 import { Order } from "../../Dashboard/Student/Dashboard";

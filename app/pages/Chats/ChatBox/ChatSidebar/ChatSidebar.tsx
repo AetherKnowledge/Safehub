@@ -1,6 +1,6 @@
 "use client";
 import { ChatData } from "@/@types/network";
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import { useEffect, useState } from "react";
 import ChatSidebarHeader from "./ChatSidebarHeader";
 import ChatSidebarUserBox, {

@@ -1,6 +1,7 @@
 "use server";
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
+import { prettifyZodErrorMessage } from "@/lib/client-utils";
 import { UploadHotlineData, uploadHotlineSchema } from "@/lib/schemas";
 import {
   createFile,
@@ -8,7 +9,6 @@ import {
   deleteFolder,
 } from "@/lib/supabase/bucketUtils";
 import { Buckets, getBucket } from "@/lib/supabase/client";
-import { prettifyZodErrorMessage } from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 
 export async function getAllHotline() {

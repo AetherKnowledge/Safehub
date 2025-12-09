@@ -1,9 +1,9 @@
 "use server";
 import ActionResult from "@/app/components/ActionResult";
 import { auth } from "@/auth";
+import { prettifyZodErrorMessage } from "@/lib/client-utils";
 import { prisma } from "@/prisma/client";
 import { onboardingSchema } from "./schema";
-import { prettifyZodErrorMessage } from "@/lib/utils";
 
 export async function hasOnboarded() {
   const session = await auth();

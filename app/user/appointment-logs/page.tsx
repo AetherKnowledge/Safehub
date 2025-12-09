@@ -1,5 +1,5 @@
 import ErrorPopup from "@/app/components/Popup/ErrorPopup";
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import LogsTable from "@/app/pages/Appointment/LogsTable";
 import { getLogs } from "@/app/pages/Appointment/LogsTable/LogActions";
 import { AppointmentLogSortBy } from "@/app/pages/Appointment/LogsTable/sort";

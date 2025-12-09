@@ -1,4 +1,4 @@
-import { CallStatus, UserType } from "@/app/generated/prisma";
+import { CallStatus, UserType } from "@/app/generated/prisma/browser";
 import { z } from "zod";
 
 export const IMAGE_SCHEMA = z

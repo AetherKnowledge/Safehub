@@ -3,7 +3,7 @@
 import SelectBoxOld from "@/app/components/Input/SelectBoxOld";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import UserImage from "@/app/components/UserImage";
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import { UpdateUserTypeData } from "@/lib/schemas";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSession } from "next-auth/react";

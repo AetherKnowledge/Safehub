@@ -1,6 +1,6 @@
 "use client";
 
-import { Appointment } from "@/app/generated/prisma";
+import { Appointment } from "@/app/generated/prisma/browser";
 import { updateNotes } from "@/app/pages/Appointment/AppointmentActions";
 import { useEffect, useRef, useState } from "react";
 import { FaRegCheckCircle, FaTimes } from "react-icons/fa";

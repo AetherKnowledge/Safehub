@@ -1,7 +1,7 @@
 "use server";
 
 import { ChatData, Message } from "@/@types/network";
-import { chathistory } from "@/app/generated/prisma";
+import { chathistory } from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
 import { Session } from "next-auth";
 

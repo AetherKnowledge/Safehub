@@ -1,6 +1,6 @@
 "use client";
 
-import { SessionPreference } from "@/app/generated/prisma";
+import { SessionPreference } from "@/app/generated/prisma/browser";
 import { AppointmentData } from "@/app/pages/Appointment/AppointmentActions";
 import { useState } from "react";
 import ViewModal from "./ViewModal";

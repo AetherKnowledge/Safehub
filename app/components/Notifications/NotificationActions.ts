@@ -5,9 +5,9 @@ import {
   AppointmentStatus,
   Notification,
   NotificationType,
-} from "@/app/generated/prisma";
+} from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
-import { formatDateDisplay } from "@/lib/utils";
+import { formatDateDisplay } from "@/lib/client-utils";
 import { prisma } from "@/prisma/client";
 import { env } from "next-runtime-env";
 import ActionResult from "../ActionResult";

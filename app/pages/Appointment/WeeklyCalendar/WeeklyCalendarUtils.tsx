@@ -1,4 +1,4 @@
-import { AppointmentStatus } from "@/app/generated/prisma";
+import { AppointmentStatus } from "@/app/generated/prisma/browser";
 import { AppointmentData } from "../AppointmentActions";
 
 // Calendar configuration: 8:00 AM to 5:00 PM

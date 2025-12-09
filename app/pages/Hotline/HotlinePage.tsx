@@ -1,5 +1,5 @@
 "use client";
-import { Hotline, UserType } from "@/app/generated/prisma/wasm";
+import { Hotline, UserType } from "@/app/generated/prisma/browser";
 import { useEffect, useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 import HotlineCard from "./HotlineCard";

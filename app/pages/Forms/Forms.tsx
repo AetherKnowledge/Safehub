@@ -1,4 +1,4 @@
-import { FormType } from "@/app/generated/prisma";
+import { FormType } from "@/app/generated/prisma/browser";
 import FormsTab from "./FormsTab";
 
 const Forms = () => {

@@ -1,4 +1,5 @@
-import { sortPosts } from "@/lib/utils";
+import { UserType } from "@/app/generated/prisma/browser";
+import { sortPosts } from "@/lib/client-utils";
 import { Suspense } from "react";
 import { ThisWeeksAppointments } from "../../Appointment/Student/AppointmentPage";
 import { getPosts } from "../../Post/PostActions";
@@ -6,7 +7,6 @@ import MoodTracker from "../Admin/MoodTracker";
 import AppointmentTimeSeriesChart from "../AppointmentTimeSeriesChart";
 import DashboardPosts from "../DashboardPosts";
 import { Order, SortBy } from "../Student/Dashboard";
-import { UserType } from "@/app/generated/prisma";
 
 type Props = { searchParams: { sortBy?: SortBy; order?: Order } };
 

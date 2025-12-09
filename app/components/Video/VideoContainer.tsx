@@ -1,6 +1,6 @@
 "use client";
 
-import { Appointment } from "@/app/generated/prisma";
+import { Appointment } from "@/app/generated/prisma/browser";
 import { getAppointmentForCall } from "@/app/pages/Appointment/AppointmentActions";
 import { getUserName } from "@/lib/socket/hooks/CallActions";
 import { PeerData } from "@/lib/socket/hooks/useCalling";

@@ -1,6 +1,6 @@
 "use client";
 
-import { MoodType } from "@/app/generated/prisma";
+import { MoodType } from "@/app/generated/prisma/browser";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import {

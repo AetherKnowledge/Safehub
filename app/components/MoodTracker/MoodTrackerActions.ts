@@ -1,6 +1,6 @@
 "use server";
 
-import { DailyMood, MoodType, UserType } from "@/app/generated/prisma";
+import { DailyMood, MoodType, UserType } from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
 import { prisma } from "@/prisma/client";
 import ActionResult from "../ActionResult";

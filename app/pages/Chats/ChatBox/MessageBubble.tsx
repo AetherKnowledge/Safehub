@@ -1,5 +1,5 @@
 import UserImage from "@/app/components/UserImage";
-import { formatDateDisplay, formatTime } from "@/lib/utils";
+import { formatDateDisplay, formatTime } from "@/lib/client-utils";
 import ReactMarkdown from "react-markdown";
 
 interface Props {

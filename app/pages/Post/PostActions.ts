@@ -1,7 +1,8 @@
 "use server";
 
-import { Post, UserType } from "@/app/generated/prisma";
+import { Post, UserType } from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
+import { prettifyZodErrorMessage } from "@/lib/client-utils";
 import {
   CommentData,
   commentSchema,
@@ -14,7 +15,6 @@ import {
   deleteFolder,
 } from "@/lib/supabase/bucketUtils";
 import { Buckets, getBucket } from "@/lib/supabase/client";
-import { prettifyZodErrorMessage } from "@/lib/utils";
 
 import { prisma } from "@/prisma/client";
 

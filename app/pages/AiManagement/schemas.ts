@@ -1,4 +1,4 @@
-import { Tools } from "@/app/generated/prisma";
+import { Tools } from "@/app/generated/prisma/browser";
 import z from "zod";
 
 export const promptDefault = `You are the **SafeHub AI Assistant**, a compassionate digital support system designed to help students with **mental health, wellness, academic, and campus-related concerns** when no human counselor is available.

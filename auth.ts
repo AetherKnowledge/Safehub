@@ -1,17 +1,17 @@
-import {
-  createManyChatsWithOthers,
-  removeManyChatsWithOthers,
-} from "@/lib/utils";
 import { prisma } from "@/prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import NextAuth from "next-auth";
 // import { encode as defaultEncode } from "next-auth/jwt";
+import { UserType } from "@/app/generated/prisma/browser";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import process from "process";
-import { UserType } from "./app/generated/prisma";
+import {
+  removeManyChatsWithOthers,
+  createManyChatsWithOthers,
+} from "./app/pages/Chats/ChatsActions";
 // import { v4 as uuid } from "uuid";
 
 // TODO: Change to database session strategy

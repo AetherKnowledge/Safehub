@@ -1,4 +1,4 @@
-import { Appointment, AppointmentLog } from "@/app/generated/prisma";
+import { Appointment, AppointmentLog } from "@/app/generated/prisma/browser";
 
 export type ParsedAppointmentLog = AppointmentLog & {
   appointmentId: Appointment["id"];

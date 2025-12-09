@@ -1,6 +1,6 @@
 import StatusBadge from "@/app/components/Table/StatusBadge";
 import UserImage from "@/app/components/UserImage";
-import { AppointmentStatus } from "@/app/generated/prisma";
+import { AppointmentStatus } from "@/app/generated/prisma/browser";
 import Link from "next/link";
 import { AiOutlineMessage } from "react-icons/ai";
 import { IoCallOutline } from "react-icons/io5";

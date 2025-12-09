@@ -13,7 +13,7 @@ import { LinearScaleProps } from "@/app/components/Input/LinearScale";
 import { RadioBoxProps } from "@/app/components/Input/RadioBox";
 import { ExtraOptions } from "@/app/components/Input/schema";
 import { SelectBoxProps } from "@/app/components/Input/SelectBox";
-import { FormType } from "@/app/generated/prisma";
+import { FormType } from "@/app/generated/prisma/browser";
 import z from "zod";
 
 export const formTypeSchema = z.enum(FormType);

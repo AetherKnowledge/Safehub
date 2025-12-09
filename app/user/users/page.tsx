@@ -1,4 +1,4 @@
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import AdminUsersPage from "@/app/pages/UserList";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";

@@ -1,4 +1,4 @@
-import { MoodType, UserType } from "@/app/generated/prisma";
+import { MoodType, UserType } from "@/app/generated/prisma/browser";
 import { DefaultSession, DefaultUser } from "next-auth";
 
 declare module "next-auth" {

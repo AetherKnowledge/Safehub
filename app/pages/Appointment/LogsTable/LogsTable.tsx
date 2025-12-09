@@ -3,7 +3,7 @@ import HeaderItem from "@/app/components/Table/HeaderItem";
 import StatusBadge from "@/app/components/Table/StatusBadge";
 import Table from "@/app/components/Table/Table";
 import TableHeader from "@/app/components/Table/TableHeader";
-import { formatDateDisplay } from "@/lib/utils";
+import { formatDateDisplay } from "@/lib/client-utils";
 import { ParsedAppointmentLog } from "./schema";
 import { AppointmentLogSortBy } from "./sort";
 

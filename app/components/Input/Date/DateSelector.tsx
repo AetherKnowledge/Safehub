@@ -1,5 +1,5 @@
 "use client";
-import { formatDateDisplay } from "@/lib/utils";
+import { formatDateDisplay } from "@/lib/client-utils";
 import { useState } from "react";
 import { FaChevronDown } from "react-icons/fa6";
 import { MdOutlineDateRange } from "react-icons/md";

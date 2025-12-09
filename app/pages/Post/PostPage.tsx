@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { sortPosts } from "@/lib/utils";
+import { sortPosts } from "@/lib/client-utils";
 import DashboardPosts from "../Dashboard/DashboardPosts";
 import { Order, SortBy } from "../Dashboard/Student/Dashboard";
 import { getPosts } from "./PostActions";

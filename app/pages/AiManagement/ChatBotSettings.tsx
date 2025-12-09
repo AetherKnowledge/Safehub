@@ -4,7 +4,7 @@ import LoadingButton from "@/app/components/Input/LoadingButton";
 import TextAreaMarkDown from "@/app/components/Input/TextAreaMarkDown";
 import Toggle from "@/app/components/Input/Toggle";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { AiPreset } from "@/app/generated/prisma";
+import { AiPreset } from "@/app/generated/prisma/browser";
 import { useEffect, useState } from "react";
 import { CiSaveDown2 } from "react-icons/ci";
 import { FaPlus, FaTrash } from "react-icons/fa6";

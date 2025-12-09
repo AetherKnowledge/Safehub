@@ -1,4 +1,4 @@
-import { CallStatus } from "@/app/generated/prisma";
+import { CallStatus } from "@/app/generated/prisma/browser";
 import { isUserOnline, setUserOnline } from "@/lib/redis";
 import { prisma } from "@/prisma/client";
 import { User } from "next-auth";

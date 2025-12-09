@@ -2,9 +2,9 @@
 import { ChatData } from "@/@types/network";
 import { useChatBot } from "@/app/components/ChatBot/ChatBotProvider";
 import UserImage from "@/app/components/UserImage";
-import { UserStatus } from "@/app/generated/prisma";
+import { UserStatus } from "@/app/generated/prisma/browser";
+import { getRelativeTime } from "@/lib/client-utils";
 import { useMessaging } from "@/lib/socket/hooks/useMessaging";
-import { getRelativeTime } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";

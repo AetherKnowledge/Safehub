@@ -1,5 +1,5 @@
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
-import { AppointmentStatus } from "@/app/generated/prisma";
+import { AppointmentStatus } from "@/app/generated/prisma/browser";
 import z from "zod";
 
 export type AppointmentFormData = {

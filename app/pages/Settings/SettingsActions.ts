@@ -1,8 +1,8 @@
 "use server";
 import ActionResult from "@/app/components/ActionResult";
-import { User } from "@/app/generated/prisma";
+import { User } from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
-import { prettifyZodErrorMessage } from "@/lib/utils";
+import { prettifyZodErrorMessage } from "@/lib/client-utils";
 import { prisma } from "@/prisma/client";
 import z from "zod";
 import {

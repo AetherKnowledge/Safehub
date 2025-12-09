@@ -1,15 +1,13 @@
 "use server";
 
 import ActionResult from "@/app/components/ActionResult";
-import { UserStatus, UserType } from "@/app/generated/prisma";
+import { UserStatus, UserType } from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
 import { UpdateUserTypeData, updateUserSchema } from "@/lib/schemas";
-import {
-  createManyChatsWithOthers,
-  prettifyZodErrorMessage,
-} from "@/lib/utils";
 import { prisma } from "@/prisma/client";
+import { createManyChatsWithOthers } from "../Chats/ChatsActions";
+import { prettifyZodErrorMessage } from "@/lib/client-utils";
 
 export type UserWithStatus = {
   id: string;

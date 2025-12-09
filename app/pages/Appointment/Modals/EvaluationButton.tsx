@@ -1,4 +1,4 @@
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/enums";
 import { JsonValue } from "@prisma/client/runtime/client";
 import Link from "next/link";
 import { MdMessage } from "react-icons/md";

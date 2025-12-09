@@ -2,10 +2,14 @@
 
 import ActionResult from "@/app/components/ActionResult";
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
-import { AppointmentStatus, FormType, UserType } from "@/app/generated/prisma";
+import {
+  AppointmentStatus,
+  FormType,
+  UserType,
+} from "@/app/generated/prisma/browser";
 import { buildZodSchema } from "@/app/pages/Forms/schema";
 import { auth } from "@/auth";
-import { prettifyZodErrorMessage } from "@/lib/utils";
+import { prettifyZodErrorMessage } from "@/lib/client-utils";
 import { prisma } from "@/prisma/client";
 
 export type EvaluationTableData = {

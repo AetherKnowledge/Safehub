@@ -1,5 +1,5 @@
 "use client";
-import { formatTime } from "@/lib/utils";
+import { formatTime } from "@/lib/client-utils";
 import { useState } from "react";
 import { AppointmentData } from "../AppointmentActions";
 import ViewModal from "../Modals/ViewModal";

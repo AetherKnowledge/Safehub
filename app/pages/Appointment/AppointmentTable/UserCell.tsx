@@ -1,7 +1,7 @@
 "use client";
 
 import UserImage from "@/app/components/UserImage";
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import { useState } from "react";
 import { AppointmentData } from "../AppointmentActions";
 import UserDetailsPopup, { StudentDetails } from "../Modals/UserDetailsPopup";

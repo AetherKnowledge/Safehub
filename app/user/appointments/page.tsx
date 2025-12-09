@@ -1,4 +1,4 @@
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import AppointmentsPage, {
   ViewMode,
 } from "@/app/pages/Appointment/Counselor/AppointmentsPage";

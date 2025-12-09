@@ -1,6 +1,6 @@
 "use client";
 import { ChatData } from "@/@types/network";
-import { UserStatus } from "@/app/generated/prisma";
+import { UserStatus } from "@/app/generated/prisma/browser";
 import Link from "next/link";
 import { IoIosArrowBack, IoIosCall } from "react-icons/io";
 import UserImage from "../../../components/UserImage";

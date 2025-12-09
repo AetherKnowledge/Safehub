@@ -1,4 +1,4 @@
-import { CallStatus } from "@/app/generated/prisma";
+import { CallStatus } from "@/app/generated/prisma/browser";
 import { Recipient } from "@/lib/socket/SocketEvents";
 import Image from "next/image";
 import ModalBase from "../../../components/Popup/ModalBase";

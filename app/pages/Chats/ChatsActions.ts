@@ -2,7 +2,7 @@
 
 import { ChatData, Message } from "@/@types/network";
 import ActionResult from "@/app/components/ActionResult";
-import { ChatType, UserStatus } from "@/app/generated/prisma";
+import { ChatType, UserStatus, UserType } from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
 import { Recipient } from "@/lib/socket/SocketEvents";
@@ -230,3 +230,57 @@ export async function getChatById(id: string): Promise<Message[]> {
 
   return messages as Message[];
 }
+
+export const createManyChatsWithOthers = async (
+  userType: UserType,
+  userId: string
+) => {
+  const users = await prisma.user.findMany({
+    where: {
+      type: userType,
+      AND: [
+        { id: { not: userId } }, // Exclude the current user
+      ],
+    },
+    select: { id: true },
+  });
+
+  users.forEach(async (user) => {
+    await prisma.chat.create({
+      data: {
+        members: {
+          create: [{ userId }, { userId: user.id }],
+        },
+      },
+    });
+  });
+};
+
+export const removeManyChatsWithOthers = async (
+  userType: UserType,
+  userId: string
+) => {
+  const users = await prisma.user.findMany({
+    where: {
+      type: userType,
+      AND: [
+        { id: { not: userId } }, // Exclude the current user
+      ],
+    },
+    select: { id: true },
+  });
+
+  users.forEach(async (user) => {
+    await prisma.chat.deleteMany({
+      where: {
+        members: {
+          every: {
+            userId: {
+              in: [userId, user.id],
+            },
+          },
+        },
+      },
+    });
+  });
+};

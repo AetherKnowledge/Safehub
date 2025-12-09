@@ -1,4 +1,4 @@
-import { AppointmentStatus } from "@/app/generated/prisma";
+import { AppointmentStatus } from "@/app/generated/prisma/browser";
 import { AppointmentData } from "../AppointmentActions";
 import UpcomingAppointmentRow from "./UpcomingAppointmentsRow";
 

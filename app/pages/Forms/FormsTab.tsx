@@ -7,7 +7,7 @@ import EditableFormHeader from "@/app/components/Forms/EditableFormHeader";
 import { createFormComponent } from "@/app/components/Forms/EditableInput/utils";
 import { FormComponentType } from "@/app/components/Forms/FormBuilder";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { FormType } from "@/app/generated/prisma";
+import { FormType } from "@/app/generated/prisma/browser";
 import { useEffect, useState } from "react";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { fetchForms, saveForms } from "./formsActions";

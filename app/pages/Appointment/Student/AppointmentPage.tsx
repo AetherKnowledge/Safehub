@@ -1,7 +1,7 @@
 import DatePicker from "@/app/components/Input/Date/DatePicker";
 import UserImage from "@/app/components/UserImage";
-import { AppointmentStatus, UserType } from "@/app/generated/prisma";
-import { formatDate } from "@/lib/utils";
+import { AppointmentStatus, UserType } from "@/app/generated/prisma/browser";
+import { formatDate } from "@/lib/client-utils";
 import Link from "next/link";
 import { FaCalendar, FaClock } from "react-icons/fa6";
 import { HiSparkles } from "react-icons/hi2";

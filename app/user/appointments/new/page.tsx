@@ -1,5 +1,5 @@
 import ErrorPopup from "@/app/components/Popup/ErrorPopup";
-import { FormType, UserType } from "@/app/generated/prisma";
+import { FormType, UserType } from "@/app/generated/prisma/browser";
 import Booking from "@/app/pages/Booking";
 import { fetchForms } from "@/app/pages/Forms/formsActions";
 import { auth } from "@/auth";

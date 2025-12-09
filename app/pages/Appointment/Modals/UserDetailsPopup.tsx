@@ -6,7 +6,7 @@ import HorizontalItemsBox from "@/app/components/Input/HorizontalItemsBox";
 import LinkedSelector from "@/app/components/Input/LinkedSelector";
 import { SelectBoxProps } from "@/app/components/Input/SelectBox";
 import ModalBase from "@/app/components/Popup/ModalBase";
-import { User } from "@/app/generated/prisma";
+import { User } from "@/app/generated/prisma/browser";
 import {
   departmentsWithPrograms,
   genderOptions,

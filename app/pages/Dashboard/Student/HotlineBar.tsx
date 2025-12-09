@@ -1,4 +1,4 @@
-import { Hotline } from "@/app/generated/prisma";
+import { Hotline } from "@/app/generated/prisma/browser";
 import Link from "next/link";
 import { Suspense } from "react";
 import { SlCallIn } from "react-icons/sl";

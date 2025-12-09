@@ -5,7 +5,7 @@ import HorizontalItemsBox from "@/app/components/Input/HorizontalItemsBox";
 import LinkedSelector from "@/app/components/Input/LinkedSelector";
 import { SelectBoxProps } from "@/app/components/Input/SelectBox";
 import { TextBoxProps } from "@/app/components/Input/TextBox";
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

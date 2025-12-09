@@ -1,4 +1,4 @@
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import Evaluation from "@/app/pages/Appointment/Evaluation";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";

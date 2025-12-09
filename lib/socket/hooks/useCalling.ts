@@ -1,4 +1,4 @@
-import { CallStatus } from "@/app/generated/prisma";
+import { CallStatus } from "@/app/generated/prisma/browser";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
 import Peer, { SignalData } from "simple-peer";

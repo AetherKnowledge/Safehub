@@ -1,7 +1,7 @@
 import Divider from "@/app/components/Divider";
 import AddPostButton from "@/app/components/Post/AddPostButton";
 import PostBox from "@/app/components/Post/PostBox";
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import { PostData } from "../Post/PostActions";
 import { Order, SortBy } from "./Student/Dashboard";
 

@@ -1,6 +1,6 @@
 "use client";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/client-utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaAngleLeft, FaRegCalendar } from "react-icons/fa";

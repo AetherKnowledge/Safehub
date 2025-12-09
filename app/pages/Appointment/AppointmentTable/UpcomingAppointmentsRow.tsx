@@ -1,8 +1,8 @@
 "use client";
 
 import UserImage from "@/app/components/UserImage";
-import { UserType } from "@/app/generated/prisma";
-import { formatDateDisplay, formatTime } from "@/lib/utils";
+import { UserType } from "@/app/generated/prisma/browser";
+import { formatDateDisplay, formatTime } from "@/lib/client-utils";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { AppointmentData } from "../AppointmentActions";

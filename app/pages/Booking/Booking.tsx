@@ -3,7 +3,7 @@ import {
   Appointment,
   AppointmentStatus,
   UserType,
-} from "@/app/generated/prisma";
+} from "@/app/generated/prisma/browser";
 
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
 import FormBuilder from "@/app/components/Forms/FormBuilder";

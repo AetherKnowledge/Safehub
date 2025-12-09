@@ -1,4 +1,4 @@
-import { ChatMessage, UserStatus } from "@/app/generated/prisma";
+import { ChatMessage, UserStatus } from "@/app/generated/prisma/browser";
 
 export interface Messaging {
   messages: Message[];

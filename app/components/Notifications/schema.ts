@@ -1,4 +1,4 @@
-import { AppointmentStatus } from "@/app/generated/prisma";
+import { AppointmentStatus } from "@/app/generated/prisma/browser";
 
 export type AppointmentCreateNotification = {
   appointmentId: string;

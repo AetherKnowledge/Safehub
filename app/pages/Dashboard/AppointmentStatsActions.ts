@@ -1,6 +1,6 @@
 "use server";
 
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
 import { prisma } from "@/prisma/client";
 

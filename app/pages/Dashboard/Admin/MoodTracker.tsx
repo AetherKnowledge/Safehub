@@ -7,7 +7,7 @@ import {
   MoodTimeSeriesData,
   TimeRange,
 } from "@/app/components/MoodTracker/MoodTrackerActions";
-import { DailyMood, UserType } from "@/app/generated/prisma";
+import { DailyMood, UserType } from "@/app/generated/prisma/browser";
 import { createClient } from "@/lib/supabase/client";
 import { Chart } from "chart.js";
 import { useSession } from "next-auth/react";

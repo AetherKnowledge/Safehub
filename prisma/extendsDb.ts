@@ -1,5 +1,5 @@
 "use server";
-import { ChatMessage } from "@/app/generated/prisma";
+import { ChatMessage } from "@/app/generated/prisma/browser";
 import type { PrismaClient } from "@prisma/client";
 
 export async function extendsDb(prisma: PrismaClient) {

@@ -1,6 +1,6 @@
 "use client";
 import NoImage from "@/app/components/Images/NoImage";
-import { MCPFile } from "@/app/generated/prisma";
+import { MCPFile } from "@/app/generated/prisma/browser";
 import { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import FilePreviewModal from "./FilePreviewModal";

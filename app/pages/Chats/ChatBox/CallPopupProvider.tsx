@@ -1,7 +1,7 @@
 "use client";
 
 import VideoContainer from "@/app/components/Video/VideoContainer";
-import { CallStatus } from "@/app/generated/prisma";
+import { CallStatus } from "@/app/generated/prisma/browser";
 import { useSession } from "next-auth/react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useCalling } from "../../../../lib/socket/hooks/useCalling";

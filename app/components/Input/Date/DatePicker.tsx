@@ -1,6 +1,6 @@
 "use client";
 
-import { convertLocalToUTC, formatDate } from "@/lib/utils";
+import { convertLocalToUTC, formatDate } from "@/lib/client-utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";

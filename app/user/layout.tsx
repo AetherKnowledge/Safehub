@@ -1,11 +1,11 @@
 import Sidebar from "@/app/components/Sidebar";
+import { UserType } from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import BottomBar from "../components/BottomBar/BottomBar";
 import MoodTrackerPopup from "../components/MoodTracker";
 import UserNavbar from "../components/Navbar/UserNavbar";
 import ErrorPopup from "../components/Popup/ErrorPopup";
-import { UserType } from "../generated/prisma";
 import { hasOnboarded } from "../pages/Onboarding/OnboardingActions";
 
 interface Props {

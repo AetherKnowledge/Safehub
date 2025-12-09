@@ -4,7 +4,7 @@ import TextArea from "@/app/components/Input/TextArea";
 import TextBox from "@/app/components/Input/TextBox";
 import ModalBase from "@/app/components/Popup/ModalBase";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { Hotline } from "@/app/generated/prisma";
+import { Hotline } from "@/app/generated/prisma/browser";
 import { UploadHotlineData } from "@/lib/schemas";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -155,6 +155,6 @@ const HotlineModal = ({
       </form>
     </ModalBase>
   );
-}
+};
 
 export default HotlineModal;

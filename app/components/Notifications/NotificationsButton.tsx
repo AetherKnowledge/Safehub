@@ -4,12 +4,12 @@ import {
   Notification,
   NotificationType,
   UserType,
-} from "@/app/generated/prisma";
+} from "@/app/generated/prisma/browser";
 import { ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { formatDateDisplay, getRelativeTime } from "@/lib/client-utils";
 import { createClient } from "@/lib/supabase/client";
-import { formatDateDisplay, getRelativeTime } from "@/lib/utils";
 import { motion } from "motion/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";

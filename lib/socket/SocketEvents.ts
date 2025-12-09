@@ -1,4 +1,4 @@
-import { CallStatus, User } from "@/app/generated/prisma";
+import { CallStatus, User } from "@/app/generated/prisma/browser";
 import { types } from "mediasoup";
 import { TransportOptions } from "mediasoup-client/types";
 
@@ -49,7 +49,7 @@ export interface SocketEvent<
     | SocketCallEnded
     | SocketSdp
     | SocketTyping
-    | SocketError,
+    | SocketError
 > {
   type: SocketEventType;
   payload: T;

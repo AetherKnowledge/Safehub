@@ -1,7 +1,7 @@
 "use client";
 
 import { usePopup } from "@/app/components/Popup/PopupProvider";
-import { AppointmentStatus } from "@/app/generated/prisma";
+import { AppointmentStatus } from "@/app/generated/prisma/browser";
 import { useRouter } from "next/navigation";
 import { FaCheckCircle } from "react-icons/fa";
 import {

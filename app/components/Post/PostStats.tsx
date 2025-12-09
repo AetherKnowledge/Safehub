@@ -1,5 +1,5 @@
 "use client";
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import { useSession } from "next-auth/react";
 import { FaRegComment, FaRegHeart } from "react-icons/fa6";
 import { PostData, dislikePost, likePost } from "../../pages/Post/PostActions";

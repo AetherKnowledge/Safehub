@@ -6,7 +6,7 @@ import {
   User,
   UserStatus,
   UserType,
-} from "@/app/generated/prisma";
+} from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
 import { isUserOnline } from "@/lib/redis";
 

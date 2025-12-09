@@ -1,5 +1,5 @@
 "use client";
-import { UserType } from "@/app/generated/prisma"; // Adjust the import path as necessary
+import { UserType } from "@/app/generated/prisma/browser"; // Adjust the import path as necessary
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";

@@ -2,9 +2,9 @@
 
 import ActionResult from "@/app/components/ActionResult";
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
-import { FormType, UserType } from "@/app/generated/prisma";
+import { FormType, UserType } from "@/app/generated/prisma/browser";
 import { auth } from "@/auth";
-import { prettifyZodErrorMessage } from "@/lib/utils";
+import { prettifyZodErrorMessage } from "@/lib/client-utils";
 import { prisma } from "@/prisma/client";
 import { formTypeSchema } from "./schema";
 

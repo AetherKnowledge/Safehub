@@ -1,4 +1,4 @@
-import { UserType } from "@/app/generated/prisma";
+import { UserType } from "@/app/generated/prisma/browser";
 import AdminDashboard from "@/app/pages/Dashboard/Admin/Dashboard";
 import CounselorDashboard from "@/app/pages/Dashboard/Counselor/Dashboard";
 import StudentDashboard from "@/app/pages/Dashboard/Student";

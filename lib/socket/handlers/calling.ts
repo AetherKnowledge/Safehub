@@ -1,4 +1,4 @@
-import { CallStatus } from "@/app/generated/prisma";
+import { CallStatus } from "@/app/generated/prisma/browser";
 import {
   answerCallSchema,
   initiateCallSchema,

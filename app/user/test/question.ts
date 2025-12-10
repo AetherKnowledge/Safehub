@@ -1,5 +1,5 @@
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
-import { FormComponentType } from "@/app/components/Forms/FormBuilder";
+import { FormComponentType } from "@/app/components/Forms/FormBuilder.types";
 
 export const testForm: BuiltFormData = {
   header: {

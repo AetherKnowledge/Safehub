@@ -5,7 +5,7 @@ import EditableFormBuilder, {
 } from "@/app/components/Forms/EditableFormBuilder";
 import EditableFormHeader from "@/app/components/Forms/EditableFormHeader";
 import { createFormComponent } from "@/app/components/Forms/EditableInput/utils";
-import { FormComponentType } from "@/app/components/Forms/FormBuilder";
+import { FormComponentType } from "@/app/components/Forms/FormBuilder.types";
 import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { FormType } from "@/app/generated/prisma/browser";
 import { useEffect, useState } from "react";

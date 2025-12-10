@@ -17,81 +17,15 @@ import TextArea, { TextAreaProps } from "../Input/TextArea";
 import TextBox, { TextBoxProps } from "../Input/TextBox";
 import { BuiltFormData } from "./EditableFormBuilder";
 import FormBG from "./FormBG";
+import type { FormComponent } from "./FormBuilder.types";
+import { FormComponentType } from "./FormBuilder.types";
 import FormComponentBG from "./FormComponentBG";
 import FormsHeader from "./FormsHeader";
 import Separator, { SeparatorProps } from "./Separator";
 import Submit from "./Submit";
 
-export enum FormComponentType {
-  SEPARATOR = "SEPARATOR",
-  TEXT = "TEXT",
-  HORIZONTAL_ITEMS = "HORIZONTAL_ITEMS",
-  TEXTAREA = "TEXTAREA",
-  RADIO = "RADIO",
-  SELECT = "SELECT",
-  LINKED_SELECTOR = "LINKED_SELECTOR",
-  DATE = "DATE",
-  TIME = "TIME",
-  DATETIME = "DATETIME",
-  LINEAR_SCALE = "LINEAR_SCALE",
-}
-
-export type FormComponent =
-  | {
-      type: FormComponentType.SEPARATOR;
-      props: SeparatorProps;
-      version: string;
-    }
-  | {
-      type: FormComponentType.TEXT;
-      props: TextBoxProps;
-      version: string;
-    }
-  | {
-      type: FormComponentType.TEXTAREA;
-      props: TextAreaProps;
-      version: string;
-    }
-  | {
-      type: FormComponentType.HORIZONTAL_ITEMS;
-      props: HorizontalItemsBoxProps;
-      version: string;
-    }
-  | {
-      type: FormComponentType.RADIO;
-      props: RadioBoxProps;
-      version: string;
-    }
-  | {
-      type: FormComponentType.SELECT;
-      props: SelectBoxProps;
-      version: string;
-    }
-  | {
-      type: FormComponentType.LINKED_SELECTOR;
-      props: LinkedSelectorProps;
-      version: string;
-    }
-  | {
-      type: FormComponentType.DATE;
-      props: DateSelectorProps;
-      version: string;
-    }
-  | {
-      type: FormComponentType.TIME;
-      props: TimeSelectorProps;
-      version: string;
-    }
-  | {
-      type: FormComponentType.DATETIME;
-      props: DateTimeSelectorProps;
-      version: string;
-    }
-  | {
-      type: FormComponentType.LINEAR_SCALE;
-      props: LinearScaleProps;
-      version: string;
-    };
+// Re-export types from the types file
+export { FormComponentType, type FormComponent } from "./FormBuilder.types";
 
 const FormBuilder = ({
   form,

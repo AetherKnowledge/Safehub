@@ -1,6 +1,6 @@
 "use client";
 import Divider from "@/app/components/Divider";
-import { FormComponentType } from "@/app/components/Forms/FormBuilder";
+import { FormComponentType } from "@/app/components/Forms/FormBuilder.types";
 import HorizontalItemsBox from "@/app/components/Input/HorizontalItemsBox";
 import LinkedSelector from "@/app/components/Input/LinkedSelector";
 import { SelectBoxProps } from "@/app/components/Input/SelectBox";

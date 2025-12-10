@@ -1,6 +1,6 @@
 import Divider from "../../Divider";
 import Toggle from "../../Input/Toggle";
-import { FormComponent, FormComponentType } from "../FormBuilder";
+import { FormComponent, FormComponentType } from "../FormBuilder.types";
 
 const BottomActionRow = ({
   component,

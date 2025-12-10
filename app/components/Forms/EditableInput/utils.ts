@@ -1,6 +1,6 @@
 import { Time } from "../../Input/Date/utils";
 import { Option } from "../../Input/InputInterface";
-import { FormComponent, FormComponentType } from "../FormBuilder";
+import { FormComponent, FormComponentType } from "../FormBuilder.types";
 
 export const getNextOptionName = (options: Option[]) => {
   let num = options.length + 1;

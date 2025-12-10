@@ -1,5 +1,5 @@
 "use client";
-import { FormComponentType } from "../Forms/FormBuilder";
+import { FormComponentType } from "../Forms/FormBuilder.types";
 import InputInterface from "./InputInterface";
 import Legend from "./Legend";
 import RadioBox, { RadioBoxProps } from "./RadioBox";

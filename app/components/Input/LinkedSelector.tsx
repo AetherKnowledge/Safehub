@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { FormComponentType } from "../Forms/FormBuilder";
+import { FormComponentType } from "../Forms/FormBuilder.types";
 import FormComponentBG from "../Forms/FormComponentBG";
 import InputInterface, { Option } from "./InputInterface";
 import Legend from "./Legend";

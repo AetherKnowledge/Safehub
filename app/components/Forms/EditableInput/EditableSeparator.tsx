@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FormComponent, FormComponentType } from "../FormBuilder";
+import { FormComponent, FormComponentType } from "../FormBuilder.types";
 import Separator, { BaseSeparator, SeparatorProps } from "../Separator";
 import BottomActionRow from "./BottomActionRow";
 import EditableFormComponentBG from "./EditableFormComponentBG";

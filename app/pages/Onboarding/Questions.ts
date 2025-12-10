@@ -1,7 +1,7 @@
 import {
   FormComponent,
   FormComponentType,
-} from "@/app/components/Forms/FormBuilder";
+} from "@/app/components/Forms/FormBuilder.types";
 import { HorizontalBoxItem } from "@/app/components/Input/HorizontalItemsBox";
 import { Option } from "@/app/components/Input/InputInterface";
 import { LinkedOption } from "@/app/components/Input/LinkedSelector";

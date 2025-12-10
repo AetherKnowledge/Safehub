@@ -5,7 +5,7 @@ import { RadioBoxProps } from "../../Input/RadioBox";
 import SelectBox, { SelectBoxProps } from "../../Input/SelectBox";
 import TextArea from "../../Input/TextArea";
 import TextBox from "../../Input/TextBox";
-import { FormComponent, FormComponentType } from "../FormBuilder";
+import { FormComponent, FormComponentType } from "../FormBuilder.types";
 import BottomActionRow from "./BottomActionRow";
 import EditableDateSelector from "./EditableDateSelector";
 import EditableDateTimeSelector from "./EditableDateTimeSelector";

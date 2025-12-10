@@ -7,7 +7,7 @@ import EditableFormComponent from "./EditableInput/EditableFormComponent";
 import EditableHeader from "./EditableInput/EditableHeader";
 import { createFormComponent } from "./EditableInput/utils";
 import FormBG from "./FormBG";
-import { FormComponent, FormComponentType } from "./FormBuilder";
+import { FormComponent, FormComponentType } from "./FormBuilder.types";
 import FormComponentBG from "./FormComponentBG";
 import { FormsHeaderProps } from "./FormsHeader";
 

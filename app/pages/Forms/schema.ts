@@ -1,5 +1,5 @@
 import { BuiltFormData } from "@/app/components/Forms/EditableFormBuilder";
-import { FormComponentType } from "@/app/components/Forms/FormBuilder";
+import { FormComponentType } from "@/app/components/Forms/FormBuilder.types";
 import { DateSelectorProps } from "@/app/components/Input/Date/DateSelector";
 import { DateTimeSelectorProps } from "@/app/components/Input/Date/DateTimeSelector";
 import { TimeSelectorProps } from "@/app/components/Input/Date/TimeSelector";

@@ -24,7 +24,7 @@ const HotlinePage = ({
   return (
     <div className="flex flex-col flex-1 gap-4 p-1 min-h-0">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gradient-to-r from-base-100 to-base-200/50 p-5 rounded-xl shadow-xl border border-base-content/5 backdrop-blur-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-linear-to-r from-base-100 to-base-200/50 p-5 rounded-xl shadow-xl border border-base-content/5 backdrop-blur-sm">
         <div className="flex-1 w-full sm:w-auto">
           <label className="input input-bordered flex items-center gap-2 w-full bg-base-100 border-base-content/10 focus-within:border-primary transition-all">
             <IoIosSearch className="text-xl text-base-content/60" />
@@ -65,7 +65,7 @@ const HotlinePage = ({
       </div>
 
       {/* Content Section */}
-      <div className="flex flex-1 bg-gradient-to-br from-base-100 to-base-200 p-5 rounded-xl overflow-y-auto shadow-xl border border-base-content/5 min-h-0">
+      <div className="flex flex-1 bg-linear-to-br from-base-100 to-base-200 p-5 rounded-xl overflow-y-auto shadow-xl border border-base-content/5 min-h-0">
         {filteredHotlines.length === 0 ? (
           <div className="flex flex-col items-center justify-center w-full h-full gap-4 text-center">
             <div className="p-6 bg-base-300/20 rounded-full">

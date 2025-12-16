@@ -91,7 +91,7 @@ const Staff = () => {
   return (
     <section
       id="staff"
-      className="relative py-16 md:py-24 bg-gradient-to-br from-primary via-primary to-primary/90 text-primary-content overflow-hidden"
+      className="relative py-16 md:py-24 bg-linear-to-br from-primary via-primary to-primary/90 text-primary-content overflow-hidden"
     >
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 opacity-10">
@@ -125,7 +125,7 @@ const Staff = () => {
               Meet the Team
             </span>
           </motion.div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary-content to-primary-content/80">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-r from-primary-content to-primary-content/80">
             SWS Staff Members
           </h2>
           <p className="mt-4 max-w-3xl mx-auto text-base md:text-lg text-primary-content/90 leading-relaxed">
@@ -184,7 +184,7 @@ const Staff = () => {
                       <figure className="pt-8 px-8">
                         <div className="relative w-32 h-32 flex items-center justify-center">
                           <div
-                            className={`absolute inset-0 bg-gradient-to-br from-primary to-primary/60 rounded-full blur-xl opacity-30 ${
+                            className={`absolute inset-0 bg-linear-to-br from-primary to-primary/60 rounded-full blur-xl opacity-30 ${
                               isCenter ? "scale-110" : "scale-100"
                             } transition-transform duration-500`}
                           />
@@ -246,7 +246,7 @@ const Staff = () => {
               >
                 <figure className="pt-8 px-8">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/60 rounded-full blur-xl opacity-30" />
+                    <div className="absolute inset-0 bg-linear-to-br from-primary to-primary/60 rounded-full blur-xl opacity-30" />
                     <img
                       src={staffMembers[activeIndex].src}
                       alt={staffMembers[activeIndex].name}

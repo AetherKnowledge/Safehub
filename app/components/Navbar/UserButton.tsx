@@ -24,7 +24,7 @@ const UserButton = async () => {
 
 const LoadingUserButton = () => {
   return (
-    <div className="flex items-center gap-2 hover:cursor-pointer bg-gradient-to-r from-base-100 to-base-200/50 shadow-xl rounded-xl border border-base-content/5 p-3 backdrop-blur-sm">
+    <div className="flex items-center gap-2 hover:cursor-pointer bg-linear-to-r from-base-100 to-base-200/50 shadow-xl rounded-xl border border-base-content/5 p-3 backdrop-blur-sm">
       <div className="animate-pulse flex items-center gap-2">
         <div className="w-10 h-10 rounded-full bg-base-300"></div>
         <div className="flex flex-col gap-1">
@@ -44,7 +44,7 @@ const AuthenticatedUserButton = (session: Session) => {
   }
 
   return (
-    <div className="flex flex-row bg-gradient-to-r from-base-100 to-base-200/50 shadow-xl rounded-xl border border-base-content/5 items-center justify-center backdrop-blur-sm">
+    <div className="flex flex-row bg-linear-to-r from-base-100 to-base-200/50 shadow-xl rounded-xl border border-base-content/5 items-center justify-center backdrop-blur-sm">
       <div className="relative dropdown" role="button" tabIndex={0}>
         <div className="flex flex-row gap-3 items-center justify-center p-3 min-w-max">
           <UserImage

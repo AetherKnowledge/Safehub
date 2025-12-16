@@ -77,7 +77,7 @@ const About = () => {
             SafeHub is a capstone project built for La Consolacion University
             Philippines (LCUP) to streamline the student counseling and
             development process. It gives students a safe, convenient way to
-            connect with Social Welfare Services wherever they are.
+            connect with Student Welfare Services wherever they are.
           </p>
 
           <div className="grid gap-4 md:grid-cols-2">

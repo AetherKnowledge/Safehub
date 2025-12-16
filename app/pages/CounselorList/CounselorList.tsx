@@ -11,7 +11,7 @@ const CounselorList = () => {
   return (
     <div className="flex flex-col flex-1 gap-4 min-h-0">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 rounded-xl shadow-md border border-base-content/5">
+      <div className="bg-linear-to-r from-primary/10 via-primary/5 to-transparent p-6 rounded-xl shadow-md border border-base-content/5">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-1 h-8 bg-primary rounded-full"></div>
           <div>
@@ -48,7 +48,7 @@ const CounselorList = () => {
       </div>
 
       {/* Table Container */}
-      <div className="flex-1 bg-gradient-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl min-h-0 border border-base-content/5 overflow-hidden">
+      <div className="flex-1 bg-linear-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl min-h-0 border border-base-content/5 overflow-hidden">
         <CounselorsTable name={name ?? undefined} />
       </div>
     </div>

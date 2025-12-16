@@ -43,7 +43,7 @@ const AppointmentsPage = async ({
     <>
       <div className="flex flex-col gap-4 flex-1 min-h-0 p-1">
         {/* Main Content Card */}
-        <div className="flex flex-col bg-gradient-to-br from-base-100 to-base-200 shadow-xl rounded-xl border border-base-content/5 flex-1 min-h-0 overflow-hidden">
+        <div className="flex flex-col bg-linear-to-br from-base-100 to-base-200 shadow-xl rounded-xl border border-base-content/5 flex-1 min-h-0 overflow-hidden">
           <AppointmentHeader />
           <div className="flex-1 min-h-0 overflow-auto flex flex-col">
             {viewMode === ViewMode.CALENDAR && (

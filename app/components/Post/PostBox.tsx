@@ -29,7 +29,7 @@ const PostBox = ({
       className={`card ${
         isPopup
           ? "bg-base-100 w-full h-full flex flex-col"
-          : "bg-gradient-to-br from-base-100 to-base-200/20 min-w-[400px]"
+          : "bg-linear-to-br from-base-100 to-base-200/20 min-w-[400px]"
       } w-full ${
         isPopup ? "" : maxHeight
       } overflow-hidden transition-all duration-300 ${

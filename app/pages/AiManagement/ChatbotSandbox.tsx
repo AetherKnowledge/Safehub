@@ -27,7 +27,7 @@ const ChatbotSandbox = () => {
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      <div className="p-4 bg-gradient-to-r from-primary/5 to-primary/10">
+      <div className="p-4 bg-linear-to-r from-primary/5 to-primary/10">
         <h2 className="text-center text-lg font-bold">ChatBot Sandbox</h2>
       </div>
       <Divider />

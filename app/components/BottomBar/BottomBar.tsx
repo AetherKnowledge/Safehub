@@ -54,7 +54,7 @@ const BottomBar = () => {
   const items = getItemsForRole(data?.user?.type ?? null);
 
   return (
-    <nav className="lg:hidden bg-gradient-to-r from-base-100 to-base-200/50 rounded-xl shadow-xl border border-base-content/5 z-20 backdrop-blur-sm">
+    <nav className="lg:hidden bg-linear-to-r from-base-100 to-base-200/50 rounded-xl shadow-xl border border-base-content/5 z-20 backdrop-blur-sm">
       <ul className="flex items-center justify-center gap-1 overflow-x-auto px-2 py-2">
         {items.map(({ href, Icon, label }) => {
           const active = pathname?.startsWith(href);

@@ -34,7 +34,7 @@ export function ChatBox({ chat }: { chat: ChatData }) {
   };
 
   return (
-    <div className="flex flex-col rounded-xl w-full h-full bg-gradient-to-br from-base-100 to-base-200 overflow-hidden shadow-xl border border-base-content/5">
+    <div className="flex flex-col rounded-xl w-full h-full bg-linear-to-br from-base-100 to-base-200 overflow-hidden shadow-xl border border-base-content/5">
       <div className="bg-base-100/50 border-b border-base-content/5">
         <ChatHeader chat={chat} />
       </div>

@@ -68,7 +68,7 @@ const Dashboard = () => {
 
           {/* Mood Chart - Always visible on desktop, tab on mobile */}
           <div
-            className={`bg-gradient-to-br from-base-100 to-base-200/50 rounded-xl p-6 w-full flex flex-col shadow-xl border border-base-content/5 flex-1 min-h-0 ${
+            className={`bg-linear-to-br from-base-100 to-base-200/50 rounded-xl p-6 w-full flex flex-col shadow-xl border border-base-content/5 flex-1 min-h-0 ${
               activeTab === "mood" ? "flex" : "hidden xl:flex"
             }`}
           >
@@ -88,7 +88,7 @@ const Dashboard = () => {
 
           {/* Appointment Statistics Card - Always visible on desktop, tab on mobile */}
           <div
-            className={`bg-gradient-to-br from-base-100 to-base-200/50 rounded-xl p-6 shadow-xl border border-base-content/5 flex flex-col flex-1 min-h-0 ${
+            className={`bg-linear-to-br from-base-100 to-base-200/50 rounded-xl p-6 shadow-xl border border-base-content/5 flex flex-col flex-1 min-h-0 ${
               activeTab === "appointments" ? "flex" : "hidden xl:flex"
             }`}
           >
@@ -108,7 +108,7 @@ const Dashboard = () => {
         </div>
 
         {/* Right Side - Logs Table (50% on desktop) */}
-        <div className="bg-gradient-to-br from-base-100 to-base-200/50 rounded-xl shadow-xl border border-base-content/5 overflow-hidden flex flex-col xl:w-1/2 min-h-0 flex-1">
+        <div className="bg-linear-to-br from-base-100 to-base-200/50 rounded-xl shadow-xl border border-base-content/5 overflow-hidden flex flex-col xl:w-1/2 min-h-0 flex-1">
           <div className="p-5 border-b border-base-content/5">
             <div className="flex items-center gap-3">
               <div className="w-1 h-6 bg-primary rounded-full"></div>

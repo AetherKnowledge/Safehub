@@ -27,7 +27,7 @@ const AiManagementTab = ({
         {icon}
         {title}
       </label>
-      <div className="tab-content bg-gradient-to-br from-base-100 to-base-200/50 border-base-300 p-0 shadow-xl h-full min-h-0 overflow-hidden">
+      <div className="tab-content bg-linear-to-br from-base-100 to-base-200/50 border-base-300 p-0 shadow-xl h-full min-h-0 overflow-hidden">
         <div className="flex flex-col h-full min-h-0">{children}</div>
       </div>
     </>

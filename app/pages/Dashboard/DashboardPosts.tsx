@@ -19,7 +19,7 @@ const DashboardPosts = async ({
   return (
     <div className="flex flex-col min-w-0 w-full max-w-2xl gap-4 flex-1 min-h-0">
       {/* Post Header */}
-      <div className="flex flex-row justify-between items-center bg-gradient-to-r from-primary/10 via-primary/5 to-transparent shadow-md rounded-xl px-6 py-4 w-full border border-base-content/5">
+      <div className="flex flex-row justify-between items-center bg-linear-to-r from-primary/10 via-primary/5 to-transparent shadow-md rounded-xl px-6 py-4 w-full border border-base-content/5">
         <div className="flex items-center gap-3">
           <div className="w-1 h-8 bg-primary rounded-full"></div>
           <p className="text-base-content font-bold text-2xl">Newsfeed</p>
@@ -31,7 +31,7 @@ const DashboardPosts = async ({
       </div>
 
       {/* Post Content */}
-      <div className="flex flex-col bg-gradient-to-br from-base-100 to-base-200/30 shadow-xl rounded-xl overflow-y-auto flex-1 min-h-0 w-full border border-base-content/5">
+      <div className="flex flex-col bg-linear-to-br from-base-100 to-base-200/30 shadow-xl rounded-xl overflow-y-auto flex-1 min-h-0 w-full border border-base-content/5">
         {posts.length > 0 ? (
           posts.map((post, index) => (
             <div key={post.id} className="inline w-full">

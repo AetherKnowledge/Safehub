@@ -47,10 +47,10 @@ const Settings = ({ user }: { user: SettingsUser }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col w-full h-full gap-0 bg-gradient-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl overflow-y-auto"
+      className="flex flex-col w-full h-full gap-0 bg-linear-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl overflow-y-auto"
     >
       {/* Profile Header */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 border-b border-base-content/5">
+      <div className="bg-linear-to-r from-primary/10 via-primary/5 to-transparent p-6 border-b border-base-content/5">
         <div className="flex flex-row items-center gap-4">
           <div className="relative">
             <UserImage

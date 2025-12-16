@@ -45,7 +45,7 @@ const ChatSidebar = ({
 
   return (
     <div
-      className={`flex min-w-0 flex-1 flex-col bg-gradient-to-br from-base-100 to-base-200 shadow-xl rounded-xl overflow-hidden border border-base-content/5 ${
+      className={`flex min-w-0 flex-1 flex-col bg-linear-to-br from-base-100 to-base-200 shadow-xl rounded-xl overflow-hidden border border-base-content/5 ${
         chatId ? "hidden xl:flex xl:max-w-80" : ""
       } `}
     >

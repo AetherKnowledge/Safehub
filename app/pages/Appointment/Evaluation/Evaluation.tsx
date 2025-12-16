@@ -14,7 +14,7 @@ const Evaluation = async () => {
     <div className="flex flex-col gap-4 flex-1 min-h-0">
       {/* Rating Summary Card */}
       <div className="flex flex-col xl:flex-row gap-4">
-        <div className="flex flex-col bg-gradient-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl p-6 gap-3 w-full border border-base-content/5">
+        <div className="flex flex-col bg-linear-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl p-6 gap-3 w-full border border-base-content/5">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1 h-8 bg-primary rounded-full"></div>
             <div>
@@ -37,7 +37,7 @@ const Evaluation = async () => {
       </div>
 
       {/* Evaluation Table */}
-      <div className="flex flex-1 bg-gradient-to-br from-base-100 to-base-200/50 rounded-xl shadow-xl min-h-0 border border-base-content/5">
+      <div className="flex flex-1 bg-linear-to-br from-base-100 to-base-200/50 rounded-xl shadow-xl min-h-0 border border-base-content/5">
         <EvaluationTable evaluationData={result.data || []} />
       </div>
     </div>

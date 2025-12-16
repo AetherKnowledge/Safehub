@@ -155,30 +155,47 @@ export function useCalling() {
 
       return peer;
     },
-    [currentCall, setPeers]
+    [currentCall, setPeers, peers]
   );
 
   const getMediaStream = useCallback(async () => {
     if (localStream) {
-      return localStream; // Return existing stream if available
+      return localStream;
     }
 
     try {
+      // 1️⃣ Try camera + mic first
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: {
           width: { min: 640, ideal: 1280, max: 1920 },
           height: { min: 480, ideal: 720, max: 1080 },
-          facingMode: "user", // Use "user" for front camera, "environment" for back camera
+          facingMode: "user",
         },
       });
 
       setLocalStream(stream);
-      return stream; // Return the new stream
-    } catch (error) {
-      console.error("Error accessing media devices.", error);
-      setLocalStream(null);
-      return null;
+      return stream;
+    } catch (videoError) {
+      console.warn(
+        "Camera not available, falling back to mic only.",
+        videoError
+      );
+
+      try {
+        // 2️⃣ Fallback to mic only
+        const audioStream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: false,
+        });
+
+        setLocalStream(audioStream);
+        return audioStream;
+      } catch (audioError) {
+        console.error("Error accessing microphone.", audioError);
+        setLocalStream(null);
+        return null;
+      }
     }
   }, [localStream]);
 

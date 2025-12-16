@@ -13,7 +13,7 @@ type HotlineBarProps = {
 const HotlineBar = ({ className }: HotlineBarProps) => {
   return (
     <div
-      className={`${className} bg-linear-to-br from-base-100 to-base-200/50 p-5 rounded-xl shadow-xl text-left text-base-content border border-base-content/5`}
+      className={`${className} bg-linear-to-br from-base-100 to-base-200/50 p-5 rounded-xl text-left text-base-content border border-base-content/5`}
     >
       <div className="flex items-center gap-3 mb-4">
         <div className="w-1 h-6 bg-primary rounded-full"></div>

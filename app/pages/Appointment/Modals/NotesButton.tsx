@@ -39,7 +39,7 @@ const NotesButton = ({ appointment }: { appointment: AppointmentData }) => {
             <CloseButton onClick={() => setShowModal(false)} />
             <div className="flex flex-col h-full">
               {/* Header */}
-              <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/5 p-6 pb-4">
+              <div className="bg-linear-to-r from-primary/10 via-primary/5 to-primary/5 p-6 pb-4">
                 <div className="flex flex-col gap-2">
                   <h2 className="text-2xl font-bold text-primary">Notes</h2>
                   <p className="text-sm text-base-content/70 text-wrap">

@@ -56,7 +56,7 @@ const VideoCallNotes = ({
   return (
     <div className="h-full bg-base-100 border-l border-base-300 flex flex-col w-full">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/5 p-4 flex items-center justify-between border-b border-base-300">
+      <div className="bg-linear-to-r from-primary/10 via-primary/5 to-primary/5 p-4 flex items-center justify-between border-b border-base-300">
         <div className="flex flex-col">
           <h3 className="text-lg font-bold text-primary">Notes</h3>
           <p className="text-xs text-base-content/60 mt-2">

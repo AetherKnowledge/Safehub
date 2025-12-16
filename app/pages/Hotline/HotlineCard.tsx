@@ -41,7 +41,7 @@ const HotlineCard = ({
   }
 
   return (
-    <div className="card rounded-xl bg-gradient-to-br from-base-100 to-base-200/50 shadow-xl border border-base-content/5 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] h-full flex flex-col">
+    <div className="card rounded-xl bg-linear-to-br from-base-100 to-base-200/50 shadow-xl border border-base-content/5 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] h-full flex flex-col">
       <figure className="pt-6 px-6">
         {hotline.image ? (
           <div className="w-32 h-32 mb-2 rounded-full overflow-hidden ring-4 ring-primary/20 ring-offset-2 ring-offset-base-100">

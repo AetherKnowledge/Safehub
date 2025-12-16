@@ -52,8 +52,8 @@ const TermsAndConditionsModal = ({ onClose }: { onClose?: () => void }) => {
               Terms & Conditions
             </h2>
             <p className="mt-1 text-xs sm:text-sm text-base-content/70 max-w-xl">
-              Please review how SafeHub works, what it can and cannot do, and your
-              responsibilities as a user.
+              Please review how SafeHub works, what it can and cannot do, and
+              your responsibilities as a user.
             </p>
           </div>
           <button
@@ -66,8 +66,7 @@ const TermsAndConditionsModal = ({ onClose }: { onClose?: () => void }) => {
         </div>
 
         <div className="px-5 py-3 overflow-y-auto flex-1">
-          <div className={`prose prose-sm max-w-none text-base-content`}
-          >
+          <div className={`prose prose-sm max-w-none text-base-content`}>
             <ReactMarkdown>
               {`# SafeHub – Terms and Conditions
 
@@ -77,7 +76,7 @@ Welcome to SafeHub. By accessing or using this platform, you agree to the follow
 
 ## 1. Purpose
 
-SafeHub is an AI-powered platform designed to provide general mental health information, educational resources, and links to social welfare support services.  
+SafeHub is an AI-powered platform designed to provide general mental health information, educational resources, and links to student welfare support services.  
 **SafeHub does not provide medical advice, diagnosis, therapy, counseling, or emergency intervention.**
 
 ---

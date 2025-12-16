@@ -30,7 +30,7 @@ const Hero = () => {
           objectFit="cover"
           fill
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-slate-800/60" />
+        <div className="absolute inset-0 bg-linear-to-r from-black/90 via-black/70 to-slate-800/60" />
         <motion.div
           className="absolute -right-40 -top-40 w-96 h-96 rounded-full bg-blue-500/30 blur-3xl"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -57,12 +57,12 @@ const Hero = () => {
             variants={itemVariants}
             className="mb-3 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-6 py-1 text-xs font-medium tracking-[0.2em] uppercase backdrop-blur-sm"
           >
-            LCUP · Social Welfare Services
+            LCUP · Student Welfare Services
           </motion.p>
 
           <motion.h1
             variants={itemVariants}
-            className="heading-step-1 font-extrabold leading-tight drop-shadow-lg bg-gradient-to-r from-sky-300 to-emerald-300 bg-clip-text text-transparent"
+            className="heading-step-1 font-extrabold leading-tight drop-shadow-lg bg-linear-to-r from-sky-300 to-emerald-300 bg-clip-text text-transparent"
           >
             Need someone
             <br />
@@ -96,7 +96,7 @@ const Hero = () => {
           transition={{ duration: 0.7, ease: "easeOut" }}
         >
           <div className="relative w-[clamp(18rem,28vw,26rem)]">
-            <div className="absolute -inset-6 rounded-3xl bg-gradient-to-br from-sky-400/40 to-emerald-400/40 blur-2xl" />
+            <div className="absolute -inset-6 rounded-3xl bg-linear-to-br from-sky-400/40 to-emerald-400/40 blur-2xl" />
             <div className="relative rounded-3xl bg-white/5 border border-white/15 backdrop-blur-xl p-6 shadow-2xl flex items-center justify-center">
               <SafehubIcon className="w-full" />
             </div>

@@ -26,7 +26,7 @@ const ChatsPage = async ({ chatId }: ChatsPageProps) => {
       {chatForSelectedId && <ChatBox chat={chatForSelectedId} />}
 
       {!chatForSelectedId && (
-        <div className="hidden xl:flex flex-1 items-center justify-center bg-gradient-to-br from-base-100 to-base-200 rounded-xl border border-base-content/5 shadow-xl">
+        <div className="hidden xl:flex flex-1 items-center justify-center bg-linear-to-br from-base-100 to-base-200 rounded-xl border border-base-content/5 shadow-xl">
           <div className="flex flex-col items-center gap-4 p-8 text-center">
             <div className="p-6 bg-primary/10 rounded-full">
               <svg

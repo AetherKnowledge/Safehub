@@ -44,7 +44,7 @@ const ImageGrid = ({
                 >
                   <ImageBox src={img} alt={`Image ${i + 1}`} />
                   {isThirdWithExtra && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-black/60 to-black/80 flex items-center justify-center hover:from-black/70 hover:to-black/90 transition-all duration-300 cursor-pointer backdrop-blur-sm">
+                    <div className="absolute inset-0 bg-linear-to-br from-black/60 to-black/80 flex items-center justify-center hover:from-black/70 hover:to-black/90 transition-all duration-300 cursor-pointer backdrop-blur-sm">
                       <div className="text-center">
                         <span className="text-white text-3xl font-bold block">
                           +{images.length - 4}

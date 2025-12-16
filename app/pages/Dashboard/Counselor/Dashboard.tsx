@@ -25,7 +25,7 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
 
         <div className="flex-col gap-4 hidden 2xl:flex min-w-[420px]">
           {/* Upcoming Appointments Card */}
-          <div className="flex flex-col bg-gradient-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl p-5 gap-3 w-full flex-1 min-h-30 border border-base-content/5">
+          <div className="flex flex-col bg-linear-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl p-5 gap-3 w-full flex-1 min-h-30 border border-base-content/5">
             <div className="flex items-center gap-3">
               <div className="w-1 h-6 bg-primary rounded-full"></div>
               <h2 className="font-bold text-lg">Upcoming Appointments</h2>
@@ -38,7 +38,7 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
           </div>
 
           {/* Student Mood Tracker Card */}
-          <div className="bg-gradient-to-br from-base-100 to-base-200/50 rounded-xl p-5 w-full flex flex-col h-[420px] shadow-xl border border-base-content/5">
+          <div className="bg-linear-to-br from-base-100 to-base-200/50 rounded-xl p-5 w-full flex flex-col h-[420px] shadow-xl border border-base-content/5">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-1 h-6 bg-primary rounded-full"></div>
               <div>
@@ -54,7 +54,7 @@ const Dashboard = async ({ searchParams: { sortBy, order } }: Props) => {
           </div>
 
           {/* Appointment Statistics Card */}
-          <div className="flex flex-col bg-gradient-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl p-5 gap-3 w-full border border-base-content/5 h-[420px]">
+          <div className="flex flex-col bg-linear-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl p-5 gap-3 w-full border border-base-content/5 h-[420px]">
             <div className="flex items-center gap-3">
               <div className="w-1 h-6 bg-primary rounded-full"></div>
               <div>

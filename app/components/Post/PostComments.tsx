@@ -71,7 +71,7 @@ const PostComments = ({
       {/* Comments */}
       <Divider />
       <div className="bg-base-200/20 rounded-lg my-2 border border-base-content/5 h-full">
-        <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/5 to-transparent border-b border-base-content/5">
+        <div className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-primary/5 to-transparent border-b border-base-content/5">
           <svg
             className="w-4 h-4 text-primary"
             fill="none"

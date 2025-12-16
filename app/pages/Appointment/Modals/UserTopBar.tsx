@@ -32,7 +32,7 @@ const UserTopBar = ({
   };
 
   return (
-    <div className="flex flex-row gap-5 items-center text-left w-full bg-gradient-to-r from-primary/10 via-primary/5 to-primary/5 p-6 pb-4">
+    <div className="flex flex-row gap-5 items-center text-left w-full bg-linear-to-r from-primary/10 via-primary/5 to-primary/5 p-6 pb-4">
       <UserImage
         src={userImgSrc || undefined}
         name={userName || userEmail.split("@")[0] || "Unknown"}

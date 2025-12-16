@@ -12,12 +12,12 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
   const weekDates = getWeekDates(date);
 
   return (
-    <div className="bg-gradient-to-br from-base-100 to-base-200/50 flex-1 min-h-0 shadow-xl border border-base-300/50 flex flex-col overflow-hidden">
+    <div className="bg-linear-to-br from-base-100 to-base-200/50 flex-1 min-h-0 shadow-xl border border-base-300/50 flex flex-col overflow-hidden">
       {/* Horizontal scroll wrapper */}
       <div className="overflow-x-auto flex-1 min-h-0 flex flex-col">
         <div className="min-w-[800px] flex-1 flex flex-col">
           {/* Calendar Grid */}
-          <div className="flex bg-gradient-to-r from-base-200/80 to-base-200/50 border-b border-base-300 flex-shrink-0">
+          <div className="flex bg-linear-to-r from-base-200/80 to-base-200/50 border-b border-base-300 flex-shrink-0">
             <div className="w-16 flex-shrink-0 p-2"></div>{" "}
             {/* Empty cell for time column - matches body */}
             <div className="flex-1 flex">
@@ -31,7 +31,7 @@ const WeeklyCalendar = ({ date }: { date: Date }) => {
                     key={day}
                     className={`flex-1 min-w-[100px] p-2 text-center border-l border-base-300 transition-colors ${
                       isToday
-                        ? "bg-gradient-to-br from-primary to-primary/80 shadow-inner"
+                        ? "bg-linear-to-br from-primary to-primary/80 shadow-inner"
                         : "hover:bg-base-200/50"
                     }`}
                   >

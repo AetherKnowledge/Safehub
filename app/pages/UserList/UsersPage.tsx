@@ -10,7 +10,7 @@ const RegisteredUsersTable = () => {
   return (
     <div className="flex flex-col flex-1 min-h-0 gap-4">
       {/* Main Content Card */}
-      <div className="flex flex-col flex-1 bg-gradient-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl border border-base-content/5 overflow-hidden min-h-0">
+      <div className="flex flex-col flex-1 bg-linear-to-br from-base-100 to-base-200/50 shadow-xl rounded-xl border border-base-content/5 overflow-hidden min-h-0">
         {/* Search and Filters */}
         <div className="p-3 md:p-5 border-b border-base-content/5 bg-base-100/50">
           <div className="flex flex-row gap-2 md:gap-3">

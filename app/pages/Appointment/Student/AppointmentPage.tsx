@@ -31,7 +31,7 @@ const AppointmentPage = async ({ appointmentId, status = "all" }: Props) => {
         {/* Top Cards Section */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           {/* Today's Appointments Card */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-base-100 to-base-200 shadow-xl rounded-xl border border-base-content/5">
+          <div className="relative overflow-hidden bg-linear-to-br from-base-100 to-base-200 shadow-xl rounded-xl border border-base-content/5">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16"></div>
             <div className="relative p-5">
               <div className="flex items-center gap-3 mb-4">
@@ -45,7 +45,7 @@ const AppointmentPage = async ({ appointmentId, status = "all" }: Props) => {
           </div>
 
           {/* Book Appointment Card */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-base-100 to-secondary/5 shadow-xl rounded-xl border border-primary/10">
+          <div className="relative overflow-hidden bg-linear-to-br from-primary/5 via-base-100 to-secondary/5 shadow-xl rounded-xl border border-primary/10">
             <div className="absolute bottom-0 right-0 w-40 h-40 bg-secondary/5 rounded-full -mr-20 -mb-20"></div>
             <div className="relative p-5 flex flex-col justify-between h-full">
               <div>
@@ -71,7 +71,7 @@ const AppointmentPage = async ({ appointmentId, status = "all" }: Props) => {
         </div>
 
         {/* Booking History Section */}
-        <div className="flex flex-col bg-gradient-to-br from-base-100 to-base-200 rounded-xl shadow-xl border border-base-content/5 flex-1 min-h-0">
+        <div className="flex flex-col bg-linear-to-br from-base-100 to-base-200 rounded-xl shadow-xl border border-base-content/5 flex-1 min-h-0">
           <div className="p-5 border-b border-base-content/5">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>

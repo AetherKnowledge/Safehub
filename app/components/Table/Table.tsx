@@ -55,7 +55,7 @@ const Table = ({
   }, [rows.length, perPage, currentPage, containerRef.current]);
 
   return (
-    <div className="flex-1 flex h-full flex-col bg-gradient-to-br from-base-100 to-base-200/30 shadow-xl rounded-xl rounded-t-none min-h-0 overflow-hidden border border-base-content/5">
+    <div className="flex-1 flex h-full flex-col bg-linear-to-br from-base-100 to-base-200/30 shadow-xl rounded-xl rounded-t-none min-h-0 overflow-hidden border border-base-content/5">
       {topActions && <TableTopActions />}
 
       <div className="flex-1 flex flex-col text-center overflow-x-auto min-h-0">

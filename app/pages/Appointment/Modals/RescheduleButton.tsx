@@ -98,7 +98,7 @@ const RescheduleButton = ({
         <ModalBase onClose={() => setShowModal(false)}>
           <div className="flex flex-col bg-base-100 rounded-2xl shadow-2xl text-base-content max-w-lg overflow-hidden">
             {/* Header */}
-            <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/5 p-6">
+            <div className="bg-linear-to-r from-primary/10 via-primary/5 to-primary/5 p-6">
               <h2 className="font-bold text-2xl text-primary">
                 Reschedule Appointment
               </h2>

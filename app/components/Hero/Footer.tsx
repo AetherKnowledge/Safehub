@@ -14,7 +14,7 @@ const Footer = () => {
     >
       <div className="flex flex-row items-center gap-2">
         <FaCopyright className="w-4 h-4" />
-        <span>SafeHub · LCUP Social Welfare Services</span>
+        <span>SafeHub · LCUP Student Welfare Services</span>
       </div>
       <p className="text-xs text-base-content/60">
         Built as a capstone project to support student counseling and

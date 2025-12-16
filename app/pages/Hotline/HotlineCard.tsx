@@ -51,6 +51,7 @@ const HotlineCard = ({
               src={hotline.image}
               alt={hotline.name}
               className="object-cover w-full h-full"
+              noErrorText
             />
           </div>
         ) : (

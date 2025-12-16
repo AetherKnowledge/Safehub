@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 
 const UserImage = ({
   name,
@@ -15,6 +18,8 @@ const UserImage = ({
   borderWidth?: number;
   onClick?: () => void;
 }) => {
+  const [hasError, setHasError] = useState(false);
+
   return (
     <div
       className={`relative shrink-0 border rounded-full ${
@@ -31,7 +36,7 @@ const UserImage = ({
       }}
       onClick={onClick}
     >
-      {src ? (
+      {src && !hasError ? (
         <Image
           src={src}
           alt={name ?? "counselor Avatar"}
@@ -40,6 +45,9 @@ const UserImage = ({
               ? "hover:brightness-90 active:brightness-75 cursor-pointer"
               : ""
           }`}
+          onError={(err) => {
+            setHasError(true);
+          }}
           fill
         />
       ) : (

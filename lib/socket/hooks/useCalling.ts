@@ -1,3 +1,6 @@
+"use client";
+
+import { usePopup } from "@/app/components/Popup/PopupProvider";
 import { CallStatus } from "@/app/generated/prisma/browser";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
@@ -24,9 +27,14 @@ export type PeerData = {
 
 // TODO: Fix bug reject call not closing call for caller
 
-// TODO: Add turn server with metered.ca
+interface UseCallingOptions {
+  onCallEnd?: () => void;
+  onCallStart?: () => void;
+  onCallAnswered?: () => void;
+  onMediaError?: () => void;
+}
 
-export function useCalling() {
+export function useCalling(options?: UseCallingOptions) {
   const session = useSession();
   const socket = useSocket().socket;
   const onRecieveData = useSocket().onRecieveData;
@@ -37,6 +45,21 @@ export function useCalling() {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [callMembers, setCallMembers] = useState<string[]>([]);
   const [peers, setPeers] = useState<PeerData[]>([]);
+  const statusPopup = usePopup();
+
+  function reset() {
+    // Destroy all peers
+    peers.forEach((p) => p.peerConnection.destroy());
+    setPeers([]);
+
+    // Existing cleanup logic
+    setCurrentCall(null);
+    if (localStream) {
+      localStream.getTracks().forEach((track) => track.stop());
+      setLocalStream(null);
+    }
+    setCallMembers([]);
+  }
 
   const createPeer = useCallback(
     async (member: string, stream: MediaStream, initiator: boolean) => {
@@ -222,6 +245,8 @@ export function useCalling() {
         `Incoming call from ${data.callerName} in chat ${data.chatId}`
       );
 
+      reset();
+
       // Set the calling state to the received call data
       setCurrentCall(data);
     }
@@ -280,6 +305,11 @@ export function useCalling() {
 
       setCurrentCall(null); // Clear the calling state
       setLocalStream(null); // Clear the local stream
+
+      // Call the onCallEnd callback if provided
+      if (options?.onCallEnd) {
+        options.onCallEnd();
+      }
     }
 
     function sdpHandler(data: SocketSdp) {
@@ -324,6 +354,13 @@ export function useCalling() {
               console.warn(
                 "Failed to get media stream. Cannot handle SDP offer."
               );
+              leaveCall();
+              statusPopup.showError("Cannot access microphone/camera.");
+
+              // Notify parent component of media error
+              if (options?.onMediaError) {
+                options.onMediaError();
+              }
               return;
             }
           }
@@ -375,7 +412,7 @@ export function useCalling() {
       sdpTimers.forEach((timer) => clearTimeout(timer));
       sdpTimers.clear();
     };
-  }, [onRecieveData, socket, peers, createPeer]);
+  }, [onRecieveData, socket, peers, createPeer, options]);
 
   useEffect(() => {
     const unsubscribe = onRecieveError((error) => {
@@ -393,6 +430,9 @@ export function useCalling() {
 
   const initiateCall = useCallback(
     async (chatId: string, recipients: Recipient[], chatName?: string) => {
+      // Clear any existing call state
+      reset();
+
       const stream = await getMediaStream();
       if (!stream) {
         console.warn("No media stream available.");
@@ -425,8 +465,13 @@ export function useCalling() {
       socket.send(JSON.stringify(message));
       setCurrentCall(callData);
       setCallMembers([session.data?.user.id]);
+
+      // Call the onCallStart callback if provided
+      if (options?.onCallStart) {
+        options.onCallStart();
+      }
     },
-    [socket, session, currentCall]
+    [socket, session, currentCall, options]
   );
 
   const answerCall = useCallback(async () => {
@@ -446,6 +491,14 @@ export function useCalling() {
       stream = await getMediaStream();
       if (!stream) {
         console.warn("Failed to get media stream. Cannot handle SDP offer.");
+        statusPopup.showError("Cannot access microphone/camera.");
+        rejectCall();
+        reset();
+
+        // Notify parent component of media error
+        if (options?.onMediaError) {
+          options.onMediaError();
+        }
         return;
       }
     }
@@ -485,7 +538,12 @@ export function useCalling() {
     }
 
     socket.send(JSON.stringify(message));
-  }, [socket, currentCall, peers, callMembers]);
+
+    // Call the onCallAnswered callback if provided
+    if (options?.onCallAnswered) {
+      options.onCallAnswered();
+    }
+  }, [socket, currentCall, peers, callMembers, options]);
 
   const rejectCall = useCallback(() => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -508,6 +566,8 @@ export function useCalling() {
       type: SocketEventType.ANSWERCALL,
       payload: answerData,
     };
+
+    reset();
 
     socket.send(JSON.stringify(message));
   }, [socket, currentCall]);
@@ -533,22 +593,16 @@ export function useCalling() {
       payload: leaveData,
     };
 
-    // Destroy all peers
-    peers.forEach((p) => p.peerConnection.destroy());
-    setPeers([]);
-
-    // Existing cleanup logic
-    setCurrentCall(null);
-    if (localStream) {
-      localStream.getTracks().forEach((track) => track.stop());
-      setLocalStream(null);
-    }
+    reset();
 
     // Send the leave call message to the server
     socket.send(JSON.stringify(message));
-    setCurrentCall(null); // Clear the calling state
-    setLocalStream(null); // Clear the local stream
-  }, [socket, currentCall, localStream, peers]);
+
+    // Call the onCallEnd callback if provided
+    if (options?.onCallEnd) {
+      options.onCallEnd();
+    }
+  }, [socket, currentCall, localStream, peers, options]);
 
   return {
     currentCall,
@@ -557,6 +611,7 @@ export function useCalling() {
     rejectCall,
     leaveCall,
     localStream,
+    setLocalStream,
     peers,
   } as const;
 }

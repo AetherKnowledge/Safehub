@@ -41,8 +41,13 @@ const CallPopup = ({ children }: Props) => {
     rejectCall,
     leaveCall,
     localStream,
+    setLocalStream,
     peers,
-  } = useCalling();
+  } = useCalling({
+    onMediaError: () => {
+      resetPopups();
+    },
+  });
 
   const callPopupContextValue: CallPopupContextType = {
     setVideoPopup: (value: boolean) => {
@@ -159,10 +164,10 @@ const CallPopup = ({ children }: Props) => {
       )}
       {videoPopup && (
         <VideoContainer
-          stream={localStream}
-          isLocalStream={true}
+          localStream={localStream}
           onEndCall={handleLeaveCall}
           peers={peers}
+          onStreamUpdate={setLocalStream}
         />
       )}
       <CallPopupContext.Provider value={callPopupContextValue}>

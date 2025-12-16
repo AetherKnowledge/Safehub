@@ -99,8 +99,8 @@ const AppointmentHeader = () => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 sm:p-6 border-b border-base-content/5 gap-4">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 flex-1">
+    <div className="flex flex-col lg:flex-row lg:items-center lg:p-6 items-start justify-between p-5  border-b border-base-content/5 gap-4">
+      <div className="flex flex-row items-center gap-4 flex-1">
         {/* View Mode Toggle */}
         <div className="inline-flex bg-base-200/50 rounded-xl p-1 shadow-sm border border-base-content/5">
           <button

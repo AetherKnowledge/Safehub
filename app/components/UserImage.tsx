@@ -17,7 +17,7 @@ const UserImage = ({
 }) => {
   return (
     <div
-      className={`relative flex-shrink-0 border rounded-full ${
+      className={`relative shrink-0 border rounded-full ${
         bordered
           ? `border-primary bg-primary`
           : "border-transparent bg-transparent"

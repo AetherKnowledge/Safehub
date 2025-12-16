@@ -12,6 +12,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { cleanN8nAIOutput } from "./ChatbotUtils";
 
 export const ChatBotContext = createContext<Messaging | undefined>(undefined);
 
@@ -156,8 +157,15 @@ export async function sendMessageToChatBot(
     for (const part of parts) {
       try {
         const parsed: ChatBotResponse = JSON.parse(part);
-        fullText += parsed.content || "";
-        if (onChunk) onChunk(parsed);
+        const cleaned = cleanN8nAIOutput(parsed.content || "");
+        fullText += cleaned;
+
+        if (onChunk) {
+          onChunk({
+            ...parsed,
+            content: cleaned,
+          });
+        }
       } catch (err) {
         console.warn("Invalid JSON skipped:", part);
       }

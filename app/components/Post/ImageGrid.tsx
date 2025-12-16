@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import ImageWithFallback from "../Images/ImageWithFallback";
 import NoImage from "../Images/NoImage";
-import ImageBox from "./ImageBox";
 
 const ImageGrid = ({
   images,
@@ -42,7 +42,7 @@ const ImageGrid = ({
                       : "aspect-video"
                   }`}
                 >
-                  <ImageBox src={img} alt={`Image ${i + 1}`} />
+                  <ImageWithFallback src={img} alt={`Image ${i + 1}`} fill />
                   {isThirdWithExtra && (
                     <div className="absolute inset-0 bg-linear-to-br from-black/60 to-black/80 flex items-center justify-center hover:from-black/70 hover:to-black/90 transition-all duration-300 cursor-pointer backdrop-blur-sm">
                       <div className="text-center">
@@ -77,7 +77,7 @@ const ImageGrid = ({
       {images.length > 0 ? (
         <div className="relative w-full h-full flex items-center justify-center">
           <div className="relative w-full h-full rounded-xl overflow-hidden border border-base-content/10 shadow-2xl">
-            <ImageBox
+            <ImageWithFallback
               src={images[currentIndex]}
               alt={`Image ${currentIndex + 1}`}
               isPopup={true}

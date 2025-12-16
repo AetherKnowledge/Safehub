@@ -2,37 +2,39 @@
 
 import { Appointment } from "@/app/generated/prisma/browser";
 import { getAppointmentForCall } from "@/app/pages/Appointment/AppointmentActions";
-import { getUserName } from "@/lib/socket/hooks/CallActions";
 import { PeerData } from "@/lib/socket/hooks/useCalling";
 import { useSession } from "next-auth/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import {
-  FaCompress,
-  FaExpand,
-  FaMicrophone,
-  FaMicrophoneSlash,
-  FaPhoneSlash,
-  FaVideo,
-  FaVideoSlash,
-} from "react-icons/fa";
-import { LuClipboardList } from "react-icons/lu";
+import PeerVideo from "./PeerVideo";
 import VideoCallNotes from "./VideoCallNotes";
+import VideoControls from "./VideoControls";
+import VideoSettings from "./VideoSettings";
 
 interface Props {
-  stream: MediaStream | null;
-  isLocalStream: boolean;
+  localStream: MediaStream | null;
   onEndCall?: () => void;
   peers?: PeerData[];
   visible?: boolean;
+  onStreamUpdate?: (stream: MediaStream) => void;
 }
 
-const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
+const VideoContainer = ({
+  localStream,
+  onEndCall,
+  peers,
+  onStreamUpdate,
+}: Props) => {
+  const hasCamera = localStream
+    ? localStream.getVideoTracks().length > 0
+    : false;
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isMicOn, setIsMicOn] = useState(true);
-  const [isCameraOn, setIsCameraOn] = useState(true);
+  const [isCameraOn, setIsCameraOn] = useState<boolean>(hasCamera || false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isNotesOpen, setIsNotesOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [appointment, setAppointment] = useState<Appointment | null>(null);
@@ -57,13 +59,13 @@ const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
   }, [session.data?.user.id, peers]);
 
   const toggleMic = useCallback(() => {
-    if (stream) {
-      stream.getAudioTracks().forEach((track) => {
+    if (localStream) {
+      localStream.getAudioTracks().forEach((track) => {
         track.enabled = !track.enabled;
       });
       setIsMicOn((prev) => !prev);
     }
-  }, [stream]);
+  }, [localStream]);
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -78,26 +80,30 @@ const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
   }, []);
 
   const toggleCamera = useCallback(() => {
-    if (stream) {
-      stream.getVideoTracks().forEach((track) => {
+    if (localStream) {
+      localStream.getVideoTracks().forEach((track) => {
         track.enabled = !track.enabled;
       });
       setIsCameraOn((prev) => !prev);
     }
-  }, [stream]);
+  }, [localStream]);
 
   const toggleNotes = useCallback(() => {
     setIsNotesOpen((prev) => !prev);
+  }, []);
+
+  const toggleSettings = useCallback(() => {
+    setIsSettingsOpen((prev) => !prev);
   }, []);
 
   const isCounselor = session.data?.user.type === "Counselor";
   const showNotesButton = isCounselor && appointment !== null;
 
   React.useEffect(() => {
-    if (videoRef.current && stream) {
-      videoRef.current.srcObject = stream;
+    if (videoRef.current && localStream) {
+      videoRef.current.srcObject = localStream;
     }
-  }, [stream]);
+  }, [localStream]);
 
   React.useEffect(() => {
     const handleFullscreenChange = () => {
@@ -112,9 +118,9 @@ const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
 
   return createPortal(
     <div
-      className={`fixed inset-0 min-w-0 flex items-center justify-center bg-transparent bg-opacity-50 backdrop-brightness-50 z-[9999]`}
+      className={`fixed inset-0 min-w-0 flex items-center justify-center bg-transparent bg-opacity-50 backdrop-brightness-50 z-9999`}
     >
-      <div className="max-h-[100vh] overflow-y-auto w-full items-center justify-center scrollbar-gutter-stable">
+      <div className="max-h-100vh overflow-y-auto w-full items-center justify-center scrollbar-gutter-stable">
         <div className="flex-1 flex p-5 items-center justify-center">
           <div className="w-full" onClick={(e) => e.stopPropagation()}>
             <div
@@ -151,96 +157,34 @@ const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
                     <div className="flex-1 flex items-center justify-center px-2 sm:px-4 md:px-8 pb-20">
                       <div className="relative w-full aspect-video max-h-[90vh]">
                         {/* Local stream video (small, top-right) */}
-                        {stream && (
+                        {localStream && (
                           <video
                             className="absolute top-3 right-3 w-24 h-16 sm:w-32 sm:h-24 md:w-48 md:h-36 rounded-lg border-2 border-gray-300 z-20 object-cover"
                             autoPlay
                             playsInline
-                            muted={isLocalStream}
+                            muted={true}
                             ref={videoRef}
                           />
                         )}
 
                         {/* Peer videos */}
-                        <div className="absolute inset-0 w-full h-full rounded-lg overflow-hidden">
-                          {peers && peers.length > 0 ? (
-                            <div
-                              className={`grid w-full h-full gap-1 ${
-                                peers.length === 1
-                                  ? "grid-cols-1"
-                                  : peers.length === 2
-                                  ? "grid-cols-2"
-                                  : peers.length <= 4
-                                  ? "grid-cols-2 grid-rows-2"
-                                  : "grid-cols-3 grid-rows-2"
-                              }`}
-                            >
-                              {peers.map((peer, index) => (
-                                <PeerVideo
-                                  key={peer.userId || index}
-                                  peer={peer}
-                                  isMainView={peers.length === 1}
-                                />
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="flex items-center justify-center w-full h-full bg-gray-900">
-                              <p className="text-base-content/70 text-sm">
-                                Waiting for other participants...
-                              </p>
-                            </div>
-                          )}
-                        </div>
+                        <PeerVideos peers={peers || []} />
 
                         {/* Control buttons at bottom center */}
-                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 z-20">
-                          <button
-                            className={`p-2 rounded-full transition-colors duration-300 cursor-pointer ${
-                              isMicOn
-                                ? "bg-green-500 hover:bg-green-600 active:bg-green-700"
-                                : "bg-red-500 hover:bg-red-600 active:bg-red-700"
-                            } text-white`}
-                            onClick={toggleMic}
-                          >
-                            {isMicOn ? <FaMicrophone /> : <FaMicrophoneSlash />}
-                          </button>
-                          <button
-                            className={`p-2 rounded-full transition-colors duration-300 cursor-pointer ${
-                              isCameraOn
-                                ? "bg-green-500 hover:bg-green-600 active:bg-green-700"
-                                : "bg-red-500 hover:bg-red-600 active:bg-red-700"
-                            } text-white`}
-                            onClick={toggleCamera}
-                          >
-                            {isCameraOn ? <FaVideo /> : <FaVideoSlash />}
-                          </button>
-                          <button
-                            className="p-2 rounded-full bg-base-100/80 border border-base-300 hover:bg-base-200 text-base-content transition-colors duration-300 cursor-pointer"
-                            type="button"
-                            onClick={toggleFullscreen}
-                          >
-                            <FaCompress />
-                          </button>
-                          {showNotesButton && (
-                            <button
-                              className={`p-2 rounded-full transition-colors duration-300 cursor-pointer ${
-                                isNotesOpen
-                                  ? "bg-primary text-white hover:bg-primary/80 active:bg-primary/90"
-                                  : "bg-base-100/80 border border-base-300 hover:bg-base-200 text-base-content"
-                              }`}
-                              type="button"
-                              onClick={toggleNotes}
-                            >
-                              <LuClipboardList />
-                            </button>
-                          )}
-                          <button
-                            className="p-2 rounded-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white transition-colors duration-300 cursor-pointer"
-                            onClick={onEndCall}
-                          >
-                            <FaPhoneSlash />
-                          </button>
-                        </div>
+                        <VideoControls
+                          isMicOn={isMicOn}
+                          toggleMic={toggleMic}
+                          isCameraOn={isCameraOn}
+                          toggleCamera={toggleCamera}
+                          toggleSettings={toggleSettings}
+                          toggleFullscreen={toggleFullscreen}
+                          isFullscreen={isFullscreen}
+                          showNotesButton={showNotesButton}
+                          isNotesOpen={isNotesOpen}
+                          toggleNotes={toggleNotes}
+                          onEndCall={() => onEndCall?.()}
+                          hasCamera={hasCamera || false}
+                        />
                       </div>
                     </div>
                   </div>
@@ -286,96 +230,34 @@ const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
 
                     <div className="relative w-full mx-auto aspect-video rounded-2xl border border-base-300 bg-base-200/80 overflow-hidden">
                       {/* Local stream video (small, top-right) */}
-                      {stream && (
+                      {localStream && (
                         <video
                           className="absolute top-2 right-2 w-24 h-16 sm:w-32 sm:h-24 md:w-48 md:h-36 rounded-lg border-2 border-gray-300 z-10 object-cover"
                           autoPlay
                           playsInline
-                          muted={isLocalStream}
+                          muted={true}
                           ref={videoRef}
                         />
                       )}
 
                       {/* Peer videos */}
-                      <div className="absolute inset-0 w-full h-full rounded-lg">
-                        {peers && peers.length > 0 ? (
-                          <div
-                            className={`grid w-full h-full gap-1 ${
-                              peers.length === 1
-                                ? "grid-cols-1"
-                                : peers.length === 2
-                                ? "grid-cols-2"
-                                : peers.length <= 4
-                                ? "grid-cols-2 grid-rows-2"
-                                : "grid-cols-3 grid-rows-2"
-                            }`}
-                          >
-                            {peers.map((peer, index) => (
-                              <PeerVideo
-                                key={peer.userId || index}
-                                peer={peer}
-                                isMainView={peers.length === 1}
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-center w-full h-full bg-gray-100 rounded-lg">
-                            <p className="text-base-content/70">
-                              Waiting for other participants...
-                            </p>
-                          </div>
-                        )}
-                      </div>
+                      <PeerVideos peers={peers || []} />
 
                       {/* Control buttons */}
-                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 z-10">
-                        <button
-                          className={`p-2 rounded-full transition-colors duration-300 cursor-pointer ${
-                            isMicOn
-                              ? "bg-green-500 hover:bg-green-600 active:bg-green-700"
-                              : "bg-red-500 hover:bg-red-600 active:bg-red-700"
-                          } text-white`}
-                          onClick={toggleMic}
-                        >
-                          {isMicOn ? <FaMicrophone /> : <FaMicrophoneSlash />}
-                        </button>
-                        <button
-                          className={`p-2 rounded-full transition-colors duration-300 cursor-pointer ${
-                            isCameraOn
-                              ? "bg-green-500 hover:bg-green-600 active:bg-green-700"
-                              : "bg-red-500 hover:bg-red-600 active:bg-red-700"
-                          } text-white`}
-                          onClick={toggleCamera}
-                        >
-                          {isCameraOn ? <FaVideo /> : <FaVideoSlash />}
-                        </button>
-                        <button
-                          className="p-2 rounded-full bg-base-100/80 border border-base-300 hover:bg-base-200 text-base-content transition-colors duration-300 cursor-pointer"
-                          type="button"
-                          onClick={toggleFullscreen}
-                        >
-                          {isFullscreen ? <FaCompress /> : <FaExpand />}
-                        </button>
-                        {showNotesButton && (
-                          <button
-                            className={`p-2 rounded-full transition-colors duration-300 cursor-pointer ${
-                              isNotesOpen
-                                ? "bg-primary text-white hover:bg-primary/80 active:bg-primary/90"
-                                : "bg-base-100/80 border border-base-300 hover:bg-base-200 text-base-content"
-                            }`}
-                            type="button"
-                            onClick={toggleNotes}
-                          >
-                            <LuClipboardList />
-                          </button>
-                        )}
-                        <button
-                          className="p-2 rounded-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white transition-colors duration-300 cursor-pointer"
-                          onClick={onEndCall}
-                        >
-                          <FaPhoneSlash />
-                        </button>
-                      </div>
+                      <VideoControls
+                        isMicOn={isMicOn}
+                        toggleMic={toggleMic}
+                        isCameraOn={isCameraOn}
+                        toggleCamera={toggleCamera}
+                        toggleSettings={toggleSettings}
+                        toggleFullscreen={toggleFullscreen}
+                        isFullscreen={isFullscreen}
+                        showNotesButton={showNotesButton}
+                        isNotesOpen={isNotesOpen}
+                        toggleNotes={toggleNotes}
+                        onEndCall={() => onEndCall?.()}
+                        hasCamera={hasCamera || false}
+                      />
                     </div>
                   </div>
                   {/* Notes sidebar in normal view */}
@@ -400,53 +282,140 @@ const VideoContainer = ({ stream, isLocalStream, onEndCall, peers }: Props) => {
           </div>
         </div>
       </div>
+      {isSettingsOpen && (
+        <VideoSettings
+          onClose={toggleSettings}
+          stream={localStream}
+          onDeviceChange={async (deviceId, kind) => {
+            if (!localStream) return;
+
+            try {
+              if (kind === "audioinput") {
+                // Get new audio track
+                const newStream = await navigator.mediaDevices.getUserMedia({
+                  audio: { deviceId: { exact: deviceId } },
+                  video: false,
+                });
+
+                const newAudioTrack = newStream.getAudioTracks()[0];
+                const oldAudioTrack = localStream.getAudioTracks()[0];
+
+                // Replace track in all peer connections
+                if (peers) {
+                  for (const peer of peers) {
+                    const senders =
+                      // @ts-expect-error -- access underlying RTCPeerConnection
+                      peer.peerConnection._pc.getSenders() as RTCRtpSender[];
+                    const audioSender = senders.find(
+                      (s) => s.track?.kind === "audio"
+                    );
+                    if (audioSender && newAudioTrack) {
+                      await audioSender.replaceTrack(newAudioTrack);
+                    }
+                  }
+                }
+
+                // Replace in local stream
+                if (oldAudioTrack) {
+                  localStream.removeTrack(oldAudioTrack);
+                  oldAudioTrack.stop();
+                }
+                localStream.addTrack(newAudioTrack);
+
+                // Update video element
+                if (videoRef.current) {
+                  videoRef.current.srcObject = localStream;
+                }
+
+                // Notify parent component
+                if (onStreamUpdate) {
+                  onStreamUpdate(localStream);
+                }
+              } else if (kind === "videoinput") {
+                // Get new video track
+                const newStream = await navigator.mediaDevices.getUserMedia({
+                  video: {
+                    deviceId: { exact: deviceId },
+                    width: { min: 640, ideal: 1280, max: 1920 },
+                    height: { min: 480, ideal: 720, max: 1080 },
+                  },
+                  audio: false,
+                });
+
+                const newVideoTrack = newStream.getVideoTracks()[0];
+                const oldVideoTrack = localStream.getVideoTracks()[0];
+
+                // Replace track in all peer connections
+                if (peers) {
+                  for (const peer of peers) {
+                    const senders =
+                      // @ts-expect-error -- access underlying RTCPeerConnection
+                      peer.peerConnection._pc.getSenders() as RTCRtpSender[];
+                    const videoSender = senders.find(
+                      (s) => s.track?.kind === "video"
+                    );
+                    if (videoSender && newVideoTrack) {
+                      await videoSender.replaceTrack(newVideoTrack);
+                    }
+                  }
+                }
+
+                // Replace in local stream
+                if (oldVideoTrack) {
+                  localStream.removeTrack(oldVideoTrack);
+                  oldVideoTrack.stop();
+                }
+                localStream.addTrack(newVideoTrack);
+
+                // Update video element
+                if (videoRef.current) {
+                  videoRef.current.srcObject = localStream;
+                }
+
+                // Notify parent component
+                if (onStreamUpdate) {
+                  onStreamUpdate(localStream);
+                }
+              }
+            } catch (error) {
+              console.error("Error changing device:", error);
+            }
+          }}
+        />
+      )}
     </div>,
     document.body
   );
 };
 
-// Separate component for each peer video
-const PeerVideo = ({
-  peer,
-  isMainView,
-}: {
-  peer: PeerData;
-  isMainView: boolean;
-}) => {
-  const peerVideoRef = React.useRef<HTMLVideoElement | null>(null);
-  const [username, setUsername] = React.useState("Unknown User");
-
-  React.useEffect(() => {
-    const fetchUsername = async () => {
-      const name = await getUserName(peer.userId);
-      setUsername(name);
-    };
-
-    fetchUsername();
-  }, [peer.userId]);
-
-  React.useEffect(() => {
-    if (peerVideoRef.current && peer.stream) {
-      peerVideoRef.current.srcObject = peer.stream;
-    }
-  }, [peer]);
-
+const PeerVideos = ({ peers }: { peers: PeerData[] }) => {
   return (
-    <div
-      className={`relative ${
-        isMainView ? "w-full h-full" : "min-h-0"
-      } bg-gray-900 rounded-lg overflow-hidden`}
-    >
-      <video
-        className="w-full h-full object-cover"
-        autoPlay
-        playsInline
-        muted={false}
-        ref={peerVideoRef}
-      />
-      {peer.userId && (
-        <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
-          {username}
+    <div className="absolute inset-0 w-full h-full rounded-lg">
+      {peers && peers.length > 0 ? (
+        <div
+          className={`grid w-full h-full gap-1 ${
+            peers.length === 1
+              ? "grid-cols-1"
+              : peers.length === 2
+              ? "grid-cols-2"
+              : peers.length <= 4
+              ? "grid-cols-2 grid-rows-2"
+              : "grid-cols-3 grid-rows-2"
+          }`}
+        >
+          {peers.map((peer, index) => (
+            <PeerVideo
+              key={peer.userId || index}
+              peer={peer}
+              isMainView={peers.length === 1}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex items-center justify-center w-full h-full bg-gray-100 rounded-lg">
+          <p className="text-base-content/70">
+            Waiting for other participants...
+          </p>
         </div>
       )}
     </div>

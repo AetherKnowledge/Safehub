@@ -260,7 +260,7 @@ export const NotificationBox = ({
       }`}
     >
       <div className="flex flex-row p-3 gap-3">
-        <div className={`flex items-center justify-center flex-shrink-0`}>
+        <div className={`flex items-center justify-center shrink-0`}>
           {notificationTypeToImage(notification.type)}
         </div>
         <div className="flex flex-col gap-1.5 w-full items-start">
@@ -278,7 +278,7 @@ export const NotificationBox = ({
             View Details →
           </Link>
         </div>
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <button
             className="btn btn-ghost btn-sm btn-circle hover:bg-error/10 hover:text-error"
             onClick={onCloseAction}

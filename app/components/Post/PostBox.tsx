@@ -43,9 +43,7 @@ const PostBox = ({
 
       <div
         className={`card-body flex flex-col ${
-          isPopup
-            ? "flex-shrink-0 max-h-[40vh] overflow-y-auto p-6"
-            : "p-6 pt-4"
+          isPopup ? "shrink-0 max-h-[40vh] overflow-y-auto p-6" : "p-6 pt-4"
         }`}
       >
         {/* STATS */}

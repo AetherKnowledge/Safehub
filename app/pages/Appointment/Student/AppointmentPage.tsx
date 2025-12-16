@@ -246,7 +246,7 @@ export async function ThisWeeksAppointments({
     );
 
   return (
-    <div className="scrollbar-gutter:stable overflow-y-auto w-full">
+    <div className="scrollbar-gutter:stable overflow-y-auto w-full min-h-20">
       <table className="w-full">
         <tbody>
           {filteredAppointments.map((appointment) => (

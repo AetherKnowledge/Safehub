@@ -44,7 +44,7 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
           : "hover:bg-base-100 border border-transparent hover:shadow-sm"
       }`}
     >
-      <div className="relative flex-shrink-0">
+      <div className="relative shrink-0">
         <UserImage
           name={chat.name}
           width={10}
@@ -64,7 +64,7 @@ const ChatSidebarUserBox = ({ chat, selected }: Props) => {
             : latestMessage?.content || "No messages yet"}
         </p>
       </div>
-      <div className="flex flex-col justify-center items-end flex-shrink-0">
+      <div className="flex flex-col justify-center items-end shrink-0">
         <p className="text-xs text-base-content/50 whitespace-nowrap">
           {latestMessage ? getRelativeTime(latestMessage.createdAt) : ""}
         </p>

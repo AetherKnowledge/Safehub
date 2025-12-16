@@ -76,7 +76,7 @@ const MoodTrackerBox = ({
 
   return (
     <div
-      className={`${className} bg-base-100 p-2 rounded-lg shadow-br text-center text-base-content`}
+      className={`${className} bg-base-100 p-2 rounded-lg text-center text-base-content`}
     >
       <h2 className="font-semibold text-lg text-base-content px-2">
         Mood Tracking

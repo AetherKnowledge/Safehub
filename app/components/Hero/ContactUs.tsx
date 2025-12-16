@@ -27,7 +27,7 @@ const ContactUs = () => {
             Contact SafeHub
           </h2>
           <p className="mt-3 text-sm md:text-base text-base-content/70 max-w-2xl mx-auto">
-            Reach out to LCUP Social Welfare Services online. Message us on
+            Reach out to LCUP Student Welfare Services online. Message us on
             Facebook or send us an email and we&apos;ll get back to you as soon
             as possible.
           </p>

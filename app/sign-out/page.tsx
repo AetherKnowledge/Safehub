@@ -72,7 +72,7 @@ export default function SignOutPage() {
           </div>
 
           <p className="mt-6 text-[11px] text-center text-base-content/60">
-            Thank you for using SafeHub to stay connected with LCUP Social
+            Thank you for using SafeHub to stay connected with LCUP Student
             Welfare Services.
           </p>
         </motion.div>

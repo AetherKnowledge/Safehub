@@ -57,7 +57,7 @@ const Hero = () => {
             variants={itemVariants}
             className="mb-3 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-6 py-1 text-xs font-medium tracking-[0.2em] uppercase backdrop-blur-sm"
           >
-            LCUP · Social Welfare Services
+            LCUP · Student Welfare Services
           </motion.p>
 
           <motion.h1

@@ -129,7 +129,7 @@ const Staff = () => {
             SWS Staff Members
           </h2>
           <p className="mt-4 max-w-3xl mx-auto text-base md:text-lg text-primary-content/90 leading-relaxed">
-            The Social Welfare Services (SWS) team behind SafeHub is here to
+            The Student Welfare Services (SWS) team behind SafeHub is here to
             listen, support, and guide LCUP students every step of the way.
           </p>
         </motion.div>

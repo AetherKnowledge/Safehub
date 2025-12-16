@@ -80,6 +80,7 @@ const ImageGrid = ({
             <ImageWithFallback
               src={images[currentIndex]}
               alt={`Image ${currentIndex + 1}`}
+              fill
               isPopup={true}
             />
 

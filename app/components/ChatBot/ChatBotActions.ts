@@ -7,6 +7,7 @@ import { Session } from "next-auth";
 
 import { prisma } from "@/prisma/client";
 import { ChatBotChat } from "./ChatBot";
+import { cleanN8nAIOutput } from "./ChatbotUtils";
 
 export type ChatBotResponse = {
   output: string;
@@ -75,7 +76,7 @@ function convertChatBotMessageToChatMessage(
       (chatHistory.message as ChatBotMessage).type === "human"
         ? session.user.id || "user"
         : "chatbot",
-    content: (chatHistory.message as ChatBotMessage).content,
+    content: cleanN8nAIOutput((chatHistory.message as ChatBotMessage).content),
     createdAt: chatHistory.createdAt,
     updatedAt: chatHistory.createdAt,
 

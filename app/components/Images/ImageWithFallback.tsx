@@ -25,7 +25,7 @@ const ImageWithFallback = (
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden rounded-sm">
+    <>
       {/* Loading skeleton */}
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center skeleton z-10">
@@ -50,7 +50,7 @@ const ImageWithFallback = (
           props.onError?.(err);
         }}
       />
-    </div>
+    </>
   );
 };
 

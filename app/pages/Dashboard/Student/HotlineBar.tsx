@@ -2,7 +2,6 @@ import { Hotline } from "@/app/generated/prisma/browser";
 import Link from "next/link";
 import { Suspense } from "react";
 import { SlCallIn } from "react-icons/sl";
-import { Await } from "react-router-dom";
 import { getThreeHotlines as getSomeHotlines } from "../../Hotline/HotlineActions";
 import HotlineSVG from "./HotlineSVG";
 
@@ -29,9 +28,7 @@ const HotlineBar = ({ className }: HotlineBarProps) => {
           <HotlineSVG />
         </div>
         <Suspense fallback={<HotlineTableSkeleton />}>
-          <Await resolve={getSomeHotlines()}>
-            {(hotlines) => <HotlineTable hotlines={hotlines} />}
-          </Await>
+          <HotlineTableLoader />
         </Suspense>
       </div>
     </div>
@@ -51,7 +48,13 @@ const HotlineTableSkeleton = () => {
   );
 };
 
-const HotlineTable = async ({ hotlines }: { hotlines: Hotline[] }) => {
+const HotlineTableLoader = async () => {
+  const hotlines = await getSomeHotlines();
+
+  return <HotlineTable hotlines={hotlines} />;
+};
+
+const HotlineTable = ({ hotlines }: { hotlines: Hotline[] }) => {
   return (
     <>
       {hotlines.length === 0 ? (

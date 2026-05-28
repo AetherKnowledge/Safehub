@@ -1,12 +1,14 @@
-import StorageFileApi from "@supabase/storage-js/dist/module/packages/StorageFileApi";
 import { fileTypeFromBuffer, FileTypeResult } from "file-type";
 import { env } from "next-runtime-env";
 import path from "path";
 import { Buckets } from "./client";
+import type { getBucket } from "./client";
+
+type StorageBucket = ReturnType<typeof getBucket>;
 
 export async function createFile(
   file: File,
-  bucket: StorageFileApi,
+  bucket: StorageBucket,
   bucketName: Buckets,
   filename: string,
   folderPath?: string,
@@ -75,11 +77,11 @@ export function isFileImage(file: File, type: FileTypeResult): boolean {
   return true;
 }
 
-export async function deleteFile(filePath: string, bucket: StorageFileApi) {
+export async function deleteFile(filePath: string, bucket: StorageBucket) {
   await bucket.remove([filePath]);
 }
 
-export async function deleteFolder(folderPath: string, bucket: StorageFileApi) {
+export async function deleteFolder(folderPath: string, bucket: StorageBucket) {
   const items = await bucket.list(folderPath);
   await bucket.remove(
     items.data?.map((item) => folderPath + "/" + item.name) || []
@@ -91,7 +93,7 @@ export async function deleteFolder(folderPath: string, bucket: StorageFileApi) {
 export async function createTemporaryFolder(
   oldFolderPath: string,
   newFolderPath: string,
-  bucket: StorageFileApi,
+  bucket: StorageBucket,
   itemsToCopy: (string | undefined)[] = []
 ) {
   const items = await bucket.list(oldFolderPath);

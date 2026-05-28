@@ -1,25 +1,26 @@
 import { auth } from "@/auth";
-import { Session } from "next-auth";
+import type { Session } from "next-auth";
 import Link from "next/link";
 import { Suspense } from "react";
 import { FaChevronDown } from "react-icons/fa6";
-import { Await } from "react-router";
 import DarkModeToggle from "../DarkModeToggle/DarkModeToggle";
 import UserImage from "../UserImage";
 import SignInButton from "./SignInButton";
 
-const UserButton = async () => {
+const UserButton = () => {
   return (
     <div className="flex items-center gap-2 hover:cursor-pointer">
       <Suspense fallback={<LoadingUserButton />}>
-        <Await resolve={await auth()}>
-          {(session) =>
-            session ? AuthenticatedUserButton(session) : <SignInButton />
-          }
-        </Await>
+        <UserButtonContent />
       </Suspense>
     </div>
   );
+};
+
+const UserButtonContent = async () => {
+  const session = await auth();
+
+  return session ? <AuthenticatedUserButton session={session} /> : <SignInButton />;
 };
 
 const LoadingUserButton = () => {
@@ -36,7 +37,7 @@ const LoadingUserButton = () => {
   );
 };
 
-const AuthenticatedUserButton = (session: Session) => {
+const AuthenticatedUserButton = ({ session }: { session: Session }) => {
   function getFirstName() {
     const name = session?.user?.name?.split(" ");
     if (!name) return "User";

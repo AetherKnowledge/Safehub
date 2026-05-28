@@ -6,3 +6,8 @@ npm-debug.log
 .env.development
 .env.production
 .DS_Store
+SAFEHUB_DOCUMENTATION
+installations
+volumes
+safehub-*-images.tar
+safehub-*-images.txt

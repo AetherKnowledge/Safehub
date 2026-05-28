@@ -1,0 +1,47 @@
+name: safehub-external-supabase
+
+services:
+  safehub:
+    image: aetherknowledge/safehub:latest
+    container_name: safehub
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      TZ: Asia/Manila
+      DATABASE_URL: ${DATABASE_URL}
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      NEXT_PUBLIC_URL: ${NEXT_PUBLIC_URL:-http://localhost:3000}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      AUTH_TRUST_HOST: ${AUTH_TRUST_HOST:-TRUE}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      REDIS_URL: redis
+      REDIS_PORT: 6379
+      NEXT_PUBLIC_N8N_URL: ${NEXT_PUBLIC_N8N_URL:-}
+      N8N_EMAIL_URL: ${N8N_EMAIL_URL:-}
+      NEXT_PUBLIC_SHOW_CLIENT_LOGS: ${NEXT_PUBLIC_SHOW_CLIENT_LOGS:-false}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      TURN_SERVER_URL: ${TURN_SERVER_URL:-}
+      TURN_SERVER_SECRET_KEY: ${TURN_SERVER_SECRET_KEY:-}
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_started
+
+  redis:
+    image: redis:6-alpine
+    container_name: safehub-redis
+    restart: unless-stopped
+    ports:
+      - "11379:6379"
+    volumes:
+      - safehub-external-redis-data:/data
+
+volumes:
+  safehub-external-redis-data:

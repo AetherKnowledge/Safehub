@@ -52,3 +52,6 @@ next-env.d.ts
 /volumes/db/data/
 /volumes/redis/
 /volumes/storage/
+/installations/without-external-supabase/volumes/db/data/
+/installations/without-external-supabase/volumes/redis/
+/installations/without-external-supabase/volumes/storage/

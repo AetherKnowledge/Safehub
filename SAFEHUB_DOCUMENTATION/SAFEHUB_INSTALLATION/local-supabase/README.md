@@ -18,6 +18,29 @@ docker compose up -d
 
 This bundle includes Watchtower. It checks for updates every 300 seconds and only updates containers labeled with the `safehub-local` scope from this Compose file.
 
+## Offline Demo Bundle
+
+To prepare this folder for a machine with no internet or slow internet, run this on a machine that already has internet:
+
+```bat
+create-offline-image-bundle.bat
+```
+
+That creates:
+
+```text
+safehub-local-supabase-images.tar
+safehub-local-supabase-images.txt
+```
+
+Copy this whole folder, including the `.tar`, to the offline machine. On the offline machine, run:
+
+```bat
+load-offline-image-bundle.bat
+```
+
+The load script imports the Docker images and starts the stack with `docker compose up -d`.
+
 Open:
 
 - SafeHub: `http://localhost:3000`

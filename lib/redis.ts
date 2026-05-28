@@ -10,13 +10,19 @@ export const redis = createClient({
 
 redis.on("error", (err) => console.error("Redis Client Error", err));
 
+const closeRedis = async () => {
+  if (redis.isOpen) {
+    await redis.quit();
+  }
+};
+
 process.on("SIGINT", async () => {
-  await redis.quit();
+  await closeRedis();
   process.exit(0);
 });
 
 process.on("SIGTERM", async () => {
-  await redis.quit();
+  await closeRedis();
   process.exit(0);
 });
 

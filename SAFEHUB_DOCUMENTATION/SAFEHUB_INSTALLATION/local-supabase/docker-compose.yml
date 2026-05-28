@@ -1,3 +1,7 @@
+x-watchtower-labels: &watchtower-labels
+  com.centurylinklabs.watchtower.enable: "true"
+  com.centurylinklabs.watchtower.scope: safehub-local
+
 # Usage
 #   Start:              docker compose up
 #   Stop:               docker compose down
@@ -57,6 +61,7 @@ services:
       # Uncomment to use Big Query backend for analytics
       # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
 
+    labels: *watchtower-labels
   kong:
     container_name: supabase-kong
     image: kong:2.8.1
@@ -85,6 +90,7 @@ services:
       DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
     entrypoint: bash -c 'bash /home/kong/render-kong.sh && /docker-entrypoint.sh kong docker-start'
 
+    labels: *watchtower-labels
   auth:
     container_name: supabase-auth
     image: supabase/gotrue:v2.182.1
@@ -175,6 +181,7 @@ services:
       # GOTRUE_HOOK_SEND_EMAIL_URI: "http://host.docker.internal:54321/functions/v1/email_sender"
       # GOTRUE_HOOK_SEND_EMAIL_SECRETS: "v1,whsec_VGhpcyBpcyBhbiBleGFtcGxlIG9mIGEgc2hvcnRlciBCYXNlNjQgc3RyaW5n"
 
+    labels: *watchtower-labels
   rest:
     container_name: supabase-rest
     image: postgrest/postgrest:v13.0.7
@@ -195,6 +202,7 @@ services:
       PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
     command: ["postgrest"]
 
+    labels: *watchtower-labels
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
@@ -240,6 +248,7 @@ services:
       SEED_SELF_HOST: true
       RUN_JANITOR: true
 
+    labels: *watchtower-labels
   storage:
     container_name: supabase-storage
     image: supabase/storage-api:v1.29.0
@@ -284,6 +293,7 @@ services:
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:5001
 
+    labels: *watchtower-labels
   imgproxy:
     container_name: supabase-imgproxy
     image: darthsim/imgproxy:v3.8.0
@@ -301,6 +311,7 @@ services:
       IMGPROXY_USE_ETAG: "true"
       IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
 
+    labels: *watchtower-labels
   meta:
     container_name: supabase-meta
     image: supabase/postgres-meta:v0.93.1
@@ -320,6 +331,7 @@ services:
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
       CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
 
+    labels: *watchtower-labels
   functions:
     container_name: supabase-edge-functions
     image: supabase/edge-runtime:v1.69.23
@@ -339,6 +351,7 @@ services:
       VERIFY_JWT: "${FUNCTIONS_VERIFY_JWT}"
     command: ["start", "--main-service", "/home/deno/functions/main"]
 
+    labels: *watchtower-labels
   analytics:
     container_name: supabase-analytics
     image: supabase/logflare:1.22.6
@@ -380,6 +393,8 @@ services:
       # Uncomment to use Big Query backend for analytics
       # GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
       # GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
+
+    labels: *watchtower-labels
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
@@ -432,6 +447,7 @@ services:
         "log_min_messages=fatal", # prevents Realtime polling queries from appearing in logs
       ]
 
+    labels: *watchtower-labels
   vector:
     container_name: supabase-vector
     image: timberio/vector:0.28.1-alpine
@@ -458,6 +474,8 @@ services:
     command: ["--config", "/etc/vector/vector.yml"]
     security_opt:
       - "label=disable"
+
+    labels: *watchtower-labels
 
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
@@ -513,6 +531,7 @@ services:
         '/app/bin/migrate && /app/bin/supavisor eval "$$(cat /etc/pooler/pooler.exs)" && /app/bin/server',
       ]
 
+    labels: *watchtower-labels
   safehub:
     image: aetherknowledge/safehub:latest
     container_name: safehub
@@ -551,6 +570,7 @@ services:
       safehub-network:
         ipv4_address: 10.0.2.2
 
+    labels: *watchtower-labels
   safehub-beta:
     image: aetherknowledge/safehub:beta
     container_name: safehub-beta
@@ -592,6 +612,7 @@ services:
       safehub-network:
         ipv4_address: 10.0.2.3
 
+    labels: *watchtower-labels
   redis:
     image: redis:6-alpine
     restart: always
@@ -604,6 +625,22 @@ services:
       default:
       safehub-network:
         ipv4_address: 10.0.2.4
+
+    labels: *watchtower-labels
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower:latest
+    container_name: safehub-local-watchtower
+    restart: unless-stopped
+    labels: *watchtower-labels
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command:
+      - --interval
+      - "300"
+      - --cleanup
+      - --label-enable
+      - --scope
+      - safehub-local
 
 networks:
   safehub-network:

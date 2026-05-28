@@ -1,3 +1,7 @@
+x-watchtower-labels: &watchtower-labels
+  com.centurylinklabs.watchtower.enable: "true"
+  com.centurylinklabs.watchtower.scope: safehub-external
+
 name: safehub-external-supabase
 
 services:
@@ -34,6 +38,7 @@ services:
       redis:
         condition: service_started
 
+    labels: *watchtower-labels
   redis:
     image: redis:6-alpine
     container_name: safehub-redis
@@ -42,6 +47,22 @@ services:
       - "11379:6379"
     volumes:
       - safehub-external-redis-data:/data
+
+    labels: *watchtower-labels
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower:latest
+    container_name: safehub-external-watchtower
+    restart: unless-stopped
+    labels: *watchtower-labels
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command:
+      - --interval
+      - "300"
+      - --cleanup
+      - --label-enable
+      - --scope
+      - safehub-external
 
 volumes:
   safehub-external-redis-data:

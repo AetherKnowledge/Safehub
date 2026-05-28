@@ -62,6 +62,17 @@ Email: admin@admin.com
 Password: admin
 ```
 
+## Automatic Image Updates
+
+Both install bundles include Watchtower. It checks for image updates every 300 seconds and removes old images after updating.
+
+Watchtower is scoped and label-limited:
+
+- `local-supabase` uses the `safehub-local` Watchtower scope.
+- `external-supabase` uses the `safehub-external` Watchtower scope.
+
+Only containers labeled inside the selected Compose file are updated. Other Docker containers on the same machine are ignored.
+
 ## Runtime Data
 
 For the local Supabase bundle, Docker runtime data is written under:

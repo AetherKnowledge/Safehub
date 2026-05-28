@@ -16,6 +16,8 @@ Start:
 docker compose up -d
 ```
 
+This bundle includes Watchtower. It checks for updates every 300 seconds and only updates containers labeled with the `safehub-local` scope from this Compose file.
+
 Open:
 
 - SafeHub: `http://localhost:3000`

@@ -1,0 +1,230 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "query": "={{ $json.query ? $json.query : $json.chatInput}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-searxng.searxng",
+      "typeVersion": 1,
+      "position": [-864, 32],
+      "id": "23670ea8-61ac-4627-a4c5-f98a55074d7e",
+      "name": "Searxng",
+      "retryOnFail": true,
+      "credentials": {
+        "searxngApi": {
+          "id": "A63JpJeRMI6CIQg1",
+          "name": "Searxng account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "results",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [-640, 32],
+      "id": "f0290f01-0f79-4b43-98e1-f136c1d8cbfe",
+      "name": "Split Search Results"
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [-400, 32],
+      "id": "95878721-bd41-43c2-a218-55dda7306e8e",
+      "name": "Limit Search Results"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://10.0.1.17:11235/md",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.url }}\",\n  \"f\": \"bm25\",\n  \"q\": \"{{ $('Workflow').isExecuted ? $('Workflow').item.json.key_words || $('Searxng').item.json.query : $('Searxng').item.json.query }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-144, 32],
+      "id": "e3dd95d6-9e60-4663-b5cd-14d7b4f21385",
+      "name": "Crawl Search URLs1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [-1136, -112],
+      "id": "3f9ed154-3ad5-4e21-9962-03619c316c6c",
+      "name": "When chat message received",
+      "webhookId": "71cad817-9783-4f63-9e7d-248a84331db8"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "searchResults",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [272, 32],
+      "id": "895e5cbb-974e-45bd-bbbc-52f5b9d61424",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1a80196e-2efc-4cbb-a8ab-e64babf5b4af",
+              "name": "url",
+              "value": "={{ $('Limit Search Results').item.json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "8f427225-716b-4b29-9033-41a82b33fcc4",
+              "name": "markdown",
+              "value": "={{ $json.markdown }}",
+              "type": "string"
+            },
+            {
+              "id": "af5103b9-e787-4637-a017-27f0bf85b55b",
+              "name": "title",
+              "value": "={{ $('Limit Search Results').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "29c99cc0-6255-4a5c-9b2c-c494f56a3656",
+              "name": "content",
+              "value": "={{ $('Limit Search Results').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "865da321-5e20-48d4-a36c-b0b31a2ad1af",
+              "name": "snippet",
+              "value": "={{ $('Limit Search Results').item.json.snippet }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [80, 32],
+      "id": "1b8ea67b-6433-48da-bae6-85c4020c3954",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query"
+            },
+            {
+              "name": "key_words"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [-1136, 32],
+      "id": "6a5a0e6b-9b8f-4810-a620-e41c711191db",
+      "name": "Workflow",
+      "notes": "This will do a web search and crawl 5 of the top results and return the data from them."
+    }
+  ],
+  "connections": {
+    "Searxng": {
+      "main": [
+        [
+          {
+            "node": "Split Search Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Search Results": {
+      "main": [
+        [
+          {
+            "node": "Limit Search Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit Search Results": {
+      "main": [
+        [
+          {
+            "node": "Crawl Search URLs1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crawl Search URLs1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Searxng",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow": {
+      "main": [
+        [
+          {
+            "node": "Searxng",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7fc30f38356fda40fff2fc6d10e307de836daf21551b1e95636cc8b91e644756"
+  }
+}

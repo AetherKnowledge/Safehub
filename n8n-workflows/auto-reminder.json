@@ -1,0 +1,1226 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-1840, 112],
+      "id": "d0b9d934-1dc9-4749-b936-eef9fb04343d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "getTimeBetweenDates",
+        "startDate": "={{ new Date() }}",
+        "endDate": "={{ new Date($('getAppointments').item.json.startTime) }}",
+        "units": ["day", "hour"],
+        "outputFieldName": "startTimeDifference",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [-1440, 112],
+      "id": "44c2eeb7-7834-4aef-b4cd-6f7d20f8677e",
+      "name": "Day difference"
+    },
+    {
+      "parameters": {
+        "operation": "getTimeBetweenDates",
+        "startDate": "={{ $('getAppointments').item.json.createdAt }}",
+        "endDate": "={{ $('getAppointments').item.json.startTime }}",
+        "units": ["day", "hour"],
+        "outputFieldName": "createdAtDifference",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [-1232, 112],
+      "id": "dab8852e-2193-48a7-be9a-f8d455ca788f",
+      "name": "CreatedAtDifference"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1131a930-bd8b-49d0-b3c4-fd7ac338537b",
+              "leftValue": "={{ $json.createdAtDifference.days }}",
+              "rightValue": 7,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "8053a6c1-e79c-47e5-8096-89cb96576119",
+              "leftValue": "={{ $('Day difference').item.json.startTimeDifference.days }}",
+              "rightValue": 7,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-1008, 0],
+      "id": "17649072-0448-4a97-a38b-41d1ab4fd1fc",
+      "name": "Week Difference"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1131a930-bd8b-49d0-b3c4-fd7ac338537b",
+              "leftValue": "={{ $json.createdAtDifference.days }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "751ba8e7-b592-4d65-835c-eea61db37061",
+              "leftValue": "={{ $('Day difference').item.json.startTimeDifference.days }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-832, 144],
+      "id": "90b304be-acdf-44d5-8482-50c5819ea694",
+      "name": "Day Difference"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1131a930-bd8b-49d0-b3c4-fd7ac338537b",
+              "leftValue": "={{ $json.createdAtDifference.hours }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "615b66e3-b939-417a-9c32-34a7e0a10464",
+              "leftValue": "={{ $('Day difference').item.json.startTimeDifference.hours }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-512, 432],
+      "id": "d4664016-caa6-4d74-9940-531ccaa312cb",
+      "name": "Hour Difference"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Appointment",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "startTime",
+              "condition": "gt",
+              "keyValue": "={{ (new Date).toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [-1632, 112],
+      "id": "db9bc129-8c8b-4007-a26c-f369122ff235",
+      "name": "getAppointments",
+      "credentials": {
+        "supabaseApi": {
+          "id": "WzmTeiErePQAsluG",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1131a930-bd8b-49d0-b3c4-fd7ac338537b",
+              "leftValue": "={{ $json.createdAtDifference.hours }}",
+              "rightValue": 6,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "615b66e3-b939-417a-9c32-34a7e0a10464",
+              "leftValue": "={{ $('Day difference').item.json.startTimeDifference.hours }}",
+              "rightValue": 6,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-672, 288],
+      "id": "215c79e9-2602-4716-ba0e-6cc82ea98dcb",
+      "name": "6 Hour Difference"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e64047da-7612-42a7-b69a-18978662c522",
+              "leftValue": "={{ $json.createdAt }}",
+              "rightValue": "",
+              "operator": {
+                "type": "dateTime",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-64, 128],
+      "id": "8f04e7b3-6f99-407b-9db8-8699e039e184",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Notification",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "type",
+              "condition": "eq",
+              "keyValue": "AppointmentReminder"
+            },
+            {
+              "keyName": "data",
+              "condition": "fullText",
+              "searchFunction": "fts",
+              "keyValue": "={{ $('getAppointments').item.json.id }}"
+            },
+            {
+              "keyName": "data",
+              "condition": "fullText",
+              "searchFunction": "fts",
+              "keyValue": "ONE_DAY"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [-272, 128],
+      "id": "99e7d6e1-9ada-40c7-a23f-19ee5330c929",
+      "name": "checkOneDayNotification",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "WzmTeiErePQAsluG",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "Notification",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "type",
+              "fieldValue": "AppointmentReminder"
+            },
+            {
+              "fieldId": "userId",
+              "fieldValue": "={{ $('getAppointments').item.json.studentId }}"
+            },
+            {
+              "fieldId": "data",
+              "fieldValue": "={{ {\n  appointmentId: $('getAppointments').item.json.id,\n  data: $json.type\n} }}"
+            },
+            {
+              "fieldId": "createdAt",
+              "fieldValue": "={{ $now }}"
+            },
+            {
+              "fieldId": "updatedAt",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [528, 144],
+      "id": "cbc9552c-74ce-4945-8464-fcf90fb9c32b",
+      "name": "Create Notification for Student",
+      "credentials": {
+        "supabaseApi": {
+          "id": "WzmTeiErePQAsluG",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "Notification",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "type",
+              "fieldValue": "AppointmentReminder"
+            },
+            {
+              "fieldId": "userId",
+              "fieldValue": "={{ $('getAppointments').item.json.counselorId }}"
+            },
+            {
+              "fieldId": "data",
+              "fieldValue": "={{ {\n  appointmentId: $('getAppointments').item.json.id,\n  data: $json.type\n} }}"
+            },
+            {
+              "fieldId": "createdAt",
+              "fieldValue": "={{ $now }}"
+            },
+            {
+              "fieldId": "updatedAt",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [768, 144],
+      "id": "b6ad0d41-df16-42c3-a0a0-7372bd23d5de",
+      "name": "Create Notification for Counselor",
+      "credentials": {
+        "supabaseApi": {
+          "id": "WzmTeiErePQAsluG",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e64047da-7612-42a7-b69a-18978662c522",
+              "leftValue": "={{ $json.createdAt }}",
+              "rightValue": "",
+              "operator": {
+                "type": "dateTime",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-64, -16],
+      "id": "339b26c7-f8e3-492e-8c8a-ef3858949eaa",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Notification",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "type",
+              "condition": "eq",
+              "keyValue": "AppointmentReminder"
+            },
+            {
+              "keyName": "data",
+              "condition": "fullText",
+              "searchFunction": "fts",
+              "keyValue": "={{ $('getAppointments').item.json.id }}"
+            },
+            {
+              "keyName": "data",
+              "condition": "fullText",
+              "searchFunction": "fts",
+              "keyValue": "ONE_WEEK"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [-272, -16],
+      "id": "8f8f4e0f-1ce0-44cc-9b7b-504aaf0af6d7",
+      "name": "checkOneWeekNotification",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "WzmTeiErePQAsluG",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e64047da-7612-42a7-b69a-18978662c522",
+              "leftValue": "={{ $json.createdAt }}",
+              "rightValue": "",
+              "operator": {
+                "type": "dateTime",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-64, 272],
+      "id": "16412710-71cf-4965-bb30-362c76074951",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Notification",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "type",
+              "condition": "eq",
+              "keyValue": "AppointmentReminder"
+            },
+            {
+              "keyName": "data",
+              "condition": "fullText",
+              "searchFunction": "fts",
+              "keyValue": "={{ $('getAppointments').item.json.id }}"
+            },
+            {
+              "keyName": "data",
+              "condition": "fullText",
+              "searchFunction": "fts",
+              "keyValue": "SIX_HOUR"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [-272, 272],
+      "id": "cf44a26f-d9f4-4330-8daf-22ed12413a18",
+      "name": "checkSixHourNotification",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "WzmTeiErePQAsluG",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e64047da-7612-42a7-b69a-18978662c522",
+              "leftValue": "={{ $json.createdAt }}",
+              "rightValue": "",
+              "operator": {
+                "type": "dateTime",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-64, 416],
+      "id": "3afe0f16-52c1-42d8-9454-217549695c93",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Notification",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "type",
+              "condition": "eq",
+              "keyValue": "AppointmentReminder"
+            },
+            {
+              "keyName": "data",
+              "condition": "fullText",
+              "searchFunction": "fts",
+              "keyValue": "={{ $('getAppointments').item.json.id }}"
+            },
+            {
+              "keyName": "data",
+              "condition": "fullText",
+              "searchFunction": "fts",
+              "keyValue": "ONE_HOUR"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [-272, 416],
+      "id": "99dc14f8-4a4f-4ccd-9cb4-02115f21ed1e",
+      "name": "checkOneHourNotification1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "WzmTeiErePQAsluG",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9846c72e-0650-4479-b59a-ca1be2c06ede",
+              "name": "type",
+              "value": "AppointmentReminder",
+              "type": "string"
+            },
+            {
+              "id": "511fb8d5-79c7-47c8-9fa5-ec5a52469410",
+              "name": "url",
+              "value": "https://safehub-lcup.uk",
+              "type": "string"
+            },
+            {
+              "id": "e035a1ec-b357-46b9-a8f2-e28d69f27237",
+              "name": "title",
+              "value": "Appointment Reminder",
+              "type": "string"
+            },
+            {
+              "id": "6b55116c-1ddc-4da2-b8d8-6aae38817277",
+              "name": "schedDate",
+              "value": "={{ $('Date Formatter').item.json.formattedDate }}",
+              "type": "string"
+            },
+            {
+              "id": "1ae02b02-cec2-4693-b8fb-2f4036fd0471",
+              "name": "schedTime",
+              "value": "={{ $('Time Formatter').item.json.formattedTime }}",
+              "type": "string"
+            },
+            {
+              "id": "a34d40cc-540f-4c5b-a11f-67a582dc5374",
+              "name": "studentEmail",
+              "value": "={{ $('Get Student').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "eb8ba957-5fb9-4665-8c32-dff78f6eb52d",
+              "name": "counselorEmail",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "63ed3e98-90da-4b83-a6d8-02f79c6f13cd",
+              "name": "studentName",
+              "value": "={{ $('Get Student').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "2e426c8d-633c-4bab-9d2f-02c6ef302d82",
+              "name": "counselorName",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "e76f62fe-2989-4c47-9acd-2cc7e593e077",
+              "name": "mode",
+              "value": "={{ $('getAppointments').item.json.sessionPreference }}",
+              "type": "string"
+            },
+            {
+              "id": "43dfba8e-c61c-41aa-8d07-cdc6713c61ab",
+              "name": "remainingDate",
+              "value": "={{ $('OneWeek').isExecuted ? \"1 Week\" : \n   $('OneDay').isExecuted ? \"1 Day\" :\n   $('SixHours').isExecuted ? \"6 Hours\" :\n   \"1 Hour\"\n}}",
+              "type": "string"
+            },
+            {
+              "id": "7be86469-60cc-4b5c-a883-91f7621f4ac2",
+              "name": "status",
+              "value": "={{ $('getAppointments').item.json.status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1872, 144],
+      "id": "00e9dd9b-6af5-436f-b8a0-003b3e838c94",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ new Date(\n    new Date($('getAppointments').item.json.startTime).toLocaleString(\"en-US\", { timeZone: \"Asia/Manila\" })\n  ).toISOString() }}",
+        "format": "MMMM dd yyyy",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [976, 144],
+      "id": "73d65468-2a1e-4b99-a781-d38d2ae6d02e",
+      "name": "Date Formatter"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ new Date(\n    new Date($('getAppointments').item.json.startTime).toLocaleString(\"en-US\", { timeZone: \"Asia/Manila\" })\n  ).toISOString() }}",
+        "format": "custom",
+        "customFormat": "hh:ss a",
+        "outputFieldName": "formattedTime",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [1200, 144],
+      "id": "7078e8e1-fe96-4951-a6cf-a825fdd5fc25",
+      "name": "Time Formatter"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "User",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('getAppointments').item.json.studentId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1408, 144],
+      "id": "4eb3432d-2c4a-4084-9b19-8fd36d58edf8",
+      "name": "Get Student",
+      "credentials": {
+        "supabaseApi": {
+          "id": "WzmTeiErePQAsluG",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "User",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('getAppointments').item.json.counselorId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1632, 144],
+      "id": "5dd25647-9291-49f7-99db-bd5e3dd0bbe0",
+      "name": "Get Counselor",
+      "credentials": {
+        "supabaseApi": {
+          "id": "WzmTeiErePQAsluG",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Bq52zGmY2I0fqXle",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Bq52zGmY2I0fqXle",
+          "cachedResultName": "Safehub Email Sender"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [2096, 144],
+      "id": "d65be159-07cc-4b1c-b10a-ff3f6179456d",
+      "name": "Call 'Safehub Email Sender'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35e4831a-70cf-400d-a020-b1b4d972524d",
+              "name": "type",
+              "value": "ONE_WEEK",
+              "type": "string"
+            },
+            {
+              "id": "64e5f058-f453-453c-a072-ffa6ed04328a",
+              "name": "remainingDate",
+              "value": "One Week",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [160, -16],
+      "id": "14e022dd-cafd-4e49-bc20-825a45afb060",
+      "name": "OneWeek"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35e4831a-70cf-400d-a020-b1b4d972524d",
+              "name": "type",
+              "value": "ONE_DAY",
+              "type": "string"
+            },
+            {
+              "id": "8ddea882-1394-447d-8571-9c3c4c26798d",
+              "name": "remainingDate",
+              "value": "One Day",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [160, 128],
+      "id": "0ed876b2-c6c7-47ea-bff6-c32876f9f73b",
+      "name": "OneDay"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35e4831a-70cf-400d-a020-b1b4d972524d",
+              "name": "type",
+              "value": "SIX_HOUR",
+              "type": "string"
+            },
+            {
+              "id": "b66c645a-1e1a-4f76-9cc1-1fae8cc20f48",
+              "name": "remainingDate",
+              "value": "Six Hours",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [160, 272],
+      "id": "e1053f27-264e-412a-813f-a406da0a4ffc",
+      "name": "SixHours"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35e4831a-70cf-400d-a020-b1b4d972524d",
+              "name": "type",
+              "value": "ONE_HOUR",
+              "type": "string"
+            },
+            {
+              "id": "c4b55ae7-385a-4db5-9125-6bb18dff1155",
+              "name": "remainingDate",
+              "value": "One Hour",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [160, 416],
+      "id": "58207374-682a-4a0a-b9e6-2f33fb20a2f4",
+      "name": "OneHour"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "getAppointments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Day difference": {
+      "main": [
+        [
+          {
+            "node": "CreatedAtDifference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CreatedAtDifference": {
+      "main": [
+        [
+          {
+            "node": "Week Difference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Week Difference": {
+      "main": [
+        [
+          {
+            "node": "checkOneWeekNotification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Day Difference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Day Difference": {
+      "main": [
+        [
+          {
+            "node": "checkOneDayNotification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "6 Hour Difference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hour Difference": {
+      "main": [
+        [
+          {
+            "node": "checkOneHourNotification1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getAppointments": {
+      "main": [
+        [
+          {
+            "node": "Day difference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6 Hour Difference": {
+      "main": [
+        [
+          {
+            "node": "checkSixHourNotification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Hour Difference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "OneDay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "checkOneDayNotification": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Notification for Student": {
+      "main": [
+        [
+          {
+            "node": "Create Notification for Counselor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Notification for Counselor": {
+      "main": [
+        [
+          {
+            "node": "Date Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "OneWeek",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "checkOneWeekNotification": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "SixHours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "checkSixHourNotification": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "OneHour",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "checkOneHourNotification1": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Call 'Safehub Email Sender'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date Formatter": {
+      "main": [
+        [
+          {
+            "node": "Time Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Time Formatter": {
+      "main": [
+        [
+          {
+            "node": "Get Student",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Student": {
+      "main": [
+        [
+          {
+            "node": "Get Counselor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Counselor": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OneWeek": {
+      "main": [
+        [
+          {
+            "node": "Create Notification for Student",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OneDay": {
+      "main": [
+        [
+          {
+            "node": "Create Notification for Student",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SixHours": {
+      "main": [
+        [
+          {
+            "node": "Create Notification for Student",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OneHour": {
+      "main": [
+        [
+          {
+            "node": "Create Notification for Student",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7fc30f38356fda40fff2fc6d10e307de836daf21551b1e95636cc8b91e644756"
+  }
+}

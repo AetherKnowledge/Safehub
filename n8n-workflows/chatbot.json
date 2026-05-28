@@ -1,0 +1,534 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Mapped Data').item.json.sessionId }}",
+        "tableName": "ChatHistory"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [0, 208],
+      "id": "eb30c4b3-821f-4a3d-bb14-15386f7fa3d8",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "3jEr2GjXFSiSp8h5",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://n8n.safehub-lcup.uk/mcp/ai-tools",
+        "include": "selected",
+        "includeTools": "={{ $('Mapped Data').item.json.tools }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [128, 208],
+      "id": "76301d94-aa26-46fe-9560-06215322c1ea",
+      "name": "Tools"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35c11012-cd29-4dbb-a074-6e2edc4e2514",
+              "name": "message",
+              "value": "={{ ($('Chatbot Webhook').isExecuted && $('Chatbot Webhook').item.json.body.message) || $('When chat message received').item.json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "9c98856e-814c-462f-82ac-f91285823d3d",
+              "name": "sessionId",
+              "value": "={{ ($('Chatbot Webhook').isExecuted && $('Chatbot Webhook').item.json.jwtPayload.sub) || $('When chat message received').item.json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "59aed1da-e32f-4bcc-8964-15466a4c5749",
+              "name": "tools",
+              "value": "={{\n  $('Get Settings').item.json.isMCPOn\n    ? $('Get Settings').item.json.tools.replace(/[{}]/g, \"\").split(\",\")\n        .map(s => s.trim())\n        .concat(\"Calculator\")\n    : [\"Calculator\"]\n}}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-352, -32],
+      "id": "183107f5-3c3f-4262-8ae3-1409e2a6cb40",
+      "name": "Mapped Data"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [480, 64],
+      "id": "0a3e2c1d-89b4-40f6-8f7b-6f0893625173",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "description": "Searches the web using the provided query, retrieves the top five results, crawls each page for relevant content. Use SearchResults tool after using this.",
+        "workflowId": {
+          "__rl": true,
+          "value": "hvhjYmXy8JA7r4j2",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hvhjYmXy8JA7r4j2",
+          "cachedResultName": "Search and Crawl"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('query', ``, 'string') }}",
+            "key_words": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('key_words', `This must be a text separated with spaces if your query is for example current weather in the philippines the keywords must be \"weather philippines\"`, 'string') }}"
+          },
+          "matchingColumns": ["query"],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "key_words",
+              "displayName": "key_words",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [592, 64],
+      "id": "2b19cbe6-77b5-4bdf-8452-a67f7efec52d",
+      "name": "WebSearch"
+    },
+    {
+      "parameters": {
+        "path": "ai-tools"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [784, -160],
+      "id": "7556f6c1-350b-4bc4-99de-68116d913f86",
+      "name": "Safehub Tools",
+      "webhookId": "000b8b21-3f50-482c-b33d-33deb0914d3a",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:v1.5"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [1184, 336],
+      "id": "d1d057b3-688c-4ac7-b516-e8d5f512f020",
+      "name": "Ollama Embedding1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "nXL1jL8ghBn4MDlE",
+          "name": "ServerPC"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [-144, 208],
+      "id": "01460796-2624-4033-8591-88f389c89bce",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IwbvoV1ZWW9BeHei",
+          "name": "Gemini JC Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "safehub",
+        "authentication": "jwtAuth",
+        "responseMode": "streaming",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-992, -32],
+      "id": "7fff13bc-03e9-4b5a-85b7-98bbe0f22e83",
+      "name": "Chatbot Webhook",
+      "webhookId": "8c9d1afc-f539-45c5-bacb-8233330b437c",
+      "credentials": {
+        "jwtAuth": {
+          "id": "GEfOsVRErLGseTW8",
+          "name": "Safehub"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [-992, 112],
+      "id": "2cd5cbe2-b7b3-46d3-adc8-19929e8dc175",
+      "name": "When chat message received",
+      "webhookId": "b439f14d-3ac2-4052-affe-fd99f84bcafc"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Mapped Data').item.json.message }}",
+        "options": {
+          "systemMessage": "={{ $('Get Preset').item.json.prompt }}\n\n---\n\n## Primary Goals\n\n{{ $('Get Preset').item.json.tasks }}\n\n---\n\n## Available Tools\n\nYou are only allowed to use tools that are explicitly listed below.  \nDo **not** use or mention any other tools not included here.\n\n**Available Tools:**\n{{ $('Mapped Data').item.json.tools.map(item => \"- \" + item).join(\"\\n\") }}\n\nIf a user requests something that requires a tool not listed here, respond with:\n> \"Sorry, I don’t have access to that tool right now.\"\n\nAlways follow this rule strictly.\n\n## Tool Usage Rules & Fallback Logic\n\nThe SafeHub AI Assistant should use tools **strategically and hierarchically**.  \nIf one tool fails, the assistant will check others based on context.\n\n---\n\n### 1. General Multi-Tool Rule\n\nIf a user requests multiple types of data (e.g., “show recent events and give hotline numbers”),  \n→ Call **each relevant tool separately** (e.g., `GetPosts` + `GetHotlines`).  \nDo **not** skip any requested tool.\n\n---\n\n### 📚 2. When to Use Each Tool\n\n| Scenario | Primary Tool | Fallback 1 | Fallback 2 |\n|-----------|---------------|-------------|-------------|\n| **Campus announcements, articles, or tips** | GetPosts | WebSearch | QueryVault |\n| **Events, internal policies, guidelines, documents** | QueryVault | GetPosts | WebSearch |\n| **External, factual, or trending info** | WebSearch | GetPosts | QueryVault |\n| **Emergency help or support numbers** | GetHotlines | (none – always use) | — |\n| **Calculations or logical reasoning** | Calculator | — | — |\n\n---\n\n### 3. Success Checking Logic\n\nAfter each tool call:\n\n- If the tool returns **clear and relevant** results → Use them in your answer.  \n- If the tool returns **empty or irrelevant** output →  \n  → Automatically **fallback** to the next tool in its hierarchy (see table above).  \n- If **all tools fail**, respond compassionately:  \n  > “I couldn’t find specific information on that right now, but I can share some general guidance.”\n\n---\n\n### 💡 4. Context Priority\n\nIf both **WebSearch** and **QueryVault** could apply, **prefer QueryVault** for:\n- Campus events  \n- Uploaded guidelines  \n- Internal documents  \n- School programs or policies  \n\nUse **WebSearch** only if the question refers to something outside SafeHub or the school environment.\n\n---\n\n## General Behavior\n\n{{ $('Get Preset').item.json.rules }}\n{{ $('Get Preset').item.json.limits }}\n\n---\n\n",
+          "enableStreaming": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [-96, -32],
+      "id": "765fd691-c99e-4771-990e-c04265f1e306",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "AiSettings",
+          "mode": "list",
+          "cachedResultName": "AiSettings"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-784, -32],
+      "id": "379bbabb-b29e-4eaf-bd19-ff092a1f69f3",
+      "name": "Get Settings",
+      "credentials": {
+        "postgres": {
+          "id": "3jEr2GjXFSiSp8h5",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "AiPreset",
+          "mode": "list",
+          "cachedResultName": "AiPreset"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.presetId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [-560, -32],
+      "id": "d4f25c5c-e0a5-4df3-b007-88e96f9cd925",
+      "name": "Get Preset",
+      "credentials": {
+        "postgres": {
+          "id": "3jEr2GjXFSiSp8h5",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to retrieve announcements, articles, tips, wellness resources, or updates from SafeHub’s websites when the user is asking for information hosted on the platform.",
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "Post",
+          "mode": "list",
+          "cachedResultName": "Post"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [768, 128],
+      "id": "c242ca67-8990-4813-8d30-08e7379bfd0c",
+      "name": "GetPosts",
+      "credentials": {
+        "postgres": {
+          "id": "3jEr2GjXFSiSp8h5",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to fetch hotline contact details from SafeHub’s websites when the user needs emergency support, crisis helplines, or counseling contact information.",
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "Hotline",
+          "mode": "list",
+          "cachedResultName": "Hotline"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [864, 128],
+      "id": "c9336c3a-14b0-4609-8bdc-ab591863e2a3",
+      "name": "GetHotlines",
+      "credentials": {
+        "postgres": {
+          "id": "3jEr2GjXFSiSp8h5",
+          "name": "Local Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use this knowledge base to answer questions from the user",
+        "tableName": "documents",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [1168, 112],
+      "id": "aa60104c-b79b-4f6d-a656-f97ff86aff42",
+      "name": "QueryVault",
+      "credentials": {
+        "postgres": {
+          "id": "3jEr2GjXFSiSp8h5",
+          "name": "Local Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tools": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mapped Data": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "Safehub Tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WebSearch": {
+      "ai_tool": [
+        [
+          {
+            "node": "Safehub Tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Embedding1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "QueryVault",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chatbot Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Get Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [[]]
+    },
+    "Get Settings": {
+      "main": [
+        [
+          {
+            "node": "Get Preset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Preset": {
+      "main": [
+        [
+          {
+            "node": "Mapped Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetPosts": {
+      "ai_tool": [
+        [
+          {
+            "node": "Safehub Tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetHotlines": {
+      "ai_tool": [
+        [
+          {
+            "node": "Safehub Tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QueryVault": {
+      "ai_tool": [
+        [
+          {
+            "node": "Safehub Tools",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7fc30f38356fda40fff2fc6d10e307de836daf21551b1e95636cc8b91e644756"
+  }
+}

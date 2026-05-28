@@ -1,4 +1,4 @@
-# SafeHub Install: With External Supabase
+# SafeHub Install: External Supabase
 
 Use this folder when Supabase is already hosted elsewhere, such as Supabase Cloud or another server. This Compose file runs only SafeHub and Redis.
 

@@ -1,4 +1,4 @@
-# SafeHub Install: Without External Supabase
+# SafeHub Install: Local Supabase
 
 Use this folder when you want Docker Compose to run SafeHub, Redis, and the full self-hosted Supabase stack together.
 

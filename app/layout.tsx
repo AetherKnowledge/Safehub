@@ -3,6 +3,7 @@ import NotificationProvider from "@/lib/NotificationProvider";
 import type { Metadata, Viewport } from "next";
 import { PublicEnvScript } from "next-runtime-env";
 import { Inter, Manrope } from "next/font/google";
+import Script from "next/script";
 import AuthProvider from "../lib/auth/AuthProvider";
 import SocketProvider from "../lib/socket/SocketProvider";
 import ChatBotProvider from "./components/ChatBot/ChatBotProvider";
@@ -216,11 +217,25 @@ export default async function RootLayout({
 }>) {
   const session = await auth();
   const darkMode = session?.user?.darkMode ?? false;
+  const showClientLogs =
+    process.env.NEXT_PUBLIC_SHOW_CLIENT_LOGS?.toLowerCase() === "true";
 
   return (
     <html lang="en" data-theme={darkMode ? "lcup-dark" : "light"}>
       <head>
         <PublicEnvScript />
+        <Script
+          id="client-console-log-gate"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.__SAFEHUB_ORIGINAL_CONSOLE_LOG__ = console.log.bind(console);
+              if (${showClientLogs ? "true" : "false"} !== true) {
+                console.log = function () {};
+              }
+            `,
+          }}
+        />
       </head>
       <body className={`${inter.variable} antialiased`}>
         <div className="h-screen text-base-content">

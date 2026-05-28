@@ -28,7 +28,7 @@ The app is built around role-based access:
 
 ## Architecture Overview
 
-SafeHub is a Next.js application backed by PostgreSQL through Prisma. It can run with a self-hosted Supabase stack using `installations/local-supabase`, or it can connect to an externally hosted Supabase project such as Supabase Cloud using `installations/external-supabase`.
+SafeHub is a Next.js application backed by PostgreSQL through Prisma. It can run with a self-hosted Supabase stack using `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase`, or it can connect to an externally hosted Supabase project such as Supabase Cloud using `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/external-supabase`.
 
 In the full local Docker setup, Supabase services, Redis, and SafeHub share one Docker network. The SafeHub container connects to Postgres through the internal `db` service name and Redis through the internal `redis` service name. On startup, the app applies Prisma migrations and runs the seed once, using `public."AppSeedState"` to avoid reseeding on every boot.
 
@@ -64,9 +64,9 @@ For local development with `pnpm dev`, create your root environment file:
 cp .env.example .env
 ```
 
-The root `.env.example` is intentionally small and only contains the values needed by the SafeHub app when it runs on your host machine. Docker deployment examples live inside the `installations/` folders.
+The root `.env.example` is intentionally small and only contains the values needed by the SafeHub app when it runs on your host machine. Docker deployment examples live inside `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION`.
 
-The `installations/external-supabase` and `installations/local-supabase` folders are designed to be copied as standalone deployment bundles. Copy the folder you need, create its `.env` from the local `.env.example`, then run `docker compose up -d` from inside that folder.
+The `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/external-supabase` and `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase` folders are designed to be copied as standalone deployment bundles. Copy the folder you need, create its `.env` from the local `.env.example`, then run `docker compose up -d` from inside that folder.
 
 Important values:
 
@@ -83,7 +83,7 @@ Important values:
 This runs SafeHub, Redis, and a self-hosted Supabase stack in one Docker network. Use this when you want the whole system locally or on a single server.
 
 ```bash
-cd installations/local-supabase
+cd SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase
 cp .env.example .env
 ```
 
@@ -133,7 +133,7 @@ docker compose down -v
 Use this when Supabase is hosted somewhere else, such as Supabase Cloud or another server. This compose file runs only SafeHub and Redis.
 
 ```bash
-cd installations/external-supabase
+cd SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/external-supabase
 cp .env.example .env
 ```
 
@@ -164,7 +164,7 @@ You can still use Docker for the database/Supabase services and run Next.js on y
 Start the local infrastructure:
 
 ```bash
-cd installations/local-supabase
+cd SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase
 cp .env.example .env
 docker compose up -d db kong auth rest realtime storage imgproxy meta functions analytics vector supavisor studio redis
 ```
@@ -181,7 +181,7 @@ NEXT_PUBLIC_SUPABASE_URL=http://localhost:10000
 Install dependencies and prepare the database:
 
 ```bash
-cd ../..
+cd ../../..
 pnpm install
 pnpm prisma generate
 pnpm prisma migrate deploy
@@ -193,17 +193,17 @@ Open `http://localhost:3000`.
 
 ## Docker Files
 
-- `installations/local-supabase/docker-compose.yml`: full local SafeHub + Supabase + Redis stack.
-- `installations/local-supabase/.env.example`: env template for the full self-hosted stack.
-- `installations/external-supabase/docker-compose.yml`: SafeHub + Redis only, for external Supabase.
-- `installations/external-supabase/.env.example`: env template for Supabase Cloud or another external Supabase.
+- `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/docker-compose.yml`: full local SafeHub + Supabase + Redis stack.
+- `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/.env.example`: env template for the full self-hosted stack.
+- `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/external-supabase/docker-compose.yml`: SafeHub + Redis only, for external Supabase.
+- `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/external-supabase/.env.example`: env template for Supabase Cloud or another external Supabase.
 - `Dockerfile`: builds the SafeHub app image.
-- `installations/local-supabase/volumes/api/kong.yml`: Kong routes for the self-hosted Supabase API.
-- `installations/local-supabase/volumes/api/render-kong.sh`: renders Kong secrets safely without breaking YAML quoting.
-- `installations/local-supabase/volumes/functions/main/index.ts`: minimal Edge Functions entrypoint required by the self-hosted stack.
+- `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/api/kong.yml`: Kong routes for the self-hosted Supabase API.
+- `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/api/render-kong.sh`: renders Kong secrets safely without breaking YAML quoting.
+- `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/functions/main/index.ts`: minimal Edge Functions entrypoint required by the self-hosted stack.
 
 ## Notes
 
-- Runtime data is ignored under `installations/local-supabase/volumes/db/data`, `installations/local-supabase/volumes/redis`, and `installations/local-supabase/volumes/storage`.
-- The committed files under `installations/local-supabase/volumes/api`, `installations/local-supabase/volumes/db`, `installations/local-supabase/volumes/functions`, `installations/local-supabase/volumes/logs`, and `installations/local-supabase/volumes/pooler` are required for the self-hosted Supabase compose stack.
+- Runtime data is ignored under `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/db/data`, `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/redis`, and `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/storage`.
+- The committed files under `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/api`, `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/db`, `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/functions`, `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/logs`, and `SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/pooler` are required for the self-hosted Supabase compose stack.
 - Production deployments should use strong generated secrets, real SMTP settings, configured Google OAuth credentials, and HTTPS public URLs.

@@ -1,39 +1,73 @@
-# 🎓 SafeHub
+# SafeHub Installation
 
-A capstone project built for **La Consolacion University Philippines (LCUP)** that streamlines the **student counseling and development process**.  
-The system allows students to **book appointments, attend video counseling sessions, view announcements, and chat with an AI chatbot when no human counselor is available.**  
+This folder contains copyable Docker deployment bundles for SafeHub.
 
----
+Choose one:
 
-## 🚀 Features
+- `local-supabase`: runs SafeHub, Redis, and a self-hosted Supabase stack in one Docker Compose project.
+- `external-supabase`: runs only SafeHub and Redis, then connects to Supabase Cloud or another external Supabase instance.
 
-- **📅 Appointment Booking**  
-  Powered by **Supabase** for real-time database management and scheduling.  
+## Local Supabase
 
-- **🎥 Video Call Integration**  
-  Uses **WebRTC** for secure peer-to-peer video counseling sessions.  
+Use this option when you want everything hosted together.
 
-- **📰 Posts & Announcements**  
-  Admins and counselors can publish important updates for students.  
+```bash
+cd SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase
+cp .env.example .env
+docker compose up -d
+```
 
-- **🤖 AI Chatbot Support**  
-  Integrated with **n8n workflows** and **Ollama models** to provide instant, automated support when no counselor is online.  
+Open:
 
-- **🔒 Authentication & User Roles**  
-  Handled via **NextAuth + Supabase Auth**:  
-  - **Students** → Book sessions, join calls, chat with the AI, view posts  
-  - **Counselors** → Manage availability, accept/reject bookings, host video calls  
-  - **Admins** → Manage users, monitor bookings, publish announcements  
+- SafeHub: `http://localhost:3000`
+- Supabase Studio / Kong: `http://localhost:10000`
+- Postgres from host: `localhost:10432`
+- Redis from host: `localhost:11379`
 
----
+Before production, edit `.env` and replace the placeholder secrets, passwords, URLs, and keys.
 
-## 🏗️ Tech Stack
+## External Supabase
 
-- **Frontend:** Next.js (React, TypeScript) + Tailwind CSS / DaisyUI  
-- **Backend:** Supabase (Postgres + Auth + Realtime)  
-- **Authentication:** NextAuth.js + Supabase Auth  
-- **Video Calls:** WebRTC  
-- **Chatbot & Automation:** n8n + Ollama  
-- **Deployment:** Vercel (frontend), Supabase Cloud (backend), Docker (for n8n & Ollama)  
+Use this option when Supabase is already hosted elsewhere.
 
----
+```bash
+cd SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/external-supabase
+cp .env.example .env
+docker compose up -d
+```
+
+Set these values in `.env` from your Supabase project:
+
+- `DATABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_JWT_SECRET`
+
+## Startup Behavior
+
+The SafeHub container runs database setup automatically on startup:
+
+```bash
+pnpm prisma migrate deploy
+pnpm prisma db seed
+```
+
+The seed is guarded by `public."AppSeedState"`, so it only runs once unless the database is reset or that seed state is changed.
+
+Default seeded admin account:
+
+```text
+Email: admin@admin.com
+Password: admin
+```
+
+## Runtime Data
+
+For the local Supabase bundle, Docker runtime data is written under:
+
+- `local-supabase/volumes/db/data`
+- `local-supabase/volumes/redis`
+- `local-supabase/volumes/storage`
+
+These paths are ignored by git.

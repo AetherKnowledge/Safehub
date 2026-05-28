@@ -1,11 +1,12 @@
 node_modules
 npm-debug.log
-.next/cache
+.next
 .env
 .env.local
 .env.development
 .env.production
 .DS_Store
+*.tsbuildinfo
 SAFEHUB_DOCUMENTATION
 installations
 volumes

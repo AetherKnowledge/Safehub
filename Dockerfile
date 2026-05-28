@@ -36,18 +36,21 @@ WORKDIR /app
 
 # Install OpenSSL
 RUN apt-get update -y && apt-get install -y openssl
+RUN corepack enable && corepack prepare pnpm@10.12.4 --activate
 
 # Copy only what we need for production
-COPY --from=builder /app/package.json /app/package-lock.json ./
+COPY --from=builder /app/package.json /app/package-lock.json /app/pnpm-lock.yaml ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/next.config.ts ./next.config.ts
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/app/generated/prisma ./generated/prisma
+COPY --from=builder /app/scripts ./scripts
 
 # Expose the port your Next.js app runs on
 EXPOSE 3000
 
 # Run the app
-CMD ["npx", "npm", "start"]
+CMD ["node", "scripts/docker-start.mjs"]

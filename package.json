@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"next dev\" \"npx prisma studio --browser none\"",
+    "dev": "next-ws patch --yes && concurrently \"next dev\" \"npx prisma studio --browser none\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -55,6 +55,7 @@
     "tailwind-merge": "^3.4.0",
     "tailwind-variants": "^3.2.2",
     "tailwindcss-displaymodes": "^1.0.8",
+    "tsx": "^4.22.3",
     "uuid": "^13.0.0",
     "ws": "^8.18.3"
   },

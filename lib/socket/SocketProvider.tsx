@@ -5,7 +5,6 @@ import {
   SocketEvent,
   SocketEventType,
 } from "@/lib/socket/SocketEvents";
-import { env } from "next-runtime-env";
 import {
   createContext,
   ReactNode,
@@ -38,10 +37,10 @@ export const useSocket = () => {
 
 const SocketProvider = ({ children }: Prop) => {
   const url = useMemo(() => {
-    return () =>
-      env("NEXT_PUBLIC_URL")?.startsWith("https")
-        ? `wss://${window.location.host}/api/user/socket`
-        : `ws://${window.location.host}/api/user/socket`;
+    return () => {
+      const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+      return `${protocol}://${window.location.host}/api/user/socket`;
+    };
   }, []);
   const { socket } = useWebSocket(url, {
     reconnect: true,

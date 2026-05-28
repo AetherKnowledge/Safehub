@@ -1,6 +1,5 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { env } from "next-runtime-env";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 // TODO: Stop from disconnecting when moving out of the page, and instead only disconnect when logging out
@@ -20,10 +19,10 @@ interface UseWebSocketReturn {
 }
 
 export function useWebSocket(
-  urlFn: () => string = () =>
-    env("NEXT_PUBLIC_URL")?.startsWith("https")
-      ? `wss://${window.location.host}/api/user/socket`
-      : `ws://${window.location.host}/api/user/socket`,
+  urlFn: () => string = () => {
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    return `${protocol}://${window.location.host}/api/user/socket`;
+  },
   options: UseWebSocketOptions = {}
 ): UseWebSocketReturn {
   const {
@@ -53,7 +52,8 @@ export function useWebSocket(
       return;
     }
 
-    const socket = new WebSocket(urlFn());
+    const socketUrl = urlFn();
+    const socket = new WebSocket(socketUrl);
     socket.onopen = () => {
       setIsConnected(true);
       setError(null);
@@ -61,13 +61,14 @@ export function useWebSocket(
       console.log("[WebSocket] Connected");
     };
     socket.onclose = (event) => {
-      console.log("[WebSocket] Closed", event);
-      console.log(event.code, event.reason);
       setIsConnected(false);
       socketRef.current = null;
       if (event.code !== 1000) {
-        // Only set error if the closure was not intentional (code 1000 means normal closure)
-        console.log("WebSocket connection closed unexpectedly.");
+        console.warn(
+          `[WebSocket] Closed unexpectedly: ${socketUrl} (code: ${event.code}, reason: ${
+            event.reason || "none"
+          })`
+        );
       }
       if (
         reconnect &&
@@ -89,7 +90,11 @@ export function useWebSocket(
       }
     };
     socket.onerror = (event) => {
-      console.error("[WebSocket] Error:", event);
+      console.warn("[WebSocket] Connection error:", {
+        url: socketUrl,
+        readyState: socket.readyState,
+        type: event.type,
+      });
       setError("WebSocket encountered an error.");
     };
     socketRef.current = socket;

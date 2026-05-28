@@ -240,7 +240,7 @@ export default async function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <div className="h-screen text-base-content">
           <PopupProvider>
-            <AuthProvider>
+            <AuthProvider session={session}>
               <SocketProvider>
                 <CallPopupProvider>
                   <NotificationProvider>

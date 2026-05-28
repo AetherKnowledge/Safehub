@@ -30,20 +30,53 @@ const ChatBotProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const loadData = async () => {
-      if (!session || session.data?.user.deactivated) return;
-
-      setLoading(true);
-      const history = await getChatBotHistory();
-      setMessages(history);
+    if (
+      session.status !== "authenticated" ||
+      !session.data?.user.id ||
+      session.data.user.deactivated
+    ) {
+      setMessages([]);
       setLoading(false);
+      return;
+    }
+
+    let ignore = false;
+
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const history = await getChatBotHistory();
+        if (!ignore) setMessages(history);
+      } catch (error) {
+        if (!ignore) {
+          console.error("Failed to load chatbot history:", error);
+          setMessages([]);
+        }
+      } finally {
+        if (!ignore) setLoading(false);
+      }
     };
+
     loadData();
-  }, [session]);
+
+    return () => {
+      ignore = true;
+    };
+  }, [
+    session.status,
+    session.data?.user.id,
+    session.data?.user.deactivated,
+  ]);
 
   const sendMessage = useCallback(
     async (content: string) => {
-      if (!session || session.data?.user.deactivated) return;
+      if (
+        session.status !== "authenticated" ||
+        !session.data?.user.id ||
+        session.data.user.deactivated
+      ) {
+        return;
+      }
 
       // Add the user's message immediately
       setMessages((prevMessages) => [

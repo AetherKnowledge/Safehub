@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Chrome, Lock, LogIn, Mail } from "lucide-react";
+import { ArrowLeft, Chrome, Eye, EyeOff, Lock, LogIn, Mail } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import ErrorPopup from "../components/Popup/ErrorPopup";
 
@@ -14,11 +14,13 @@ const containerVariants = {
 
 export default function SignInPage() {
   const session = useSession();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = "/user/dashboard";
   const error = searchParams.get("error");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   if (session.data) {
@@ -48,9 +50,27 @@ export default function SignInPage() {
     }
   }
 
+  function handleBack() {
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/");
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-100 px-4 py-10 text-base-content">
       <div className="w-full max-w-md">
+        <button
+          type="button"
+          onClick={handleBack}
+          className="btn btn-ghost btn-sm mb-4 -ml-2 flex items-center gap-2"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          <span>Back</span>
+        </button>
+
         <motion.div
           className="rounded-3xl bg-base-100 border border-base-300 shadow-xl px-6 py-8 sm:px-8 sm:py-10"
           initial="hidden"
@@ -84,9 +104,9 @@ export default function SignInPage() {
               >
                 Email
               </label>
-              <div className="relative">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-base-content/50">
-                  <Mail size={16} className="text-base-content/60" />
+              <div className="relative flex items-center">
+                <span className="pointer-events-none absolute left-4 z-10 flex items-center text-base-content/60">
+                  <Mail size={18} strokeWidth={2} aria-hidden="true" />
                 </span>
                 <input
                   id="email"
@@ -95,7 +115,7 @@ export default function SignInPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="input input-bordered w-full pl-9 text-sm"
+                  className="input input-bordered w-full pl-12 text-sm"
                   placeholder="you@example.com"
                 />
               </div>
@@ -108,20 +128,32 @@ export default function SignInPage() {
               >
                 Password
               </label>
-              <div className="relative">
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-base-content/50">
-                  <Lock size={16} className="text-base-content/60" />
+              <div className="relative flex items-center">
+                <span className="pointer-events-none absolute left-4 z-10 flex items-center text-base-content/60">
+                  <Lock size={18} strokeWidth={2} aria-hidden="true" />
                 </span>
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input input-bordered w-full pl-9 text-sm"
+                  className="input input-bordered w-full pl-12 pr-12 text-sm"
                   placeholder="••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((current) => !current)}
+                  className="btn btn-ghost btn-xs absolute right-2 z-10 min-h-8 h-8 w-8 p-0 text-base-content/60 hover:text-base-content"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff size={18} strokeWidth={2} aria-hidden="true" />
+                  ) : (
+                    <Eye size={18} strokeWidth={2} aria-hidden="true" />
+                  )}
+                </button>
               </div>
             </div>
 

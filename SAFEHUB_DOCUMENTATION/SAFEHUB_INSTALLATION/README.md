@@ -7,6 +7,20 @@ Choose one:
 - `local-supabase`: runs SafeHub, Redis, and a self-hosted Supabase stack in one Docker Compose project.
 - `external-supabase`: runs only SafeHub and Redis, then connects to Supabase Cloud or another external Supabase instance.
 
+## Prerequisite: Docker
+
+Install Docker before using either bundle.
+
+- Windows: install Docker Desktop, start it, and wait until it says Docker is running.
+- Linux: install Docker Engine and the Docker Compose plugin.
+
+Check that Docker works:
+
+```bash
+docker --version
+docker compose version
+```
+
 ## Local Supabase
 
 Use this option when you want everything hosted together.

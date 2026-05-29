@@ -29,11 +29,14 @@ create-offline-image-bundle.bat
 That creates:
 
 ```text
-safehub-local-supabase-images.tar
-safehub-local-supabase-images.txt
+containers/
+  safehub-local-supabase-images.txt
+  one .tar file per Docker image
 ```
 
-Copy this whole folder, including the `.tar`, to the offline machine. On the offline machine, run:
+If you run `create-offline-image-bundle.bat` again later, it pulls the latest images and overwrites the existing `.tar` files in `containers/`, so the offline bundle is updated in place.
+
+Copy this whole folder, including `containers/`, to the offline machine. On the offline machine, run:
 
 ```bat
 load-offline-image-bundle.bat

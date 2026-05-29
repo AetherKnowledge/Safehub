@@ -3,8 +3,10 @@ setlocal EnableExtensions EnableDelayedExpansion
 
 cd /d "%~dp0"
 
-set "BUNDLE=safehub-local-supabase-images.tar"
-set "IMAGE_LIST=safehub-local-supabase-images.txt"
+set "CONTAINERS_DIR=containers"
+set "IMAGE_LIST=%CONTAINERS_DIR%\safehub-local-supabase-images.txt"
+
+if not exist "%CONTAINERS_DIR%" mkdir "%CONTAINERS_DIR%"
 
 echo [SafeHub] Pulling images from docker-compose.yml...
 docker compose pull
@@ -20,28 +22,38 @@ if errorlevel 1 (
   exit /b 1
 )
 
-set "IMAGES="
+set "COUNT=0"
+
 for /f "usebackq delims=" %%I in ("%IMAGE_LIST%") do (
-  if not "%%I"=="" set "IMAGES=!IMAGES! "%%I""
+  if not "%%I"=="" (
+    set /a COUNT+=1
+    set "IMAGE=%%I"
+    set "FILE=!IMAGE:/=_!"
+    set "FILE=!FILE::=_!"
+    set "FILE=!FILE:@=_!"
+    set "FILE=!FILE:\=_!"
+    set "TARGET=%CONTAINERS_DIR%\!FILE!.tar"
+
+    echo [SafeHub] Saving %%I...
+    if exist "!TARGET!" del /f /q "!TARGET!"
+    docker save -o "!TARGET!" "%%I"
+    if errorlevel 1 (
+      echo [SafeHub] Failed to save %%I.
+      exit /b 1
+    )
+  )
 )
 
-if "%IMAGES%"=="" (
+if "%COUNT%"=="0" (
   echo [SafeHub] No images found.
   exit /b 1
 )
 
-echo [SafeHub] Saving images to %BUNDLE%...
-docker save -o "%BUNDLE%" %IMAGES%
-if errorlevel 1 (
-  echo [SafeHub] Failed to save Docker image bundle.
-  exit /b 1
-)
-
 echo.
-echo [SafeHub] Offline image bundle created:
-echo   %CD%\%BUNDLE%
+echo [SafeHub] Offline container image files updated in:
+echo   %CD%\%CONTAINERS_DIR%
 echo.
-echo Copy this folder and %BUNDLE% to the offline machine.
+echo Copy this whole folder to the offline machine.
 echo On the offline machine, run:
 echo   load-offline-image-bundle.bat
 

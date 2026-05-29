@@ -57,3 +57,6 @@ next-env.d.ts
 /SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/volumes/storage/
 /SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/*-images.tar
 /SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/*-images.txt
+/SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/containers/*.tar
+/SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/containers/*.txt
+!/SAFEHUB_DOCUMENTATION/SAFEHUB_INSTALLATION/local-supabase/containers/.gitkeep
